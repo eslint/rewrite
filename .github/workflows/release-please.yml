@@ -1,0 +1,71 @@
+on:
+    push:
+        branches:
+            - main
+
+name: release-please
+
+permissions:
+    contents: write
+    pull-requests: write
+    id-token: write
+
+jobs:
+    release-please:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: GoogleCloudPlatform/release-please-action@v4
+              id: release
+              with:
+                  token: ${{secrets.GITHUB_TOKEN}}
+
+            # Output which releases were created
+            - run: echo "A release was created."
+              if: ${{ steps.release.outputs.releases_created }}
+
+            # Check to see if we need to do any releases and if so check out the repo
+            - uses: actions/checkout@v4
+              if: ${{ steps.release.outputs.releases_created }}
+
+            # Node.js release
+            - uses: actions/setup-node@v4
+              if: ${{ steps.release.outputs.releases_created }}
+              with:
+                  node-version: lts/*
+                  registry-url: "https://registry.npmjs.org"
+
+            - run: npm ci
+              if: ${{ steps.release.outputs.releases_created }}
+
+            #-----------------------------------------------------------------------------
+            # @eslint/objects-schema
+            #-----------------------------------------------------------------------------
+
+            - name: Publish @eslint/object-schema package to npm
+              run: npm publish -w packages/object-schema
+              if: ${{ steps.release.outputs['packages/object-schema--release_created'] }}
+              env:
+                  NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+
+            - name: Publish @eslint/object-schema package to JSR
+              run: |
+                npm run build --if-present
+                npx jsr publish
+              working-directory: packages/object-schema
+              if: ${{ steps.release.outputs['packages/object-schema--release_created'] }}
+
+            - name: Tweet Release Announcement
+              run: npx @humanwhocodes/tweet "@eslint/object-schema v${{ steps.release.outputs['packages/object-schema--major'] }}.${{ steps.release.outputs['packages/core--minor'] }}.${{ steps.release.outputs['packages/core--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/v${{ steps.release.outputs['packages/core--tag_name'] }}"
+              if: ${{ steps.release.outputs['packages/object-schema--release_created'] }}
+              env:
+                TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
+                TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
+                TWITTER_ACCESS_TOKEN_KEY: ${{ secrets.TWITTER_ACCESS_TOKEN_KEY }}
+                TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+            
+            - name: Toot Release Announcement
+              run: npx @humanwhocodes/toot "@eslint/object-schema v${{ steps.release.outputs['packages/object-schema--major'] }}.${{ steps.release.outputs['packages/object-schema--minor'] }}.${{ steps.release.outputs['packages/object-schema--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/v${{ steps.release.outputs['packages/object-schema--tag_name'] }}"'
+              if: ${{ steps.release.outputs['packages/object-schema--release_created'] }}
+              env:
+                MASTODON_ACCESS_TOKEN: ${{ secrets.MASTODON_ACCESS_TOKEN }}
+                MASTODON_HOST: ${{ secrets.MASTODON_HOST }}

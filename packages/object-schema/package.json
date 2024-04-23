@@ -1,0 +1,54 @@
+{
+  "name": "@eslint/object-schema",
+  "version": "2.0.3",
+  "description": "An object schema merger/validator",
+  "type": "module",
+  "exports": {
+    "require": {
+      "types": "./dist/cjs/index.d.cts",
+      "default": "./dist/cjs/index.cjs"
+    },
+    "import": {
+      "types": "./dist/esm/index.d.ts",
+      "default": "./dist/esm/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "build": "rollup -c && tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json",
+    "prepare": "npm run build",
+    "test": "mocha tests/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eslint/rewrite.git"
+  },
+  "keywords": [
+    "object",
+    "validation",
+    "schema",
+    "merge"
+  ],
+  "author": "Nicholas C. Zakas",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/eslint/rewrite/issues"
+  },
+  "homepage": "https://github.com/eslint/rewrite#readme",
+  "devDependencies": {
+    "mocha": "^10.4.0",
+    "rollup": "^4.16.2",
+    "typescript": "^5.4.5",
+    "rollup-plugin-copy": "^3.5.0"
+  },
+  "engines": {
+    "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
+  }
+}
