@@ -23,8 +23,9 @@
   },
   "homepage": "https://github.com/eslint/rewrite#readme",
   "scripts": {
-    "build": "rollup -c",
-    "prepare": "npm run build",
+    "build:dedupe-types": "node ../../tools/dedupe-types.js dist/cjs/index.cjs dist/esm/index.js", 
+    "build": "rollup -c && npm run build:dedupe-types && tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json",
+    "pretest": "npm run build",
     "test": "mocha tests/"
   },
   "keywords": [
@@ -39,10 +40,11 @@
     "minimatch": "^3.0.5"
   },
   "devDependencies": {
+    "@types/minimatch": "^3.0.5",
     "mocha": "^10.4.0",
     "rollup": "^4.16.2",
-    "typescript": "^5.4.5",
-    "rollup-plugin-copy": "^3.5.0"
+    "rollup-plugin-copy": "^3.5.0",
+    "typescript": "^5.4.5"
   },
   "engines": {
     "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
