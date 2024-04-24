@@ -1,3 +1,4 @@
 {
-  "packages/object-schema": "2.0.3"
+  "packages/object-schema": "2.0.3",
+  "packages/config-array": "0.30.0"
 }

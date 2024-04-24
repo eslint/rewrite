@@ -38,7 +38,7 @@ jobs:
               if: ${{ steps.release.outputs.releases_created }}
 
             #-----------------------------------------------------------------------------
-            # @eslint/objects-schema
+            # @eslint/object-schema
             #-----------------------------------------------------------------------------
 
             - name: Publish @eslint/object-schema package to npm
@@ -55,7 +55,7 @@ jobs:
               if: ${{ steps.release.outputs['packages/object-schema--release_created'] }}
 
             - name: Tweet Release Announcement
-              run: npx @humanwhocodes/tweet "@eslint/object-schema v${{ steps.release.outputs['packages/object-schema--major'] }}.${{ steps.release.outputs['packages/core--minor'] }}.${{ steps.release.outputs['packages/core--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/v${{ steps.release.outputs['packages/core--tag_name'] }}"
+              run: npx @humanwhocodes/tweet "@eslint/object-schema v${{ steps.release.outputs['packages/object-schema--major'] }}.${{ steps.release.outputs['packages/object-schema--minor'] }}.${{ steps.release.outputs['packages/object-schema--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/v${{ steps.release.outputs['packages/object-schema--tag_name'] }}"
               if: ${{ steps.release.outputs['packages/object-schema--release_created'] }}
               env:
                 TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
@@ -66,6 +66,39 @@ jobs:
             - name: Toot Release Announcement
               run: npx @humanwhocodes/toot "@eslint/object-schema v${{ steps.release.outputs['packages/object-schema--major'] }}.${{ steps.release.outputs['packages/object-schema--minor'] }}.${{ steps.release.outputs['packages/object-schema--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/v${{ steps.release.outputs['packages/object-schema--tag_name'] }}"'
               if: ${{ steps.release.outputs['packages/object-schema--release_created'] }}
+              env:
+                MASTODON_ACCESS_TOKEN: ${{ secrets.MASTODON_ACCESS_TOKEN }}
+                MASTODON_HOST: ${{ secrets.MASTODON_HOST }}
+
+            #-----------------------------------------------------------------------------
+            # @eslint/config-array
+            #-----------------------------------------------------------------------------
+
+            - name: Publish @eslint/config-array package to npm
+              run: npm publish -w packages/config-array
+              if: ${{ steps.release.outputs['packages/config-array--release_created'] }}
+              env:
+                  NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+
+            - name: Publish @eslint/config-array package to JSR
+              run: |
+                npm run build --if-present
+                npx jsr publish
+              working-directory: packages/config-array
+              if: ${{ steps.release.outputs['packages/config-array--release_created'] }}
+
+            - name: Tweet Release Announcement
+              run: npx @humanwhocodes/tweet "@eslint/config-array v${{ steps.release.outputs['packages/config-array--major'] }}.${{ steps.release.outputs['packages/config-array--minor'] }}.${{ steps.release.outputs['packages/config-array--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/v${{ steps.release.outputs['packages/config-array--tag_name'] }}"
+              if: ${{ steps.release.outputs['packages/config-array--release_created'] }}
+              env:
+                TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
+                TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
+                TWITTER_ACCESS_TOKEN_KEY: ${{ secrets.TWITTER_ACCESS_TOKEN_KEY }}
+                TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+            
+            - name: Toot Release Announcement
+              run: npx @humanwhocodes/toot "@eslint/config-array v${{ steps.release.outputs['packages/config-array--major'] }}.${{ steps.release.outputs['packages/config-array--minor'] }}.${{ steps.release.outputs['packages/config-array--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/v${{ steps.release.outputs['packages/config-array--tag_name'] }}"'
+              if: ${{ steps.release.outputs['packages/config-array--release_created'] }}
               env:
                 MASTODON_ACCESS_TOKEN: ${{ secrets.MASTODON_ACCESS_TOKEN }}
                 MASTODON_HOST: ${{ secrets.MASTODON_HOST }}

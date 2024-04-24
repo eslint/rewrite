@@ -1,0 +1,50 @@
+{
+  "name": "@eslint/config-array",
+  "version": "0.12.3",
+  "description": "Glob-based configuration matching.",
+  "author": "Nicholas C. Zakas",
+  "type": "module",
+  "exports": {
+    "require": {
+      "types": "./dist/cjs/index.d.cts",
+      "default": "./dist/cjs/index.cjs"
+    },
+    "import": {
+      "types": "./dist/esm/index.d.ts",
+      "default": "./dist/esm/index.js"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eslint/rewrite.git"
+  },
+  "bugs": {
+    "url": "https://github.com/eslint/rewrite/issues"
+  },
+  "homepage": "https://github.com/eslint/rewrite#readme",
+  "scripts": {
+    "build": "rollup -c",
+    "prepare": "npm run build",
+    "test": "mocha tests/"
+  },
+  "keywords": [
+    "configuration",
+    "configarray",
+    "config file"
+  ],
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@eslint/object-schema": "^2.0.3",
+    "debug": "^4.3.1",
+    "minimatch": "^3.0.5"
+  },
+  "devDependencies": {
+    "mocha": "^10.4.0",
+    "rollup": "^4.16.2",
+    "typescript": "^5.4.5",
+    "rollup-plugin-copy": "^3.5.0"
+  },
+  "engines": {
+    "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
+  }
+}
