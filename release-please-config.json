@@ -3,6 +3,16 @@
   "plugins": ["node-workspace"],
   "bump-minor-pre-major": true,
   "packages": {
+    "packages/compat": {
+      "release-type": "node",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "jsr.json",
+          "jsonpath": "$.version"
+        }
+      ]
+    },
     "packages/object-schema": {
       "release-type": "node",
       "extra-files": [
