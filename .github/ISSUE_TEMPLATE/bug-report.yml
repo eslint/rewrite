@@ -9,6 +9,10 @@ body:
       attributes:
           label: Which packages are affected?
           options:
+              - label: "`@eslint/compat`"
+                required: false
+              - label: "`@eslint/config-array`"
+                required: false
               - label: "`@eslint/object-schema`"
                 required: false
     - type: textarea

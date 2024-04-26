@@ -38,6 +38,45 @@ jobs:
               if: ${{ steps.release.outputs.releases_created }}
 
             #-----------------------------------------------------------------------------
+            # NOTE: Packages are released in order of dependency. The packages with the
+            # fewest internal dependencies are released first and the packages with the
+            # most internal dependencies are released last.
+            #-----------------------------------------------------------------------------
+
+            #-----------------------------------------------------------------------------
+            # @eslint/compat
+            #-----------------------------------------------------------------------------
+
+            - name: Publish @eslint/compat package to npm
+              run: npm publish -w packages/compat
+              if: ${{ steps.release.outputs['packages/compat--release_created'] }}
+              env:
+                  NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+
+            - name: Publish @eslint/compat package to JSR
+              run: |
+                npm run build --if-present
+                npx jsr publish
+              working-directory: packages/compat
+              if: ${{ steps.release.outputs['packages/compat--release_created'] }}
+
+            - name: Tweet Release Announcement
+              run: npx @humanwhocodes/tweet "@eslint/compat v${{ steps.release.outputs['packages/compat--major'] }}.${{ steps.release.outputs['packages/compat--minor'] }}.${{ steps.release.outputs['packages/compat--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/v${{ steps.release.outputs['packages/compat--tag_name'] }}"
+              if: ${{ steps.release.outputs['packages/compat--release_created'] }}
+              env:
+                TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
+                TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
+                TWITTER_ACCESS_TOKEN_KEY: ${{ secrets.TWITTER_ACCESS_TOKEN_KEY }}
+                TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+            
+            - name: Toot Release Announcement
+              run: npx @humanwhocodes/toot "@eslint/compat v${{ steps.release.outputs['packages/compat--major'] }}.${{ steps.release.outputs['packages/compat--minor'] }}.${{ steps.release.outputs['packages/compat--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/v${{ steps.release.outputs['packages/compat--tag_name'] }}"'
+              if: ${{ steps.release.outputs['packages/compat--release_created'] }}
+              env:
+                MASTODON_ACCESS_TOKEN: ${{ secrets.MASTODON_ACCESS_TOKEN }}
+                MASTODON_HOST: ${{ secrets.MASTODON_HOST }}
+
+                #-----------------------------------------------------------------------------
             # @eslint/object-schema
             #-----------------------------------------------------------------------------
 
