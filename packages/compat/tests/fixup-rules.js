@@ -19,11 +19,7 @@ import { Linter } from "eslint";
 // Data
 //-----------------------------------------------------------------------------
 
-const REPLACEMENT_METHODS = [
-	"getScope",
-	"getAncestors",
-	"getDeclaredVariables",
-];
+const REPLACEMENT_METHODS = ["getScope", "getAncestors"];
 
 //-----------------------------------------------------------------------------
 // Tests
@@ -81,8 +77,80 @@ describe("@eslint/backcompat", () => {
 			assert.strictEqual(fixedUpRule, fixedUpRule2);
 		});
 
+		it("should create a rule where getDeclaredVariables() returns the same value as sourceCode.getDeclaredVariables(node)", () => {
+			const rule = {
+				create(context) {
+					const { sourceCode } = context;
+
+					return {
+						Program(node) {
+							const result = context.getDeclaredVariables(node);
+							const expected =
+								sourceCode.getDeclaredVariables(node);
+							assert.deepStrictEqual(result, expected);
+							context.report(node, "Program");
+						},
+
+						FunctionDeclaration(node) {
+							const result = context.getDeclaredVariables(node);
+							const expected =
+								sourceCode.getDeclaredVariables(node);
+							assert.deepStrictEqual(result, expected);
+							context.report(node, "FunctionDeclaration");
+						},
+
+						ArrowFunctionExpression(node) {
+							const result = context.getDeclaredVariables(node);
+							const expected =
+								sourceCode.getDeclaredVariables(node);
+							assert.deepStrictEqual(result, expected);
+							context.report(node, "ArrowFunctionExpression");
+						},
+
+						Identifier(node) {
+							const result = context.getDeclaredVariables(node);
+							const expected =
+								sourceCode.getDeclaredVariables(node);
+							assert.deepStrictEqual(result, expected);
+							context.report(node, "Identifier");
+						},
+					};
+				},
+			};
+
+			const config = {
+				plugins: {
+					test: {
+						rules: {
+							"test-rule": fixupRule(rule),
+						},
+					},
+				},
+				rules: {
+					"test/test-rule": "error",
+				},
+			};
+
+			const linter = new Linter();
+			const code = "var foo = () => 123; function bar() { return 123; }";
+			const messages = linter.verify(code, config, {
+				filename: "test.js",
+			});
+
+			assert.deepStrictEqual(
+				messages.map(message => message.message),
+				[
+					"Program",
+					"Identifier",
+					"ArrowFunctionExpression",
+					"FunctionDeclaration",
+					"Identifier",
+				],
+			);
+		});
+
 		REPLACEMENT_METHODS.forEach(method => {
-			it(`should create a rule where context.${method}() returns the same value as sourceCode.${method}(node)`, () => {
+			it(`should create a rule where context.${method}() returns the same value as sourceCode.${method}(node) in visitor methods`, () => {
 				const rule = {
 					create(context) {
 						const { sourceCode } = context;
@@ -147,6 +215,103 @@ describe("@eslint/backcompat", () => {
 						"ArrowFunctionExpression",
 						"FunctionDeclaration",
 						"Identifier",
+					],
+				);
+			});
+
+			it(`should create a rule where context.${method}() returns the same value as sourceCode.${method}(node) in code path methods`, () => {
+				const rule = {
+					create(context) {
+						const sourceCode = context.sourceCode;
+
+						return {
+							onCodePathSegmentLoop(
+								fromSegment,
+								toSegment,
+								node,
+							) {
+								const result = context[method]();
+								const expected = sourceCode[method](node);
+								assert.deepStrictEqual(result, expected);
+								context.report(node, "onCodePathSegmentLoop");
+							},
+
+							onCodePathStart(codePath, node) {
+								const result = context[method]();
+								const expected = sourceCode[method](node);
+								assert.deepStrictEqual(result, expected);
+								context.report(node, "onCodePathStart");
+							},
+
+							onCodePathEnd(codePath, node) {
+								const result = context[method]();
+								const expected = sourceCode[method](node);
+								assert.deepStrictEqual(result, expected);
+								context.report(node, "onCodePathEnd");
+							},
+
+							onCodePathSegmentStart(segment, node) {
+								const result = context[method]();
+								const expected = sourceCode[method](node);
+								assert.deepStrictEqual(result, expected);
+								context.report(node, "onCodePathSegmentStart");
+							},
+
+							onCodePathSegmentEnd(segment, node) {
+								const result = context[method]();
+								const expected = sourceCode[method](node);
+								assert.deepStrictEqual(result, expected);
+								context.report(node, "onCodePathSegmentEnd");
+							},
+						};
+					},
+				};
+
+				const config = {
+					plugins: {
+						test: {
+							rules: {
+								"test-rule": fixupRule(rule),
+							},
+						},
+					},
+					rules: {
+						"test/test-rule": "error",
+					},
+				};
+
+				const linter = new Linter();
+				const code =
+					"var foo = () => 123; function bar() { for (const x of y) { foo(); } }";
+				const messages = linter.verify(code, config, {
+					filename: "test.js",
+				});
+
+				assert.deepStrictEqual(
+					messages.map(message => message.message),
+					[
+						"onCodePathStart",
+						"onCodePathSegmentStart",
+						"onCodePathSegmentEnd",
+						"onCodePathEnd",
+						"onCodePathStart",
+						"onCodePathSegmentStart",
+						"onCodePathSegmentEnd",
+						"onCodePathEnd",
+						"onCodePathStart",
+						"onCodePathSegmentStart",
+						"onCodePathSegmentEnd",
+						"onCodePathEnd",
+						"onCodePathSegmentLoop",
+						"onCodePathSegmentEnd",
+						"onCodePathSegmentStart",
+						"onCodePathSegmentEnd",
+						"onCodePathSegmentStart",
+						"onCodePathSegmentEnd",
+						"onCodePathSegmentStart",
+						"onCodePathSegmentLoop",
+						"onCodePathSegmentEnd",
+						"onCodePathSegmentStart",
 					],
 				);
 			});

@@ -32,6 +32,7 @@ const removedMethodNames = new Map([
 	["getSource", "getText"],
 	["getSourceLines", "getLines"],
 	["getAllComments", "getAllComments"],
+	["getDeclaredVariables", "getDeclaredVariables"],
 	["getNodeByRangeIndex", "getNodeByRangeIndex"],
 	["getCommentsBefore", "getCommentsBefore"],
 	["getCommentsAfter", "getCommentsAfter"],
@@ -125,10 +126,6 @@ export function fixupRule(ruleDefinition) {
 				return sourceCode.getAncestors(currentNode);
 			},
 
-			getDeclaredVariables() {
-				return sourceCode.getDeclaredVariables(currentNode);
-			},
-
 			markVariableAsUsed(variable) {
 				sourceCode.markVariableAsUsed(variable, currentNode);
 			},
@@ -159,10 +156,14 @@ export function fixupRule(ruleDefinition) {
 		 * methods like `getScope()` need to know the current node.
 		 */
 		for (const [methodName, method] of Object.entries(visitor)) {
-			// node is the second argument for code path methods
+			/*
+			 * Node is the second argument to most code path methods,
+			 * and the third argument for onCodePathSegmentLoop.
+			 */
 			if (methodName.startsWith("on")) {
 				visitor[methodName] = (...args) => {
-					currentNode = args[1];
+					currentNode =
+						args[methodName === "onCodePathSegmentLoop" ? 2 : 1];
 
 					return method.call(visitor, ...args);
 				};
