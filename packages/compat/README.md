@@ -111,7 +111,7 @@ module.exports = [
 
 ### Fixing Configs
 
-If you are importing other configs into your `eslint.config.js` that use plugins that are not yet compatible with ESLint 9.x, you can wrap the entire array using the `fixupConfigRules()` function:
+If you are importing other configs into your `eslint.config.js` that use plugins that are not yet compatible with ESLint 9.x, you can wrap the entire array or a single object using the `fixupConfigRules()` function:
 
 ```js
 // eslint.config.js - ESM example

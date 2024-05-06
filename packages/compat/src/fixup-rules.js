@@ -233,10 +233,12 @@ export function fixupPluginRules(plugin) {
 /**
  * Takes the given configuration and creates a new configuration with all of the
  * rules wrapped to provide the missing methods on the `context` object.
- * @param {FixupConfigArray} configs The configuration to fix up.
+ * @param {FixupConfigArray|FixupConfig} config The configuration to fix up.
  * @returns {FixupConfigArray} The fixed-up configuration.
  */
-export function fixupConfigRules(configs) {
+export function fixupConfigRules(config) {
+	const configs = Array.isArray(config) ? config : [config];
+
 	return configs.map(config => {
 		if (!config.plugins) {
 			return config;
