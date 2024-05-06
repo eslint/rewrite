@@ -14,6 +14,16 @@
       "default": "./dist/esm/index.js"
     }
   },
+  "files": [
+    "dist/cjs/index.cjs",
+    "dist/cjs/index.d.ts",
+    "dist/cjs/types.d.ts",
+    "dist/esm/index.js",
+    "dist/esm/index.d.ts",
+    "dist/esm/types.d.ts",
+    "README.md",
+    "LICENSE"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/eslint/rewrite.git"
