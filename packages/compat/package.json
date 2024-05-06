@@ -18,6 +18,9 @@
     "LICENSE",
     "README.md"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "directories": {
     "test": "tests"
   },
