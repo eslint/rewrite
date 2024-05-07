@@ -1,0 +1,10 @@
+{
+  "name": "@eslint/compat",
+  "version": "0.0.0",
+  "exports":  "./dist/esm/index.js",
+  "publish": {
+    "exclude": [
+        "!dist"
+    ]
+  }
+}
