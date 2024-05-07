@@ -36,7 +36,6 @@
     "build:dedupe-types": "node ../../tools/dedupe-types.js dist/cjs/index.cjs dist/esm/index.js", 
     "build": "rollup -c && npm run build:dedupe-types && tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json",
     "pretest": "npm run build",
-    "prepare": "npm run build",
     "test": "mocha tests/"
   },
   "keywords": [
