@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "npm test --workspaces --if-present",
+    "build": "node scripts/build.js",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "fmt": "prettier --write ."
