@@ -16,7 +16,7 @@
   },
   "files": [
     "dist/cjs/index.cjs",
-    "dist/cjs/index.d.ts",
+    "dist/cjs/index.d.cts",
     "dist/cjs/types.d.ts",
     "dist/esm/index.js",
     "dist/esm/index.d.ts",
