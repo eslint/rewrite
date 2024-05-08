@@ -4,6 +4,13 @@
  */
 
 //------------------------------------------------------------------------------
+// Types
+//------------------------------------------------------------------------------
+
+/** @typedef {import("@eslint/object-schema").PropertyDefinition} PropertyDefinition */
+/** @typedef {import("@eslint/object-schema").ObjectDefinition} ObjectDefinition */
+
+//------------------------------------------------------------------------------
 // Helpers
 //------------------------------------------------------------------------------
 
@@ -15,7 +22,7 @@
  */
 function assertIsArray(value) {
 	if (!Array.isArray(value)) {
-		throw new TypeError('Expected value to be an array.');
+		throw new TypeError("Expected value to be an array.");
 	}
 }
 
@@ -25,11 +32,17 @@ function assertIsArray(value) {
  * @returns {void}
  * @throws {TypeError} When the value is not an array of strings and functions.
  */
-function assertIsArrayOfStringsAndFunctions(value, name) {
-	assertIsArray(value, name);
+function assertIsArrayOfStringsAndFunctions(value) {
+	assertIsArray(value);
 
-	if (value.some(item => typeof item !== 'string' && typeof item !== 'function')) {
-		throw new TypeError('Expected array to only contain strings and functions.');
+	if (
+		value.some(
+			item => typeof item !== "string" && typeof item !== "function",
+		)
+	) {
+		throw new TypeError(
+			"Expected array to only contain strings and functions.",
+		);
 	}
 }
 
@@ -41,7 +54,7 @@ function assertIsArrayOfStringsAndFunctions(value, name) {
  */
 function assertIsNonEmptyArray(value) {
 	if (!Array.isArray(value) || value.length === 0) {
-		throw new TypeError('Expected value to be a non-empty array.');
+		throw new TypeError("Expected value to be a non-empty array.");
 	}
 }
 
@@ -51,7 +64,7 @@ function assertIsNonEmptyArray(value) {
 
 /**
  * The schema for `files` and `ignores` that every ConfigArray uses.
- * @type Object
+ * @type {ObjectDefinition}
  */
 export const filesAndIgnoresSchema = Object.freeze({
 	files: {
@@ -60,7 +73,6 @@ export const filesAndIgnoresSchema = Object.freeze({
 			return undefined;
 		},
 		validate(value) {
-
 			// first check if it's an array
 			assertIsNonEmptyArray(value);
 
@@ -68,18 +80,22 @@ export const filesAndIgnoresSchema = Object.freeze({
 			value.forEach(item => {
 				if (Array.isArray(item)) {
 					assertIsArrayOfStringsAndFunctions(item);
-				} else if (typeof item !== 'string' && typeof item !== 'function') {
-					throw new TypeError('Items must be a string, a function, or an array of strings and functions.');
+				} else if (
+					typeof item !== "string" &&
+					typeof item !== "function"
+				) {
+					throw new TypeError(
+						"Items must be a string, a function, or an array of strings and functions.",
+					);
 				}
 			});
-
-		}
+		},
 	},
 	ignores: {
 		required: false,
 		merge() {
 			return undefined;
 		},
-		validate: assertIsArrayOfStringsAndFunctions
-	}
+		validate: assertIsArrayOfStringsAndFunctions,
+	},
 });

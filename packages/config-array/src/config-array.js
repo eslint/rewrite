@@ -7,35 +7,77 @@
 // Imports
 //------------------------------------------------------------------------------
 
-import path from 'path';
-import minimatch from 'minimatch';
-import createDebug from 'debug';
+import path from "node:path";
+import minimatch from "minimatch";
+import createDebug from "debug";
 
-import { ObjectSchema } from '@humanwhocodes/object-schema';
-import { baseSchema } from './base-schema.js';
-import { filesAndIgnoresSchema } from './files-and-ignores-schema.js';
+import { ObjectSchema } from "@eslint/object-schema";
+import { baseSchema } from "./base-schema.js";
+import { filesAndIgnoresSchema } from "./files-and-ignores-schema.js";
+
+//------------------------------------------------------------------------------
+// Types
+//------------------------------------------------------------------------------
+
+/** @typedef {import("@eslint/object-schema").PropertyDefinition} PropertyDefinition */
+/** @typedef {import("@eslint/object-schema").ObjectDefinition} ObjectDefinition */
+/** @typedef {import("./types.ts").BaseConfigObject} BaseConfigObject */
+/** @typedef {import("minimatch").IMinimatchStatic} IMinimatchStatic */
+/** @typedef {import("minimatch").IMinimatch} IMinimatch */
+
+/*
+ * This is a bit of a hack to make TypeScript happy with the Rollup-created
+ * CommonJS file. Rollup doesn't do object destructuring for imported files
+ * and instead imports the default via `require()`. This messes up type checking
+ * for `ObjectSchema`. To work around that, we just import the type manually
+ * and give it a different name to use in the JSDoc comments.
+ */
+/** @typedef {import("@eslint/object-schema").ObjectSchema} ObjectSchemaInstance */
 
 //------------------------------------------------------------------------------
 // Helpers
 //------------------------------------------------------------------------------
 
 const Minimatch = minimatch.Minimatch;
-const minimatchCache = new Map();
-const negatedMinimatchCache = new Map();
-const debug = createDebug('@hwc/config-array');
+const debug = createDebug("@eslint/config-array");
 
+/**
+ * A cache for minimatch instances.
+ * @type {Map<string, IMinimatch>}
+ */
+const minimatchCache = new Map();
+
+/**
+ * A cache for negated minimatch instances.
+ * @type {Map<string, IMinimatch>}
+ */
+const negatedMinimatchCache = new Map();
+
+/**
+ * Options to use with minimatch.
+ * @type {Object}
+ */
 const MINIMATCH_OPTIONS = {
 	// matchBase: true,
-	dot: true
+	dot: true,
 };
 
-const CONFIG_TYPES = new Set(['array', 'function']);
+/**
+ * The types of config objects that are supported.
+ * @type {Set<string>}
+ */
+const CONFIG_TYPES = new Set(["array", "function"]);
 
 /**
  * Fields that are considered metadata and not part of the config object.
+ * @type {Set<string>}
  */
-const META_FIELDS = new Set(['name']);
+const META_FIELDS = new Set(["name"]);
 
+/**
+ * A schema containing just files and ignores for early validation.
+ * @type {ObjectSchemaInstance}
+ */
 const FILES_AND_IGNORES_SCHEMA = new ObjectSchema(filesAndIgnoresSchema);
 
 /**
@@ -43,16 +85,15 @@ const FILES_AND_IGNORES_SCHEMA = new ObjectSchema(filesAndIgnoresSchema);
  * error message.
  */
 class ConfigError extends Error {
-
 	/**
 	 * Creates a new instance.
 	 * @param {string} name The config object name causing the error.
 	 * @param {number} index The index of the config object in the array.
-	 * @param {Error} source The source error. 
+	 * @param {Object} options The options for the error.
+	 * @param {Error} [options.cause] The error that caused this error.
+	 * @param {string} [options.message] The message to use for the error.
 	 */
 	constructor(name, index, { cause, message }) {
-
-
 		const finalMessage = message || cause.message;
 
 		super(`Config ${name}: ${finalMessage}`, { cause });
@@ -71,7 +112,7 @@ class ConfigError extends Error {
 		 * @type {string}
 		 * @readonly
 		 */
-		this.name = 'ConfigError';
+		this.name = "ConfigError";
 
 		/**
 		 * The index of the config object in the array.
@@ -84,36 +125,36 @@ class ConfigError extends Error {
 
 /**
  * Gets the name of a config object.
- * @param {object} config The config object to get the name of.
+ * @param {BaseConfigObject} config The config object to get the name of.
  * @returns {string} The name of the config object.
- */ 
+ */
 function getConfigName(config) {
-	if (config && typeof config.name === 'string' && config.name) {
+	if (config && typeof config.name === "string" && config.name) {
 		return `"${config.name}"`;
 	}
 
-	return '(unnamed)';
+	return "(unnamed)";
 }
 
 /**
  * Rethrows a config error with additional information about the config object.
- * @param {object} config The config object to get the name of. 
+ * @param {object} config The config object to get the name of.
  * @param {number} index The index of the config object in the array.
  * @param {Error} error The error to rethrow.
  * @throws {ConfigError} When the error is rethrown for a config.
  */
 function rethrowConfigError(config, index, error) {
 	const configName = getConfigName(config);
-	throw new ConfigError(configName, index, error);
+	throw new ConfigError(configName, index, { cause: error });
 }
 
 /**
  * Shorthand for checking if a value is a string.
  * @param {any} value The value to check.
- * @returns {boolean} True if a string, false if not. 
+ * @returns {boolean} True if a string, false if not.
  */
 function isString(value) {
-	return typeof value === 'string';
+	return typeof value === "string";
 }
 
 /**
@@ -126,33 +167,38 @@ function isString(value) {
  * @throws {ConfigError} If the files and ignores keys of a config object are not valid.
  */
 function assertValidBaseConfig(config, index) {
-
 	if (config === null) {
-		throw new ConfigError(getConfigName(config), index, { message: 'Unexpected null config.' });
+		throw new ConfigError(getConfigName(config), index, {
+			message: "Unexpected null config.",
+		});
 	}
 
 	if (config === undefined) {
-		throw new ConfigError(getConfigName(config), index, { message: 'Unexpected undefined config.' });
+		throw new ConfigError(getConfigName(config), index, {
+			message: "Unexpected undefined config.",
+		});
 	}
 
-	if (typeof config !== 'object') {
-		throw new ConfigError(getConfigName(config), index, { message: 'Unexpected non-object config.' });
+	if (typeof config !== "object") {
+		throw new ConfigError(getConfigName(config), index, {
+			message: "Unexpected non-object config.",
+		});
 	}
 
-	const validateConfig = { };
-	
-	if ('files' in config) {
+	const validateConfig = {};
+
+	if ("files" in config) {
 		validateConfig.files = config.files;
 	}
-	
-	if ('ignores' in config) {
+
+	if ("ignores" in config) {
 		validateConfig.ignores = config.ignores;
 	}
 
 	try {
 		FILES_AND_IGNORES_SCHEMA.validate(validateConfig);
 	} catch (validationError) {
-		rethrowConfigError(config, index, { cause: validationError });
+		rethrowConfigError(config, index, validationError);
 	}
 }
 
@@ -162,10 +208,9 @@ function assertValidBaseConfig(config, index) {
  * @param {string} filepath The file path to match.
  * @param {string} pattern The glob pattern to match against.
  * @param {object} options The minimatch options to use.
- * @returns 
+ * @returns
  */
 function doMatch(filepath, pattern, options = {}) {
-
 	let cache = minimatchCache;
 
 	if (options.flipNegate) {
@@ -175,7 +220,10 @@ function doMatch(filepath, pattern, options = {}) {
 	let matcher = cache.get(pattern);
 
 	if (!matcher) {
-		matcher = new Minimatch(pattern, Object.assign({}, MINIMATCH_OPTIONS, options));
+		matcher = new Minimatch(
+			pattern,
+			Object.assign({}, MINIMATCH_OPTIONS, options),
+		);
 		cache.set(pattern, matcher);
 	}
 
@@ -193,15 +241,14 @@ function doMatch(filepath, pattern, options = {}) {
  * @throws {TypeError} When a config function returns a function.
  */
 async function normalize(items, context, extraConfigTypes) {
-
-	const allowFunctions = extraConfigTypes.includes('function');
-	const allowArrays = extraConfigTypes.includes('array');
+	const allowFunctions = extraConfigTypes.includes("function");
+	const allowArrays = extraConfigTypes.includes("array");
 
 	async function* flatTraverse(array) {
 		for (let item of array) {
-			if (typeof item === 'function') {
+			if (typeof item === "function") {
 				if (!allowFunctions) {
-					throw new TypeError('Unexpected function.');
+					throw new TypeError("Unexpected function.");
 				}
 
 				item = item(context);
@@ -212,11 +259,13 @@ async function normalize(items, context, extraConfigTypes) {
 
 			if (Array.isArray(item)) {
 				if (!allowArrays) {
-					throw new TypeError('Unexpected array.');
+					throw new TypeError("Unexpected array.");
 				}
 				yield* flatTraverse(item);
-			} else if (typeof item === 'function') {
-				throw new TypeError('A config function can only return an object or array.');
+			} else if (typeof item === "function") {
+				throw new TypeError(
+					"A config function can only return an object or array.",
+				);
 			} else {
 				yield item;
 			}
@@ -248,33 +297,34 @@ async function normalize(items, context, extraConfigTypes) {
  * @throws {TypeError} When a config function returns a function.
  */
 function normalizeSync(items, context, extraConfigTypes) {
-
-	const allowFunctions = extraConfigTypes.includes('function');
-	const allowArrays = extraConfigTypes.includes('array');
+	const allowFunctions = extraConfigTypes.includes("function");
+	const allowArrays = extraConfigTypes.includes("array");
 
 	function* flatTraverse(array) {
 		for (let item of array) {
-			if (typeof item === 'function') {
-
+			if (typeof item === "function") {
 				if (!allowFunctions) {
-					throw new TypeError('Unexpected function.');
+					throw new TypeError("Unexpected function.");
 				}
 
 				item = item(context);
 				if (item.then) {
-					throw new TypeError('Async config functions are not supported.');
+					throw new TypeError(
+						"Async config functions are not supported.",
+					);
 				}
 			}
 
 			if (Array.isArray(item)) {
-
 				if (!allowArrays) {
-					throw new TypeError('Unexpected array.');
+					throw new TypeError("Unexpected array.");
 				}
 
 				yield* flatTraverse(item);
-			} else if (typeof item === 'function') {
-				throw new TypeError('A config function can only return an object or array.');
+			} else if (typeof item === "function") {
+				throw new TypeError(
+					"A config function can only return an object or array.",
+				);
 			} else {
 				yield item;
 			}
@@ -287,47 +337,41 @@ function normalizeSync(items, context, extraConfigTypes) {
 /**
  * Determines if a given file path should be ignored based on the given
  * matcher.
- * @param {Array<string|() => boolean>} ignores The ignore patterns to check. 
+ * @param {Array<string|((string) => boolean)>} ignores The ignore patterns to check.
  * @param {string} filePath The absolute path of the file to check.
  * @param {string} relativeFilePath The relative path of the file to check.
  * @returns {boolean} True if the path should be ignored and false if not.
  */
 function shouldIgnorePath(ignores, filePath, relativeFilePath) {
-
 	// all files outside of the basePath are ignored
-	if (relativeFilePath.startsWith('..')) {
+	if (relativeFilePath.startsWith("..")) {
 		return true;
 	}
 
 	return ignores.reduce((ignored, matcher) => {
-
 		if (!ignored) {
-
-			if (typeof matcher === 'function') {
+			if (typeof matcher === "function") {
 				return matcher(filePath);
 			}
 
 			// don't check negated patterns because we're not ignored yet
-			if (!matcher.startsWith('!')) {
+			if (!matcher.startsWith("!")) {
 				return doMatch(relativeFilePath, matcher);
 			}
 
 			// otherwise we're still not ignored
 			return false;
-
 		}
 
 		// only need to check negated patterns because we're ignored
-		if (typeof matcher === 'string' && matcher.startsWith('!')) {
+		if (typeof matcher === "string" && matcher.startsWith("!")) {
 			return !doMatch(relativeFilePath, matcher, {
-				flipNegate: true
+				flipNegate: true,
 			});
 		}
 
 		return ignored;
-
 	}, false);
-
 }
 
 /**
@@ -340,7 +384,6 @@ function shouldIgnorePath(ignores, filePath, relativeFilePath) {
  *      false if not.
  */
 function pathMatchesIgnores(filePath, basePath, config) {
-
 	/*
 	 * For both files and ignores, functions are passed the absolute
 	 * file path while strings are compared against the relative
@@ -348,10 +391,11 @@ function pathMatchesIgnores(filePath, basePath, config) {
 	 */
 	const relativeFilePath = path.relative(basePath, filePath);
 
-	return Object.keys(config).filter(key => !META_FIELDS.has(key)).length > 1 &&
-		!shouldIgnorePath(config.ignores, filePath, relativeFilePath);
+	return (
+		Object.keys(config).filter(key => !META_FIELDS.has(key)).length > 1 &&
+		!shouldIgnorePath(config.ignores, filePath, relativeFilePath)
+	);
 }
-
 
 /**
  * Determines if a given file path is matched by a config. If the config
@@ -365,7 +409,6 @@ function pathMatchesIgnores(filePath, basePath, config) {
  *      false if not.
  */
 function pathMatches(filePath, basePath, config) {
-
 	/*
 	 * For both files and ignores, functions are passed the absolute
 	 * file path while strings are compared against the relative
@@ -375,12 +418,11 @@ function pathMatches(filePath, basePath, config) {
 
 	// match both strings and functions
 	const match = pattern => {
-
 		if (isString(pattern)) {
 			return doMatch(relativeFilePath, pattern);
 		}
 
-		if (typeof pattern === 'function') {
+		if (typeof pattern === "function") {
 			return pattern(filePath);
 		}
 
@@ -401,7 +443,11 @@ function pathMatches(filePath, basePath, config) {
 	 * if there are any files to ignore.
 	 */
 	if (filePathMatchesPattern && config.ignores) {
-		filePathMatchesPattern = !shouldIgnorePath(config.ignores, filePath, relativeFilePath);
+		filePathMatchesPattern = !shouldIgnorePath(
+			config.ignores,
+			filePath,
+			relativeFilePath,
+		);
 	}
 
 	return filePathMatchesPattern;
@@ -409,14 +455,16 @@ function pathMatches(filePath, basePath, config) {
 
 /**
  * Ensures that a ConfigArray has been normalized.
- * @param {ConfigArray} configArray The ConfigArray to check. 
+ * @param {ConfigArray} configArray The ConfigArray to check.
  * @returns {void}
  * @throws {Error} When the `ConfigArray` is not normalized.
  */
 function assertNormalized(configArray) {
 	// TODO: Throw more verbose error
 	if (!configArray.isNormalized()) {
-		throw new Error('ConfigArray must be normalized to perform this operation.');
+		throw new Error(
+			"ConfigArray must be normalized to perform this operation.",
+		);
 	}
 }
 
@@ -428,12 +476,16 @@ function assertNormalized(configArray) {
  */
 function assertExtraConfigTypes(extraConfigTypes) {
 	if (extraConfigTypes.length > 2) {
-		throw new TypeError('configTypes must be an array with at most two items.');
+		throw new TypeError(
+			"configTypes must be an array with at most two items.",
+		);
 	}
 
 	for (const configType of extraConfigTypes) {
 		if (!CONFIG_TYPES.has(configType)) {
-			throw new TypeError(`Unexpected config type "${configType}" found. Expected one of: "object", "array", "function".`);
+			throw new TypeError(
+				`Unexpected config type "${configType}" found. Expected one of: "object", "array", "function".`,
+			);
 		}
 	}
 }
@@ -443,11 +495,11 @@ function assertExtraConfigTypes(extraConfigTypes) {
 //------------------------------------------------------------------------------
 
 export const ConfigArraySymbol = {
-	isNormalized: Symbol('isNormalized'),
-	configCache: Symbol('configCache'),
-	schema: Symbol('schema'),
-	finalizeConfig: Symbol('finalizeConfig'),
-	preprocessConfig: Symbol('preprocessConfig')
+	isNormalized: Symbol("isNormalized"),
+	configCache: Symbol("configCache"),
+	schema: Symbol("schema"),
+	finalizeConfig: Symbol("finalizeConfig"),
+	preprocessConfig: Symbol("preprocessConfig"),
 };
 
 // used to store calculate data for faster lookup
@@ -458,24 +510,26 @@ const dataCache = new WeakMap();
  * those config objects.
  */
 export class ConfigArray extends Array {
-
 	/**
 	 * Creates a new instance of ConfigArray.
 	 * @param {Iterable|Function|Object} configs An iterable yielding config
 	 *      objects, or a config function, or a config object.
+	 * @param {Object} options The options for the ConfigArray.
 	 * @param {string} [options.basePath=""] The path of the config file
 	 * @param {boolean} [options.normalized=false] Flag indicating if the
 	 *      configs have already been normalized.
-	 * @param {Object} [options.schema] The additional schema 
+	 * @param {Object} [options.schema] The additional schema
 	 *      definitions to use for the ConfigArray schema.
-	 * @param {Array<string>} [options.configTypes] List of config types supported.
+	 * @param {Array<string>} [options.extraConfigTypes] List of config types supported.
 	 */
-	constructor(configs, {
-		basePath = '',
-		normalized = false,
-		schema: customSchema,
-		extraConfigTypes = []
-	} = {}
+	constructor(
+		configs,
+		{
+			basePath = "",
+			normalized = false,
+			schema: customSchema,
+			extraConfigTypes = [],
+		} = {},
 	) {
 		super();
 
@@ -490,11 +544,11 @@ export class ConfigArray extends Array {
 		/**
 		 * The schema used for validating and merging configs.
 		 * @property schema
-		 * @type ObjectSchema
+		 * @type {ObjectSchemaInstance}
 		 * @private
 		 */
 		this[ConfigArraySymbol.schema] = new ObjectSchema(
-			Object.assign({}, customSchema, baseSchema)
+			Object.assign({}, customSchema, baseSchema),
 		);
 
 		/**
@@ -509,10 +563,10 @@ export class ConfigArray extends Array {
 
 		/**
 		 * The supported config types.
-		 * @property configTypes
 		 * @type {Array<string>}
 		 */
-		this.extraConfigTypes = Object.freeze([...extraConfigTypes]);
+		this.extraConfigTypes = [...extraConfigTypes];
+		Object.freeze(this.extraConfigTypes);
 
 		/**
 		 * A cache to store calculated configs for faster repeat lookup.
@@ -527,7 +581,7 @@ export class ConfigArray extends Array {
 			explicitMatches: new Map(),
 			directoryMatches: new Map(),
 			files: undefined,
-			ignores: undefined
+			ignores: undefined,
 		});
 
 		// load the configs into this array
@@ -536,15 +590,14 @@ export class ConfigArray extends Array {
 		} else {
 			this.push(configs);
 		}
-
 	}
 
 	/**
 	 * Prevent normal array methods from creating a new `ConfigArray` instance.
-	 * This is to ensure that methods such as `slice()` won't try to create a 
+	 * This is to ensure that methods such as `slice()` won't try to create a
 	 * new instance of `ConfigArray` behind the scenes as doing so may throw
 	 * an error due to the different constructor signature.
-	 * @returns {Function} The `Array` constructor.
+	 * @type {ArrayConstructor} The `Array` constructor.
 	 */
 	static get [Symbol.species]() {
 		return Array;
@@ -558,7 +611,6 @@ export class ConfigArray extends Array {
 	 * @returns {Array<string|Function>} An array of matchers.
 	 */
 	get files() {
-
 		assertNormalized(this);
 
 		// if this data has been cached, retrieve it
@@ -595,7 +647,6 @@ export class ConfigArray extends Array {
 	 * @returns {string[]} An array of string patterns and functions to be ignored.
 	 */
 	get ignores() {
-
 		assertNormalized(this);
 
 		// if this data has been cached, retrieve it
@@ -610,13 +661,16 @@ export class ConfigArray extends Array {
 		const result = [];
 
 		for (const config of this) {
-
 			/*
 			 * We only count ignores if there are no other keys in the object.
 			 * In this case, it acts list a globally ignored pattern. If there
 			 * are additional keys, then ignores act like exclusions.
 			 */
-			if (config.ignores && Object.keys(config).filter(key => !META_FIELDS.has(key)).length === 1) {
+			if (
+				config.ignores &&
+				Object.keys(config).filter(key => !META_FIELDS.has(key))
+					.length === 1
+			) {
 				result.push(...config.ignores);
 			}
 		}
@@ -639,15 +693,22 @@ export class ConfigArray extends Array {
 	/**
 	 * Normalizes a config array by flattening embedded arrays and executing
 	 * config functions.
-	 * @param {ConfigContext} context The context object for config functions.
+	 * @param {Object} [context] The context object for config functions.
 	 * @returns {Promise<ConfigArray>} The current ConfigArray instance.
 	 */
 	async normalize(context = {}) {
-
 		if (!this.isNormalized()) {
-			const normalizedConfigs = await normalize(this, context, this.extraConfigTypes);
+			const normalizedConfigs = await normalize(
+				this,
+				context,
+				this.extraConfigTypes,
+			);
 			this.length = 0;
-			this.push(...normalizedConfigs.map(this[ConfigArraySymbol.preprocessConfig].bind(this)));
+			this.push(
+				...normalizedConfigs.map(
+					this[ConfigArraySymbol.preprocessConfig].bind(this),
+				),
+			);
 			this.forEach(assertValidBaseConfig);
 			this[ConfigArraySymbol.isNormalized] = true;
 
@@ -661,15 +722,22 @@ export class ConfigArray extends Array {
 	/**
 	 * Normalizes a config array by flattening embedded arrays and executing
 	 * config functions.
-	 * @param {ConfigContext} context The context object for config functions.
+	 * @param {Object} [context] The context object for config functions.
 	 * @returns {ConfigArray} The current ConfigArray instance.
 	 */
 	normalizeSync(context = {}) {
-
 		if (!this.isNormalized()) {
-			const normalizedConfigs = normalizeSync(this, context, this.extraConfigTypes);
+			const normalizedConfigs = normalizeSync(
+				this,
+				context,
+				this.extraConfigTypes,
+			);
 			this.length = 0;
-			this.push(...normalizedConfigs.map(this[ConfigArraySymbol.preprocessConfig].bind(this)));
+			this.push(
+				...normalizedConfigs.map(
+					this[ConfigArraySymbol.preprocessConfig].bind(this),
+				),
+			);
 			this.forEach(assertValidBaseConfig);
 			this[ConfigArraySymbol.isNormalized] = true;
 
@@ -712,7 +780,6 @@ export class ConfigArray extends Array {
 	 * 		or false if not.
 	 */
 	isExplicitMatch(filePath) {
-
 		assertNormalized(this);
 
 		const cache = dataCache.get(this);
@@ -720,7 +787,7 @@ export class ConfigArray extends Array {
 		// first check the cache to avoid duplicate work
 		let result = cache.explicitMatches.get(filePath);
 
-		if (typeof result == 'boolean') {
+		if (typeof result == "boolean") {
 			return result;
 		}
 
@@ -738,7 +805,6 @@ export class ConfigArray extends Array {
 		// filePath isn't automatically ignored, so try to find a match
 
 		for (const config of this) {
-
 			if (!config.files) {
 				continue;
 			}
@@ -759,7 +825,6 @@ export class ConfigArray extends Array {
 	 * @returns {Object} The config object for this file.
 	 */
 	getConfig(filePath) {
-
 		assertNormalized(this);
 
 		const cache = this[ConfigArraySymbol.configCache];
@@ -800,9 +865,7 @@ export class ConfigArray extends Array {
 		const universalPattern = /\/\*{1,2}$/;
 
 		this.forEach((config, index) => {
-
 			if (!config.files) {
-
 				if (!config.ignores) {
 					debug(`Anonymous universal config found for ${filePath}`);
 					matchingConfigIndices.push(index);
@@ -810,12 +873,16 @@ export class ConfigArray extends Array {
 				}
 
 				if (pathMatchesIgnores(filePath, this.basePath, config)) {
-					debug(`Matching config found for ${filePath} (based on ignores: ${config.ignores})`);
+					debug(
+						`Matching config found for ${filePath} (based on ignores: ${config.ignores})`,
+					);
 					matchingConfigIndices.push(index);
 					return;
 				}
-				
-				debug(`Skipped config found for ${filePath} (based on ignores: ${config.ignores})`);
+
+				debug(
+					`Skipped config found for ${filePath} (based on ignores: ${config.ignores})`,
+				);
 				return;
 			}
 
@@ -826,26 +893,25 @@ export class ConfigArray extends Array {
 			 * a file with a specific extensions such as *.js.
 			 */
 
-			const universalFiles = config.files.filter(
-				pattern => universalPattern.test(pattern)
+			const universalFiles = config.files.filter(pattern =>
+				universalPattern.test(pattern),
 			);
 
 			// universal patterns were found so we need to check the config twice
 			if (universalFiles.length) {
-
-				debug('Universal files patterns found. Checking carefully.');
+				debug("Universal files patterns found. Checking carefully.");
 
 				const nonUniversalFiles = config.files.filter(
-					pattern => !universalPattern.test(pattern)
+					pattern => !universalPattern.test(pattern),
 				);
 
 				// check that the config matches without the non-universal files first
 				if (
-					nonUniversalFiles.length && 
-					pathMatches(
-						filePath, this.basePath,
-						{ files: nonUniversalFiles, ignores: config.ignores }
-					)
+					nonUniversalFiles.length &&
+					pathMatches(filePath, this.basePath, {
+						files: nonUniversalFiles,
+						ignores: config.ignores,
+					})
 				) {
 					debug(`Matching config found for ${filePath}`);
 					matchingConfigIndices.push(index);
@@ -856,10 +922,10 @@ export class ConfigArray extends Array {
 				// if there wasn't a match then check if it matches with universal files
 				if (
 					universalFiles.length &&
-					pathMatches(
-						filePath, this.basePath,
-						{ files: universalFiles, ignores: config.ignores }
-					)
+					pathMatches(filePath, this.basePath, {
+						files: universalFiles,
+						ignores: config.ignores,
+					})
 				) {
 					debug(`Matching config found for ${filePath}`);
 					matchingConfigIndices.push(index);
@@ -877,7 +943,6 @@ export class ConfigArray extends Array {
 				matchFound = true;
 				return;
 			}
-
 		});
 
 		// if matching both files and ignores, there will be no config to create
@@ -893,7 +958,6 @@ export class ConfigArray extends Array {
 		finalConfig = cache.get(matchingConfigIndices.toString());
 
 		if (finalConfig) {
-
 			// also store for filename for faster lookup next time
 			cache.set(filePath, finalConfig);
 
@@ -904,11 +968,14 @@ export class ConfigArray extends Array {
 
 		finalConfig = matchingConfigIndices.reduce((result, index) => {
 			try {
-				return this[ConfigArraySymbol.schema].merge(result, this[index]);
+				return this[ConfigArraySymbol.schema].merge(
+					result,
+					this[index],
+				);
 			} catch (validationError) {
-				rethrowConfigError(this[index], index, { cause: validationError});
+				rethrowConfigError(this[index], index, validationError);
 			}
-		}, {}, this);
+		}, {});
 
 		finalConfig = this[ConfigArraySymbol.finalizeConfig](finalConfig);
 
@@ -939,7 +1006,7 @@ export class ConfigArray extends Array {
 
 	/**
 	 * Determines if the given directory is ignored based on the configs.
-	 * This checks only default `ignores` that don't have `files` in the 
+	 * This checks only default `ignores` that don't have `files` in the
 	 * same config. A pattern such as `/foo` be considered to ignore the directory
 	 * while a pattern such as `/foo/**` is not considered to ignore the
 	 * directory because it is matching files.
@@ -949,13 +1016,13 @@ export class ConfigArray extends Array {
 	 * @throws {Error} When the `ConfigArray` is not normalized.
 	 */
 	isDirectoryIgnored(directoryPath) {
-
 		assertNormalized(this);
 
-		const relativeDirectoryPath = path.relative(this.basePath, directoryPath)
-			.replace(/\\/g, '/');
+		const relativeDirectoryPath = path
+			.relative(this.basePath, directoryPath)
+			.replace(/\\/g, "/");
 
-		if (relativeDirectoryPath.startsWith('..')) {
+		if (relativeDirectoryPath.startsWith("..")) {
 			return true;
 		}
 
@@ -966,8 +1033,8 @@ export class ConfigArray extends Array {
 			return cache.get(relativeDirectoryPath);
 		}
 
-		const directoryParts = relativeDirectoryPath.split('/');
-		let relativeDirectoryToCheck = '';
+		const directoryParts = relativeDirectoryPath.split("/");
+		let relativeDirectoryToCheck = "";
 		let result = false;
 
 		/*
@@ -975,22 +1042,20 @@ export class ConfigArray extends Array {
 		 * ignored parent directory cannot have any descendants unignored,
 		 * we need to check every directory starting at the parent all
 		 * the way down to the actual requested directory.
-		 * 
+		 *
 		 * We aggressively cache all of this info to make sure we don't
 		 * have to recalculate everything for every call.
 		 */
 		do {
-
-			relativeDirectoryToCheck += directoryParts.shift() + '/';
+			relativeDirectoryToCheck += directoryParts.shift() + "/";
 
 			result = shouldIgnorePath(
 				this.ignores,
 				path.join(this.basePath, relativeDirectoryToCheck),
-				relativeDirectoryToCheck
+				relativeDirectoryToCheck,
 			);
 
 			cache.set(relativeDirectoryToCheck, result);
-
 		} while (!result && directoryParts.length);
 
 		// also cache the result for the requested path
@@ -998,5 +1063,4 @@ export class ConfigArray extends Array {
 
 		return result;
 	}
-
 }

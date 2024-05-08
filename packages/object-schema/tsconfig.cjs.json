@@ -3,7 +3,7 @@
   "files": ["dist/cjs/index.cjs"],
   "compilerOptions": {
     "outDir": "dist/cjs",
-    "moduleResolution": "Node",
-    "module": "CommonJS"
+    "moduleResolution": "Bundler",
+    "module": "Preserve"
   },
 }
