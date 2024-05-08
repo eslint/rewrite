@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.1.0](https://github.com/eslint/rewrite/compare/object-schema-v2.0.3...object-schema-v2.1.0) (2024-05-08)
+
+
+### Features
+
+* Add types to config-array ([#3](https://github.com/eslint/rewrite/issues/3)) ([8b80e81](https://github.com/eslint/rewrite/commit/8b80e81cd0613ef1eccd15eacc0dbfad7a689dbf))
+* sync packages meta ([#12](https://github.com/eslint/rewrite/issues/12)) ([27fcd25](https://github.com/eslint/rewrite/commit/27fcd259dab40e4ac1742b5699b74701a6b3660e))
+* tsc + ESM for object-schema ([b865844](https://github.com/eslint/rewrite/commit/b8658440cc6e37e5392f32a33bdefb012bfd4290))
+
 ## [2.0.3](https://github.com/humanwhocodes/object-schema/compare/v2.0.2...v2.0.3) (2024-04-01)
 
 

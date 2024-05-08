@@ -1,5 +1,5 @@
 {
-  "packages/object-schema": "2.0.3",
-  "packages/config-array": "0.13.0",
-  "packages/compat": "0.0.0"
+  "packages/object-schema": "2.1.0",
+  "packages/config-array": "0.14.0",
+  "packages/compat": "1.0.0"
 }

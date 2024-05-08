@@ -1,6 +1,6 @@
 {
   "name": "@eslint/config-array",
-  "version": "0.12.3",
+  "version": "0.14.0",
   "description": "General purpose glob-based configuration matching.",
   "author": "Nicholas C. Zakas",
   "type": "module",
@@ -36,7 +36,7 @@
   },
   "homepage": "https://github.com/eslint/rewrite#readme",
   "scripts": {
-    "build:dedupe-types": "node ../../tools/dedupe-types.js dist/cjs/index.cjs dist/esm/index.js", 
+    "build:dedupe-types": "node ../../tools/dedupe-types.js dist/cjs/index.cjs dist/esm/index.js",
     "build": "rollup -c && npm run build:dedupe-types && tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json",
     "pretest": "npm run build",
     "test": "mocha tests/"
@@ -48,7 +48,7 @@
   ],
   "license": "Apache-2.0",
   "dependencies": {
-    "@eslint/object-schema": "^2.0.3",
+    "@eslint/object-schema": "^2.1.0",
     "debug": "^4.3.1",
     "minimatch": "^3.0.5"
   },

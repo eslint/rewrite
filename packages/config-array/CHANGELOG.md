@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.14.0](https://github.com/eslint/rewrite/compare/config-array-v0.13.0...config-array-v0.14.0) (2024-05-08)
+
+
+### Features
+
+* Add config-array package ([4a2274d](https://github.com/eslint/rewrite/commit/4a2274def58d1d41352b33f4e9c197d258fb5a36))
+* Add types to config-array ([#3](https://github.com/eslint/rewrite/issues/3)) ([8b80e81](https://github.com/eslint/rewrite/commit/8b80e81cd0613ef1eccd15eacc0dbfad7a689dbf))
+* sync packages meta ([#12](https://github.com/eslint/rewrite/issues/12)) ([27fcd25](https://github.com/eslint/rewrite/commit/27fcd259dab40e4ac1742b5699b74701a6b3660e))
+
+
+### Bug Fixes
+
+* Include package.json ([ce52aaa](https://github.com/eslint/rewrite/commit/ce52aaaec724ecf9dc9826efa680f6851b576357))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/object-schema bumped from ^2.0.3 to ^2.1.0
+
 ## [0.13.0](https://github.com/humanwhocodes/config-array/compare/v0.12.3...v0.13.0) (2024-04-17)
 
 
