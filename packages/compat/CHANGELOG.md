@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/eslint/rewrite/compare/compat-v1.0.0...compat-v1.0.1) (2024-05-08)
+
+
+### Bug Fixes
+
+* Minor change to trigger new releases ([#13](https://github.com/eslint/rewrite/issues/13)) ([8184402](https://github.com/eslint/rewrite/commit/8184402d5efc8028380cbdd5669f600aea5c050a))
+
 ## 1.0.0 (2024-05-08)
 
 ### Features

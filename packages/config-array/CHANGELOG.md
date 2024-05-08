@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.14.1](https://github.com/eslint/rewrite/compare/config-array-v0.14.0...config-array-v0.14.1) (2024-05-08)
+
+
+### Bug Fixes
+
+* Minor change to trigger new releases ([#13](https://github.com/eslint/rewrite/issues/13)) ([8184402](https://github.com/eslint/rewrite/commit/8184402d5efc8028380cbdd5669f600aea5c050a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/object-schema bumped from ^2.1.0 to ^2.1.1
+
 ## [0.14.0](https://github.com/eslint/rewrite/compare/config-array-v0.13.0...config-array-v0.14.0) (2024-05-08)
 
 ### Features
