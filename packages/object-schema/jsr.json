@@ -1,15 +1,15 @@
 {
-  "name": "@eslint/object-schema",
-  "version": "2.0.3",
-  "exports":  "./dist/esm/index.js",
-  "publish": {
-    "include": [
-        "dist/esm/index.js",
-        "dist/esm/index.d.ts",
-        "dist/esm/types.d.ts",
-        "README.md",
-        "jsr.json",
-        "LICENSE"
-    ]
-  }
+    "name": "@eslint/object-schema",
+    "version": "2.1.0",
+    "exports": "./dist/esm/index.js",
+    "publish": {
+        "include": [
+            "dist/esm/index.js",
+            "dist/esm/index.d.ts",
+            "dist/esm/types.d.ts",
+            "README.md",
+            "jsr.json",
+            "LICENSE"
+        ]
+    }
 }

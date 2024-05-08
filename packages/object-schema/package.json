@@ -1,6 +1,6 @@
 {
   "name": "@eslint/object-schema",
-  "version": "2.0.3",
+  "version": "2.1.0",
   "description": "An object schema merger/validator",
   "type": "module",
   "exports": {
