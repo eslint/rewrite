@@ -2,7 +2,6 @@
 
 ## 1.0.0 (2024-05-08)
 
-
 ### Features
 
 * @eslint/compat package ([#5](https://github.com/eslint/rewrite/issues/5)) ([e765f07](https://github.com/eslint/rewrite/commit/e765f0764780144565aa51e56a097d1aaac8ddba))
