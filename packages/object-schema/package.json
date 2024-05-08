@@ -14,16 +14,23 @@
     }
   },
   "files": [
-    "dist",
-    "LICENSE",
-    "README.md"
+    "dist/cjs/index.cjs",
+    "dist/cjs/index.d.cts",
+    "dist/cjs/types.d.ts",
+    "dist/esm/index.js",
+    "dist/esm/index.d.ts",
+    "dist/esm/types.d.ts",
+    "README.md",
+    "LICENSE"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "directories": {
     "test": "tests"
   },
   "scripts": {
     "build": "rollup -c && tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json",
-    "prepare": "npm run build",
     "test": "mocha tests/"
   },
   "repository": {
