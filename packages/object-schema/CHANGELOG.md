@@ -2,7 +2,6 @@
 
 ## [2.1.0](https://github.com/eslint/rewrite/compare/object-schema-v2.0.3...object-schema-v2.1.0) (2024-05-08)
 
-
 ### Features
 
 * Add types to config-array ([#3](https://github.com/eslint/rewrite/issues/3)) ([8b80e81](https://github.com/eslint/rewrite/commit/8b80e81cd0613ef1eccd15eacc0dbfad7a689dbf))

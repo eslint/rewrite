@@ -2,7 +2,6 @@
 
 ## [0.14.0](https://github.com/eslint/rewrite/compare/config-array-v0.13.0...config-array-v0.14.0) (2024-05-08)
 
-
 ### Features
 
 * Add config-array package ([4a2274d](https://github.com/eslint/rewrite/commit/4a2274def58d1d41352b33f4e9c197d258fb5a36))
