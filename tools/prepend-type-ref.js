@@ -5,7 +5,7 @@
  * before tsc is run. This script is run after tsc is run.
  *
  * Usage:
- *  node scripts/prepend-type-ref.js filename.js
+ *  node tools/prepend-type-ref.js filename.js
  *
  * @author Nicholas C. Zakas
  */
