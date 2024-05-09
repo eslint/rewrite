@@ -40,11 +40,11 @@ In this example, there are two config objects: the first matches all JSON files 
 You can install the package using npm or Yarn:
 
 ```bash
-npm install @humanwhocodes/config-array --save
+npm install @eslint/config-array --save
 
 # or
 
-yarn add @humanwhocodes/config-array
+yarn add @eslint/config-array
 ```
 
 ## Usage
@@ -52,11 +52,11 @@ yarn add @humanwhocodes/config-array
 First, import the `ConfigArray` constructor:
 
 ```js
-import { ConfigArray } from "@humanwhocodes/config-array";
+import { ConfigArray } from "@eslint/config-array";
 
 // or using CommonJS
 
-const { ConfigArray } = require("@humanwhocodes/config-array");
+const { ConfigArray } = require("@eslint/config-array");
 ```
 
 When you create a new instance of `ConfigArray`, you must pass in two arguments: an array of configs and an options object. The array of configs is most likely read in from a configuration file, so here's a typical example:
@@ -78,7 +78,7 @@ This example reads in an object or array from `my.config.js` and passes it into 
 
 ### Specifying a Schema
 
-The `schema` option is required for you to use additional properties in config objects. The schema is an object that follows the format of an [`ObjectSchema`](https://npmjs.com/package/@humanwhocodes/object-schema). The schema specifies both validation and merge rules that the `ConfigArray` instance needs to combine configs when there are multiple matches. Here's an example:
+The `schema` option is required for you to use additional properties in config objects. The schema is an object that follows the format of an [`ObjectSchema`](https://npmjs.com/package/@eslint/object-schema). The schema specifies both validation and merge rules that the `ConfigArray` instance needs to combine configs when there are multiple matches. Here's an example:
 
 ```js
 const configFilename = path.resolve(process.cwd(), "my.config.js");
