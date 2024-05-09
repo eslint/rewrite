@@ -14,16 +14,7 @@
     }
   },
   "files": [
-    "dist/cjs/index.cjs",
-    "dist/cjs/index.d.cts",
-    "dist/cjs/types.ts",
-    "dist/cjs/types.d.ts",
-    "dist/esm/index.js",
-    "dist/esm/index.d.ts",
-    "dist/esm/types.ts",
-    "dist/esm/types.d.ts",
-    "README.md",
-    "LICENSE"
+    "dist"
   ],
   "publishConfig": {
     "access": "public"
