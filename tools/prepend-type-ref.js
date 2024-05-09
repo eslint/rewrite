@@ -5,7 +5,7 @@
  * before tsc is run. This script is run after tsc is run.
  *
  * Usage:
- *  node scripts/prepend-type-ref.js filename.js
+ *  node tools/prepend-type-ref.js filename.js
  *
  * @author Nicholas C. Zakas
  */
@@ -22,7 +22,7 @@ import path from "node:path";
 //-----------------------------------------------------------------------------
 
 // read file from the command line
-const filePath = process.argv.slice(2)[0];
+const filePath = process.argv[2];
 const filename = path.basename(filePath, ".js");
 
 // read the file
