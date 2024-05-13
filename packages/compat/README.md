@@ -1,6 +1,5 @@
 # ESLint Compatibility Utilities
 
-
 ## Overview
 
 This packages contains functions that allow you to wrap existing ESLint rules, plugins, and configurations that were intended for use with ESLint v8.x to allow them to work as-is in ESLint v9.x.
@@ -29,9 +28,9 @@ deno add @eslint/compat
 
 This package exports the following functions in both ESM and CommonJS format:
 
-* `fixupRule(rule)` - wraps the given rule in a compatibility layer and returns the result
-* `fixupPluginRules(plugin)` - wraps each rule in the given plugin using `fixupRule()` and returns a new object that represents the plugin with the fixed-up rules
-* `fixupConfigRules(configs)` - wraps all plugins found in an array of config objects using `fixupPluginRules()`
+-   `fixupRule(rule)` - wraps the given rule in a compatibility layer and returns the result
+-   `fixupPluginRules(plugin)` - wraps each rule in the given plugin using `fixupRule()` and returns a new object that represents the plugin with the fixed-up rules
+-   `fixupConfigRules(configs)` - wraps all plugins found in an array of config objects using `fixupPluginRules()`
 
 ### Fixing Rules
 
@@ -77,15 +76,15 @@ import { fixupPluginRules } from "@eslint/compat";
 import somePlugin from "eslint-plugin-some-plugin";
 
 export default [
-    {
-        plugins: {
-            // insert the fixed plugin instead of the original
-            somePlugin: fixupPluginRules(somePlugin)
-        },
-        rules: {
-            "somePlugin/rule-name": "error"
-        }
-    }
+	{
+		plugins: {
+			// insert the fixed plugin instead of the original
+			somePlugin: fixupPluginRules(somePlugin),
+		},
+		rules: {
+			"somePlugin/rule-name": "error",
+		},
+	},
 ];
 ```
 
@@ -97,15 +96,15 @@ const { fixupPluginRules } = require("@eslint/compat");
 const somePlugin = require("eslint-plugin-some-plugin");
 
 module.exports = [
-    {
-        plugins: {
-            // insert the fixed plugin instead of the original
-            somePlugin: fixupPluginRules(somePlugin)
-        },
-        rules: {
-            "somePlugin/rule-name": "error"
-        }
-    }
+	{
+		plugins: {
+			// insert the fixed plugin instead of the original
+			somePlugin: fixupPluginRules(somePlugin),
+		},
+		rules: {
+			"somePlugin/rule-name": "error",
+		},
+	},
 ];
 ```
 
@@ -119,10 +118,10 @@ import { fixupConfigRules } from "@eslint/compat";
 import someConfig from "eslint-config-some-config";
 
 export default [
-    ...fixupConfigRules(someConfig),
-    {
-        // your overrides
-    }
+	...fixupConfigRules(someConfig),
+	{
+		// your overrides
+	},
 ];
 ```
 
@@ -134,10 +133,10 @@ const { fixupConfigRules } = require("@eslint/compat");
 const someConfig = require("eslint-config-some-config");
 
 module.exports = [
-    ...fixupConfigRules(someConfig),
-    {
-        // your overrides
-    }
+	...fixupConfigRules(someConfig),
+	{
+		// your overrides
+	},
 ];
 ```
 

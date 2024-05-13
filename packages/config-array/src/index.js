@@ -3,4 +3,4 @@
  * @author Nicholas C. Zakas
  */
 
-export { ConfigArray, ConfigArraySymbol } from './config-array.js';
+export { ConfigArray, ConfigArraySymbol } from "./config-array.js";

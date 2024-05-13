@@ -14,7 +14,7 @@ export default [
 				afterEach: "readonly",
 				before: "readonly",
 				after: "readonly",
-			}
-		}
-	}
+			},
+		},
+	},
 ];

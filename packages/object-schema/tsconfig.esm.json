@@ -1,4 +1,4 @@
 {
   "extends": "./tsconfig.json",
-  "files": ["dist/esm/index.js"],
+  "files": ["dist/esm/index.js"]
 }

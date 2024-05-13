@@ -4,20 +4,18 @@
  */
 
 export interface BaseConfigObject {
+	/**
+	 * The files to include.
+	 */
+	files?: string[];
 
-    /**
-     * The files to include.
-     */
-    files?: string[];
+	/**
+	 * The files to exclude.
+	 */
+	ignores?: string[];
 
-    /**
-     * The files to exclude.
-     */
-    ignores?: string[];
-
-    /**
-     * The name of the config object.
-     */
-    name?: string;
-
+	/**
+	 * The name of the config object.
+	 */
+	name?: string;
 }
