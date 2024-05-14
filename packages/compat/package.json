@@ -23,8 +23,9 @@
     "test": "tests"
   },
   "scripts": {
-    "build:prepend-type-ref": "node ../../tools/prepend-type-ref.js dist/esm/index.js",
-    "build": "rollup -c && tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && npm run build:prepend-type-ref",
+    "build:cts": "node -e \"fs.copyFileSync('dist/esm/index.d.ts', 'dist/cjs/index.d.cts')\"",
+    "build": "rollup -c && tsc -p tsconfig.esm.json && npm run build:cts",
+    "test:jsr": "npx jsr@latest publish --dry-run",
     "test": "mocha tests/*.js"
   },
   "repository": {
