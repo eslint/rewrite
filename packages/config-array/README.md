@@ -6,7 +6,7 @@ If you find this useful, please consider supporting my work with a [donation](ht
 
 ## Description
 
-A config array is a way of managing configurations that are based on glob pattern matching of filenames. Each config array contains the information needed to determine the correct configuration for any file based on the filename. 
+A config array is a way of managing configurations that are based on glob pattern matching of filenames. Each config array contains the information needed to determine the correct configuration for any file based on the filename.
 
 ## Background
 
@@ -16,20 +16,19 @@ The basic idea is that all configuration, including overrides, can be represente
 
 ```js
 export default [
+	// match all JSON files
+	{
+		name: "JSON Handler",
+		files: ["**/*.json"],
+		handler: jsonHandler,
+	},
 
-    // match all JSON files
-    {
-        name: "JSON Handler",
-        files: ["**/*.json"],
-        handler: jsonHandler
-    },
-
-    // match only package.json
-    {
-        name: "package.json Handler",
-        files: ["package.json"],
-        handler: packageJsonHandler
-    }
+	// match only package.json
+	{
+		name: "package.json Handler",
+		files: ["package.json"],
+		handler: packageJsonHandler,
+	},
 ];
 ```
 
@@ -65,12 +64,11 @@ When you create a new instance of `ConfigArray`, you must pass in two arguments:
 const configFilename = path.resolve(process.cwd(), "my.config.js");
 const { default: rawConfigs } = await import(configFilename);
 const configs = new ConfigArray(rawConfigs, {
-    
-    // the path to match filenames from
-    basePath: process.cwd(),
+	// the path to match filenames from
+	basePath: process.cwd(),
 
-    // additional items in each config
-    schema: mySchema
+	// additional items in each config
+	schema: mySchema,
 });
 ```
 
@@ -102,7 +100,7 @@ const mySchema = {
 };
 
 const configs = new ConfigArray(rawConfigs, {
-    
+
     // the path to match filenames from
     basePath: process.cwd(),
 
@@ -120,51 +118,49 @@ Config arrays can be multidimensional, so it's possible for a config array to co
 
 ```js
 export default [
-    
-    // JS config
-    {
-        files: ["**/*.js"],
-        handler: jsHandler
-    },
+	// JS config
+	{
+		files: ["**/*.js"],
+		handler: jsHandler,
+	},
 
-    // JSON configs
-    [
+	// JSON configs
+	[
+		// match all JSON files
+		{
+			name: "JSON Handler",
+			files: ["**/*.json"],
+			handler: jsonHandler,
+		},
 
-        // match all JSON files
-        {
-            name: "JSON Handler",
-            files: ["**/*.json"],
-            handler: jsonHandler
-        },
+		// match only package.json
+		{
+			name: "package.json Handler",
+			files: ["package.json"],
+			handler: packageJsonHandler,
+		},
+	],
 
-        // match only package.json
-        {
-            name: "package.json Handler",
-            files: ["package.json"],
-            handler: packageJsonHandler
-        }
-    ],
+	// filename must match function
+	{
+		files: [filePath => filePath.endsWith(".md")],
+		handler: markdownHandler,
+	},
 
-    // filename must match function
-    {
-        files: [ filePath => filePath.endsWith(".md") ],
-        handler: markdownHandler
-    },
+	// filename must match all patterns in subarray
+	{
+		files: [["*.test.*", "*.js"]],
+		handler: jsTestHandler,
+	},
 
-    // filename must match all patterns in subarray
-    {
-        files: [ ["*.test.*", "*.js"] ],
-        handler: jsTestHandler
-    },
-
-    // filename must not match patterns beginning with !
-    {
-        name: "Non-JS files",
-        files: ["!*.js"],
-        settings: {
-            js: false
-        }
-    }
+	// filename must not match patterns beginning with !
+	{
+		name: "Non-JS files",
+		files: ["!*.js"],
+		settings: {
+			js: false,
+		},
+	},
 ];
 ```
 
@@ -180,7 +176,7 @@ You can also specify an `ignores` key that will force files matching those patte
 
 ```js
 export default [
-    
+
     // Always ignored
     {
         ignores: ["**/.git/**", "**/node_modules/**"]
@@ -199,13 +195,11 @@ You can use negated patterns in `ignores` to exclude a file that was already ign
 
 ```js
 export default [
-    
-    // Ignore all JSON files except tsconfig.json
-    {
-        files: ["**/*"],
-        ignores: ["**/*.json", "!tsconfig.json"]
-    },
-
+	// Ignore all JSON files except tsconfig.json
+	{
+		files: ["**/*"],
+		ignores: ["**/*.json", "!tsconfig.json"],
+	},
 ];
 ```
 
@@ -215,32 +209,30 @@ Config arrays can also include config functions when `extraConfigTypes` contains
 
 ```js
 export default [
-    
-    // JS config
-    {
-        files: ["**/*.js"],
-        handler: jsHandler
-    },
+	// JS config
+	{
+		files: ["**/*.js"],
+		handler: jsHandler,
+	},
 
-    // JSON configs
-    function (context) {
-        return [
+	// JSON configs
+	function (context) {
+		return [
+			// match all JSON files
+			{
+				name: context.name + " JSON Handler",
+				files: ["**/*.json"],
+				handler: jsonHandler,
+			},
 
-            // match all JSON files
-            {
-                name: context.name + " JSON Handler",
-                files: ["**/*.json"],
-                handler: jsonHandler
-            },
-
-            // match only package.json
-            {
-                name: context.name + " package.json Handler",
-                files: ["package.json"],
-                handler: packageJsonHandler
-            }
-        ];
-    }
+			// match only package.json
+			{
+				name: context.name + " package.json Handler",
+				files: ["package.json"],
+				handler: packageJsonHandler,
+			},
+		];
+	},
 ];
 ```
 
@@ -256,7 +248,7 @@ To normalize a config array, call the `normalize()` method and pass in a context
 
 ```js
 await configs.normalize({
-    name: "MyApp"
+	name: "MyApp",
 });
 ```
 
@@ -266,7 +258,7 @@ If you want to disallow async config functions, you can call `normalizeSync()` i
 
 ```js
 await configs.normalizeSync({
-    name: "MyApp"
+	name: "MyApp",
 });
 ```
 
@@ -278,49 +270,51 @@ To get the config for a file, use the `getConfig()` method on a normalized confi
 
 ```js
 // pass in absolute filename
-const fileConfig = configs.getConfig(path.resolve(process.cwd(), "package.json"));
+const fileConfig = configs.getConfig(
+	path.resolve(process.cwd(), "package.json"),
+);
 ```
 
 The config array always returns an object, even if there are no configs matching the given filename. You can then inspect the returned config object to determine how to proceed.
 
 A few things to keep in mind:
 
-* You must pass in the absolute filename to get a config for.
-* The returned config object never has `files`, `ignores`, or `name` properties; the only properties on the object will be the other configuration options specified.
-* The config array caches configs, so subsequent calls to `getConfig()` with the same filename will return in a fast lookup rather than another calculation.
-* A config will only be generated if the filename matches an entry in a `files` key. A config will not be generated without matching a `files` key (configs without a `files` key are only applied when another config with a `files` key is applied; configs without `files` are never applied on their own). Any config with a `files` key entry ending with `/**` or `/*` will only be applied if another entry in the same `files` key matches or another config matches.
+-   You must pass in the absolute filename to get a config for.
+-   The returned config object never has `files`, `ignores`, or `name` properties; the only properties on the object will be the other configuration options specified.
+-   The config array caches configs, so subsequent calls to `getConfig()` with the same filename will return in a fast lookup rather than another calculation.
+-   A config will only be generated if the filename matches an entry in a `files` key. A config will not be generated without matching a `files` key (configs without a `files` key are only applied when another config with a `files` key is applied; configs without `files` are never applied on their own). Any config with a `files` key entry ending with `/**` or `/*` will only be applied if another entry in the same `files` key matches or another config matches.
 
 ## Determining Ignored Paths
 
 You can determine if a file is ignored by using the `isFileIgnored()` method and passing in the absolute path of any file, as in this example:
 
 ```js
-const ignored = configs.isFileIgnored('/foo/bar/baz.txt');
+const ignored = configs.isFileIgnored("/foo/bar/baz.txt");
 ```
 
 A file is considered ignored if any of the following is true:
 
-* **It's parent directory is ignored.** For example, if `foo` is in `ignores`, then `foo/a.js` is considered ignored.
-* **It has an ancestor directory that is ignored.** For example, if `foo` is in `ignores`, then `foo/baz/a.js` is considered ignored.
-* **It matches an ignored file pattern.** For example, if `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
-* **If it matches an entry in `files` and also in `ignores`.** For example, if `**/*.js` is in `files` and `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
-* **The file is outside the `basePath`.** If the `basePath` is `/usr/me`, then `/foo/a.js` is considered ignored.
+-   **It's parent directory is ignored.** For example, if `foo` is in `ignores`, then `foo/a.js` is considered ignored.
+-   **It has an ancestor directory that is ignored.** For example, if `foo` is in `ignores`, then `foo/baz/a.js` is considered ignored.
+-   **It matches an ignored file pattern.** For example, if `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
+-   **If it matches an entry in `files` and also in `ignores`.** For example, if `**/*.js` is in `files` and `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
+-   **The file is outside the `basePath`.** If the `basePath` is `/usr/me`, then `/foo/a.js` is considered ignored.
 
 For directories, use the `isDirectoryIgnored()` method and pass in the absolute path of any directory, as in this example:
 
 ```js
-const ignored = configs.isDirectoryIgnored('/foo/bar/');
+const ignored = configs.isDirectoryIgnored("/foo/bar/");
 ```
 
 A directory is considered ignored if any of the following is true:
 
-* **It's parent directory is ignored.** For example, if `foo` is in `ignores`, then `foo/baz` is considered ignored.
-* **It has an ancestor directory that is ignored.** For example, if `foo` is in `ignores`, then `foo/bar/baz/a.js` is considered ignored.
-* **It matches and ignored file pattern.** For example, if `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
-* **If it matches an entry in `files` and also in `ignores`.** For example, if `**/*.js` is in `files` and `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
-* **The file is outside the `basePath`.** If the `basePath` is `/usr/me`, then `/foo/a.js` is considered ignored.
+-   **It's parent directory is ignored.** For example, if `foo` is in `ignores`, then `foo/baz` is considered ignored.
+-   **It has an ancestor directory that is ignored.** For example, if `foo` is in `ignores`, then `foo/bar/baz/a.js` is considered ignored.
+-   **It matches and ignored file pattern.** For example, if `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
+-   **If it matches an entry in `files` and also in `ignores`.** For example, if `**/*.js` is in `files` and `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
+-   **The file is outside the `basePath`.** If the `basePath` is `/usr/me`, then `/foo/a.js` is considered ignored.
 
-**Important:** A pattern such as `foo/**` means that `foo` and `foo/` are *not* ignored whereas `foo/bar` is ignored. If you want to ignore `foo` and all of its subdirectories, use the pattern `foo` or `foo/` in `ignores`.
+**Important:** A pattern such as `foo/**` means that `foo` and `foo/` are _not_ ignored whereas `foo/bar` is ignored. If you want to ignore `foo` and all of its subdirectories, use the pattern `foo` or `foo/` in `ignores`.
 
 ## Caching Mechanisms
 
@@ -333,9 +327,9 @@ Each `ConfigArray` aggressively caches configuration objects to avoid unnecessar
 
 The design of this project was influenced by feedback on the ESLint RFC, and incorporates ideas from:
 
-* Teddy Katz (@not-an-aardvark)
-* Toru Nagashima (@mysticatea)
-* Kai Cataldo (@kaicataldo)
+-   Teddy Katz (@not-an-aardvark)
+-   Toru Nagashima (@mysticatea)
+-   Kai Cataldo (@kaicataldo)
 
 ## License
 

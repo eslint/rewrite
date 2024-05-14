@@ -1,16 +1,16 @@
 {
-    "name": "@eslint/compat",
-    "version": "1.0.1",
-    "exports": "./dist/esm/index.js",
-    "publish": {
-        "include": [
-            "dist/esm/index.js",
-            "dist/esm/index.d.ts",
-            "dist/esm/types.d.ts",
-            "dist/esm/types.ts",
-            "README.md",
-            "jsr.json",
-            "LICENSE"
-        ]
-    }
+  "name": "@eslint/compat",
+  "version": "1.0.1",
+  "exports": "./dist/esm/index.js",
+  "publish": {
+    "include": [
+      "dist/esm/index.js",
+      "dist/esm/index.d.ts",
+      "dist/esm/types.d.ts",
+      "dist/esm/types.ts",
+      "README.md",
+      "jsr.json",
+      "LICENSE"
+    ]
+  }
 }
