@@ -50,6 +50,34 @@ jobs:
             #-----------------------------------------------------------------------------
 
             #-----------------------------------------------------------------------------
+            # @eslint/migrate-config
+            #-----------------------------------------------------------------------------
+
+            - name: Publish @eslint/migrate-config package to npm
+              run: npm publish -w packages/migrate-config
+              if: ${{ steps.release.outputs['packages/migrate-config--release_created'] }}
+              env:
+                  NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+
+            # NOTE: No JSR package because JSR doesn't support CLIs
+
+            - name: Tweet Release Announcement
+              run: npx @humanwhocodes/tweet "@eslint/migrate-config v${{ steps.release.outputs['packages/migrate-config--major'] }}.${{ steps.release.outputs['packages/migrate-config--minor'] }}.${{ steps.release.outputs['packages/migrate-config--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/v${{ steps.release.outputs['packages/migrate-config--tag_name'] }}"
+              if: ${{ steps.release.outputs['packages/migrate-config--release_created'] }}
+              env:
+                  TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
+                  TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
+                  TWITTER_ACCESS_TOKEN_KEY: ${{ secrets.TWITTER_ACCESS_TOKEN_KEY }}
+                  TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+
+            - name: Toot Release Announcement
+              run: npx @humanwhocodes/toot "@eslint/migrate-config v${{ steps.release.outputs['packages/migrate-config--major'] }}.${{ steps.release.outputs['packages/migrate-config--minor'] }}.${{ steps.release.outputs['packages/migrate-config--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/v${{ steps.release.outputs['packages/migrate-config--tag_name'] }}"'
+              if: ${{ steps.release.outputs['packages/migrate-config--release_created'] }}
+              env:
+                  MASTODON_ACCESS_TOKEN: ${{ secrets.MASTODON_ACCESS_TOKEN }}
+                  MASTODON_HOST: ${{ secrets.MASTODON_HOST }}
+
+            #-----------------------------------------------------------------------------
             # @eslint/compat
             #-----------------------------------------------------------------------------
 

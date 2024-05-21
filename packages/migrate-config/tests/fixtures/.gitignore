@@ -1,0 +1,4 @@
+# Generated files
+eslint.config.*
+basic-eslintrc.mjs
+basic-eslintrc.cjs
