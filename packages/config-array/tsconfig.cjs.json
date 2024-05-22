@@ -1,9 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "files": ["dist/cjs/index.cjs"],
-  "compilerOptions": {
-    "outDir": "dist/cjs",
-    "moduleResolution": "Bundler",
-    "module": "Preserve"
-  }
-}

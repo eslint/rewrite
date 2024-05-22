@@ -10,6 +10,7 @@ export default {
 		{
 			file: "dist/esm/index.js",
 			format: "esm",
+			banner: '// @ts-self-types="./index.d.ts"',
 		},
 	],
 	plugins: [

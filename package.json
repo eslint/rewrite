@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "fmt": "prettier --write .",
-    "fmt:check": "prettier --check ."
+    "fmt:check": "prettier --check .",
+    "test:jsr": "npm run test:jsr --workspaces --if-present"
   },
   "workspaces": [
     "packages/*"
