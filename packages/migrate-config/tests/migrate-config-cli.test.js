@@ -27,6 +27,15 @@ const filePaths = [
 //-----------------------------------------------------------------------------
 
 /**
+ * Normalizes line endings in a string.
+ * @param {string} text The text to normalize.
+ * @returns {string} The normalized text.
+ */
+function normalizeLineEndings(text) {
+	return text.replace(/\r\n/g, "\n");
+}
+
+/**
  * Asserts that two files have the same contents.
  * @param {string} resultPath The path to the actual file.
  * @param {string} expectedPath The path to the expected file.
@@ -37,8 +46,8 @@ async function assertFilesEqual(resultPath, expectedPath) {
 	const expected = await fsp.readFile(expectedPath, "utf8");
 	const actual = await fsp.readFile(resultPath, "utf8");
 	assert.strictEqual(
-		actual,
-		expected,
+		normalizeLineEndings(actual),
+		normalizeLineEndings(expected),
 		`Files ${resultPath} and ${expectedPath} do not have the same contents`,
 	);
 }
