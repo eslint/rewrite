@@ -71,7 +71,7 @@ module.exports = [{
         sourceType: "module",
 
         parserOptions: {
-            project: "C:\\Users\\nzaka\\projects\\eslint\\rewrite\\packages\\migrate-config\\tests\\fixtures\\prisma\\tsconfig.json",
+            project: "tsconfig.json",
         },
     },
 
