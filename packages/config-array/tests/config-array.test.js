@@ -1646,13 +1646,13 @@ describe("ConfigArray", () => {
 
 			// https://github.com/eslint/eslint/pull/16579/files
 			describe("gitignore-style unignores", () => {
-				it('should return "unconfigured" when a subdirectory is ignored and then we try to unignore a directory', () => {
+				it('should return "ignored" when a subdirectory is ignored and then we try to unignore a directory', () => {
 					configs = new ConfigArray(
 						[
 							{
 								ignores: [
-									"/**/node_modules/*",
-									"!/node_modules/foo",
+									"**/node_modules/*",
+									"!node_modules/",
 								],
 							},
 						],
@@ -1667,17 +1667,17 @@ describe("ConfigArray", () => {
 
 					assert.strictEqual(
 						configs.getConfigStatus(filename),
-						"unconfigured",
+						"ignored",
 					);
 				});
 
-				it('should return "unconfigured" when a subdirectory is ignored and then we try to unignore a file', () => {
+				it('should return "ignored" when a subdirectory is ignored and then we try to unignore a file', () => {
 					configs = new ConfigArray(
 						[
 							{
 								ignores: [
-									"/**/node_modules/*",
-									"!/node_modules/foo/**",
+									"**/node_modules/*",
+									"!node_modules/foo/*.js",
 								],
 							},
 						],
@@ -1692,17 +1692,17 @@ describe("ConfigArray", () => {
 
 					assert.strictEqual(
 						configs.getConfigStatus(filename),
-						"unconfigured",
+						"ignored",
 					);
 				});
 
-				it("should return true when all descendant directories are ignored and then we try to unignore a file", () => {
+				it('should return "ignored" when all descendant directories are ignored and then we try to unignore a file', () => {
 					configs = new ConfigArray(
 						[
 							{
 								ignores: [
-									"/**/node_modules/**",
-									"!/node_modules/foo/**",
+									"**/node_modules/**",
+									"!node_modules/foo/*.js",
 								],
 							},
 						],
@@ -1717,7 +1717,7 @@ describe("ConfigArray", () => {
 
 					assert.strictEqual(
 						configs.getConfigStatus(filename),
-						"unconfigured",
+						"ignored",
 					);
 				});
 
@@ -2345,13 +2345,13 @@ describe("ConfigArray", () => {
 
 			// https://github.com/eslint/eslint/pull/16579/files
 			describe("gitignore-style unignores", () => {
-				it("should return false when a subdirectory is ignored and then we try to unignore a directory", () => {
+				it("should return true when a subdirectory is ignored and then we try to unignore a directory", () => {
 					configs = new ConfigArray(
 						[
 							{
 								ignores: [
-									"/**/node_modules/*",
-									"!/node_modules/foo",
+									"**/node_modules/*",
+									"!node_modules/",
 								],
 							},
 						],
@@ -2364,16 +2364,16 @@ describe("ConfigArray", () => {
 						"node_modules/foo/bar.js",
 					);
 
-					assert.strictEqual(configs.isFileIgnored(filename), false);
+					assert.strictEqual(configs.isFileIgnored(filename), true);
 				});
 
-				it("should return false when a subdirectory is ignored and then we try to unignore a file", () => {
+				it("should return true when a subdirectory is ignored and then we try to unignore a file", () => {
 					configs = new ConfigArray(
 						[
 							{
 								ignores: [
-									"/**/node_modules/*",
-									"!/node_modules/foo/**",
+									"**/node_modules/*",
+									"!node_modules/foo/*.js",
 								],
 							},
 						],
@@ -2386,16 +2386,16 @@ describe("ConfigArray", () => {
 						"node_modules/foo/bar.js",
 					);
 
-					assert.strictEqual(configs.isFileIgnored(filename), false);
+					assert.strictEqual(configs.isFileIgnored(filename), true);
 				});
 
-				it("should return false when all descendant directories are ignored and then we try to unignore a file", () => {
+				it("should return true when all descendant directories are ignored and then we try to unignore a file", () => {
 					configs = new ConfigArray(
 						[
 							{
 								ignores: [
-									"/**/node_modules/**",
-									"!/node_modules/foo/**",
+									"**/node_modules/**",
+									"!node_modules/foo/*.js",
 								],
 							},
 						],
@@ -2408,7 +2408,7 @@ describe("ConfigArray", () => {
 						"node_modules/foo/bar.js",
 					);
 
-					assert.strictEqual(configs.isFileIgnored(filename), false);
+					assert.strictEqual(configs.isFileIgnored(filename), true);
 				});
 
 				it("should return true when all descendant directories are ignored without leading slash and then we try to unignore a file", () => {
@@ -2922,14 +2922,11 @@ describe("ConfigArray", () => {
 					);
 				});
 
-				it("should return false when first-level subdirectories are ignored with leading slash and then one is negated", () => {
+				it("should return false when attempting to ignore first-level subdirectories with leading slash", () => {
 					configs = new ConfigArray(
 						[
 							{
-								ignores: [
-									"/**/node_modules/*",
-									"!**/node_modules/foo/",
-								],
+								ignores: ["/**/node_modules/*"],
 							},
 						],
 						{ basePath },
