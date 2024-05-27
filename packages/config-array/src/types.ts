@@ -3,7 +3,7 @@
  * @author Nicholas C. Zakas
  */
 
-export interface BaseConfigObject {
+export interface ConfigObject {
 	/**
 	 * The files to include.
 	 */
@@ -18,4 +18,7 @@ export interface BaseConfigObject {
 	 * The name of the config object.
 	 */
 	name?: string;
+
+	// may also have any number of other properties
+	[key: string]: unknown;
 }

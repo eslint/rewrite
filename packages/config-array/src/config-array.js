@@ -21,7 +21,7 @@ import { filesAndIgnoresSchema } from "./files-and-ignores-schema.js";
 
 /** @typedef {import("@eslint/object-schema").PropertyDefinition} PropertyDefinition */
 /** @typedef {import("@eslint/object-schema").ObjectDefinition} ObjectDefinition */
-/** @typedef {import("./types.ts").BaseConfigObject} BaseConfigObject */
+/** @typedef {import("./types.ts").ConfigObject} ConfigObject */
 /** @typedef {import("minimatch").IMinimatchStatic} IMinimatchStatic */
 /** @typedef {import("minimatch").IMinimatch} IMinimatch */
 
@@ -125,7 +125,7 @@ class ConfigError extends Error {
 
 /**
  * Gets the name of a config object.
- * @param {BaseConfigObject} config The config object to get the name of.
+ * @param {ConfigObject} config The config object to get the name of.
  * @returns {string} The name of the config object.
  */
 function getConfigName(config) {
