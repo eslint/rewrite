@@ -12,11 +12,11 @@
 // Types
 //-----------------------------------------------------------------------------
 
-/** @typedef {import("./types.ts").FixupRuleDefinition} FixupRuleDefinition */
-/** @typedef {import("./types.ts").FixupLegacyRuleDefinition} FixupLegacyRuleDefinition */
-/** @typedef {import("./types.ts").FixupPluginDefinition} FixupPluginDefinition */
-/** @typedef {import("./types.ts").FixupConfig} FixupConfig */
-/** @typedef {import("./types.ts").FixupConfigArray} FixupConfigArray */
+/** @typedef {import("eslint").ESLint.Plugin} FixupPluginDefinition */
+/** @typedef {import("eslint").Rule.RuleModule} FixupRuleDefinition */
+/** @typedef {import("eslint").Rule.OldStyleRule} FixupLegacyRuleDefinition */
+/** @typedef {import("eslint").Linter.FlatConfig} FixupConfig */
+/** @typedef {Array<FixupConfig>} FixupConfigArray */
 
 //-----------------------------------------------------------------------------
 // Data

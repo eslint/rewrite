@@ -45,11 +45,11 @@
   },
   "homepage": "https://github.com/eslint/rewrite#readme",
   "devDependencies": {
+    "@types/eslint": "^8.56.10",
     "eslint": "^9.0.0",
     "mocha": "^10.4.0",
     "rollup": "^4.16.2",
-    "typescript": "^5.4.5",
-    "rollup-plugin-copy": "^3.5.0"
+    "typescript": "^5.4.5"
   },
   "engines": {
     "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
