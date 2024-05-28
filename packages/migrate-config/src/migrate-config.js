@@ -423,8 +423,18 @@ function createLanguageOptions(migration, config) {
 		properties.push(b.property("init", b.identifier("globals"), globals));
 	}
 
-	// For `env` we will need to the `globals` package
-	if (config.env && Object.keys(config.env).some(name => !name.startsWith("es"))) {
+	/*
+	 * For `env`, we need the `globals` package if there are any environments
+	 * that aren't ECMAScript environments and also aren't from plugins
+	 * (the name contains a slash).
+	 */
+	const needsGlobals =
+		config.env &&
+		Object.keys(config.env).some(envName => {
+			return !envName.startsWith("es") && !envName.includes("/");
+		});
+
+	if (needsGlobals && !imports.has("globals")) {
 		imports.set("globals", {
 			name: "globals",
 			added: true,

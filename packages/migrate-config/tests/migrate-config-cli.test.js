@@ -20,6 +20,7 @@ const filePaths = [
 	"prisma/.eslintrc.cjs",
 	"reveal-md/.eslintrc",
 	"release-it/.eslintrc.json",
+	"no-globals-for-env/.eslintrc.yml",
 ].map(file => `tests/fixtures/${file}`);
 
 //-----------------------------------------------------------------------------
