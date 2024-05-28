@@ -635,6 +635,81 @@ describe("ConfigArray", () => {
 			});
 		});
 
+		describe("getConfigWithStatus()", () => {
+			it("should throw an error when not normalized", () => {
+				const filename = path.resolve(basePath, "foo.js");
+
+				assert.throws(() => {
+					unnormalizedConfigs.getConfigWithStatus(filename);
+				}, /normalized/);
+			});
+
+			describe("should return expected results", () => {
+				it("for a file outside the base path", () => {
+					const filename = path.resolve(basePath, "../foo.js");
+					const configWithStatus =
+						configs.getConfigWithStatus(filename);
+
+					assert(Object.isFrozen(configWithStatus));
+					assert.strictEqual(configWithStatus.config, undefined);
+					assert.strictEqual(configWithStatus.status, "external");
+				});
+
+				it("for a file ignored based on directory pattern", () => {
+					const filename = path.resolve(
+						basePath,
+						"node_modules/foo.js",
+					);
+					const configWithStatus =
+						configs.getConfigWithStatus(filename);
+
+					assert(Object.isFrozen(configWithStatus));
+					assert.strictEqual(configWithStatus.config, undefined);
+					assert.strictEqual(configWithStatus.status, "ignored");
+				});
+
+				it("for a file ignored based on file pattern", () => {
+					const filename = path.resolve(basePath, ".gitignore");
+					const configWithStatus =
+						configs.getConfigWithStatus(filename);
+
+					assert(Object.isFrozen(configWithStatus));
+					assert.strictEqual(configWithStatus.config, undefined);
+					assert.strictEqual(configWithStatus.status, "ignored");
+				});
+
+				it("for a file without a matching config object", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*"],
+							},
+						],
+						{ basePath },
+					);
+
+					configs.normalizeSync();
+					const filename = path.resolve(basePath, "foo.bar");
+					const configWithStatus =
+						configs.getConfigWithStatus(filename);
+
+					assert(Object.isFrozen(configWithStatus));
+					assert.strictEqual(configWithStatus.config, undefined);
+					assert.strictEqual(configWithStatus.status, "unconfigured");
+				});
+
+				it("for a file with a config", () => {
+					const filename = path.resolve(basePath, "foo.js");
+					const configWithStatus =
+						configs.getConfigWithStatus(filename);
+
+					assert(Object.isFrozen(configWithStatus));
+					assert.notEqual(configWithStatus.config, undefined);
+					assert.strictEqual(configWithStatus.status, "matched");
+				});
+			});
+		});
+
 		describe("getConfig()", () => {
 			it("should throw an error when not normalized", () => {
 				const filename = path.resolve(basePath, "foo.js");
