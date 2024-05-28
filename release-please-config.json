@@ -32,9 +32,9 @@
           "jsonpath": "$.version"
         }
       ]
+    },
+    "packages/migrate-config": {
+      "release-type": "node"
     }
-  },
-  "packages/migrate-config": {
-    "release-type": "node"
   }
 }
