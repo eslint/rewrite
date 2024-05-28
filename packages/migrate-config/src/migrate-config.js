@@ -424,7 +424,7 @@ function createLanguageOptions(migration, config) {
 	}
 
 	// For `env` we will need to the `globals` package
-	if (config.env) {
+	if (config.env && Object.keys(config.env).some(name => !name.startsWith("es"))) {
 		imports.set("globals", {
 			name: "globals",
 			added: true,
