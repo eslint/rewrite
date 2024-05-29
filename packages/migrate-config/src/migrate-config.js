@@ -730,7 +730,26 @@ function migrateConfigObject(migration, config) {
 		}
 	});
 
-	configArrayElements.push(b.objectExpression(properties));
+	/*
+	 * If there is an `extends` with a `files` and/or `ignores`, then it's possible this object
+	 * will contain only `files` (and/or `ignores`), in which case we don't need it because there
+	 * is already a config object with the same properties.
+	 */
+	const objectIsNeeded =
+		!config.extends ||
+		properties.some(property => {
+			if (property.key.type === "Identifier") {
+				return (
+					property.key.name !== "files" &&
+					property.key.name !== "ignores"
+				);
+			}
+
+			return true;
+		});
+	if (objectIsNeeded) {
+		configArrayElements.push(b.objectExpression(properties));
+	}
 
 	return configArrayElements;
 }
@@ -753,6 +772,14 @@ export function migrateConfig(config, { sourceType = "module" } = {}) {
 		),
 	];
 
+	// if the base config has no properties, then remove the empty object
+	if (
+		configArrayElements[0].type === "ObjectExpression" &&
+		configArrayElements[0].properties.length === 0
+	) {
+		configArrayElements.shift();
+	}
+
 	// add any overrides
 	if (config.overrides) {
 		config.overrides.forEach(override => {
@@ -762,7 +789,11 @@ export function migrateConfig(config, { sourceType = "module" } = {}) {
 		});
 	}
 
-	if (config.extends) {
+	// if any config has extends then we need to add imports
+	if (
+		config.extends ||
+		config.overrides?.some(override => override.extends)
+	) {
 		if (sourceType === "module") {
 			migration.imports.set("node:path", {
 				name: "path",
