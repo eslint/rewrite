@@ -653,6 +653,13 @@ describe("ConfigArray", () => {
 					assert(Object.isFrozen(configWithStatus));
 					assert.strictEqual(configWithStatus.config, undefined);
 					assert.strictEqual(configWithStatus.status, "external");
+
+					const newFilename = path.resolve(basePath, "../bar.js");
+					const newConfigWithStatus =
+						configs.getConfigWithStatus(newFilename);
+
+					// check that returned objects are reused
+					assert.strictEqual(newConfigWithStatus, configWithStatus);
 				});
 
 				it("for a file ignored based on directory pattern", () => {
@@ -666,6 +673,16 @@ describe("ConfigArray", () => {
 					assert(Object.isFrozen(configWithStatus));
 					assert.strictEqual(configWithStatus.config, undefined);
 					assert.strictEqual(configWithStatus.status, "ignored");
+
+					const newFilename = path.resolve(
+						basePath,
+						"node_modules/bar.js",
+					);
+					const newConfigWithStatus =
+						configs.getConfigWithStatus(newFilename);
+
+					// check that returned objects are reused
+					assert.strictEqual(newConfigWithStatus, configWithStatus);
 				});
 
 				it("for a file ignored based on file pattern", () => {
@@ -676,6 +693,16 @@ describe("ConfigArray", () => {
 					assert(Object.isFrozen(configWithStatus));
 					assert.strictEqual(configWithStatus.config, undefined);
 					assert.strictEqual(configWithStatus.status, "ignored");
+
+					const newFilename = path.resolve(
+						basePath,
+						"dir/.gitignore",
+					);
+					const newConfigWithStatus =
+						configs.getConfigWithStatus(newFilename);
+
+					// check that returned objects are reused
+					assert.strictEqual(newConfigWithStatus, configWithStatus);
 				});
 
 				it("for a file without a matching config object", () => {
@@ -696,6 +723,13 @@ describe("ConfigArray", () => {
 					assert(Object.isFrozen(configWithStatus));
 					assert.strictEqual(configWithStatus.config, undefined);
 					assert.strictEqual(configWithStatus.status, "unconfigured");
+
+					const newFilename = path.resolve(basePath, "foo.baz");
+					const newConfigWithStatus =
+						configs.getConfigWithStatus(newFilename);
+
+					// check that returned objects are reused
+					assert.strictEqual(newConfigWithStatus, configWithStatus);
 				});
 
 				it("for a file with a config", () => {
