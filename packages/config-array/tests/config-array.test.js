@@ -635,6 +635,115 @@ describe("ConfigArray", () => {
 			});
 		});
 
+		describe("getConfigWithStatus()", () => {
+			it("should throw an error when not normalized", () => {
+				const filename = path.resolve(basePath, "foo.js");
+
+				assert.throws(() => {
+					unnormalizedConfigs.getConfigWithStatus(filename);
+				}, /normalized/);
+			});
+
+			describe("should return expected results", () => {
+				it("for a file outside the base path", () => {
+					const filename = path.resolve(basePath, "../foo.js");
+					const configWithStatus =
+						configs.getConfigWithStatus(filename);
+
+					assert(Object.isFrozen(configWithStatus));
+					assert.strictEqual(configWithStatus.config, undefined);
+					assert.strictEqual(configWithStatus.status, "external");
+
+					const newFilename = path.resolve(basePath, "../bar.js");
+					const newConfigWithStatus =
+						configs.getConfigWithStatus(newFilename);
+
+					// check that returned objects are reused
+					assert.strictEqual(newConfigWithStatus, configWithStatus);
+				});
+
+				it("for a file ignored based on directory pattern", () => {
+					const filename = path.resolve(
+						basePath,
+						"node_modules/foo.js",
+					);
+					const configWithStatus =
+						configs.getConfigWithStatus(filename);
+
+					assert(Object.isFrozen(configWithStatus));
+					assert.strictEqual(configWithStatus.config, undefined);
+					assert.strictEqual(configWithStatus.status, "ignored");
+
+					const newFilename = path.resolve(
+						basePath,
+						"node_modules/bar.js",
+					);
+					const newConfigWithStatus =
+						configs.getConfigWithStatus(newFilename);
+
+					// check that returned objects are reused
+					assert.strictEqual(newConfigWithStatus, configWithStatus);
+				});
+
+				it("for a file ignored based on file pattern", () => {
+					const filename = path.resolve(basePath, ".gitignore");
+					const configWithStatus =
+						configs.getConfigWithStatus(filename);
+
+					assert(Object.isFrozen(configWithStatus));
+					assert.strictEqual(configWithStatus.config, undefined);
+					assert.strictEqual(configWithStatus.status, "ignored");
+
+					const newFilename = path.resolve(
+						basePath,
+						"dir/.gitignore",
+					);
+					const newConfigWithStatus =
+						configs.getConfigWithStatus(newFilename);
+
+					// check that returned objects are reused
+					assert.strictEqual(newConfigWithStatus, configWithStatus);
+				});
+
+				it("for a file without a matching config object", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*"],
+							},
+						],
+						{ basePath },
+					);
+
+					configs.normalizeSync();
+					const filename = path.resolve(basePath, "foo.bar");
+					const configWithStatus =
+						configs.getConfigWithStatus(filename);
+
+					assert(Object.isFrozen(configWithStatus));
+					assert.strictEqual(configWithStatus.config, undefined);
+					assert.strictEqual(configWithStatus.status, "unconfigured");
+
+					const newFilename = path.resolve(basePath, "foo.baz");
+					const newConfigWithStatus =
+						configs.getConfigWithStatus(newFilename);
+
+					// check that returned objects are reused
+					assert.strictEqual(newConfigWithStatus, configWithStatus);
+				});
+
+				it("for a file with a config", () => {
+					const filename = path.resolve(basePath, "foo.js");
+					const configWithStatus =
+						configs.getConfigWithStatus(filename);
+
+					assert(Object.isFrozen(configWithStatus));
+					assert.notEqual(configWithStatus.config, undefined);
+					assert.strictEqual(configWithStatus.status, "matched");
+				});
+			});
+		});
+
 		describe("getConfig()", () => {
 			it("should throw an error when not normalized", () => {
 				const filename = path.resolve(basePath, "foo.js");
@@ -961,6 +1070,793 @@ describe("ConfigArray", () => {
 			});
 		});
 
+		describe("getConfigStatus()", () => {
+			it("should throw an error when not normalized", () => {
+				const filename = path.resolve(basePath, "foo.js");
+				assert.throws(() => {
+					unnormalizedConfigs.getConfigStatus(filename);
+				}, /normalized/);
+			});
+
+			it('should return "matched" when passed JS filename', () => {
+				const filename = path.resolve(basePath, "foo.js");
+
+				assert.strictEqual(
+					configs.getConfigStatus(filename),
+					"matched",
+				);
+			});
+
+			it('should return "external" when passed JS filename in parent directory', () => {
+				const filename = path.resolve(basePath, "../foo.js");
+
+				assert.strictEqual(
+					configs.getConfigStatus(filename),
+					"external",
+				);
+			});
+
+			it('should return "matched" when passed HTML filename', () => {
+				const filename = path.resolve(basePath, "foo.html");
+
+				assert.strictEqual(
+					configs.getConfigStatus(filename),
+					"matched",
+				);
+			});
+
+			it('should return "ignored" when passed ignored .gitignore filename', () => {
+				const filename = path.resolve(basePath, ".gitignore");
+
+				assert.strictEqual(
+					configs.getConfigStatus(filename),
+					"ignored",
+				);
+			});
+
+			it('should return "matched" when passed CSS filename', () => {
+				const filename = path.resolve(basePath, "foo.css");
+
+				assert.strictEqual(
+					configs.getConfigStatus(filename),
+					"matched",
+				);
+			});
+
+			it('should return "matched" when passed docx filename', () => {
+				const filename = path.resolve(basePath, "sss.docx");
+
+				assert.strictEqual(
+					configs.getConfigStatus(filename),
+					"matched",
+				);
+			});
+
+			it('should return "ignored" when passed ignored node_modules filename', () => {
+				const filename = path.resolve(basePath, "node_modules/foo.js");
+
+				assert.strictEqual(
+					configs.getConfigStatus(filename),
+					"ignored",
+				);
+			});
+
+			it('should return "unconfigured" when passed matching both files and ignores in a config', () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["**/*.xsl"],
+							ignores: ["fixtures/test.xsl"],
+							defs: {
+								xsl: true,
+							},
+						},
+					],
+					{ basePath },
+				);
+
+				configs.normalizeSync();
+				const filename = path.resolve(basePath, "fixtures/test.xsl");
+
+				assert.strictEqual(
+					configs.getConfigStatus(filename),
+					"unconfigured",
+				);
+			});
+
+			it('should return "matched" when negated pattern comes after matching pattern', () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["**/foo.*"],
+							ignores: ["**/*.txt", "!foo.txt"],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfigStatus(path.join(basePath, "bar.txt")),
+					"unconfigured",
+				);
+				assert.strictEqual(
+					configs.getConfigStatus(path.join(basePath, "foo.txt")),
+					"matched",
+				);
+			});
+
+			it('should return "ignored" when negated pattern comes before matching pattern', () => {
+				configs = new ConfigArray(
+					[
+						{
+							ignores: ["!foo.txt", "**/*.txt"],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfigStatus(path.join(basePath, "bar.txt")),
+					"ignored",
+				);
+				assert.strictEqual(
+					configs.getConfigStatus(path.join(basePath, "foo.txt")),
+					"ignored",
+				);
+			});
+
+			it('should return "matched" when matching files and ignores has a negated pattern after matching pattern', () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["**/*.js"],
+							ignores: ["**/*.test.js", "!foo.test.js"],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfigStatus(path.join(basePath, "bar.test.js")),
+					"unconfigured",
+				);
+				assert.strictEqual(
+					configs.getConfigStatus(path.join(basePath, "foo.test.js")),
+					"matched",
+				);
+			});
+
+			it('should return "ignored" when file is inside of ignored directory', () => {
+				configs = new ConfigArray(
+					[
+						{
+							ignores: ["ignoreme"],
+						},
+						{
+							files: ["**/*.js"],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfigStatus(
+						path.join(basePath, "ignoreme/foo.js"),
+					),
+					"ignored",
+				);
+			});
+
+			it('should return "matched" when file is inside of unignored directory', () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["**/*.js"],
+						},
+						{
+							ignores: ["foo/*", "!foo/bar"],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfigStatus(
+						path.join(basePath, "foo/bar/a.js"),
+					),
+					"matched",
+				);
+			});
+
+			it('should return "ignored" when file is ignored, unignored, and then reignored', () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["**/*.js"],
+						},
+						{
+							ignores: ["a.js", "!a*.js", "a.js"],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfigStatus(path.join(basePath, "a.js")),
+					"ignored",
+				);
+			});
+
+			it('should return "ignored" when the parent directory of a file is ignored', () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["**/*.js"],
+						},
+						{
+							ignores: ["foo"],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfigStatus(
+						path.join(basePath, "foo/bar/a.js"),
+					),
+					"ignored",
+				);
+			});
+
+			it('should "ignored" true when an ignored directory is later negated with **', () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["**/*.js"],
+						},
+						{
+							ignores: ["**/node_modules/**"],
+						},
+						{
+							ignores: ["!node_modules/package/**"],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfigStatus(
+						path.join(basePath, "node_modules/package/a.js"),
+					),
+					"ignored",
+				);
+			});
+
+			it('should return "ignored" when an ignored directory is later negated with *', () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["**/*.js"],
+						},
+						{
+							ignores: ["**/node_modules/**"],
+						},
+						{
+							ignores: ["!node_modules/package/*"],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfigStatus(
+						path.join(basePath, "node_modules/package/a.js"),
+					),
+					"ignored",
+				);
+			});
+
+			it('should return "unconfigured" when there are only patterns ending with /*', () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["foo/*"],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfigStatus(path.join(basePath, "foo/a.js")),
+					"unconfigured",
+				);
+			});
+
+			it('should return "unconfigured" when there are only patterns ending with /**', () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["foo/**"],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfigStatus(path.join(basePath, "foo/a.js")),
+					"unconfigured",
+				);
+			});
+
+			it('should return "matched" when files pattern matches and there is a pattern ending with /**', () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["foo/*.js", "foo/**"],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfigStatus(path.join(basePath, "foo/a.js")),
+					"matched",
+				);
+			});
+
+			it('should return "matched" when file has the same name as a directory that is ignored by a pattern that ends with `/`', () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["**/foo"],
+						},
+						{
+							ignores: ["foo/"],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfigStatus(path.join(basePath, "foo")),
+					"matched",
+				);
+			});
+
+			it('should return "matched" when file is in the parent directory of directories that are ignored by a pattern that ends with `/`', () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["**/*.js"],
+						},
+						{
+							ignores: ["foo/*/"],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfigStatus(path.join(basePath, "foo/a.js")),
+					"matched",
+				);
+			});
+
+			it('should return "ignored" when file is in a directory that is ignored by a pattern that ends with `/`', () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["**/*.js"],
+						},
+						{
+							ignores: ["foo/"],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfigStatus(path.join(basePath, "foo/a.js")),
+					"ignored",
+				);
+			});
+
+			it('should return "ignored" when file is in a directory that is ignored by a pattern that does not end with `/`', () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["**/*.js"],
+						},
+						{
+							ignores: ["foo"],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfigStatus(path.join(basePath, "foo/a.js")),
+					"ignored",
+				);
+			});
+
+			it('should return "matched" when file is in a directory that is ignored and then unignored by pattern that ends with `/`', () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["**/*.js"],
+						},
+						{
+							ignores: ["foo/", "!foo/"],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfigStatus(path.join(basePath, "foo/a.js")),
+					"matched",
+				);
+			});
+
+			it('should return "ignored" when file is in a directory that is ignored along with its files by a pattern that ends with `/**` and then unignored by pattern that ends with `/`', () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["**/*.js"],
+						},
+						{
+							ignores: [
+								"foo/**",
+
+								// only the directory is unignored, files are not
+								"!foo/",
+							],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfigStatus(path.join(basePath, "foo/a.js")),
+					"ignored",
+				);
+			});
+
+			it('should return "ignored" when file is in a directory that is ignored along with its files by a pattern that ends with `/**` and then unignored by pattern that does not end with `/`', () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["**/*.js"],
+						},
+						{
+							ignores: [
+								"foo/**",
+
+								// only the directory is unignored, files are not
+								"!foo",
+							],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfigStatus(path.join(basePath, "foo/a.js")),
+					"ignored",
+				);
+			});
+
+			it('should return "matched" when file is in a directory that is ignored along its files by pattern that ends with `/**` and then unignored along its files by pattern that ends with `/**`', () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["**/*.js"],
+						},
+						{
+							ignores: [
+								"foo/**",
+
+								// both the directory and the files are unignored
+								"!foo/**",
+							],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfigStatus(path.join(basePath, "foo/a.js")),
+					"matched",
+				);
+			});
+
+			it('should return "ignored" when file is ignored by a pattern and there are unignore patterns that target files of a directory with the same name', () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["**/foo"],
+						},
+						{
+							ignores: ["foo", "!foo/*", "!foo/**"],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfigStatus(path.join(basePath, "foo")),
+					"ignored",
+				);
+			});
+
+			it('should return "ignored" when file is in a directory that is ignored even if an unignore pattern that ends with `/*` matches the file', () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["**/*.js"],
+						},
+						{
+							ignores: ["foo", "!foo/*"],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfigStatus(path.join(basePath, "foo/a.js")),
+					"ignored",
+				);
+			});
+
+			// https://github.com/eslint/eslint/issues/17964#issuecomment-1879840650
+			it('should return "ignored" for all files ignored in a directory tree except for explicitly unignored ones', () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["**/*.js"],
+						},
+						{
+							ignores: [
+								// ignore all files and directories
+								"tests/format/**/*",
+
+								// unignore all directories
+								"!tests/format/**/*/",
+
+								// unignore specific files
+								"!tests/format/**/jsfmt.spec.js",
+							],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfigStatus(
+						path.join(basePath, "tests/format/foo.js"),
+					),
+					"ignored",
+				);
+				assert.strictEqual(
+					configs.getConfigStatus(
+						path.join(basePath, "tests/format/jsfmt.spec.js"),
+					),
+					"matched",
+				);
+				assert.strictEqual(
+					configs.getConfigStatus(
+						path.join(basePath, "tests/format/subdir/foo.js"),
+					),
+					"ignored",
+				);
+				assert.strictEqual(
+					configs.getConfigStatus(
+						path.join(
+							basePath,
+							"tests/format/subdir/jsfmt.spec.js",
+						),
+					),
+					"matched",
+				);
+			});
+
+			// https://github.com/eslint/eslint/pull/16579/files
+			describe("gitignore-style unignores", () => {
+				it('should return "ignored" when a subdirectory is ignored and then we try to unignore a directory', () => {
+					configs = new ConfigArray(
+						[
+							{
+								ignores: [
+									"**/node_modules/*",
+									"!node_modules/",
+								],
+							},
+						],
+						{ basePath },
+					);
+
+					configs.normalizeSync();
+					const filename = path.resolve(
+						basePath,
+						"node_modules/foo/bar.js",
+					);
+
+					assert.strictEqual(
+						configs.getConfigStatus(filename),
+						"ignored",
+					);
+				});
+
+				it('should return "ignored" when a subdirectory is ignored and then we try to unignore a file', () => {
+					configs = new ConfigArray(
+						[
+							{
+								ignores: [
+									"**/node_modules/*",
+									"!node_modules/foo/*.js",
+								],
+							},
+						],
+						{ basePath },
+					);
+
+					configs.normalizeSync();
+					const filename = path.resolve(
+						basePath,
+						"node_modules/foo/bar.js",
+					);
+
+					assert.strictEqual(
+						configs.getConfigStatus(filename),
+						"ignored",
+					);
+				});
+
+				it('should return "ignored" when all descendant directories are ignored and then we try to unignore a file', () => {
+					configs = new ConfigArray(
+						[
+							{
+								ignores: [
+									"**/node_modules/**",
+									"!node_modules/foo/*.js",
+								],
+							},
+						],
+						{ basePath },
+					);
+
+					configs.normalizeSync();
+					const filename = path.resolve(
+						basePath,
+						"node_modules/foo/bar.js",
+					);
+
+					assert.strictEqual(
+						configs.getConfigStatus(filename),
+						"ignored",
+					);
+				});
+
+				it('should return "ignored" when all descendant directories are ignored without leading slash and then we try to unignore a file', () => {
+					configs = new ConfigArray(
+						[
+							{
+								ignores: [
+									"**/node_modules/**",
+									"!/node_modules/foo/**",
+								],
+							},
+						],
+						{ basePath },
+					);
+
+					configs.normalizeSync();
+					const filename = path.resolve(
+						basePath,
+						"node_modules/foo/bar.js",
+					);
+
+					assert.strictEqual(
+						configs.getConfigStatus(filename),
+						"ignored",
+					);
+				});
+			});
+		});
+
 		describe("isIgnored()", () => {
 			it("should throw an error when not normalized", () => {
 				const filename = path.resolve(basePath, "foo.js");
@@ -973,9 +1869,9 @@ describe("ConfigArray", () => {
 				assert.strictEqual(configs.isIgnored(filename), false);
 			});
 
-			it("should return true when passed JS filename in parent directory", () => {
+			it("should return false when passed JS filename in parent directory", () => {
 				const filename = path.resolve(basePath, "../foo.js");
-				assert.strictEqual(configs.isIgnored(filename), true);
+				assert.strictEqual(configs.isIgnored(filename), false);
 			});
 
 			it("should return false when passed HTML filename", () => {
@@ -994,7 +1890,7 @@ describe("ConfigArray", () => {
 				assert.strictEqual(configs.isIgnored(filename), false);
 			});
 
-			it("should return true when passed docx filename", () => {
+			it("should return false when passed docx filename", () => {
 				const filename = path.resolve(basePath, "sss.docx");
 
 				assert.strictEqual(configs.isIgnored(filename), false);
@@ -1004,50 +1900,6 @@ describe("ConfigArray", () => {
 				const filename = path.resolve(basePath, "node_modules/foo.js");
 
 				assert.strictEqual(configs.isIgnored(filename), true);
-			});
-			it("should return true when passed matching both files and ignores in a config", () => {
-				configs = new ConfigArray(
-					[
-						{
-							files: ["**/*.xsl"],
-							ignores: ["fixtures/test.xsl"],
-							defs: {
-								xsl: true,
-							},
-						},
-					],
-					{ basePath },
-				);
-
-				configs.normalizeSync();
-				const filename = path.resolve(basePath, "fixtures/test.xsl");
-
-				assert.strictEqual(configs.isIgnored(filename), true);
-			});
-
-			it("should return false when negated pattern comes after matching pattern", () => {
-				configs = new ConfigArray(
-					[
-						{
-							files: ["**/foo.*"],
-							ignores: ["**/*.txt", "!foo.txt"],
-						},
-					],
-					{
-						basePath,
-					},
-				);
-
-				configs.normalizeSync();
-
-				assert.strictEqual(
-					configs.isIgnored(path.join(basePath, "bar.txt")),
-					true,
-				);
-				assert.strictEqual(
-					configs.isIgnored(path.join(basePath, "foo.txt")),
-					false,
-				);
 			});
 
 			it("should return true when negated pattern comes before matching pattern", () => {
@@ -1071,31 +1923,6 @@ describe("ConfigArray", () => {
 				assert.strictEqual(
 					configs.isIgnored(path.join(basePath, "foo.txt")),
 					true,
-				);
-			});
-
-			it("should return false when matching files and ignores has a negated pattern comes after matching pattern", () => {
-				configs = new ConfigArray(
-					[
-						{
-							files: ["**/*.js"],
-							ignores: ["**/*.test.js", "!foo.test.js"],
-						},
-					],
-					{
-						basePath,
-					},
-				);
-
-				configs.normalizeSync();
-
-				assert.strictEqual(
-					configs.isIgnored(path.join(basePath, "bar.test.js")),
-					true,
-				);
-				assert.strictEqual(
-					configs.isIgnored(path.join(basePath, "foo.test.js")),
-					false,
 				);
 			});
 		});
@@ -1114,10 +1941,10 @@ describe("ConfigArray", () => {
 				assert.strictEqual(configs.isFileIgnored(filename), false);
 			});
 
-			it("should return true when passed JS filename in parent directory", () => {
+			it("should return false when passed JS filename in parent directory", () => {
 				const filename = path.resolve(basePath, "../foo.js");
 
-				assert.strictEqual(configs.isFileIgnored(filename), true);
+				assert.strictEqual(configs.isFileIgnored(filename), false);
 			});
 
 			it("should return false when passed HTML filename", () => {
@@ -1138,7 +1965,7 @@ describe("ConfigArray", () => {
 				assert.strictEqual(configs.isFileIgnored(filename), false);
 			});
 
-			it("should return true when passed docx filename", () => {
+			it("should return false when passed docx filename", () => {
 				const filename = path.resolve(basePath, "sss.docx");
 
 				assert.strictEqual(configs.isFileIgnored(filename), false);
@@ -1148,51 +1975,6 @@ describe("ConfigArray", () => {
 				const filename = path.resolve(basePath, "node_modules/foo.js");
 
 				assert.strictEqual(configs.isFileIgnored(filename), true);
-			});
-
-			it("should return true when passed matching both files and ignores in a config", () => {
-				configs = new ConfigArray(
-					[
-						{
-							files: ["**/*.xsl"],
-							ignores: ["fixtures/test.xsl"],
-							defs: {
-								xsl: true,
-							},
-						},
-					],
-					{ basePath },
-				);
-
-				configs.normalizeSync();
-				const filename = path.resolve(basePath, "fixtures/test.xsl");
-
-				assert.strictEqual(configs.isFileIgnored(filename), true);
-			});
-
-			it("should return false when negated pattern comes after matching pattern", () => {
-				configs = new ConfigArray(
-					[
-						{
-							files: ["**/foo.*"],
-							ignores: ["**/*.txt", "!foo.txt"],
-						},
-					],
-					{
-						basePath,
-					},
-				);
-
-				configs.normalizeSync();
-
-				assert.strictEqual(
-					configs.isFileIgnored(path.join(basePath, "bar.txt")),
-					true,
-				);
-				assert.strictEqual(
-					configs.isFileIgnored(path.join(basePath, "foo.txt")),
-					false,
-				);
 			});
 
 			it("should return true when negated pattern comes before matching pattern", () => {
@@ -1219,32 +2001,7 @@ describe("ConfigArray", () => {
 				);
 			});
 
-			it("should return false when matching files and ignores has a negated pattern comes after matching pattern", () => {
-				configs = new ConfigArray(
-					[
-						{
-							files: ["**/*.js"],
-							ignores: ["**/*.test.js", "!foo.test.js"],
-						},
-					],
-					{
-						basePath,
-					},
-				);
-
-				configs.normalizeSync();
-
-				assert.strictEqual(
-					configs.isFileIgnored(path.join(basePath, "bar.test.js")),
-					true,
-				);
-				assert.strictEqual(
-					configs.isFileIgnored(path.join(basePath, "foo.test.js")),
-					false,
-				);
-			});
-
-			it("should return false when file is inside of ignored directory", () => {
+			it("should return true when file is inside of ignored directory", () => {
 				configs = new ConfigArray(
 					[
 						{
@@ -1269,7 +2026,7 @@ describe("ConfigArray", () => {
 				);
 			});
 
-			it("should return false when file is inside of ignored directory", () => {
+			it("should return false when file is inside of unignored directory", () => {
 				configs = new ConfigArray(
 					[
 						{
@@ -1394,66 +2151,6 @@ describe("ConfigArray", () => {
 				);
 			});
 
-			it("should return true when there are only patterns ending with /*", () => {
-				configs = new ConfigArray(
-					[
-						{
-							files: ["foo/*"],
-						},
-					],
-					{
-						basePath,
-					},
-				);
-
-				configs.normalizeSync();
-
-				assert.strictEqual(
-					configs.isFileIgnored(path.join(basePath, "foo/a.js")),
-					true,
-				);
-			});
-
-			it("should return true when there are only patterns ending with /**", () => {
-				configs = new ConfigArray(
-					[
-						{
-							files: ["foo/**"],
-						},
-					],
-					{
-						basePath,
-					},
-				);
-
-				configs.normalizeSync();
-
-				assert.strictEqual(
-					configs.isFileIgnored(path.join(basePath, "foo/a.js")),
-					true,
-				);
-			});
-
-			it("should return false when files pattern matches and there is a pattern ending with /**", () => {
-				configs = new ConfigArray(
-					[
-						{
-							files: ["foo/*.js", "foo/**"],
-						},
-					],
-					{
-						basePath,
-					},
-				);
-
-				configs.normalizeSync();
-
-				assert.strictEqual(
-					configs.isFileIgnored(path.join(basePath, "foo/a.js")),
-					false,
-				);
-			});
-
 			it("should return false when file has the same name as a directory that is ignored by a pattern that ends with `/`", () => {
 				configs = new ConfigArray(
 					[
@@ -1546,7 +2243,7 @@ describe("ConfigArray", () => {
 				);
 			});
 
-			it("should return false when file is in a directory that is ignored and then unignored by pattern that end with `/`", () => {
+			it("should return false when file is in a directory that is ignored and then unignored by pattern that ends with `/`", () => {
 				configs = new ConfigArray(
 					[
 						{
@@ -1762,8 +2459,8 @@ describe("ConfigArray", () => {
 						[
 							{
 								ignores: [
-									"/**/node_modules/*",
-									"!/node_modules/foo",
+									"**/node_modules/*",
+									"!node_modules/",
 								],
 							},
 						],
@@ -1784,8 +2481,8 @@ describe("ConfigArray", () => {
 						[
 							{
 								ignores: [
-									"/**/node_modules/*",
-									"!/node_modules/foo/**",
+									"**/node_modules/*",
+									"!node_modules/foo/*.js",
 								],
 							},
 						],
@@ -1806,8 +2503,8 @@ describe("ConfigArray", () => {
 						[
 							{
 								ignores: [
-									"/**/node_modules/**",
-									"!/node_modules/foo/**",
+									"**/node_modules/**",
+									"!node_modules/foo/*.js",
 								],
 							},
 						],
@@ -2334,14 +3031,11 @@ describe("ConfigArray", () => {
 					);
 				});
 
-				it("should return false when first-level subdirectories are ignored with leading slash and then one is negated", () => {
+				it("should return false when attempting to ignore first-level subdirectories with leading slash", () => {
 					configs = new ConfigArray(
 						[
 							{
-								ignores: [
-									"/**/node_modules/*",
-									"!**/node_modules/foo/",
-								],
+								ignores: ["/**/node_modules/*"],
 							},
 						],
 						{ basePath },

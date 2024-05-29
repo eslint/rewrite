@@ -80,6 +80,14 @@ const META_FIELDS = new Set(["name"]);
  */
 const FILES_AND_IGNORES_SCHEMA = new ObjectSchema(filesAndIgnoresSchema);
 
+// Precomputed constant objects returned by `ConfigArray.getConfigWithStatus`.
+
+const CONFIG_WITH_STATUS_EXTERNAL = Object.freeze({ status: "external" });
+const CONFIG_WITH_STATUS_IGNORED = Object.freeze({ status: "ignored" });
+const CONFIG_WITH_STATUS_UNCONFIGURED = Object.freeze({
+	status: "unconfigured",
+});
+
 /**
  * Wrapper error for config validation errors that adds a name to the front of the
  * error message.
@@ -820,11 +828,14 @@ export class ConfigArray extends Array {
 	}
 
 	/**
-	 * Returns the config object for a given file path.
+	 * Returns the config object for a given file path and a status that can be used to determine why a file has no config.
 	 * @param {string} filePath The complete path of a file to get a config for.
-	 * @returns {Object} The config object for this file.
+	 * @returns {{ config?: Object, status: "ignored"|"external"|"unconfigured"|"matched" }}
+	 * An object with an optional property `config` and property `status`.
+	 * `config` is the config object for the specified file as returned by {@linkcode ConfigArray.getConfig},
+	 * `status` a is one of the constants returned by {@linkcode ConfigArray.getConfigStatus}.
 	 */
-	getConfig(filePath) {
+	getConfigWithStatus(filePath) {
 		assertNormalized(this);
 
 		const cache = this[ConfigArraySymbol.configCache];
@@ -834,7 +845,17 @@ export class ConfigArray extends Array {
 			return cache.get(filePath);
 		}
 
-		let finalConfig;
+		// check to see if the file is outside the base path
+
+		const relativeFilePath = path.relative(this.basePath, filePath);
+
+		if (relativeFilePath.startsWith("..")) {
+			debug(`No config for file ${filePath} outside of base path`);
+
+			// cache and return result
+			cache.set(filePath, CONFIG_WITH_STATUS_EXTERNAL);
+			return CONFIG_WITH_STATUS_EXTERNAL;
+		}
 
 		// next check to see if the file should be ignored
 
@@ -842,20 +863,17 @@ export class ConfigArray extends Array {
 		if (this.isDirectoryIgnored(path.dirname(filePath))) {
 			debug(`Ignoring ${filePath} based on directory pattern`);
 
-			// cache and return result - finalConfig is undefined at this point
-			cache.set(filePath, finalConfig);
-			return finalConfig;
+			// cache and return result
+			cache.set(filePath, CONFIG_WITH_STATUS_IGNORED);
+			return CONFIG_WITH_STATUS_IGNORED;
 		}
-
-		// TODO: Maybe move elsewhere?
-		const relativeFilePath = path.relative(this.basePath, filePath);
 
 		if (shouldIgnorePath(this.ignores, filePath, relativeFilePath)) {
 			debug(`Ignoring ${filePath} based on file pattern`);
 
-			// cache and return result - finalConfig is undefined at this point
-			cache.set(filePath, finalConfig);
-			return finalConfig;
+			// cache and return result
+			cache.set(filePath, CONFIG_WITH_STATUS_IGNORED);
+			return CONFIG_WITH_STATUS_IGNORED;
 		}
 
 		// filePath isn't automatically ignored, so try to construct config
@@ -949,24 +967,25 @@ export class ConfigArray extends Array {
 		if (!matchFound) {
 			debug(`No matching configs found for ${filePath}`);
 
-			// cache and return result - finalConfig is undefined at this point
-			cache.set(filePath, finalConfig);
-			return finalConfig;
+			// cache and return result
+			cache.set(filePath, CONFIG_WITH_STATUS_UNCONFIGURED);
+			return CONFIG_WITH_STATUS_UNCONFIGURED;
 		}
 
 		// check to see if there is a config cached by indices
-		finalConfig = cache.get(matchingConfigIndices.toString());
+		const indicesKey = matchingConfigIndices.toString();
+		let configWithStatus = cache.get(indicesKey);
 
-		if (finalConfig) {
+		if (configWithStatus) {
 			// also store for filename for faster lookup next time
-			cache.set(filePath, finalConfig);
+			cache.set(filePath, configWithStatus);
 
-			return finalConfig;
+			return configWithStatus;
 		}
 
 		// otherwise construct the config
 
-		finalConfig = matchingConfigIndices.reduce((result, index) => {
+		let finalConfig = matchingConfigIndices.reduce((result, index) => {
 			try {
 				return this[ConfigArraySymbol.schema].merge(
 					result,
@@ -979,10 +998,36 @@ export class ConfigArray extends Array {
 
 		finalConfig = this[ConfigArraySymbol.finalizeConfig](finalConfig);
 
-		cache.set(filePath, finalConfig);
-		cache.set(matchingConfigIndices.toString(), finalConfig);
+		configWithStatus = Object.freeze({
+			config: finalConfig,
+			status: "matched",
+		});
+		cache.set(filePath, configWithStatus);
+		cache.set(indicesKey, configWithStatus);
 
-		return finalConfig;
+		return configWithStatus;
+	}
+
+	/**
+	 * Returns the config object for a given file path.
+	 * @param {string} filePath The complete path of a file to get a config for.
+	 * @returns {Object|undefined} The config object for this file or `undefined`.
+	 */
+	getConfig(filePath) {
+		return this.getConfigWithStatus(filePath).config;
+	}
+
+	/**
+	 * Determines whether a file has a config or why it doesn't.
+	 * @param {string} filePath The complete path of the file to check.
+	 * @returns {"ignored"|"external"|"unconfigured"|"matched"} One of the following values:
+	 * * `"ignored"`: the file is ignored
+	 * * `"external"`: the file is outside the base path
+	 * * `"unconfigured"`: the file is not matched by any config
+	 * * `"matched"`: the file has a matching config
+	 */
+	getConfigStatus(filePath) {
+		return this.getConfigWithStatus(filePath).status;
 	}
 
 	/**
@@ -1001,7 +1046,7 @@ export class ConfigArray extends Array {
 	 * @returns {boolean} True if the path is ignored, false if not.
 	 */
 	isFileIgnored(filePath) {
-		return this.getConfig(filePath) === undefined;
+		return this.getConfigStatus(filePath) === "ignored";
 	}
 
 	/**
