@@ -103,8 +103,8 @@ if (ignorePatterns) {
 		config.ignorePatterns = [];
 	}
 
-	// put the .eslintignore patterns first so they can be overridden
-	config.ignorePatterns = [...ignorePatterns, ...config.ignorePatterns];
+	// put the .eslintignore patterns last so they can override config ignores
+	config.ignorePatterns = [...config.ignorePatterns, ...ignorePatterns];
 }
 
 const result = migrateConfig(config, {
