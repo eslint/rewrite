@@ -204,20 +204,13 @@ ${init}`;
 function convertGlobPattern(pattern) {
 	const isNegated = pattern.startsWith("!");
 	const patternToTest = isNegated ? pattern.slice(1) : pattern;
-	const isDescendant = patternToTest.startsWith("**");
-	const isRoot = patternToTest.startsWith("/");
-	const isCwd = patternToTest.startsWith("./");
-	const slashIndex = patternToTest.indexOf("/");
-	const lastSlashIndex = patternToTest.lastIndexOf("/");
-	const hasSlash = slashIndex !== -1;
-	const hasMultipleSlashes = hasSlash && slashIndex !== lastSlashIndex;
 
 	// if the pattern is already in the correct format, return it
-	if (isDescendant || isRoot || isCwd || hasMultipleSlashes) {
+	if (patternToTest === "**" || patternToTest.includes("/")) {
 		return pattern;
 	}
 
-	return `${isNegated ? "!" : ""}**/${pattern}`;
+	return `${isNegated ? "!" : ""}**/${patternToTest}`;
 }
 
 /**
