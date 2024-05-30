@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/eslint/rewrite/compare/compat-v1.0.2...compat-v1.0.3) (2024-05-30)
+
+
+### Bug Fixes
+
+* Update and standardize READMEs ([#33](https://github.com/eslint/rewrite/issues/33)) ([75521f7](https://github.com/eslint/rewrite/commit/75521f7d2e4aac9e77310803e7569d9d5b39869c))
+
 ## [1.0.2](https://github.com/eslint/rewrite/compare/compat-v1.0.1...compat-v1.0.2) (2024-05-30)
 
 
