@@ -12,6 +12,8 @@ body:
                 required: false
               - label: "`@eslint/config-array`"
                 required: false
+              - label: "`@eslint/migrate-config`"
+                required: false
               - label: "`@eslint/object-schema`"
                 required: false
     - type: textarea

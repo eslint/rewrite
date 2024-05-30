@@ -56,9 +56,7 @@ async function calculatePackageDependencies(packageDirs) {
 
 				if (pkg.dependencies) {
 					for (const dep of Object.keys(pkg.dependencies)) {
-						if (dep.startsWith("@eslint")) {
-							dependencies.add(dep);
-						}
+						dependencies.add(dep);
 					}
 				}
 
@@ -84,9 +82,13 @@ function createBuildOrder(dependencies) {
 	function visit(name) {
 		if (!seen.has(name)) {
 			seen.add(name);
-			const { dependencies: deps, dir } = dependencies.get(name);
-			deps.forEach(visit);
-			buildOrder.push(dir);
+
+			// we only need to deal with dependencies in this monorepo
+			if (dependencies.has(name)) {
+				const { dependencies: deps, dir } = dependencies.get(name);
+				deps.forEach(visit);
+				buildOrder.push(dir);
+			}
 		}
 	}
 

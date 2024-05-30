@@ -3,6 +3,9 @@ import js from "@eslint/js";
 export default [
 	js.configs.recommended,
 	{
+		ignores: ["**/tests/fixtures/**/*.*"],
+	},
+	{
 		files: ["**/*.test.js"],
 		languageOptions: {
 			globals: {

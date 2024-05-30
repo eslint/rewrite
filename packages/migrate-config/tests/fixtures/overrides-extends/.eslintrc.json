@@ -1,0 +1,23 @@
+{
+    "overrides": [
+        {
+            "files": "src/app/**",
+            "excludedFiles": "*.test.js",
+            "extends": [
+                "airbnb"
+            ]
+        },
+        {
+            "files": "src/app/**/*.test.js",
+            "extends": [
+                "airbnb-base"
+            ]
+        },
+        {
+            "excludedFiles": "src/app/**/*.spec.js",
+            "extends": [
+                "airbnb-base"
+            ]
+        }
+    ]
+}

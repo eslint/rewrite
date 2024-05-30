@@ -1,0 +1,38 @@
+root: true
+plugins:
+    - prettier
+    - import
+    - node
+    - promise
+    - standard
+    - "@typescript-eslint"
+env:
+    es6: true
+    node/base: true
+extends:
+    - eslint:recommended
+    - plugin:import/errors
+parserOptions:
+    ecmaVersion: 2018
+rules:
+    semi:
+        - error
+    quotes:
+        - error
+    no-console:
+        - warn
+overrides:
+    - files:
+          - "*.ts"
+      excludedFiles:
+          - "*.d.ts"
+      parser: "@typescript-eslint/parser"
+      plugins:
+          - "@typescript-eslint"
+      extends:
+          - plugin:@typescript-eslint/recommended
+      rules:
+          "@typescript-eslint/no-explicit-any":
+              - error
+          "@typescript-eslint/no-unused-vars":
+              - error
