@@ -11,7 +11,6 @@ import * as recast from "recast";
 import { Legacy } from "@eslint/eslintrc";
 import camelCase from "camelcase";
 import pluginsNeedingCompat from "./compat-plugins.js";
-import { gitignoreToMinimatch } from "@humanwhocodes/gitignore-to-minimatch";
 
 //-----------------------------------------------------------------------------
 // Types
@@ -120,6 +119,36 @@ function getParserVariableName(parser) {
 	}
 
 	return "parser";
+}
+
+/**
+ * Converts an ESLint ignore pattern to a minimatch pattern.
+ * @param {string} pattern The .eslintignore pattern to convert.
+ * @returns {string} The converted pattern.
+ */
+function convertESLintIgnoreToMinimatch(pattern) {
+	const isNegated = pattern.startsWith("!");
+	const negatedPrefix = isNegated ? "!" : "";
+	const patternToTest = (isNegated ? pattern.slice(1) : pattern).trimEnd();
+
+	// special cases
+	if (["", "**", "/**", "**/"].includes(patternToTest)) {
+		return `${negatedPrefix}${patternToTest}`;
+	}
+
+	const firstIndexOfSlash = patternToTest.indexOf("/");
+
+	const matchEverywherePrefix =
+		firstIndexOfSlash < 0 || firstIndexOfSlash === patternToTest.length - 1
+			? "**/"
+			: "";
+
+	const patternWithoutLeadingSlash =
+		firstIndexOfSlash === 0 ? patternToTest.slice(1) : patternToTest;
+
+	const matchInsideSuffix = patternToTest.endsWith("/**") ? "/*" : "";
+
+	return `${negatedPrefix}${matchEverywherePrefix}${patternWithoutLeadingSlash}${matchInsideSuffix}`;
 }
 
 /**
@@ -576,7 +605,9 @@ function createGlobalIgnores(config) {
 		? config.ignorePatterns
 		: [config.ignorePatterns];
 	const ignorePatternsArray = b.arrayExpression(
-		ignorePatterns.map(pattern => b.literal(gitignoreToMinimatch(pattern))),
+		ignorePatterns.map(pattern =>
+			b.literal(convertESLintIgnoreToMinimatch(pattern)),
+		),
 	);
 	return b.objectExpression([
 		b.property("init", b.identifier("ignores"), ignorePatternsArray),

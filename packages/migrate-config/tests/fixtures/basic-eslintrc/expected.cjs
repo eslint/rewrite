@@ -24,55 +24,52 @@ const compat = new FlatCompat({
     allConfig: js.configs.all
 });
 
-module.exports = [
-    ...fixupConfigRules(compat.extends("eslint:recommended", "plugin:import/errors")),
-    {
-        plugins: {
-            prettier,
-            import: fixupPluginRules(_import),
-            node,
-            promise,
-            standard,
-            "@typescript-eslint": typescriptEslint,
-        },
-
-        languageOptions: {
-            globals: {
-                ...globals["shared-node-browser"],
-                ...Object.fromEntries(Object.entries(globals.amd).map(([key]) => [key, "off"])),
-                ...node.environments.base.globals,
-            },
-
-            ecmaVersion: 2018,
-            sourceType: "script",
-        },
-
-        rules: {
-            semi: ["error"],
-            quotes: ["error"],
-            "no-console": ["warn"],
-        },
+module.exports = [{
+    ignores: ["*/a.js", "dir/**/*", "**/dir/"],
+}, ...fixupConfigRules(compat.extends("eslint:recommended", "plugin:import/errors")), {
+    plugins: {
+        prettier,
+        import: fixupPluginRules(_import),
+        node,
+        promise,
+        standard,
+        "@typescript-eslint": typescriptEslint,
     },
-    ...compat.extends("plugin:@typescript-eslint/recommended").map(config => ({
-        ...config,
-        files: ["**/*.ts"],
-        ignores: ["**/*.d.ts"],
-    })),
-    {
-        files: ["**/*.ts"],
-        ignores: ["**/*.d.ts"],
 
-        plugins: {
-            "@typescript-eslint": typescriptEslint,
+    languageOptions: {
+        globals: {
+            ...globals["shared-node-browser"],
+            ...Object.fromEntries(Object.entries(globals.amd).map(([key]) => [key, "off"])),
+            ...node.environments.base.globals,
         },
 
-        languageOptions: {
-            parser: tsParser,
-        },
-
-        rules: {
-            "@typescript-eslint/no-explicit-any": ["error"],
-            "@typescript-eslint/no-unused-vars": ["error"],
-        },
+        ecmaVersion: 2018,
+        sourceType: "script",
     },
-];
+
+    rules: {
+        semi: ["error"],
+        quotes: ["error"],
+        "no-console": ["warn"],
+    },
+}, ...compat.extends("plugin:@typescript-eslint/recommended").map(config => ({
+    ...config,
+    files: ["**/*.ts"],
+    ignores: ["**/*.d.ts"],
+})), {
+    files: ["**/*.ts"],
+    ignores: ["**/*.d.ts"],
+
+    plugins: {
+        "@typescript-eslint": typescriptEslint,
+    },
+
+    languageOptions: {
+        parser: tsParser,
+    },
+
+    rules: {
+        "@typescript-eslint/no-explicit-any": ["error"],
+        "@typescript-eslint/no-unused-vars": ["error"],
+    },
+}];
