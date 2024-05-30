@@ -23,20 +23,5 @@
 			addLabels: ["deps:npm"],
 			matchManagers: ["npm"],
 		},
-		{
-			description: "Group Babel packages into a single PR.",
-			groupName: "babel",
-			matchPackagePrefixes: ["@babel", "babel-"],
-		},
-		{
-			description: "Group wdio packages into a single PR.",
-			groupName: "wdio",
-			matchPackagePrefixes: ["@wdio"],
-		},
-		{
-			description: "Group metascraper packages into a single PR.",
-			groupName: "metascraper",
-			matchPackagePrefixes: ["metascraper"],
-		},
 	],
 }
