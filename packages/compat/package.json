@@ -26,7 +26,8 @@
     "build:cts": "node -e \"fs.copyFileSync('dist/esm/index.d.ts', 'dist/cjs/index.d.cts')\"",
     "build": "rollup -c && tsc -p tsconfig.esm.json && npm run build:cts",
     "test:jsr": "npx jsr@latest publish --dry-run",
-    "test": "mocha tests/*.js"
+    "test": "mocha tests/*.js",
+    "test:coverage": "c8 npm test"
   },
   "repository": {
     "type": "git",
@@ -46,6 +47,7 @@
   "homepage": "https://github.com/eslint/rewrite#readme",
   "devDependencies": {
     "@types/eslint": "^8.56.10",
+    "c8": "^9.1.0",
     "eslint": "^9.0.0",
     "mocha": "^10.4.0",
     "rollup": "^4.16.2",
