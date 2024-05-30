@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.15.0](https://github.com/eslint/rewrite/compare/config-array-v0.14.1...config-array-v0.15.0) (2024-05-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* add method `getConfigStatus`, update `isFileIgnored` ([#7](https://github.com/eslint/rewrite/issues/7))
+
+### Features
+
+* add method `getConfigStatus`, update `isFileIgnored` ([#7](https://github.com/eslint/rewrite/issues/7)) ([400c5f9](https://github.com/eslint/rewrite/commit/400c5f92b7370f8ab6efd1b8dcd90ac1c1d04dd4))
+
+
+### Bug Fixes
+
+* ConfigObject type ([#27](https://github.com/eslint/rewrite/issues/27)) ([e42b15d](https://github.com/eslint/rewrite/commit/e42b15dc4a424030cac97582c0d500a76b13f328))
+* npm and JSR package contents ([#16](https://github.com/eslint/rewrite/issues/16)) ([3e9eb67](https://github.com/eslint/rewrite/commit/3e9eb67964327ef908ab27fa0f14990580ec801c))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/object-schema bumped from ^2.1.1 to ^2.1.2
+
 ## [0.14.1](https://github.com/eslint/rewrite/compare/config-array-v0.14.0...config-array-v0.14.1) (2024-05-08)
 
 
