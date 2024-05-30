@@ -1,28 +1,38 @@
-# ESLint ObjectSchema Package
+# ObjectSchema Package
 
 ## Overview
 
-A JavaScript object merge/validation utility where you can define a different merge and validation strategy for each key. This is helpful when you need to validate complex data structures and then merge them in a way that is more complex than `Object.assign()`.
+A JavaScript object merge/validation utility where you can define a different merge and validation strategy for each key. This is helpful when you need to validate complex data structures and then merge them in a way that is more complex than `Object.assign()`. This is used in the [`@eslint/config-array`](https://npmjs.com/package/@eslint/config-array) package but can also be used on its own.
 
 ## Installation
 
-You can install using either npm:
+For Node.js and compatible runtimes:
 
-```
+```shell
 npm install @eslint/object-schema
-```
-
-Or Yarn:
-
-```
+# or
 yarn add @eslint/object-schema
+# or
+pnpm install @eslint/object-schema
+# or
+bun install @eslint/object-schema
+```
+
+For Deno:
+
+```shell
+deno add @eslint/object-schema
 ```
 
 ## Usage
 
-Use CommonJS to get access to the `ObjectSchema` constructor:
+Import the `ObjectSchema` constructor:
 
 ```js
+// using ESM
+import { ObjectSchema } from "@eslint/object-schema";
+
+// using CommonJS
 const { ObjectSchema } = require("@eslint/object-schema");
 
 const schema = new ObjectSchema({

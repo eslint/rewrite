@@ -1,16 +1,32 @@
 # Config Array
 
-by [Nicholas C. Zakas](https://humanwhocodes.com)
-
-If you find this useful, please consider supporting my work with a [donation](https://humanwhocodes.com/donate).
-
 ## Description
 
 A config array is a way of managing configurations that are based on glob pattern matching of filenames. Each config array contains the information needed to determine the correct configuration for any file based on the filename.
 
-## Background
+**Note:** This is a generic package that can be used outside of ESLint. It contains no ESLint-specific functionality.
 
-In 2019, I submitted an [ESLint RFC](https://github.com/eslint/rfcs/pull/9) proposing a new way of configuring ESLint. The goal was to streamline what had become an increasingly complicated configuration process. Over several iterations, this proposal was eventually born.
+## Installation
+
+For Node.js and compatible runtimes:
+
+```shell
+npm install @eslint/config-array
+# or
+yarn add @eslint/config-array
+# or
+pnpm install @eslint/config-array
+# or
+bun install @eslint/config-array
+```
+
+For Deno:
+
+```shell
+deno add @eslint/config-array
+```
+
+## Background
 
 The basic idea is that all configuration, including overrides, can be represented by a single array where each item in the array is a config object. Config objects appearing later in the array override config objects appearing earlier in the array. You can calculate a config for a given file by traversing all config objects in the array to find the ones that match the filename. Matching is done by specifying glob patterns in `files` and `ignores` properties on each config object. Here's an example:
 
@@ -33,18 +49,6 @@ export default [
 ```
 
 In this example, there are two config objects: the first matches all JSON files in all directories and the second matches just `package.json` in the base path directory (all the globs are evaluated as relative to a base path that can be specified). When you retrieve a configuration for `foo.json`, only the first config object matches so `handler` is equal to `jsonHandler`; when you retrieve a configuration for `package.json`, `handler` is equal to `packageJsonHandler` (because both config objects match, the second one wins).
-
-## Installation
-
-You can install the package using npm or Yarn:
-
-```bash
-npm install @eslint/config-array --save
-
-# or
-
-yarn add @eslint/config-array
-```
 
 ## Usage
 

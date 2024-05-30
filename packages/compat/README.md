@@ -4,6 +4,8 @@
 
 This packages contains functions that allow you to wrap existing ESLint rules, plugins, and configurations that were intended for use with ESLint v8.x to allow them to work as-is in ESLint v9.x.
 
+**Note:** All plugins are not guaranteed to work in ESLint v9.x. This package fixes the most common issues but can't fix everything.
+
 ## Installation
 
 For Node.js and compatible runtimes:
