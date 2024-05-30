@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.2](https://github.com/eslint/rewrite/compare/object-schema-v2.1.1...object-schema-v2.1.2) (2024-05-30)
+
+
+### Bug Fixes
+
+* npm and JSR package contents ([#16](https://github.com/eslint/rewrite/issues/16)) ([3e9eb67](https://github.com/eslint/rewrite/commit/3e9eb67964327ef908ab27fa0f14990580ec801c))
+
 ## [2.1.1](https://github.com/eslint/rewrite/compare/object-schema-v2.1.0...object-schema-v2.1.1) (2024-05-08)
 
 

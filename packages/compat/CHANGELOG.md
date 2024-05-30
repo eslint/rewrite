@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.2](https://github.com/eslint/rewrite/compare/compat-v1.0.1...compat-v1.0.2) (2024-05-30)
+
+
+### Bug Fixes
+
+* npm and JSR package contents ([#16](https://github.com/eslint/rewrite/issues/16)) ([3e9eb67](https://github.com/eslint/rewrite/commit/3e9eb67964327ef908ab27fa0f14990580ec801c))
+* Use types from @types/eslint ([#28](https://github.com/eslint/rewrite/issues/28)) ([e94f435](https://github.com/eslint/rewrite/commit/e94f4355c39cf4d566690fdc9180a97e06d292f1))
+
 ## [1.0.1](https://github.com/eslint/rewrite/compare/compat-v1.0.0...compat-v1.0.1) (2024-05-08)
 
 
