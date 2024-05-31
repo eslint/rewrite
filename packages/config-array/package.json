@@ -34,7 +34,8 @@
     "build": "rollup -c && npm run build:dedupe-types && tsc -p tsconfig.esm.json && npm run build:cts",
     "test:jsr": "npx jsr@latest publish --dry-run",
     "pretest": "npm run build",
-    "test": "mocha tests/"
+    "test": "mocha tests/",
+    "test:coverage": "c8 npm test"
   },
   "keywords": [
     "configuration",
@@ -49,6 +50,7 @@
   },
   "devDependencies": {
     "@types/minimatch": "^3.0.5",
+    "c8": "^9.1.0",
     "mocha": "^10.4.0",
     "rollup": "^4.16.2",
     "rollup-plugin-copy": "^3.5.0",
