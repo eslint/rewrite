@@ -1,6 +1,6 @@
+import { fixupConfigRules, fixupPluginRules } from "@eslint/compat";
 import prettier from "eslint-plugin-prettier";
 import _import from "eslint-plugin-import";
-import { fixupPluginRules, fixupConfigRules } from "@eslint/compat";
 import globals from "globals";
 import path from "node:path";
 import { fileURLToPath } from "node:url";

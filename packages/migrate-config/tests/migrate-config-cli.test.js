@@ -21,6 +21,8 @@ const filePaths = [
 	"reveal-md/.eslintrc",
 	"release-it/.eslintrc.json",
 	"no-globals-for-env/.eslintrc.yml",
+	"overrides-extends/.eslintrc.json",
+	"plugins-dedupe/.eslintrc.yml",
 ].map(file => `tests/fixtures/${file}`);
 
 //-----------------------------------------------------------------------------

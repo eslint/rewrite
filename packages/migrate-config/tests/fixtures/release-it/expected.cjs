@@ -1,11 +1,10 @@
-const prettier = require("eslint-plugin-prettier");
-const _import = require("eslint-plugin-import");
-
 const {
-    fixupPluginRules,
     fixupConfigRules,
+    fixupPluginRules,
 } = require("@eslint/compat");
 
+const prettier = require("eslint-plugin-prettier");
+const _import = require("eslint-plugin-import");
 const globals = require("globals");
 const js = require("@eslint/js");
 
