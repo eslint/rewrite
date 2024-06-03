@@ -151,6 +151,9 @@ function convertESLintIgnoreToMinimatch(pattern) {
 	return `${negatedPrefix}${matchEverywherePrefix}${patternWithoutLeadingSlash}${matchInsideSuffix}`;
 }
 
+// cache for plugins needing compat
+const pluginsNeedingCompatCache = new Set(pluginsNeedingCompat);
+
 /**
  * Determines if a plugin needs the compat utility.
  * @param {string} pluginName The name of the plugin.
@@ -161,7 +164,7 @@ function pluginNeedsCompat(pluginName) {
 		? pluginName.slice(0, pluginName.indexOf("/"))
 		: pluginName;
 
-	return pluginsNeedingCompat.includes(
+	return pluginsNeedingCompatCache.has(
 		naming.normalizePackageName(pluginNameToTest, "eslint-plugin"),
 	);
 }
@@ -643,17 +646,6 @@ function migrateConfigObject(migration, config) {
 		properties.push(b.property("init", b.identifier("ignores"), ignores));
 	}
 
-	// Copy over `plugins`
-	if (config.plugins) {
-		properties.push(
-			b.property(
-				"init",
-				b.identifier("plugins"),
-				createPlugins(config.plugins, migration),
-			),
-		);
-	}
-
 	// Handle `extends`
 	if (config.extends) {
 		let extendsCallExpression = b.callExpression(
@@ -675,6 +667,25 @@ function migrateConfigObject(migration, config) {
 		});
 
 		if (needsCompat) {
+			/*
+			 * When even one `extends` item needs compat, we need to mark every
+			 * plugin as needing compat. This is because the `fixupConfigRules`
+			 * function will be called on the entire object, and if any of those
+			 * plugins is also referenced in `plugins`, the user will get a
+			 * "can't redefine plugin" error.
+			 */
+			extendsArray.forEach(extend => {
+				if (extend.startsWith("plugin:")) {
+					const pluginName = extend.slice(7, extend.indexOf("/"));
+					const normalizedPluginName = naming.normalizePackageName(
+						pluginName,
+						"eslint-plugin",
+					);
+
+					pluginsNeedingCompatCache.add(normalizedPluginName);
+				}
+			});
+
 			if (!migration.imports.has("@eslint/compat")) {
 				migration.imports.set("@eslint/compat", {
 					bindings: ["fixupConfigRules"],
@@ -726,6 +737,20 @@ function migrateConfigObject(migration, config) {
 		}
 
 		configArrayElements.push(b.spreadElement(extendsCallExpression));
+	}
+
+	/*
+	 * Copy over plugins. This must happen after processing `extends` in order to
+	 * properly account for plugins that need the compat utility.
+	 */
+	if (config.plugins) {
+		properties.push(
+			b.property(
+				"init",
+				b.identifier("plugins"),
+				createPlugins(config.plugins, migration),
+			),
+		);
 	}
 
 	// Copy over `noInlineConfig` and `reportUnusedDisableDirectives`

@@ -1,15 +1,14 @@
+const {
+    fixupConfigRules,
+    fixupPluginRules,
+} = require("@eslint/compat");
+
 const prettier = require("eslint-plugin-prettier");
 const _import = require("eslint-plugin-import");
 const node = require("eslint-plugin-node");
 const promise = require("eslint-plugin-promise");
 const standard = require("eslint-plugin-standard");
 const typescriptEslint = require("@typescript-eslint/eslint-plugin");
-
-const {
-    fixupPluginRules,
-    fixupConfigRules,
-} = require("@eslint/compat");
-
 const globals = require("globals");
 const tsParser = require("@typescript-eslint/parser");
 const js = require("@eslint/js");

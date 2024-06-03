@@ -1,10 +1,10 @@
+import { fixupConfigRules, fixupPluginRules } from "@eslint/compat";
 import prettier from "eslint-plugin-prettier";
 import _import from "eslint-plugin-import";
 import node from "eslint-plugin-node";
 import promise from "eslint-plugin-promise";
 import standard from "eslint-plugin-standard";
 import typescriptEslint from "@typescript-eslint/eslint-plugin";
-import { fixupPluginRules, fixupConfigRules } from "@eslint/compat";
 import globals from "globals";
 import tsParser from "@typescript-eslint/parser";
 import path from "node:path";
