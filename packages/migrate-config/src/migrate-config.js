@@ -676,7 +676,7 @@ function migrateConfigObject(migration, config) {
 			 */
 			extendsArray.forEach(extend => {
 				if (extend.startsWith("plugin:")) {
-					const pluginName = extend.slice(7);
+					const pluginName = extend.slice(7, extend.indexOf("/"));
 					const normalizedPluginName = naming.normalizePackageName(
 						pluginName,
 						"eslint-plugin",
