@@ -164,22 +164,9 @@ function pluginNeedsCompat(pluginName) {
 		? pluginName.slice(0, pluginName.indexOf("/"))
 		: pluginName;
 
-	const normalizedName = naming.normalizePackageName(
-		pluginNameToTest,
-		"eslint-plugin",
+	return pluginsNeedingCompatCache.has(
+		naming.normalizePackageName(pluginNameToTest, "eslint-plugin"),
 	);
-
-	if (pluginsNeedingCompatCache.has(normalizedName)) {
-		return true;
-	}
-
-	const needsCompat = pluginsNeedingCompat.includes(normalizedName);
-
-	if (needsCompat) {
-		pluginsNeedingCompatCache.add(normalizedName);
-	}
-
-	return needsCompat;
 }
 
 /**
