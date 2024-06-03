@@ -152,7 +152,7 @@ function convertESLintIgnoreToMinimatch(pattern) {
 }
 
 // cache for plugins needing compat
-const pluginsNeedingCompatCache = new Set();
+const pluginsNeedingCompatCache = new Set(pluginsNeedingCompat);
 
 /**
  * Determines if a plugin needs the compat utility.
