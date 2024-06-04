@@ -8,7 +8,7 @@
  *
  * @author Nicholas C. Zakas
  */
-/* global process */
+
 //-----------------------------------------------------------------------------
 // Imports
 //-----------------------------------------------------------------------------
@@ -23,7 +23,7 @@ import fs from "node:fs";
 const files = process.argv.slice(2);
 
 files.forEach(filePath => {
-	const lines = fs.readFileSync(filePath, "utf8").split(/\r?\n/g);
+	const lines = fs.readFileSync(filePath, "utf8").split(/\r?\n/gu);
 	const typedefs = new Set();
 
 	const remainingLines = lines.filter(line => {

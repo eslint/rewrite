@@ -1,8 +1,6 @@
 /**
- * @filedescription Object Schema
+ * @fileoverview Object Schema
  */
-
-"use strict";
 
 //-----------------------------------------------------------------------------
 // Imports
@@ -102,7 +100,7 @@ export function fixupRule(ruleDefinition) {
 		? ruleDefinition
 		: ruleDefinition.create.bind(ruleDefinition);
 
-	const ruleCreate = context => {
+	function ruleCreate(context) {
 		// if getScope is already there then no need to create old methods
 		if ("getScope" in context) {
 			return originalCreate(context);
@@ -161,6 +159,7 @@ export function fixupRule(ruleDefinition) {
 			 * and the third argument for onCodePathSegmentLoop.
 			 */
 			if (methodName.startsWith("on")) {
+				// eslint-disable-next-line no-loop-func -- intentionally updating shared `currentNode` variable
 				visitor[methodName] = (...args) => {
 					currentNode =
 						args[methodName === "onCodePathSegmentLoop" ? 2 : 1];
@@ -171,6 +170,7 @@ export function fixupRule(ruleDefinition) {
 				continue;
 			}
 
+			// eslint-disable-next-line no-loop-func -- intentionally updating shared `currentNode` variable
 			visitor[methodName] = (...args) => {
 				currentNode = args[0];
 
@@ -179,7 +179,7 @@ export function fixupRule(ruleDefinition) {
 		}
 
 		return visitor;
-	};
+	}
 
 	const newRuleDefinition = {
 		...(isLegacyRule ? undefined : ruleDefinition),
@@ -239,20 +239,20 @@ export function fixupPluginRules(plugin) {
 export function fixupConfigRules(config) {
 	const configs = Array.isArray(config) ? config : [config];
 
-	return configs.map(config => {
-		if (!config.plugins) {
-			return config;
+	return configs.map(configItem => {
+		if (!configItem.plugins) {
+			return configItem;
 		}
 
 		const newPlugins = Object.fromEntries(
-			Object.entries(config.plugins).map(([pluginName, plugin]) => [
+			Object.entries(configItem.plugins).map(([pluginName, plugin]) => [
 				pluginName,
 				fixupPluginRules(plugin),
 			]),
 		);
 
 		return {
-			...config,
+			...configItem,
 			plugins: newPlugins,
 		};
 	});

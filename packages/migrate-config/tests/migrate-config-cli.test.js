@@ -1,5 +1,5 @@
 /**
- * @filedescription Fixup tests
+ * @fileoverview Fixup tests
  */
 
 //-----------------------------------------------------------------------------
@@ -35,7 +35,7 @@ const filePaths = [
  * @returns {string} The normalized text.
  */
 function normalizeLineEndings(text) {
-	return text.replace(/\r\n/g, "\n");
+	return text.replace(/\r\n/gu, "\n");
 }
 
 /**
@@ -62,13 +62,13 @@ async function assertFilesEqual(resultPath, expectedPath) {
 describe("@eslint/migrate-config", async () => {
 	for (const filePath of filePaths) {
 		const fileBaseName = path.basename(filePath);
-		const fileBaseNameWithoutExt = fileBaseName.replace(/\.\w+$/, "");
+		const fileBaseNameWithoutExt = fileBaseName.replace(/\.\w+$/u, "");
 		const isESLintRC = fileBaseName.startsWith(".eslintrc");
 		const fixturePath = path.dirname(filePath);
 		const expectedMjsPath = `${fixturePath}/expected.mjs`;
 		const expectedCjsPath = `${fixturePath}/expected.cjs`;
-		const resultMjsPath = `${fixturePath}/${isESLintRC ? "eslint.config.mjs" : fileBaseNameWithoutExt + ".mjs"}`;
-		const resultCjsPath = `${fixturePath}/${isESLintRC ? "eslint.config.cjs" : fileBaseNameWithoutExt + ".cjs"}`;
+		const resultMjsPath = `${fixturePath}/${isESLintRC ? "eslint.config.mjs" : `${fileBaseNameWithoutExt}.mjs`}`;
+		const resultCjsPath = `${fixturePath}/${isESLintRC ? "eslint.config.cjs" : `${fileBaseNameWithoutExt}.cjs`}`;
 
 		it(`should migrate ${filePath}`, async () => {
 			// Note: Using execSync instead of exec due to race conditions

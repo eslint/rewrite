@@ -1,5 +1,5 @@
 /**
- * @filedescription Object Schema Package
+ * @fileoverview Object Schema Package
  */
 
 export { ObjectSchema } from "./object-schema.js";

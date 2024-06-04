@@ -1,9 +1,6 @@
 /**
- * @filedescription Merge Strategy Tests
+ * @fileoverview Merge Strategy Tests
  */
-/* global it, describe */
-
-"use strict";
 
 //-----------------------------------------------------------------------------
 // Requirements
@@ -25,25 +22,25 @@ describe("ValidationStrategy", () => {
 		it("should throw an error when the value is null", () => {
 			assert.throws(() => {
 				ValidationStrategy.boolean(null);
-			}, /Expected a Boolean/);
+			}, /Expected a Boolean/u);
 		});
 
 		it("should throw an error when the value is a string", () => {
 			assert.throws(() => {
 				ValidationStrategy.boolean("foo");
-			}, /Expected a Boolean/);
+			}, /Expected a Boolean/u);
 		});
 
 		it("should throw an error when the value is a number", () => {
 			assert.throws(() => {
 				ValidationStrategy.boolean(123);
-			}, /Expected a Boolean/);
+			}, /Expected a Boolean/u);
 		});
 
 		it("should throw an error when the value is an object", () => {
 			assert.throws(() => {
 				ValidationStrategy.boolean({});
-			}, /Expected a Boolean/);
+			}, /Expected a Boolean/u);
 		});
 	});
 
@@ -55,25 +52,25 @@ describe("ValidationStrategy", () => {
 		it("should throw an error when the value is null", () => {
 			assert.throws(() => {
 				ValidationStrategy.number(null);
-			}, /Expected a number/);
+			}, /Expected a number/u);
 		});
 
 		it("should throw an error when the value is a string", () => {
 			assert.throws(() => {
 				ValidationStrategy.number("foo");
-			}, /Expected a number/);
+			}, /Expected a number/u);
 		});
 
 		it("should throw an error when the value is a boolean", () => {
 			assert.throws(() => {
 				ValidationStrategy.number(true);
-			}, /Expected a number/);
+			}, /Expected a number/u);
 		});
 
 		it("should throw an error when the value is an object", () => {
 			assert.throws(() => {
 				ValidationStrategy.number({});
-			}, /Expected a number/);
+			}, /Expected a number/u);
 		});
 	});
 
@@ -85,13 +82,13 @@ describe("ValidationStrategy", () => {
 		it("should throw an error when the value is null", () => {
 			assert.throws(() => {
 				ValidationStrategy.object(null);
-			}, /Expected an object/);
+			}, /Expected an object/u);
 		});
 
 		it("should throw an error when the value is a string", () => {
 			assert.throws(() => {
 				ValidationStrategy.object("");
-			}, /Expected an object/);
+			}, /Expected an object/u);
 		});
 	});
 
@@ -103,19 +100,19 @@ describe("ValidationStrategy", () => {
 		it("should throw an error when the value is null", () => {
 			assert.throws(() => {
 				ValidationStrategy.array(null);
-			}, /Expected an array/);
+			}, /Expected an array/u);
 		});
 
 		it("should throw an error when the value is a string", () => {
 			assert.throws(() => {
 				ValidationStrategy.array("");
-			}, /Expected an array/);
+			}, /Expected an array/u);
 		});
 
 		it("should throw an error when the value is an object", () => {
 			assert.throws(() => {
 				ValidationStrategy.array({});
-			}, /Expected an array/);
+			}, /Expected an array/u);
 		});
 	});
 
@@ -131,7 +128,7 @@ describe("ValidationStrategy", () => {
 		it("should throw an error when the value is a string", () => {
 			assert.throws(() => {
 				ValidationStrategy["object?"]("");
-			}, /Expected an object/);
+			}, /Expected an object/u);
 		});
 	});
 
@@ -147,13 +144,13 @@ describe("ValidationStrategy", () => {
 		it("should throw an error when the value is null", () => {
 			assert.throws(() => {
 				ValidationStrategy.string(null);
-			}, /Expected a string/);
+			}, /Expected a string/u);
 		});
 
 		it("should throw an error when the value is an object", () => {
 			assert.throws(() => {
 				ValidationStrategy.string({});
-			}, /Expected a string/);
+			}, /Expected a string/u);
 		});
 	});
 
@@ -165,19 +162,19 @@ describe("ValidationStrategy", () => {
 		it("should throw an error when the value is an empty string", () => {
 			assert.throws(() => {
 				ValidationStrategy["string!"]("");
-			}, /Expected a non-empty string/);
+			}, /Expected a non-empty string/u);
 		});
 
 		it("should throw an error when the value is null", () => {
 			assert.throws(() => {
 				ValidationStrategy["string!"](null);
-			}, /Expected a non-empty string/);
+			}, /Expected a non-empty string/u);
 		});
 
 		it("should throw an error when the value is an object", () => {
 			assert.throws(() => {
 				ValidationStrategy["string!"]({});
-			}, /Expected a non-empty string/);
+			}, /Expected a non-empty string/u);
 		});
 	});
 });

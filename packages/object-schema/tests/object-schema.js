@@ -1,9 +1,6 @@
 /**
- * @filedescription Object Schema Tests
+ * @fileoverview Object Schema Tests
  */
-/* global it, describe */
-
-"use strict";
 
 //-----------------------------------------------------------------------------
 // Requirements
@@ -38,13 +35,13 @@ describe("ObjectSchema", () => {
 						validate() {},
 					},
 				});
-			}, /Definition for key "foo" must have a merge property/);
+			}, /Definition for key "foo" must have a merge property/u);
 		});
 
 		it("should throw an error when a strategy is missing a merge() method", () => {
 			assert.throws(() => {
 				schema = new ObjectSchema();
-			}, /Schema definitions missing/);
+			}, /Schema definitions missing/u);
 		});
 
 		it("should throw an error when a strategy is missing a validate() method", () => {
@@ -54,43 +51,45 @@ describe("ObjectSchema", () => {
 						merge() {},
 					},
 				});
-			}, /Definition for key "foo" must have a validate\(\) method/);
+			}, /Definition for key "foo" must have a validate\(\) method/u);
 		});
 
 		it("should throw an error when merge is an invalid string", () => {
 			assert.throws(() => {
+				// eslint-disable-next-line no-new -- testing whether constructor throws an error
 				new ObjectSchema({
 					foo: {
 						merge: "bar",
 						validate() {},
 					},
 				});
-			}, /key "foo" missing valid merge strategy/);
+			}, /key "foo" missing valid merge strategy/u);
 		});
 
 		it("should throw an error when validate is an invalid string", () => {
 			assert.throws(() => {
+				// eslint-disable-next-line no-new -- testing whether constructor throws an error
 				new ObjectSchema({
 					foo: {
 						merge: "assign",
 						validate: "s",
 					},
 				});
-			}, /key "foo" missing valid validation strategy/);
+			}, /key "foo" missing valid validation strategy/u);
 		});
 	});
 
 	describe("merge()", () => {
 		it("should throw an error when an unexpected key is found", () => {
-			let schema = new ObjectSchema({});
+			schema = new ObjectSchema({});
 
 			assert.throws(() => {
 				schema.merge({ foo: true }, { foo: true });
-			}, /Unexpected key "foo"/);
+			}, /Unexpected key "foo"/u);
 		});
 
 		it("should throw an error when merge() throws an error", () => {
-			let schema = new ObjectSchema({
+			schema = new ObjectSchema({
 				foo: {
 					merge() {
 						throw new Error("Boom!");
@@ -101,13 +100,14 @@ describe("ObjectSchema", () => {
 
 			assert.throws(() => {
 				schema.merge({ foo: true }, { foo: true });
-			}, /Key "foo": Boom!/);
+			}, /Key "foo": Boom!/u);
 		});
 
 		it("should throw an error when merge() throws an error with a readonly message", () => {
-			let schema = new ObjectSchema({
+			schema = new ObjectSchema({
 				foo: {
 					merge() {
+						// eslint-disable-next-line no-throw-literal -- intentionally throwing an object that is not an instance of Error
 						throw {
 							get message() {
 								return "Boom!";
@@ -120,13 +120,14 @@ describe("ObjectSchema", () => {
 
 			assert.throws(() => {
 				schema.merge({ foo: true }, { foo: true });
-			}, /Key "foo": Boom!/);
+			}, /Key "foo": Boom!/u);
 		});
 
 		it("should throw an error with custom properties when merge() throws an error with custom properties", () => {
-			let schema = new ObjectSchema({
+			schema = new ObjectSchema({
 				foo: {
 					merge() {
+						// eslint-disable-next-line no-throw-literal -- intentionally throwing an object that is not an instance of Error
 						throw {
 							get message() {
 								return "Boom!";
@@ -428,10 +429,10 @@ describe("ObjectSchema", () => {
 
 	describe("validate()", () => {
 		it("should throw an error when an unexpected key is found", () => {
-			let schema = new ObjectSchema({});
+			schema = new ObjectSchema({});
 			assert.throws(() => {
 				schema.validate({ foo: true });
-			}, /Unexpected key "foo"/);
+			}, /Unexpected key "foo"/u);
 		});
 
 		it("should not throw an error when an expected key is found", () => {
@@ -525,7 +526,7 @@ describe("ObjectSchema", () => {
 
 			assert.throws(() => {
 				schema.validate({ bar: true });
-			}, /Key "bar" requires keys "foo", "baz"./);
+			}, /Key "bar" requires keys "foo", "baz"./u);
 		});
 
 		it("should throw an error when an expected key is found but is invalid", () => {
@@ -542,7 +543,7 @@ describe("ObjectSchema", () => {
 
 			assert.throws(() => {
 				schema.validate({ foo: true });
-			}, /Key "foo": Invalid key/);
+			}, /Key "foo": Invalid key/u);
 		});
 
 		it("should throw an error when an expected key is found but is invalid with a string validator", () => {
@@ -557,7 +558,7 @@ describe("ObjectSchema", () => {
 
 			assert.throws(() => {
 				schema.validate({ foo: true });
-			}, /Key "foo": Expected a string/);
+			}, /Key "foo": Expected a string/u);
 		});
 
 		it("should throw an error when an expected key is found but is invalid with a number validator", () => {
@@ -572,7 +573,7 @@ describe("ObjectSchema", () => {
 
 			assert.throws(() => {
 				schema.validate({ foo: true });
-			}, /Key "foo": Expected a number/);
+			}, /Key "foo": Expected a number/u);
 		});
 
 		it("should throw an error when a required key is missing", () => {
@@ -588,7 +589,7 @@ describe("ObjectSchema", () => {
 
 			assert.throws(() => {
 				schema.validate({});
-			}, /Missing required key "foo"/);
+			}, /Missing required key "foo"/u);
 		});
 
 		it("should throw an error when a subschema is provided and the value doesn't validate", () => {
@@ -614,7 +615,7 @@ describe("ObjectSchema", () => {
 						last: "z",
 					},
 				});
-			}, /Key "name": Key "first": Expected a string/);
+			}, /Key "name": Key "first": Expected a string/u);
 		});
 
 		it("should not throw an error when a subschema is provided and the value validates", () => {

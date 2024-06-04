@@ -425,7 +425,7 @@ function pathMatches(filePath, basePath, config) {
 	const relativeFilePath = path.relative(basePath, filePath);
 
 	// match both strings and functions
-	const match = pattern => {
+	function match(pattern) {
 		if (isString(pattern)) {
 			return doMatch(relativeFilePath, pattern);
 		}
@@ -435,7 +435,7 @@ function pathMatches(filePath, basePath, config) {
 		}
 
 		throw new TypeError(`Unexpected matcher type ${pattern}.`);
-	};
+	}
 
 	// check for all matches to config.files
 	let filePathMatchesPattern = config.files.some(pattern => {
@@ -756,6 +756,8 @@ export class ConfigArray extends Array {
 		return this;
 	}
 
+	/* eslint-disable class-methods-use-this -- Desired as instance methods */
+
 	/**
 	 * Finalizes the state of a config before being cached and returned by
 	 * `getConfig()`. Does nothing by default but is provided to be
@@ -779,6 +781,8 @@ export class ConfigArray extends Array {
 		return config;
 	}
 
+	/* eslint-enable class-methods-use-this -- Desired as instance methods */
+
 	/**
 	 * Determines if a given file path explicitly matches a `files` entry
 	 * and also doesn't match an `ignores` entry. Configs that don't have
@@ -793,9 +797,9 @@ export class ConfigArray extends Array {
 		const cache = dataCache.get(this);
 
 		// first check the cache to avoid duplicate work
-		let result = cache.explicitMatches.get(filePath);
+		const result = cache.explicitMatches.get(filePath);
 
-		if (typeof result == "boolean") {
+		if (typeof result === "boolean") {
 			return result;
 		}
 
@@ -880,7 +884,7 @@ export class ConfigArray extends Array {
 
 		const matchingConfigIndices = [];
 		let matchFound = false;
-		const universalPattern = /\/\*{1,2}$/;
+		const universalPattern = /\/\*{1,2}$/u;
 
 		this.forEach((config, index) => {
 			if (!config.files) {
@@ -959,7 +963,6 @@ export class ConfigArray extends Array {
 				debug(`Matching config found for ${filePath}`);
 				matchingConfigIndices.push(index);
 				matchFound = true;
-				return;
 			}
 		});
 
@@ -985,6 +988,7 @@ export class ConfigArray extends Array {
 
 		// otherwise construct the config
 
+		// eslint-disable-next-line array-callback-return, consistent-return -- rethrowConfigError always throws an error
 		let finalConfig = matchingConfigIndices.reduce((result, index) => {
 			try {
 				return this[ConfigArraySymbol.schema].merge(
@@ -1065,7 +1069,7 @@ export class ConfigArray extends Array {
 
 		const relativeDirectoryPath = path
 			.relative(this.basePath, directoryPath)
-			.replace(/\\/g, "/");
+			.replace(/\\/gu, "/");
 
 		if (relativeDirectoryPath.startsWith("..")) {
 			return true;
@@ -1080,7 +1084,7 @@ export class ConfigArray extends Array {
 
 		const directoryParts = relativeDirectoryPath.split("/");
 		let relativeDirectoryToCheck = "";
-		let result = false;
+		let result;
 
 		/*
 		 * In order to get the correct gitignore-style ignores, where an
@@ -1092,7 +1096,7 @@ export class ConfigArray extends Array {
 		 * have to recalculate everything for every call.
 		 */
 		do {
-			relativeDirectoryToCheck += directoryParts.shift() + "/";
+			relativeDirectoryToCheck += `${directoryParts.shift()}/`;
 
 			result = shouldIgnorePath(
 				this.ignores,

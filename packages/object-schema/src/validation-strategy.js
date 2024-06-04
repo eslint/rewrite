@@ -1,8 +1,6 @@
 /**
- * @filedescription Validation Strategy
+ * @fileoverview Validation Strategy
  */
-
-"use strict";
 
 //-----------------------------------------------------------------------------
 // Class
