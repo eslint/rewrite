@@ -21,8 +21,6 @@ body:
           label: What problem do you want to solve?
           description: |
               Please explain your use case in as much detail as possible without referring to a specific solution.
-          placeholder: |
-              humanfs currently...
       validations:
           required: true
     - type: textarea
@@ -30,8 +28,6 @@ body:
           label: What do you think is the correct solution?
           description: |
               Please explain how you'd like to change humanfs to address the problem.
-          placeholder: |
-              I'd like humanfs to...
       validations:
           required: true
     - type: checkboxes
