@@ -1,10 +1,7 @@
 /**
- * @fileoverview Object Schema
+ * @filedescription Functions to fix up rules to provide missing methods on the `context` object.
+ * @author Nicholas C. Zakas
  */
-
-//-----------------------------------------------------------------------------
-// Imports
-//-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
 // Types

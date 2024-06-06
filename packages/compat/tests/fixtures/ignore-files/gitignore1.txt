@@ -1,0 +1,17 @@
+# Node.js
+node_modules
+!/fixtures/node_modules
+/dist
+
+# Logs
+*.log
+
+# Gatsby files
+.cache/
+
+# vuepress build output
+.vuepress/dist
+
+# other
+*/foo.js
+dir/**
