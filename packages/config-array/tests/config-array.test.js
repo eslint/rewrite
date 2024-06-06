@@ -8,7 +8,7 @@
 //-----------------------------------------------------------------------------
 
 import { ConfigArray, ConfigArraySymbol } from "../src/config-array.js";
-import path from "path";
+import path from "node:path";
 import assert from "node:assert";
 
 //-----------------------------------------------------------------------------
