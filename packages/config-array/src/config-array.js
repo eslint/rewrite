@@ -784,54 +784,6 @@ export class ConfigArray extends Array {
 	/* eslint-enable class-methods-use-this -- Desired as instance methods */
 
 	/**
-	 * Determines if a given file path explicitly matches a `files` entry
-	 * and also doesn't match an `ignores` entry. Configs that don't have
-	 * a `files` property are not considered an explicit match.
-	 * @param {string} filePath The complete path of a file to check.
-	 * @returns {boolean} True if the file path matches a `files` entry
-	 * 		or false if not.
-	 */
-	isExplicitMatch(filePath) {
-		assertNormalized(this);
-
-		const cache = dataCache.get(this);
-
-		// first check the cache to avoid duplicate work
-		const result = cache.explicitMatches.get(filePath);
-
-		if (typeof result === "boolean") {
-			return result;
-		}
-
-		// TODO: Maybe move elsewhere? Maybe combine with getConfig() logic?
-		const relativeFilePath = path.relative(this.basePath, filePath);
-
-		if (shouldIgnorePath(this.ignores, filePath, relativeFilePath)) {
-			debug(`Ignoring ${filePath}`);
-
-			// cache and return result
-			cache.explicitMatches.set(filePath, false);
-			return false;
-		}
-
-		// filePath isn't automatically ignored, so try to find a match
-
-		for (const config of this) {
-			if (!config.files) {
-				continue;
-			}
-
-			if (pathMatches(filePath, this.basePath, config)) {
-				debug(`Matching config found for ${filePath}`);
-				cache.explicitMatches.set(filePath, true);
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
 	 * Returns the config object for a given file path and a status that can be used to determine why a file has no config.
 	 * @param {string} filePath The complete path of a file to get a config for.
 	 * @returns {{ config?: Object, status: "ignored"|"external"|"unconfigured"|"matched" }}
