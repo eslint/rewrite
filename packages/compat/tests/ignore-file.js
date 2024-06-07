@@ -46,6 +46,14 @@ describe("@eslint/compat", () => {
 	});
 
 	describe("includeIgnoreFile", () => {
+		it("should throw an error when a relative path is passed", () => {
+			const ignoreFilePath =
+				"../tests/fixtures/ignore-files/gitignore1.txt";
+			assert.throws(() => {
+				includeIgnoreFile(ignoreFilePath);
+			}, /The ignore file location must be an absolute path./);
+		});
+
 		it("should return an object with an `ignores` property", () => {
 			const ignoreFilePath = fileURLToPath(
 				new URL(

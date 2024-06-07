@@ -8,6 +8,7 @@
 //-----------------------------------------------------------------------------
 
 import fs from "node:fs";
+import path from "node:path";
 
 //-----------------------------------------------------------------------------
 // Types
@@ -51,10 +52,15 @@ export function convertIgnorePatternToMinimatch(pattern) {
 
 /**
  * Reads an ignore file and returns an object with the ignore patterns.
- * @param {string} ignoreFilePath The path to the ignore file.
+ * @param {string} ignoreFilePath The absolute path to the ignore file.
  * @returns {FlatConfig} An object with an `ignores` property that is an array of ignore patterns.
+ * @throws {Error} If the ignore file path is not an absolute path.
  */
 export function includeIgnoreFile(ignoreFilePath) {
+	if (!path.isAbsolute(ignoreFilePath)) {
+		throw new Error("The ignore file location must be an absolute path.");
+	}
+
 	const ignoreFile = fs.readFileSync(ignoreFilePath, "utf8");
 	const lines = ignoreFile.split(/\r?\n/);
 

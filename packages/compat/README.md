@@ -150,9 +150,15 @@ If you were using an alternate ignore file in ESLint v8.x, such as using `--igno
 ```js
 // eslint.config.js - ESM example
 import { includeIgnoreFile } from "@eslint/compat";
+import path from "node:path";
+import { fileURLtoPath } from "node:url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const gitignorePath = path.resolve(__dirname, ".gitignore");
 
 export default [
-	includeIgnoreFile(".gitignore"),
+	includeIgnoreFile(gitignorePath),
 	{
 		// your overrides
 	},
@@ -164,9 +170,11 @@ Or in CommonJS:
 ```js
 // eslint.config.js - CommonJS example
 const { includeIgnoreFile } = require("@eslint/compat");
+const path = require("node:path");
+const gitignorePath = path.resolve(__dirname, ".gitignore");
 
 module.exports = [
-	includeIgnoreFile(".gitignore"),
+	includeIgnoreFile(gitignorePath),
 	{
 		// your overrides
 	},
