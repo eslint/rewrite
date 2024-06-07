@@ -1434,6 +1434,26 @@ describe("ConfigArray", () => {
 				);
 			});
 
+			it('should return "unconfigured" when there is only * pattern', () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["*"],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfigStatus(path.join(basePath, "a.js")),
+					"unconfigured",
+				);
+			});
+
 			it('should return "matched" when files pattern matches and there is a pattern ending with /**', () => {
 				configs = new ConfigArray(
 					[
