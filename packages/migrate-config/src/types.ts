@@ -1,5 +1,5 @@
 /**
- * @filedescription Types for migrate-config package.
+ * @fileoverview Types for migrate-config package.
  */
 
 export interface MigrationImport {

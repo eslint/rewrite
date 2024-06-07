@@ -2,7 +2,6 @@
  * @fileoverview disallow assignments that can lead to race conditions due to usage of `await` or `yield`
  * @author Teddy Katz
  */
-"use strict";
 
 //------------------------------------------------------------------------------
 // Requirements

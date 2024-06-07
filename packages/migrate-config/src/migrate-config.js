@@ -1,5 +1,5 @@
 /**
- * @filedescription Configuration Migration
+ * @fileoverview Configuration Migration
  * @author Nicholas C. Zakas
  */
 
@@ -177,7 +177,7 @@ function pluginNeedsCompat(pluginName) {
  * @returns {string} The variable name to use.
  */
 function getPluginVariableName(pluginName) {
-	let name = pluginName.replace(/^eslint-plugin-/, "");
+	let name = pluginName.replace(/^eslint-plugin-/u, "");
 
 	if (name === "import" || name === "export") {
 		return `_${name}`;
@@ -262,7 +262,7 @@ function createGlobals(config) {
 	if (env) {
 		properties.push(
 			...Object.keys(env)
-				.filter(env => !env.startsWith("es"))
+				.filter(name => !name.startsWith("es"))
 				.map(name => {
 					let envName = name;
 					const memberExpression = b.memberExpression(
@@ -346,13 +346,13 @@ function createGlobals(config) {
 
 	if (globals) {
 		properties.push(
-			...Object.keys(globals).map(name => {
-				return b.property(
+			...Object.keys(globals).map(name =>
+				b.property(
 					"init",
 					b.identifier(name),
 					b.literal(globals[name]),
-				);
-			}),
+				),
+			),
 		);
 	}
 
@@ -455,9 +455,9 @@ function createLanguageOptions(migration, config) {
 	 */
 	const needsGlobals =
 		config.env &&
-		Object.keys(config.env).some(envName => {
-			return !envName.startsWith("es") && !envName.includes("/");
-		});
+		Object.keys(config.env).some(
+			envName => !envName.startsWith("es") && !envName.includes("/"),
+		);
 
 	if (needsGlobals && !imports.has("globals")) {
 		imports.set("globals", {

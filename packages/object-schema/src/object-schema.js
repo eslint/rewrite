@@ -1,8 +1,6 @@
 /**
- * @filedescription Object Schema
+ * @fileoverview Object Schema
  */
-
-"use strict";
 
 //-----------------------------------------------------------------------------
 // Requirements
@@ -123,9 +121,9 @@ class WrapperError extends Error {
 		super(`Key "${key}": ${source.message}`, { cause: source });
 
 		// copy over custom properties that aren't represented
-		for (const key of Object.keys(source)) {
-			if (!(key in this)) {
-				this[key] = source[key];
+		for (const sourceKey of Object.keys(source)) {
+			if (!(sourceKey in this)) {
+				this[sourceKey] = source[sourceKey];
 			}
 		}
 	}
@@ -232,7 +230,9 @@ export class ObjectSchema {
 		}
 
 		if (
-			objects.some(object => object == null || typeof object !== "object")
+			objects.some(
+				object => object === null || typeof object !== "object",
+			)
 		) {
 			throw new TypeError("All arguments must be objects.");
 		}

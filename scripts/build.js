@@ -5,9 +5,6 @@
  * @author Nicholas C. Zakas
  */
 
-/* eslint no-console: off */
-/* global console */
-
 //------------------------------------------------------------------------------
 // Imports
 //------------------------------------------------------------------------------
@@ -21,8 +18,8 @@ import { fileURLToPath } from "node:url";
 // Data
 //-----------------------------------------------------------------------------
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __filename = fileURLToPath(import.meta.url); // eslint-disable-line no-underscore-dangle -- convention
+const __dirname = path.dirname(__filename); // eslint-disable-line no-underscore-dangle -- convention
 const PACKAGES_DIR = path.resolve(__dirname, "..", "packages");
 
 //------------------------------------------------------------------------------
