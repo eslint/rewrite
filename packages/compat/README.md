@@ -163,7 +163,7 @@ Or in CommonJS:
 
 ```js
 // eslint.config.js - CommonJS example
-import { includeIgnoreFile } from "@eslint/compat";
+const { includeIgnoreFile } = require("@eslint/compat");
 
 module.exports = [
 	includeIgnoreFile(".gitignore"),
