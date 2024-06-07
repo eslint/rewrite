@@ -2,6 +2,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import js from "@eslint/js";
 import { FlatCompat } from "@eslint/eslintrc";
+import { includeIgnoreFile } from "@eslint/compat";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -10,15 +11,12 @@ const compat = new FlatCompat({
     recommendedConfig: js.configs.recommended,
     allConfig: js.configs.all
 });
+const gitignorePath = path.resolve(__dirname, ".gitignore");
 
-export default [...compat.extends("airbnb").map(config => ({
-    ...config,
-    files: ["src/app/**"],
-    ignores: ["**/*.test.js"],
-})), ...compat.extends("airbnb-base").map(config => ({
-    ...config,
-    files: ["src/app/**/*.test.js"],
-})), ...compat.extends("airbnb-base").map(config => ({
-    ...config,
-    ignores: ["src/app/**/*.spec.js"],
-}))];
+export default [{
+    ignores: ["**/baz"],
+}, includeIgnoreFile(gitignorePath), ...compat.extends("eslint:recommended"), {
+    rules: {
+        "no-console": "off",
+    },
+}];

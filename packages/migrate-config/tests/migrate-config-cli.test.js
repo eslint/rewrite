@@ -86,4 +86,29 @@ describe("@eslint/migrate-config", async () => {
 			await assertFilesEqual(resultCjsPath, expectedCjsPath);
 		});
 	}
+
+	it("should migrate a config with a .gitignore file", async () => {
+		const filePath = "tests/fixtures/gitignore/.eslintrc.json";
+		const fixturePath = path.dirname(filePath);
+		const expectedMjsPath = `${fixturePath}/expected.mjs`;
+		const expectedCjsPath = `${fixturePath}/expected.cjs`;
+		const resultMjsPath = `${fixturePath}/eslint.config.mjs`;
+		const resultCjsPath = `${fixturePath}/eslint.config.cjs`;
+
+		// Note: Using execSync instead of exec due to race conditions
+
+		// run the migration for mjs
+		execSync(`node src/migrate-config-cli.js ${filePath} --gitignore`);
+
+		// run the migration for cjs
+		execSync(
+			`node src/migrate-config-cli.js ${filePath} --commonjs --gitignore`,
+		);
+
+		// check the mjs file
+		await assertFilesEqual(resultMjsPath, expectedMjsPath);
+
+		// check the cjs file
+		await assertFilesEqual(resultCjsPath, expectedCjsPath);
+	});
 });
