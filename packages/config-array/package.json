@@ -4,6 +4,8 @@
   "description": "General purpose glob-based configuration matching.",
   "author": "Nicholas C. Zakas",
   "type": "module",
+  "main": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
   "exports": {
     "require": {
       "types": "./dist/cjs/index.d.cts",
