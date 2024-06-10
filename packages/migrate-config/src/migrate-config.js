@@ -177,7 +177,7 @@ function getDirnameInit() {
 	 * Recast doesn't support `import.meta.url`, so using an uppercase "I" to
 	 * allow for parsing. We then need to replace it with the lowercase "i".
 	 */
-	let init = `\n
+	const init = `\n
 const __filename = fileURLToPath(Import.meta.url);
 const __dirname = path.dirname(__filename);`;
 
@@ -194,7 +194,7 @@ const __dirname = path.dirname(__filename);`;
  * @returns {Array<Statement>} The AST for the initialization block.
  */
 function getFlatCompatInit() {
-	let init = `
+	const init = `
 const compat = new FlatCompat({
     baseDirectory: __dirname,
     recommendedConfig: js.configs.recommended,
@@ -209,7 +209,7 @@ const compat = new FlatCompat({
  * @returns {Statement} The AST for the initialization block.
  */
 function getGitignoreInit() {
-	let init = `
+	const init = `
 const gitignorePath = path.resolve(__dirname, ".gitignore");
 `;
 
@@ -252,7 +252,7 @@ function createGitignoreEntry(migration) {
 			.bindings.push("includeIgnoreFile");
 	}
 
-	let code = `includeIgnoreFile(gitignorePath)`;
+	const code = `includeIgnoreFile(gitignorePath)`;
 
 	return recast.parse(code).program.body[0].expression;
 }
