@@ -1,7 +1,6 @@
 /**
  * @filedescription Fixup tests
  */
-/* global it, describe, URL */
 
 //-----------------------------------------------------------------------------
 // Imports
@@ -51,7 +50,7 @@ describe("@eslint/compat", () => {
 				"../tests/fixtures/ignore-files/gitignore1.txt";
 			assert.throws(() => {
 				includeIgnoreFile(ignoreFilePath);
-			}, /The ignore file location must be an absolute path./);
+			}, /The ignore file location must be an absolute path./u);
 		});
 
 		it("should return an object with an `ignores` property", () => {

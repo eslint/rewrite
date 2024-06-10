@@ -62,7 +62,7 @@ export function includeIgnoreFile(ignoreFilePath) {
 	}
 
 	const ignoreFile = fs.readFileSync(ignoreFilePath, "utf8");
-	const lines = ignoreFile.split(/\r?\n/);
+	const lines = ignoreFile.split(/\r?\n/u);
 
 	return {
 		name: "Imported .gitignore patterns",
