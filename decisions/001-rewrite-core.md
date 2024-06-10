@@ -22,3 +22,7 @@ We will rewrite the ESLint core from scratch. The rewrite will happen in a separ
 For a period of time, we will end up maintaining two versions of ESLint. This is a necessary step to ensure that we don't disrupt the normal flow of ESLint usage until we are certain that the new core is ready for production use.
 
 When the new core is ready, we will need to be careful about the migration plan for users as we don't want to alienate folks or make it seem like too big of a change.
+
+## See Also
+
+-   <https://github.com/eslint/eslint/discussions/16557>
