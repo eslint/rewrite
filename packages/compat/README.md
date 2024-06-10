@@ -151,7 +151,7 @@ If you were using an alternate ignore file in ESLint v8.x, such as using `--igno
 // eslint.config.js - ESM example
 import { includeIgnoreFile } from "@eslint/compat";
 import path from "node:path";
-import { fileURLtoPath } from "node:url";
+import { fileURLToPath } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
