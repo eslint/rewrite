@@ -3,3 +3,4 @@
  */
 
 export * from "./fixup-rules.js";
+export * from "./ignore-file.js";
