@@ -29,7 +29,6 @@
   "devDependencies": {
     "@eslint/js": "^9.0.0",
     "common-tags": "^1.8.2",
-    "ejs": "^3.1.10",
     "eslint": "^9.4.0",
     "eslint-config-eslint": "^11.0.0",
     "got": "^14.4.1",

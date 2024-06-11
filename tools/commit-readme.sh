@@ -10,8 +10,8 @@ else
 	echo "Data changed!"
 
 	# commit the result
-	git add **/**/README.md
-	git commit -m "docs: Update README"
+	git add README.md packages/**/README.md
+	git commit -m "docs: Update README sponsors"
 
 	# push back to source control
 	git push origin HEAD  
