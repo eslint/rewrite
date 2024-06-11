@@ -844,6 +844,8 @@ export function migrateConfig(
 ) {
 	const migration = new Migration(config);
 	const body = [];
+
+	/** @type {Array<CallExpression|ObjectExpression|SpreadElement>} */
 	const configArrayElements = [
 		...migrateConfigObject(
 			migration,
