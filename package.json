@@ -27,7 +27,6 @@
     "!(*.js)": "prettier --write --ignore-unknown"
   },
   "devDependencies": {
-    "@eslint/js": "^9.0.0",
     "common-tags": "^1.8.2",
     "eslint": "^9.4.0",
     "eslint-config-eslint": "^11.0.0",
