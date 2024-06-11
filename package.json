@@ -6,6 +6,7 @@
   "scripts": {
     "test": "npm test --workspaces --if-present",
     "build": "node scripts/build.js",
+    "build:readme": "node tools/update-readme.js",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "fmt": "prettier --write .",
@@ -27,8 +28,11 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
-    "eslint": "^9.0.0",
-    "eslint-config-eslint": "^10.0.0",
+    "common-tags": "^1.8.2",
+    "ejs": "^3.1.10",
+    "eslint": "^9.4.0",
+    "eslint-config-eslint": "^11.0.0",
+    "got": "^14.4.1",
     "lint-staged": "^15.2.0",
     "prettier": "^3.1.1",
     "yorkie": "^2.0.0"
