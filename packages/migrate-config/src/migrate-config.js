@@ -902,6 +902,13 @@ export function migrateConfig(
 	if (gitignore) {
 		migration.needsDirname ||= isModule;
 		configArrayElements.unshift(createGitignoreEntry(migration));
+
+		if (migration.needsDirname && !migration.imports.has("node:url")) {
+			migration.imports.set("node:url", {
+				bindings: ["fileURLToPath"],
+				added: true,
+			});
+		}
 	}
 
 	if (config.ignorePatterns) {
