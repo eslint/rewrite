@@ -1,9 +1,6 @@
 /**
- * @filedescription Merge Strategy Tests
+ * @fileoverview Merge Strategy Tests
  */
-/* global it, describe */
-
-"use strict";
 
 //-----------------------------------------------------------------------------
 // Requirements

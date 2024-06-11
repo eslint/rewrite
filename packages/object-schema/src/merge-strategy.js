@@ -1,8 +1,6 @@
 /**
- * @filedescription Merge Strategy
+ * @fileoverview Merge Strategy
  */
-
-"use strict";
 
 //-----------------------------------------------------------------------------
 // Class

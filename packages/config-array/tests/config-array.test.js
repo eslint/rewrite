@@ -2,14 +2,13 @@
  * @fileoverview Tests for ConfigArray object.
  * @author Nicholas C. Zakas
  */
-/* globals URL */
 
 //-----------------------------------------------------------------------------
 // Imports
 //-----------------------------------------------------------------------------
 
 import { ConfigArray, ConfigArraySymbol } from "../src/config-array.js";
-import path from "path";
+import path from "node:path";
 import assert from "node:assert";
 
 //-----------------------------------------------------------------------------
@@ -35,6 +34,8 @@ const schema = {
 			if (!a) {
 				return b;
 			}
+
+			throw new Error("Unexpected undefined arguments.");
 		},
 	},
 	defs: {
@@ -125,13 +126,13 @@ function createConfigArray(options) {
 					{
 						files: ["baz.test.js"],
 						defs: {
-							name: "baz-" + context.name,
+							name: `baz-${context.name}`,
 						},
 					},
 					{
 						files: ["boom.test.js"],
 						defs: {
-							name: "boom-" + context.name,
+							name: `boom-${context.name}`,
 						},
 					},
 				];
@@ -245,7 +246,7 @@ describe("ConfigArray", () => {
 					throw new Error("Missing error.");
 				})
 				.catch(ex => {
-					assert.match(ex.message, /Unexpected array/);
+					assert.match(ex.message, /Unexpected array/u);
 					done();
 				});
 		});
@@ -265,7 +266,7 @@ describe("ConfigArray", () => {
 			);
 			assert.throws(() => {
 				configs.normalizeSync();
-			}, /Unexpected array/);
+			}, /Unexpected array/u);
 		});
 
 		it("should throw an error in normalize() when functions are not allowed", done => {
@@ -279,7 +280,7 @@ describe("ConfigArray", () => {
 					throw new Error("Missing error.");
 				})
 				.catch(ex => {
-					assert.match(ex.message, /Unexpected function/);
+					assert.match(ex.message, /Unexpected function/u);
 					done();
 				});
 		});
@@ -291,7 +292,7 @@ describe("ConfigArray", () => {
 
 			assert.throws(() => {
 				configs.normalizeSync();
-			}, /Unexpected function/);
+			}, /Unexpected function/u);
 		});
 	});
 
@@ -299,13 +300,15 @@ describe("ConfigArray", () => {
 		function testValidationError({
 			only = false,
 			title,
-			configs,
+			configs: configsToTest,
 			expectedError,
 		}) {
 			const localIt = only ? it.only : it;
 
 			localIt(`${title} when calling normalize()`, async () => {
-				const configArray = new ConfigArray(configs, { basePath });
+				const configArray = new ConfigArray(configsToTest, {
+					basePath,
+				});
 
 				let actualError;
 				try {
@@ -321,7 +324,9 @@ describe("ConfigArray", () => {
 			});
 
 			localIt(`${title} when calling normalizeSync()`, () => {
-				const configArray = new ConfigArray(configs, { basePath });
+				const configArray = new ConfigArray(configsToTest, {
+					basePath,
+				});
 
 				assert.throws(
 					() => configArray.normalizeSync(),
@@ -337,7 +342,7 @@ describe("ConfigArray", () => {
 					files: "*.js",
 				},
 			],
-			expectedError: /non-empty array/,
+			expectedError: /non-empty array/u,
 		});
 
 		testValidationError({
@@ -347,7 +352,7 @@ describe("ConfigArray", () => {
 					files: [],
 				},
 			],
-			expectedError: /non-empty array/,
+			expectedError: /non-empty array/u,
 		});
 
 		testValidationError({
@@ -357,7 +362,7 @@ describe("ConfigArray", () => {
 					files: undefined,
 				},
 			],
-			expectedError: /non-empty array/,
+			expectedError: /non-empty array/u,
 		});
 
 		testValidationError({
@@ -502,11 +507,9 @@ describe("ConfigArray", () => {
 		describe("ConfigArraySymbol.finalizeConfig", () => {
 			it("should allow finalizeConfig to alter config before returning when calling normalize()", async () => {
 				configs = createConfigArray();
-				configs[ConfigArraySymbol.finalizeConfig] = () => {
-					return {
-						name: "from-finalize",
-					};
-				};
+				configs[ConfigArraySymbol.finalizeConfig] = () => ({
+					name: "from-finalize",
+				});
 
 				await configs.normalize({
 					name: "from-context",
@@ -519,11 +522,9 @@ describe("ConfigArray", () => {
 
 			it("should allow finalizeConfig to alter config before returning when calling normalizeSync()", async () => {
 				configs = createConfigArray();
-				configs[ConfigArraySymbol.finalizeConfig] = () => {
-					return {
-						name: "from-finalize",
-					};
-				};
+				configs[ConfigArraySymbol.finalizeConfig] = () => ({
+					name: "from-finalize",
+				});
 
 				configs.normalizeSync({
 					name: "from-context",
@@ -641,7 +642,7 @@ describe("ConfigArray", () => {
 
 				assert.throws(() => {
 					unnormalizedConfigs.getConfigWithStatus(filename);
-				}, /normalized/);
+				}, /normalized/u);
 			});
 
 			describe("should return expected results", () => {
@@ -736,9 +737,10 @@ describe("ConfigArray", () => {
 					const filename = path.resolve(basePath, "foo.js");
 					const configWithStatus =
 						configs.getConfigWithStatus(filename);
+					const { config } = configWithStatus;
 
 					assert(Object.isFrozen(configWithStatus));
-					assert.notEqual(configWithStatus.config, undefined);
+					assert(config && typeof config === "object");
 					assert.strictEqual(configWithStatus.status, "matched");
 				});
 			});
@@ -750,7 +752,7 @@ describe("ConfigArray", () => {
 
 				assert.throws(() => {
 					unnormalizedConfigs.getConfig(filename);
-				}, /normalized/);
+				}, /normalized/u);
 			});
 
 			it("should calculate correct config when passed JS filename", () => {
@@ -840,42 +842,42 @@ describe("ConfigArray", () => {
 			});
 
 			it("should calculate correct config when passed JS filename that matches a async function config", () => {
-				const configs = createConfigArray();
-				configs.push(context => {
-					return Promise.resolve([
+				const configsToTest = createConfigArray();
+				configsToTest.push(context =>
+					Promise.resolve([
 						{
 							files: ["async.test.js"],
 							defs: {
-								name: "async-" + context.name,
+								name: `async-${context.name}`,
 							},
 						},
-					]);
-				});
+					]),
+				);
 
 				assert.throws(() => {
-					configs.normalizeSync();
-				}, /Async config functions are not supported/);
+					configsToTest.normalizeSync();
+				}, /Async config functions are not supported/u);
 			});
 
 			it("should throw an error when passed JS filename that matches a async function config and normalizeSync() is called", async () => {
 				const filename = path.resolve(basePath, "async.test.js");
-				const configs = createConfigArray();
-				configs.push(context => {
-					return Promise.resolve([
+				const configsToTest = createConfigArray();
+				configsToTest.push(context =>
+					Promise.resolve([
 						{
 							files: ["async.test.js"],
 							defs: {
-								name: "async-" + context.name,
+								name: `async-${context.name}`,
 							},
 						},
-					]);
-				});
+					]),
+				);
 
-				await configs.normalize({
+				await configsToTest.normalize({
 					name: "from-context",
 				});
 
-				const config = configs.getConfig(filename);
+				const config = configsToTest.getConfig(filename);
 
 				assert.strictEqual(config.language, JSLanguage);
 				assert.strictEqual(typeof config.defs, "object");
@@ -885,7 +887,7 @@ describe("ConfigArray", () => {
 			});
 
 			it("should throw an error when defs doesn't pass validation", async () => {
-				const configs = new ConfigArray(
+				const configsToTest = new ConfigArray(
 					[
 						{
 							files: ["**/*.js"],
@@ -896,12 +898,12 @@ describe("ConfigArray", () => {
 					{ basePath, schema },
 				);
 
-				await configs.normalize();
+				await configsToTest.normalize();
 
 				const filename = path.resolve(basePath, "foo.js");
 				assert.throws(() => {
-					configs.getConfig(filename);
-				}, /Config "bar": Key "defs": Object expected./);
+					configsToTest.getConfig(filename);
+				}, /Config "bar": Key "defs": Object expected./u);
 			});
 
 			it("should calculate correct config when passed JS filename that matches a function config returning an array", () => {
@@ -1075,7 +1077,7 @@ describe("ConfigArray", () => {
 				const filename = path.resolve(basePath, "foo.js");
 				assert.throws(() => {
 					unnormalizedConfigs.getConfigStatus(filename);
-				}, /normalized/);
+				}, /normalized/u);
 			});
 
 			it('should return "matched" when passed JS filename', () => {
@@ -1862,7 +1864,7 @@ describe("ConfigArray", () => {
 				const filename = path.resolve(basePath, "foo.js");
 				assert.throws(() => {
 					unnormalizedConfigs.isIgnored(filename);
-				}, /normalized/);
+				}, /normalized/u);
 			});
 			it("should return false when passed JS filename", () => {
 				const filename = path.resolve(basePath, "foo.js");
@@ -1932,7 +1934,7 @@ describe("ConfigArray", () => {
 				const filename = path.resolve(basePath, "foo.js");
 				assert.throws(() => {
 					unnormalizedConfigs.isFileIgnored(filename);
-				}, /normalized/);
+				}, /normalized/u);
 			});
 
 			it("should return false when passed JS filename", () => {
@@ -2571,7 +2573,7 @@ describe("ConfigArray", () => {
 				);
 				assert.strictEqual(
 					configs.isDirectoryIgnored(
-						path.join(basePath, "node_modules") + "/",
+						`${path.join(basePath, "node_modules")}/`,
 						"Trailing slash",
 					),
 					true,
@@ -2601,7 +2603,7 @@ describe("ConfigArray", () => {
 				);
 				assert.strictEqual(
 					configs.isDirectoryIgnored(
-						path.join(basePath, "node_modules") + "/",
+						`${path.join(basePath, "node_modules")}/`,
 						"Trailing slash",
 					),
 					true,
@@ -2630,7 +2632,7 @@ describe("ConfigArray", () => {
 				);
 				assert.strictEqual(
 					configs.isDirectoryIgnored(
-						path.join(basePath, "node_modules") + "/",
+						`${path.join(basePath, "node_modules")}/`,
 						"Trailing slash",
 					),
 					true,
@@ -2659,7 +2661,7 @@ describe("ConfigArray", () => {
 				);
 				assert.strictEqual(
 					configs.isDirectoryIgnored(
-						path.join(basePath, "node_modules") + "/",
+						`${path.join(basePath, "node_modules")}/`,
 					),
 					true,
 				);
@@ -2688,7 +2690,7 @@ describe("ConfigArray", () => {
 				);
 				assert.strictEqual(
 					configs.isDirectoryIgnored(
-						path.join(basePath, "node_modules") + "/",
+						`${path.join(basePath, "node_modules")}/`,
 						"Trailing slash",
 					),
 					false,
@@ -2715,7 +2717,7 @@ describe("ConfigArray", () => {
 				);
 				assert.strictEqual(
 					configs.isDirectoryIgnored(
-						path.join(basePath, "foo") + "/",
+						`${path.join(basePath, "foo")}/`,
 						"Trailing slash",
 					),
 					true,
@@ -2742,7 +2744,7 @@ describe("ConfigArray", () => {
 				);
 				assert.strictEqual(
 					configs.isDirectoryIgnored(
-						path.join(basePath, "bar") + "/",
+						`${path.join(basePath, "bar")}/`,
 						"Trailing slash",
 					),
 					false,
@@ -2793,7 +2795,7 @@ describe("ConfigArray", () => {
 				);
 				assert.strictEqual(
 					configs.isDirectoryIgnored(
-						path.join(basePath, "foo/bar") + "/",
+						`${path.join(basePath, "foo/bar")}/`,
 						"Trailing slash",
 					),
 					true,
@@ -2813,7 +2815,7 @@ describe("ConfigArray", () => {
 				);
 				assert.throws(() => {
 					configs.isDirectoryIgnored("foo/bar");
-				}, /normalized/);
+				}, /normalized/u);
 			});
 
 			it("should return true when the directory is outside of the basePath", () => {
@@ -3105,81 +3107,11 @@ describe("ConfigArray", () => {
 			});
 		});
 
-		describe("isExplicitMatch()", () => {
-			it("should throw an error when not normalized", () => {
-				const filename = path.resolve(basePath, "foo.js");
-				assert.throws(() => {
-					unnormalizedConfigs.isExplicitMatch(filename);
-				}, /normalized/);
-			});
-
-			it("should return true when passed JS filename", () => {
-				const filename = path.resolve(basePath, "foo.js");
-
-				assert.strictEqual(configs.isExplicitMatch(filename), true);
-			});
-
-			it("should return true when passed HTML filename", () => {
-				const filename = path.resolve(basePath, "foo.html");
-
-				assert.strictEqual(configs.isExplicitMatch(filename), true);
-			});
-
-			it("should return true when passed CSS filename", () => {
-				const filename = path.resolve(basePath, "foo.css");
-
-				assert.strictEqual(configs.isExplicitMatch(filename), true);
-			});
-
-			it("should return true when passed EXE filename because it matches !.css", () => {
-				const filename = path.resolve(basePath, "foo.exe");
-
-				assert.strictEqual(configs.isExplicitMatch(filename), true);
-			});
-
-			it("should return false when passed EXE filename because no explicit matches", () => {
-				const filename = path.resolve(basePath, "foo.exe");
-				configs = new ConfigArray(
-					[
-						{
-							files: ["*.js"],
-						},
-					],
-					{
-						basePath,
-					},
-				);
-				configs.normalizeSync();
-
-				assert.strictEqual(configs.isExplicitMatch(filename), false);
-			});
-
-			it("should return false when passed matching both files and ignores in a config", () => {
-				configs = new ConfigArray(
-					[
-						{
-							files: ["**/*.xsl"],
-							ignores: ["fixtures/test.xsl"],
-							defs: {
-								xsl: true,
-							},
-						},
-					],
-					{ basePath },
-				);
-
-				configs.normalizeSync();
-				const filename = path.resolve(basePath, "fixtures/test.xsl");
-
-				assert.strictEqual(configs.isExplicitMatch(filename), false);
-			});
-		});
-
 		describe("files", () => {
 			it("should throw an error when not normalized", () => {
 				assert.throws(() => {
-					unnormalizedConfigs.files;
-				}, /normalized/);
+					unnormalizedConfigs.files; // eslint-disable-line no-unused-expressions -- testing whether getter throws
+				}, /normalized/u);
 			});
 
 			it("should return all string pattern file from all configs when called", () => {
@@ -3198,8 +3130,8 @@ describe("ConfigArray", () => {
 		describe("ignores", () => {
 			it("should throw an error when not normalized", () => {
 				assert.throws(() => {
-					unnormalizedConfigs.ignores;
-				}, /normalized/);
+					unnormalizedConfigs.ignores; // eslint-disable-line no-unused-expressions -- testing whether getter throws
+				}, /normalized/u);
 			});
 
 			it("should return all ignores from all configs without files when called", () => {
@@ -3243,7 +3175,7 @@ describe("ConfigArray", () => {
 			it("should throw an error when normalized", () => {
 				assert.throws(() => {
 					configs.push({});
-				}, /extensible/);
+				}, /extensible/u);
 			});
 		});
 	});

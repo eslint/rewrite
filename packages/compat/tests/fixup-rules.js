@@ -1,7 +1,6 @@
 /**
- * @filedescription Fixup tests
+ * @fileoverview Fixup tests
  */
-/* global it, describe */
 
 //-----------------------------------------------------------------------------
 // Imports

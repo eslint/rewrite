@@ -1,5 +1,5 @@
 /**
- * @filedescription Types for object-schema package.
+ * @fileoverview Types for object-schema package.
  */
 
 /**

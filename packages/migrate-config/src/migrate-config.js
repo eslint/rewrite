@@ -1,5 +1,5 @@
 /**
- * @filedescription Configuration Migration
+ * @fileoverview Configuration Migration
  * @author Nicholas C. Zakas
  */
 
@@ -11,6 +11,7 @@ import * as recast from "recast";
 import { Legacy } from "@eslint/eslintrc";
 import camelCase from "camelcase";
 import pluginsNeedingCompat from "./compat-plugins.js";
+import { convertIgnorePatternToMinimatch } from "@eslint/compat";
 
 //-----------------------------------------------------------------------------
 // Types
@@ -121,36 +122,6 @@ function getParserVariableName(parser) {
 	return "parser";
 }
 
-/**
- * Converts an ESLint ignore pattern to a minimatch pattern.
- * @param {string} pattern The .eslintignore pattern to convert.
- * @returns {string} The converted pattern.
- */
-function convertESLintIgnoreToMinimatch(pattern) {
-	const isNegated = pattern.startsWith("!");
-	const negatedPrefix = isNegated ? "!" : "";
-	const patternToTest = (isNegated ? pattern.slice(1) : pattern).trimEnd();
-
-	// special cases
-	if (["", "**", "/**", "**/"].includes(patternToTest)) {
-		return `${negatedPrefix}${patternToTest}`;
-	}
-
-	const firstIndexOfSlash = patternToTest.indexOf("/");
-
-	const matchEverywherePrefix =
-		firstIndexOfSlash < 0 || firstIndexOfSlash === patternToTest.length - 1
-			? "**/"
-			: "";
-
-	const patternWithoutLeadingSlash =
-		firstIndexOfSlash === 0 ? patternToTest.slice(1) : patternToTest;
-
-	const matchInsideSuffix = patternToTest.endsWith("/**") ? "/*" : "";
-
-	return `${negatedPrefix}${matchEverywherePrefix}${patternWithoutLeadingSlash}${matchInsideSuffix}`;
-}
-
 // cache for plugins needing compat
 const pluginsNeedingCompatCache = new Set(pluginsNeedingCompat);
 
@@ -177,7 +148,7 @@ function pluginNeedsCompat(pluginName) {
  * @returns {string} The variable name to use.
  */
 function getPluginVariableName(pluginName) {
-	let name = pluginName.replace(/^eslint-plugin-/, "");
+	let name = pluginName.replace(/^eslint-plugin-/u, "");
 
 	if (name === "import" || name === "export") {
 		return `_${name}`;
@@ -262,7 +233,7 @@ function createGlobals(config) {
 	if (env) {
 		properties.push(
 			...Object.keys(env)
-				.filter(env => !env.startsWith("es"))
+				.filter(name => !name.startsWith("es"))
 				.map(name => {
 					let envName = name;
 					const memberExpression = b.memberExpression(
@@ -346,13 +317,13 @@ function createGlobals(config) {
 
 	if (globals) {
 		properties.push(
-			...Object.keys(globals).map(name => {
-				return b.property(
+			...Object.keys(globals).map(name =>
+				b.property(
 					"init",
 					b.identifier(name),
 					b.literal(globals[name]),
-				);
-			}),
+				),
+			),
 		);
 	}
 
@@ -455,9 +426,9 @@ function createLanguageOptions(migration, config) {
 	 */
 	const needsGlobals =
 		config.env &&
-		Object.keys(config.env).some(envName => {
-			return !envName.startsWith("es") && !envName.includes("/");
-		});
+		Object.keys(config.env).some(
+			envName => !envName.startsWith("es") && !envName.includes("/"),
+		);
 
 	if (needsGlobals && !imports.has("globals")) {
 		imports.set("globals", {
@@ -609,7 +580,7 @@ function createGlobalIgnores(config) {
 		: [config.ignorePatterns];
 	const ignorePatternsArray = b.arrayExpression(
 		ignorePatterns.map(pattern =>
-			b.literal(convertESLintIgnoreToMinimatch(pattern)),
+			b.literal(convertIgnorePatternToMinimatch(pattern)),
 		),
 	);
 	return b.objectExpression([

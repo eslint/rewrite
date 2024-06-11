@@ -4,8 +4,6 @@
  * @author Nicholas C. Zakas
  */
 
-/* global process, console */
-
 /*
  * IMPORTANT!
  *
@@ -48,7 +46,7 @@ const { loadConfigFile } = Legacy;
  */
 async function loadIgnoreFile(filePath) {
 	try {
-		const lines = (await fsp.readFile(filePath, "utf8")).split(/\r?\n/);
+		const lines = (await fsp.readFile(filePath, "utf8")).split(/\r?\n/u);
 		return lines.filter(
 			line => line.trim() !== "" && !line.startsWith("#"),
 		);
@@ -122,12 +120,12 @@ if (result.imports.size) {
 	console.log(
 		"\nYou will need to install the following packages to use the new config:",
 	);
-	console.log(addedImports.map(imp => `- ${imp}`).join("\n") + "\n");
+	console.log(`${addedImports.map(imp => `- ${imp}`).join("\n")}\n`);
 	console.log("You can install them using the following command:\n");
 	console.log(`npm install ${addedImports.join(" ")} -D\n`);
 }
 
 if (result.messages.length) {
 	console.log("The following messages were generated during migration:");
-	console.log(result.messages.map(msg => `- ${msg}`).join("\n") + "\n");
+	console.log(`${result.messages.map(msg => `- ${msg}`).join("\n")}\n`);
 }
