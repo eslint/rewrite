@@ -8,6 +8,7 @@ const {
     includeIgnoreFile,
 } = require("@eslint/compat");
 
+const path = require("node:path");
 const compat = new FlatCompat({
     baseDirectory: __dirname,
     recommendedConfig: js.configs.recommended,

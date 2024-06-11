@@ -252,6 +252,13 @@ function createGitignoreEntry(migration) {
 			.bindings.push("includeIgnoreFile");
 	}
 
+	if (!migration.imports.has("node:path")) {
+		migration.imports.set("node:path", {
+			name: "path",
+			added: true,
+		});
+	}
+
 	const code = `includeIgnoreFile(gitignorePath)`;
 
 	return recast.parse(code).program.body[0].expression;
@@ -885,12 +892,13 @@ export function migrateConfig(
 			bindings: ["FlatCompat"],
 			added: true,
 		});
-		migration.needsDirname = isModule;
+		migration.needsDirname ||= isModule;
 		migration.inits.push(...getFlatCompatInit());
 	}
 
 	// add .gitignore if necessary
 	if (gitignore) {
+		migration.needsDirname ||= isModule;
 		configArrayElements.unshift(createGitignoreEntry(migration));
 	}
 
