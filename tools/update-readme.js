@@ -12,7 +12,7 @@
 // Requirements
 //-----------------------------------------------------------------------------
 
-import { readFileSync, writeFileSync } from "fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { stripIndents } from "common-tags";
 import ejs from "ejs";
 import got from "got";
