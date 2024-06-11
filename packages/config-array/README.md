@@ -286,7 +286,7 @@ A few things to keep in mind:
 -   You must pass in the absolute filename to get a config for.
 -   The returned config object never has `files`, `ignores`, or `name` properties; the only properties on the object will be the other configuration options specified.
 -   The config array caches configs, so subsequent calls to `getConfig()` with the same filename will return in a fast lookup rather than another calculation.
--   A config will only be generated if the filename matches an entry in a `files` key. A config will not be generated without matching a `files` key (configs without a `files` key are only applied when another config with a `files` key is applied; configs without `files` are never applied on their own). Any config with a `files` key entry ending with `/**` or `/*` will only be applied if another entry in the same `files` key matches or another config matches.
+-   A config will only be generated if the filename matches an entry in a `files` key. A config will not be generated without matching a `files` key (configs without a `files` key are only applied when another config with a `files` key is applied; configs without `files` are never applied on their own). Any config with a `files` key entry that is `*` or ends with `/**` or `/*` will only be applied if another entry in the same `files` key matches or another config matches.
 
 ## Determining Ignored Paths
 
