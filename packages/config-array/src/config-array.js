@@ -836,7 +836,7 @@ export class ConfigArray extends Array {
 
 		const matchingConfigIndices = [];
 		let matchFound = false;
-		const universalPattern = /\/\*{1,2}$/u;
+		const universalPattern = /^\*$|\/\*{1,2}$/u;
 
 		this.forEach((config, index) => {
 			if (!config.files) {
@@ -861,8 +861,8 @@ export class ConfigArray extends Array {
 			}
 
 			/*
-			 * If a config has a files pattern ending in /** or /*, and the
-			 * filePath only matches those patterns, then the config is only
+			 * If a config has a files pattern * or patterns ending in /** or /*,
+			 * and the filePath only matches those patterns, then the config is only
 			 * applied if there is another config where the filePath matches
 			 * a file with a specific extensions such as *.js.
 			 */
