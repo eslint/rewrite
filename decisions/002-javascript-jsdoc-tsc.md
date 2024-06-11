@@ -8,7 +8,7 @@ Status: accepted
 
 The [decision to rewrite the core](./001-rewrite-core.md) in a new repository brings with it the opportunity to do things differently, which naturally brought up the idea of rewriting the core in TypeScript. While TypeScript has advantages for many projects, the nature of ESLint makes this less appealing.
 
-The ESLint project is more than just the `eslint` CLI tool. It is also [Espree](https://github.com/eslint/espree), [`eslint-scope`](https://github.com/eslint/eslint-scope), and other utilities that ESLint uses to lint JavaScript code. Part of maintaining stability in ESLint is ESLint's ability to effectively test all of these utilities every time ESLint is run. Rewriting in TypeScript would necessarily mean switching to use [`typescript-eslint`](https://typescript-eslint.io) for linting out own project, which would mean we'd no longer be dogfooding our own utilities.
+The ESLint project is more than just the `eslint` CLI tool. It is also [Espree](https://github.com/eslint/espree), [`eslint-scope`](https://github.com/eslint/eslint-scope), and other utilities that ESLint uses to lint JavaScript code. Part of maintaining stability in ESLint is ESLint's ability to effectively test all of these utilities every time ESLint is run. Rewriting in TypeScript would necessarily mean switching to use [`typescript-eslint`](https://typescript-eslint.io) for linting our own project, which would mean we'd no longer be dogfooding our own utilities.
 
 ## Decision
 
