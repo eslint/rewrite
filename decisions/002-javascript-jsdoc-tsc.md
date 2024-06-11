@@ -14,7 +14,7 @@ The ESLint project is more than just the `eslint` CLI tool. It is also [Espree](
 
 The rewrite will use JavaScript and JSDoc comments along with `tsc` to enforce type checking. This allows ESLint to continue to dogfood its own parser, scope analyzer, and related tools without foregoing the type safety that TypeScript provides. We will use TypeScript for defining interfaces where necessary, as this is more convenient than JSDoc format, but not for functionality.
 
-Additionally, each package in the rewrite repository will publish their own types.
+Additionally, each package in the rewrite repository will publish its own types.
 
 ## Consequences
 
