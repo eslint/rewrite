@@ -38,6 +38,16 @@ npx @eslint/migrate-config .eslintrc.json --commonjs
 bunx @eslint/migrate-config .eslintrc.json --commonjs
 ```
 
+### Including a `.gitignore` file
+
+If you are currently using `--ignore-path .gitignore` on the CLI, you'll need to read the `.gitignore` file into your config file. The migration can handle this for you by passing the `--gitignore` flag:
+
+```shell
+npx @eslint/migrate-config .eslintrc.json --gitignore
+# or
+bunx @eslint/migrate-config .eslintrc.json --gitignore
+```
+
 ## Followup Steps
 
 Once you have completed the migration, you may need to manually modify the resulting config file.

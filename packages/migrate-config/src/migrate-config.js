@@ -22,6 +22,7 @@ import { convertIgnorePatternToMinimatch } from "@eslint/compat";
 /** @typedef {import("eslint").Linter.ConfigOverride} ConfigOverride  */
 /** @typedef {import("recast").types.namedTypes.ObjectExpression} ObjectExpression */
 /** @typedef {import("recast").types.namedTypes.ArrayExpression} ArrayExpression */
+/** @typedef {import("recast").types.namedTypes.CallExpression} CallExpression */
 /** @typedef {import("recast").types.namedTypes.Property} Property */
 /** @typedef {import("recast").types.namedTypes.MemberExpression} MemberExpression */
 /** @typedef {import("recast").types.namedTypes.Program} Program */
@@ -65,6 +66,12 @@ class Migration {
 	 * @type {string[]}
 	 */
 	messages = [];
+
+	/**
+	 * Whether or not the migration needs the `__dirname` variable defined.
+	 * @type {boolean}
+	 */
+	needsDirname = false;
 
 	/**
 	 * Any initialization needed in the file.
@@ -162,41 +169,51 @@ function getPluginVariableName(pluginName) {
 }
 
 /**
- * Creates an initialization block for the FlatCompat utility.
- * @param {"module"|"commonjs"} sourceType The module type to use.
+ * Get the initialization code for `__dirname`.
  * @returns {Array<Statement>} The AST for the initialization block.
  */
-function getFlatCompatInit(sourceType) {
-	let init = `
+function getDirnameInit() {
+	/*
+	 * Recast doesn't support `import.meta.url`, so using an uppercase "I" to
+	 * allow for parsing. We then need to replace it with the lowercase "i".
+	 */
+	const init = `\n
+const __filename = fileURLToPath(Import.meta.url);
+const __dirname = path.dirname(__filename);`;
+
+	const result = recast.parse(init).program.body;
+
+	// Replace uppercase "I" with lowercase "i" in "Import.meta.url"
+	result[0].declarations[0].init.arguments[0].object.object.name = "import";
+
+	return result;
+}
+
+/**
+ * Creates an initialization block for the FlatCompat utility.
+ * @returns {Array<Statement>} The AST for the initialization block.
+ */
+function getFlatCompatInit() {
+	const init = `
 const compat = new FlatCompat({
     baseDirectory: __dirname,
     recommendedConfig: js.configs.recommended,
     allConfig: js.configs.all
 });
 `;
+	return recast.parse(init).program.body;
+}
 
-	/*
-	 * Need to calculate `__dirname` and `__filename` for ESM. Note that Recast
-	 * doesn't support `import.meta.url`, so using an uppercase "I" to allow for
-	 * parsing. We then need to replace it with the lowercase "i".
-	 */
-	if (sourceType === "module") {
-		init = `
-const __filename = fileURLToPath(Import.meta.url);
-const __dirname = path.dirname(__filename);
+/**
+ * Creates an initialization block for the gitignore file.
+ * @returns {Statement} The AST for the initialization block.
+ */
+function getGitignoreInit() {
+	const init = `
+const gitignorePath = path.resolve(__dirname, ".gitignore");
+`;
 
-${init}`;
-	}
-
-	const result = recast.parse(init).program.body;
-
-	// Replace uppercase "I" with lowercase "i" in "Import.meta.url"
-	if (sourceType === "module") {
-		result[0].declarations[0].init.arguments[0].object.object.name =
-			"import";
-	}
-
-	return result;
+	return recast.parse(init).program.body[0];
 }
 
 /**
@@ -214,6 +231,37 @@ function convertGlobPattern(pattern) {
 	}
 
 	return `${isNegated ? "!" : ""}**/${patternToTest}`;
+}
+
+/**
+ * Creates the entry for the gitignore inclusion.
+ * @param {Migration} migration The migration object.
+ * @returns {CallExpression} The AST for the gitignore entry.
+ */
+function createGitignoreEntry(migration) {
+	migration.inits.push(getGitignoreInit());
+
+	if (!migration.imports.has("@eslint/compat")) {
+		migration.imports.set("@eslint/compat", {
+			bindings: ["includeIgnoreFile"],
+			added: true,
+		});
+	} else {
+		migration.imports
+			.get("@eslint/compat")
+			.bindings.push("includeIgnoreFile");
+	}
+
+	if (!migration.imports.has("node:path")) {
+		migration.imports.set("node:path", {
+			name: "path",
+			added: true,
+		});
+	}
+
+	const code = `includeIgnoreFile(gitignorePath)`;
+
+	return recast.parse(code).program.body[0].expression;
 }
 
 /**
@@ -786,18 +834,25 @@ function migrateConfigObject(migration, config) {
  * @param {Config} config The eslintrc config to migrate.
  * @param {Object} [options] Options for the migration.
  * @param {"module"|"commonjs"} [options.sourceType] The module type to use.
+ * @param {boolean} [options.gitignore] `true` to include contents of a .gitignore file.
  * @returns {{code:string,messages:Array<string>,imports:Map<string,MigrationImport>}} The migrated config and
  * any messages to display to the user.
  */
-export function migrateConfig(config, { sourceType = "module" } = {}) {
+export function migrateConfig(
+	config,
+	{ sourceType = "module", gitignore = false } = {},
+) {
 	const migration = new Migration(config);
 	const body = [];
+
+	/** @type {Array<CallExpression|ObjectExpression|SpreadElement>} */
 	const configArrayElements = [
 		...migrateConfigObject(
 			migration,
 			/** @type {ConfigOverride} */ (config),
 		),
 	];
+	const isModule = sourceType === "module";
 
 	// if the base config has no properties, then remove the empty object
 	if (
@@ -821,7 +876,7 @@ export function migrateConfig(config, { sourceType = "module" } = {}) {
 		config.extends ||
 		config.overrides?.some(override => override.extends)
 	) {
-		if (sourceType === "module") {
+		if (isModule) {
 			migration.imports.set("node:path", {
 				name: "path",
 				added: true,
@@ -839,7 +894,21 @@ export function migrateConfig(config, { sourceType = "module" } = {}) {
 			bindings: ["FlatCompat"],
 			added: true,
 		});
-		migration.inits.push(...getFlatCompatInit(sourceType));
+		migration.needsDirname ||= isModule;
+		migration.inits.push(...getFlatCompatInit());
+	}
+
+	// add .gitignore if necessary
+	if (gitignore) {
+		migration.needsDirname ||= isModule;
+		configArrayElements.unshift(createGitignoreEntry(migration));
+
+		if (migration.needsDirname && !migration.imports.has("node:url")) {
+			migration.imports.set("node:url", {
+				bindings: ["fileURLToPath"],
+				added: true,
+			});
+		}
 	}
 
 	if (config.ignorePatterns) {
@@ -847,7 +916,7 @@ export function migrateConfig(config, { sourceType = "module" } = {}) {
 	}
 
 	// add imports to the top of the file
-	if (sourceType === "commonjs") {
+	if (!isModule) {
 		migration.imports.forEach(({ name, bindings }, path) => {
 			const bindingProperties = bindings?.map(binding => {
 				const bindingProperty = b.property(
@@ -897,11 +966,16 @@ export function migrateConfig(config, { sourceType = "module" } = {}) {
 		});
 	}
 
+	// add calculation of `__dirname` if needed
+	if (migration.needsDirname) {
+		body.push(...getDirnameInit());
+	}
+
 	// output any inits
 	body.push(...migration.inits);
 
 	// output the actual config array to the program
-	if (sourceType === "commonjs") {
+	if (!isModule) {
 		body.push(
 			b.expressionStatement(
 				b.assignmentExpression(

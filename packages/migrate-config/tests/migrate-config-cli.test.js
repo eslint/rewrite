@@ -23,6 +23,8 @@ const filePaths = [
 	"no-globals-for-env/.eslintrc.yml",
 	"overrides-extends/.eslintrc.json",
 	"plugins-dedupe/.eslintrc.yml",
+	"gitignore-simple/.eslintrc.json",
+	"gitignore-complex/.eslintrc.json",
 ].map(file => `tests/fixtures/${file}`);
 
 //-----------------------------------------------------------------------------
@@ -73,11 +75,19 @@ describe("@eslint/migrate-config", async () => {
 		it(`should migrate ${filePath}`, async () => {
 			// Note: Using execSync instead of exec due to race conditions
 
+			const gitignoreFlag = filePath.includes("gitignore")
+				? "--gitignore"
+				: "";
+
 			// run the migration for mjs
-			execSync(`node src/migrate-config-cli.js ${filePath}`);
+			execSync(
+				`node src/migrate-config-cli.js ${filePath} ${gitignoreFlag}`,
+			);
 
 			// run the migration for cjs
-			execSync(`node src/migrate-config-cli.js ${filePath} --commonjs`);
+			execSync(
+				`node src/migrate-config-cli.js ${filePath} --commonjs  ${gitignoreFlag}`,
+			);
 
 			// check the mjs file
 			await assertFilesEqual(resultMjsPath, expectedMjsPath);

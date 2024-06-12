@@ -66,11 +66,7 @@ if (!configFilePath) {
 
 const config = loadConfigFile(path.resolve(configFilePath));
 const ignorePatterns = await loadIgnoreFile(
-	path.resolve(
-		configFilePath,
-		"../",
-		gitignore ? ".gitignore" : ".eslintignore",
-	),
+	path.resolve(configFilePath, "../", ".eslintignore"),
 );
 const resultExtname = commonjs ? "cjs" : "mjs";
 const configFileExtname = path.extname(configFilePath);
@@ -107,6 +103,7 @@ if (ignorePatterns) {
 
 const result = migrateConfig(config, {
 	sourceType: commonjs ? "commonjs" : "module",
+	gitignore,
 });
 await fsp.writeFile(resultFilePath, result.code);
 
