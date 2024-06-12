@@ -1,6 +1,6 @@
 {
-  "packages/object-schema": "2.1.3",
-  "packages/config-array": "0.15.1",
-  "packages/compat": "1.0.3",
-  "packages/migrate-config": "1.0.1"
+  "packages/object-schema": "2.1.4",
+  "packages/config-array": "0.16.0",
+  "packages/compat": "1.1.0",
+  "packages/migrate-config": "1.1.0"
 }

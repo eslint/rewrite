@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.1.0](https://github.com/eslint/rewrite/compare/migrate-config-v1.0.1...migrate-config-v1.1.0) (2024-06-12)
+
+
+### Features
+
+* Add --gitignore flag to read in .gitignore files ([#55](https://github.com/eslint/rewrite/issues/55)) ([3d9f7ce](https://github.com/eslint/rewrite/commit/3d9f7cedd9a2bfc9827fe338fa3b948a00cd088f))
+* Add includeIgnoreFile() method ([#47](https://github.com/eslint/rewrite/issues/47)) ([b5f74ed](https://github.com/eslint/rewrite/commit/b5f74ed7bf20f287cc88579f2c6d9a27943d1105))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/compat bumped from ^1.0.3 to ^1.1.0
+
 ## [1.0.1](https://github.com/eslint/rewrite/compare/migrate-config-v1.0.0...migrate-config-v1.0.1) (2024-06-03)
 
 

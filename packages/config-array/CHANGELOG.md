@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.16.0](https://github.com/eslint/rewrite/compare/config-array-v0.15.1...config-array-v0.16.0) (2024-06-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* treat `*` as a universal pattern ([#50](https://github.com/eslint/rewrite/issues/50))
+* Remove `ConfigArray#isExplicitMatch()` ([#53](https://github.com/eslint/rewrite/issues/53))
+
+### Features
+
+* Remove `ConfigArray#isExplicitMatch()` ([#53](https://github.com/eslint/rewrite/issues/53)) ([10d8200](https://github.com/eslint/rewrite/commit/10d8200fbc99ae4496fc308af82930bb41aeacfa))
+
+
+### Bug Fixes
+
+* Add 'main' and 'types' entries to package.json ([#48](https://github.com/eslint/rewrite/issues/48)) ([16ee1fa](https://github.com/eslint/rewrite/commit/16ee1fad998cc654208628ccb06958d29f95a3a5))
+* treat `*` as a universal pattern ([#50](https://github.com/eslint/rewrite/issues/50)) ([79ad4bc](https://github.com/eslint/rewrite/commit/79ad4bcd09f73e66168ee3936c3c260af2c9953a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/object-schema bumped from ^2.1.3 to ^2.1.4
+
 ## [0.15.1](https://github.com/eslint/rewrite/compare/config-array-v0.15.0...config-array-v0.15.1) (2024-05-30)
 
 

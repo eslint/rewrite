@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.4](https://github.com/eslint/rewrite/compare/object-schema-v2.1.3...object-schema-v2.1.4) (2024-06-12)
+
+
+### Bug Fixes
+
+* Add 'main' and 'types' entries to package.json ([#48](https://github.com/eslint/rewrite/issues/48)) ([16ee1fa](https://github.com/eslint/rewrite/commit/16ee1fad998cc654208628ccb06958d29f95a3a5))
+
 ## [2.1.3](https://github.com/eslint/rewrite/compare/object-schema-v2.1.2...object-schema-v2.1.3) (2024-05-30)
 
 
