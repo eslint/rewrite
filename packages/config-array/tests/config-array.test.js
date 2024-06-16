@@ -10,13 +10,14 @@
 import { ConfigArray, ConfigArraySymbol } from "../src/config-array.js";
 import path from "node:path";
 import assert from "node:assert";
+import { fileURLToPath } from "node:url";
 
 //-----------------------------------------------------------------------------
 // Helpers
 //-----------------------------------------------------------------------------
 
 // calculate base path using import.meta
-const basePath = path.dirname(new URL(import.meta.url).pathname);
+const basePath = fileURLToPath(new URL(".", import.meta.url));
 
 const schema = {
 	language: {
@@ -1248,6 +1249,15 @@ describe("ConfigArray", () => {
 				);
 			});
 
+			it('should return "matched" when passed JS filename that starts with ".."', () => {
+				const filename = path.resolve(basePath, "..foo.js");
+
+				assert.strictEqual(
+					configs.getConfigStatus(filename),
+					"matched",
+				);
+			});
+
 			it('should return "external" when passed JS filename in parent directory', () => {
 				const filename = path.resolve(basePath, "../foo.js");
 
@@ -2033,6 +2043,146 @@ describe("ConfigArray", () => {
 					assert.strictEqual(
 						configs.getConfigStatus(filename),
 						"ignored",
+					);
+				});
+			});
+
+			describe("on Windows", () => {
+				// Windows only
+				if (process.platform !== "win32") {
+					return;
+				}
+
+				it('should return "matched" for a file in the base directory with different capitalization', () => {
+					configs = new ConfigArray([{ files: ["**/*.js"] }], {
+						basePath: "C:\\DIR",
+					});
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus("c:\\dir\\subdir\\file.js"),
+						"matched",
+					);
+				});
+
+				it('should return "external" for a file on a different drive when a base path is specified', () => {
+					configs = new ConfigArray([{ files: ["**/*.js"] }], {
+						basePath: "C:\\dir",
+					});
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus("D:\\dir\\file.js"),
+						"external",
+					);
+				});
+
+				it('should return "external" for a file on a different drive when no base path is specified', () => {
+					const currentDriveLetter = process.cwd()[0];
+					const otherDriveLetter =
+						currentDriveLetter === "X" ? "Y" : "X";
+					const filePath = `${otherDriveLetter}:\\dir\\file.js`;
+
+					configs = new ConfigArray([{ files: ["**/*.js"] }]);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus(filePath),
+						"external",
+					);
+				});
+
+				it('should return "external" for a file with a UNC path on a different drive', () => {
+					configs = new ConfigArray([{ files: ["**/*.js"] }], {
+						basePath: "C:\\dir",
+					});
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus("\\\\NAS\\Share\\file.js"),
+						"external",
+					);
+				});
+
+				it('should return "matched" for a file with a UNC path in the base directory', () => {
+					configs = new ConfigArray([{ files: ["**/*.js"] }], {
+						basePath: "\\\\NAS\\Share",
+					});
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus("\\\\NAS\\Share\\dir\\file.js"),
+						"matched",
+					);
+				});
+
+				it('should return "matched" for a file with a namespaced path in the base directory', () => {
+					configs = new ConfigArray([{ files: ["**/*.js"] }], {
+						basePath: "C:\\dir",
+					});
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus("\\\\?\\c:\\dir\\file.js"),
+						"matched",
+					);
+				});
+
+				it('should return "matched" for a file with a namespaced UNC path in the base directory', () => {
+					configs = new ConfigArray([{ files: ["**/*.js"] }], {
+						basePath: "\\\\NAS\\Share",
+					});
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus(
+							"\\\\?\\UNC\\NAS\\Share\\file.js",
+						),
+						"matched",
+					);
+				});
+
+				it('should return "ignored" for a file with a namespaced path in a directory matched by a global ignore pattern', () => {
+					configs = new ConfigArray(
+						[{ files: ["**/*.js"] }, { ignores: ["dist"] }],
+						{ basePath: "C:\\dir" },
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus(
+							"\\\\?\\C:\\dir\\dist\\file.js",
+						),
+						"ignored",
+					);
+				});
+
+				it('should return "unconfigured" for a file with a namespaced path matched by a non-global ignore pattern', () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+								ignores: ["dist/**"],
+							},
+						],
+						{ basePath: "C:\\dir" },
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus(
+							"\\\\?\\C:\\dir\\dist\\file.js",
+						),
+						"unconfigured",
 					);
 				});
 			});
@@ -3032,6 +3182,30 @@ describe("ConfigArray", () => {
 					configs.isDirectoryIgnored(
 						path.resolve(basePath, "../foo/bar"),
 					),
+					true,
+				);
+			});
+
+			it("should return true when the directory is the parent of the base path", () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["**/*.js"],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.isDirectoryIgnored(path.join(basePath, "..")),
+					true,
+				);
+				assert.strictEqual(
+					configs.isDirectoryIgnored(path.join(basePath, "../")),
 					true,
 				);
 			});
