@@ -89,6 +89,8 @@ const CONFIG_WITH_STATUS_UNCONFIGURED = Object.freeze({
 	status: "unconfigured",
 });
 
+const EXTERNAL_PATH_REGEX = new RegExp(`^\\.\\.($|\\${path.sep})`, "u");
+
 /**
  * Wrapper error for config validation errors that adds a name to the front of the
  * error message.
@@ -352,11 +354,6 @@ function normalizeSync(items, context, extraConfigTypes) {
  * @returns {boolean} True if the path should be ignored and false if not.
  */
 function shouldIgnorePath(ignores, filePath, relativeFilePath) {
-	// all files outside of the basePath are ignored
-	if (relativeFilePath.startsWith("..")) {
-		return true;
-	}
-
 	return ignores.reduce((ignored, matcher) => {
 		if (!ignored) {
 			if (typeof matcher === "function") {
@@ -387,19 +384,12 @@ function shouldIgnorePath(ignores, filePath, relativeFilePath) {
  * Determines if a given file path is matched by a config based on
  * `ignores` only.
  * @param {string} filePath The absolute file path to check.
- * @param {string} basePath The base path for the config.
+ * @param {string} relativeFilePath The relative path of the file to check.
  * @param {Object} config The config object to check.
  * @returns {boolean} True if the file path is matched by the config,
  *      false if not.
  */
-function pathMatchesIgnores(filePath, basePath, config) {
-	/*
-	 * For both files and ignores, functions are passed the absolute
-	 * file path while strings are compared against the relative
-	 * file path.
-	 */
-	const relativeFilePath = path.relative(basePath, filePath);
-
+function pathMatchesIgnores(filePath, relativeFilePath, config) {
 	return (
 		Object.keys(config).filter(key => !META_FIELDS.has(key)).length > 1 &&
 		!shouldIgnorePath(config.ignores, filePath, relativeFilePath)
@@ -412,19 +402,12 @@ function pathMatchesIgnores(filePath, basePath, config) {
  * is present then we match the globs in `files` and exclude any globs in
  * `ignores`.
  * @param {string} filePath The absolute file path to check.
- * @param {string} basePath The base path for the config.
+ * @param {string} relativeFilePath The relative path of the file to check.
  * @param {Object} config The config object to check.
  * @returns {boolean} True if the file path is matched by the config,
  *      false if not.
  */
-function pathMatches(filePath, basePath, config) {
-	/*
-	 * For both files and ignores, functions are passed the absolute
-	 * file path while strings are compared against the relative
-	 * file path.
-	 */
-	const relativeFilePath = path.relative(basePath, filePath);
-
+function pathMatches(filePath, relativeFilePath, config) {
 	// match both strings and functions
 	function match(pattern) {
 		if (isString(pattern)) {
@@ -599,6 +582,13 @@ export class ConfigArray extends Array {
 		} else {
 			this.push(configs);
 		}
+
+		// On Windows, `path.relative()` returns an absolute path when given two paths on different drives.
+		// The namespaced base path is useful to make sure that calculated relative paths are always relative.
+		// On Unix, it is identical to the base path.
+		this.namespacedBasePath = path.toNamespacedPath(
+			basePath || path.resolve(),
+		);
 	}
 
 	/**
@@ -804,9 +794,12 @@ export class ConfigArray extends Array {
 
 		// check to see if the file is outside the base path
 
-		const relativeFilePath = path.relative(this.basePath, filePath);
+		const relativeFilePath = path.relative(
+			this.namespacedBasePath,
+			path.toNamespacedPath(filePath),
+		);
 
-		if (relativeFilePath.startsWith("..")) {
+		if (EXTERNAL_PATH_REGEX.test(relativeFilePath)) {
 			debug(`No config for file ${filePath} outside of base path`);
 
 			// cache and return result
@@ -847,7 +840,7 @@ export class ConfigArray extends Array {
 					return;
 				}
 
-				if (pathMatchesIgnores(filePath, this.basePath, config)) {
+				if (pathMatchesIgnores(filePath, relativeFilePath, config)) {
 					debug(
 						`Matching config found for ${filePath} (based on ignores: ${config.ignores})`,
 					);
@@ -883,7 +876,7 @@ export class ConfigArray extends Array {
 				// check that the config matches without the non-universal files first
 				if (
 					nonUniversalFiles.length &&
-					pathMatches(filePath, this.basePath, {
+					pathMatches(filePath, relativeFilePath, {
 						files: nonUniversalFiles,
 						ignores: config.ignores,
 					})
@@ -897,7 +890,7 @@ export class ConfigArray extends Array {
 				// if there wasn't a match then check if it matches with universal files
 				if (
 					universalFiles.length &&
-					pathMatches(filePath, this.basePath, {
+					pathMatches(filePath, relativeFilePath, {
 						files: universalFiles,
 						ignores: config.ignores,
 					})
@@ -912,7 +905,7 @@ export class ConfigArray extends Array {
 			}
 
 			// the normal case
-			if (pathMatches(filePath, this.basePath, config)) {
+			if (pathMatches(filePath, relativeFilePath, config)) {
 				debug(`Matching config found for ${filePath}`);
 				matchingConfigIndices.push(index);
 				matchFound = true;
@@ -1020,18 +1013,21 @@ export class ConfigArray extends Array {
 	isDirectoryIgnored(directoryPath) {
 		assertNormalized(this);
 
-		const relativeDirectoryPath = path
-			.relative(this.basePath, directoryPath)
-			.replace(/\\/gu, "/");
+		let relativeDirectoryPath = path.relative(
+			this.namespacedBasePath,
+			path.toNamespacedPath(directoryPath),
+		);
 
 		// basePath directory can never be ignored
 		if (relativeDirectoryPath === "") {
 			return false;
 		}
 
-		if (relativeDirectoryPath.startsWith("..")) {
+		if (EXTERNAL_PATH_REGEX.test(relativeDirectoryPath)) {
 			return true;
 		}
+
+		relativeDirectoryPath = relativeDirectoryPath.replace(/\\/gu, "/");
 
 		// first check the cache
 		const cache = dataCache.get(this).directoryMatches;
