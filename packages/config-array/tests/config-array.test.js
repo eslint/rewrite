@@ -970,6 +970,107 @@ describe("ConfigArray", () => {
 				assert.strictEqual(config, undefined);
 			});
 
+			// https://github.com/eslint/eslint/issues/18597
+			it("should correctly handle escaped characters in `files` patterns", () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["src/\\{a,b}.js"],
+							defs: {
+								severity: "error",
+							},
+						},
+					],
+					{ basePath, schema },
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfig(path.resolve(basePath, "src", "a.js")),
+					undefined,
+				);
+				assert.strictEqual(
+					configs.getConfig(path.resolve(basePath, "src", "b.js")),
+					undefined,
+				);
+				assert.strictEqual(
+					configs.getConfig(path.resolve(basePath, "src", "{a,b}.js"))
+						.defs.severity,
+					"error",
+				);
+			});
+
+			it("should correctly handle escaped characters in `ignores` patterns", () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["**/*.js"],
+							ignores: ["src/\\{a,b}.js"],
+							defs: {
+								severity: "error",
+							},
+						},
+					],
+					{ basePath, schema },
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfig(path.resolve(basePath, "src", "a.js"))
+						.defs.severity,
+					"error",
+				);
+				assert.strictEqual(
+					configs.getConfig(path.resolve(basePath, "src", "b.js"))
+						.defs.severity,
+					"error",
+				);
+				assert.strictEqual(
+					configs.getConfig(
+						path.resolve(basePath, "src", "{a,b}.js"),
+					),
+					undefined,
+				);
+			});
+
+			it("should correctly handle escaped characters in global `ignores` patterns", () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["**/*.js"],
+							defs: {
+								severity: "error",
+							},
+						},
+						{
+							ignores: ["src/\\{a,b}.js"],
+						},
+					],
+					{ basePath, schema },
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfig(path.resolve(basePath, "src", "a.js"))
+						.defs.severity,
+					"error",
+				);
+				assert.strictEqual(
+					configs.getConfig(path.resolve(basePath, "src", "b.js"))
+						.defs.severity,
+					"error",
+				);
+				assert.strictEqual(
+					configs.getConfig(
+						path.resolve(basePath, "src", "{a,b}.js"),
+					),
+					undefined,
+				);
+			});
+
 			// https://github.com/eslint/eslint/issues/17103
 			describe("ignores patterns should be properly applied", () => {
 				it("should return undefined when a filename matches an ignores pattern but not a files pattern", () => {
