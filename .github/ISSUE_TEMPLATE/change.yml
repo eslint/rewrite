@@ -27,7 +27,7 @@ body:
       attributes:
           label: What do you think is the correct solution?
           description: |
-              Please explain how you'd like to change humanfs to address the problem.
+              Please explain what you'd like to change to address the problem.
       validations:
           required: true
     - type: checkboxes
