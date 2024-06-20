@@ -97,7 +97,7 @@ function formatSponsors(sponsors) {
  */
 function formatTechSponsors(sponsors) {
 	return stripIndents`<!--techsponsorsstart-->
-        <h3>Technology Sponsors</h3>
+        <h2>Technology Sponsors</h2>
             <p>${sponsors
 				.map(
 					sponsor =>
