@@ -44,7 +44,7 @@ const heights = {
 
 /**
  * Fetches the latest sponsors data from the website.
- * @returns {Object} The sponsors are data object.
+ * @returns {Object} The sponsors data object.
  */
 async function fetchSponsorsData() {
 	const data = await got(SPONSORS_URL).json();
@@ -97,7 +97,7 @@ function formatSponsors(sponsors) {
  */
 function formatTechSponsors(sponsors) {
 	return stripIndents`<!--techsponsorsstart-->
-        <h3>Tech Sponsors</h3>
+        <h3>Technology Sponsors</h3>
             <p>${sponsors
 				.map(
 					sponsor =>
