@@ -101,7 +101,7 @@ function formatTechSponsors(sponsors) {
             <p>${sponsors
 				.map(
 					sponsor =>
-						`<a href="${sponsor.url || "#"}"><img src="${TECH_SPONSORS_IMAGE_PATH + sponsor.image}" alt="${sponsor.name}" height="${heights.gold}"></a>`,
+						`<a href="${sponsor.url || "#"}"><img src="${TECH_SPONSORS_IMAGE_PATH + sponsor.image}" alt="${sponsor.name}" height="${heights.bronze}"></a>`,
 				)
 				.join(" ")}
 			</p>
