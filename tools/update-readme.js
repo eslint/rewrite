@@ -21,6 +21,12 @@ import got from "got";
 const SPONSORS_URL =
 	"https://raw.githubusercontent.com/eslint/eslint.org/main/src/_data/sponsors.json";
 
+const TECH_SPONSORS_URL =
+	"https://raw.githubusercontent.com/eslint/eslint.org/main/src/_data/techsponsors.json";
+
+const TECH_SPONSORS_IMAGE_PATH =
+	"https://raw.githubusercontent.com/eslint/eslint.org/main/src";
+
 const README_FILE_PATHS = [
 	"./README.md",
 	...readdirSync("./packages").map(dir => `./packages/${dir}/README.md`),
@@ -50,8 +56,18 @@ async function fetchSponsorsData() {
 }
 
 /**
+ * Fetches the latest tech sponsors data from the website.
+ * @returns {Array<Object>} The tech sponsors array of data object.
+ */
+async function fetchTechSponsors() {
+	const data = await got(TECH_SPONSORS_URL).json();
+
+	return data;
+}
+
+/**
  * Formats an array of sponsors into HTML for the readme.
- * @param {Array} sponsors The array of sponsors.
+ * @param {Object} sponsors The object of sponsors.
  * @returns {string} The HTML for the readme.
  */
 function formatSponsors(sponsors) {
@@ -74,12 +90,33 @@ function formatSponsors(sponsors) {
     <!--sponsorsend-->`;
 }
 
+/**
+ * Formats an array of sponsors into HTML for the readme.
+ * @param {Array} sponsors The array of sponsors.
+ * @returns {string} The HTML for the readme.
+ */
+function formatTechSponsors(sponsors) {
+	return stripIndents`<!--techsponsorsstart-->
+        <h2>Technology Sponsors</h2>
+            <p>${sponsors
+				.map(
+					sponsor =>
+						`<a href="${sponsor.url || "#"}"><img src="${TECH_SPONSORS_IMAGE_PATH + sponsor.image}" alt="${sponsor.name}" height="${heights.bronze}"></a>`,
+				)
+				.join(" ")}
+			</p>
+    <!--techsponsorsend-->`;
+}
+
 //-----------------------------------------------------------------------------
 // Main
 //-----------------------------------------------------------------------------
 
 (async () => {
-	const allSponsors = await fetchSponsorsData();
+	const [techSponsors, allSponsors] = await Promise.all([
+		fetchTechSponsors(),
+		fetchSponsorsData(),
+	]);
 
 	README_FILE_PATHS.forEach(filePath => {
 		// read readme file
@@ -88,6 +125,11 @@ function formatSponsors(sponsors) {
 		let newReadme = readme.replace(
 			/<!--sponsorsstart-->[\w\W]*?<!--sponsorsend-->/u,
 			formatSponsors(allSponsors),
+		);
+
+		newReadme = newReadme.replace(
+			/<!--techsponsorsstart-->[\w\W]*?<!--techsponsorsend-->/u,
+			formatTechSponsors(techSponsors),
 		);
 
 		// replace multiple consecutive blank lines with just one blank line
