@@ -89,7 +89,12 @@ const CONFIG_WITH_STATUS_UNCONFIGURED = Object.freeze({
 	status: "unconfigured",
 });
 
+// Match two leading dots followed by a path separator or the end of input.
 const EXTERNAL_PATH_REGEX = new RegExp(`^\\.\\.($|\\${path.sep})`, "u");
+
+// Some `node:path` polyfills do not provide an implementation for `toNamespacedPath`.
+// In that case, return the argument unchanged like on POSIX systems.
+const toNamespacedPath = path.toNamespacedPath ?? (arg => arg);
 
 /**
  * Wrapper error for config validation errors that adds a name to the front of the
@@ -350,7 +355,7 @@ function normalizeSync(items, context, extraConfigTypes) {
  * matcher.
  * @param {Array<string|((string) => boolean)>} ignores The ignore patterns to check.
  * @param {string} filePath The absolute path of the file to check.
- * @param {string} relativeFilePath The relative path of the file to check.
+ * @param {string} relativeFilePath The path of the file to check relative to the base path.
  * @returns {boolean} True if the path should be ignored and false if not.
  */
 function shouldIgnorePath(ignores, filePath, relativeFilePath) {
@@ -384,7 +389,7 @@ function shouldIgnorePath(ignores, filePath, relativeFilePath) {
  * Determines if a given file path is matched by a config based on
  * `ignores` only.
  * @param {string} filePath The absolute file path to check.
- * @param {string} relativeFilePath The relative path of the file to check.
+ * @param {string} relativeFilePath The path of the file to check relative to the base path.
  * @param {Object} config The config object to check.
  * @returns {boolean} True if the file path is matched by the config,
  *      false if not.
@@ -402,7 +407,7 @@ function pathMatchesIgnores(filePath, relativeFilePath, config) {
  * is present then we match the globs in `files` and exclude any globs in
  * `ignores`.
  * @param {string} filePath The absolute file path to check.
- * @param {string} relativeFilePath The relative path of the file to check.
+ * @param {string} relativeFilePath The path of the file to check relative to the base path.
  * @param {Object} config The config object to check.
  * @returns {boolean} True if the file path is matched by the config,
  *      false if not.
@@ -586,9 +591,7 @@ export class ConfigArray extends Array {
 		// On Windows, `path.relative()` returns an absolute path when given two paths on different drives.
 		// The namespaced base path is useful to make sure that calculated relative paths are always relative.
 		// On Unix, it is identical to the base path.
-		this.namespacedBasePath = path.toNamespacedPath(
-			basePath || path.resolve(),
-		);
+		this.namespacedBasePath = toNamespacedPath(basePath || process.cwd());
 	}
 
 	/**
@@ -796,7 +799,7 @@ export class ConfigArray extends Array {
 
 		const relativeFilePath = path.relative(
 			this.namespacedBasePath,
-			path.toNamespacedPath(filePath),
+			toNamespacedPath(filePath),
 		);
 
 		if (EXTERNAL_PATH_REGEX.test(relativeFilePath)) {
@@ -1015,7 +1018,7 @@ export class ConfigArray extends Array {
 
 		let relativeDirectoryPath = path.relative(
 			this.namespacedBasePath,
-			path.toNamespacedPath(directoryPath),
+			toNamespacedPath(directoryPath),
 		);
 
 		// basePath directory can never be ignored
