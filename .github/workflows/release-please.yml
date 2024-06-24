@@ -83,6 +83,39 @@ jobs:
                   MASTODON_HOST: ${{ secrets.MASTODON_HOST }}
 
             #-----------------------------------------------------------------------------
+            # @eslint/core
+            #-----------------------------------------------------------------------------
+
+            - name: Publish @eslint/core package to npm
+              run: npm publish -w packages/core
+              if: ${{ steps.release.outputs['packages/core--release_created'] }}
+              env:
+                  NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+
+            - name: Publish @eslint/core package to JSR
+              run: |
+                  npm run build --if-present
+                  npx jsr publish
+              working-directory: packages/core
+              if: ${{ steps.release.outputs['packages/core--release_created'] }}
+
+            - name: Tweet Release Announcement
+              run: npx @humanwhocodes/tweet "eslint/core v${{ steps.release.outputs['packages/core--major'] }}.${{ steps.release.outputs['packages/core--minor'] }}.${{ steps.release.outputs['packages/core--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/${{ steps.release.outputs['packages/core--tag_name'] }}"
+              if: ${{ steps.release.outputs['packages/core--release_created'] }}
+              env:
+                  TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
+                  TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
+                  TWITTER_ACCESS_TOKEN_KEY: ${{ secrets.TWITTER_ACCESS_TOKEN_KEY }}
+                  TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+
+            - name: Toot Release Announcement
+              run: npx @humanwhocodes/toot "eslint/core v${{ steps.release.outputs['packages/core--major'] }}.${{ steps.release.outputs['packages/core--minor'] }}.${{ steps.release.outputs['packages/core--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/${{ steps.release.outputs['packages/core--tag_name'] }}"
+              if: ${{ steps.release.outputs['packages/core--release_created'] }}
+              env:
+                  MASTODON_ACCESS_TOKEN: ${{ secrets.MASTODON_ACCESS_TOKEN }}
+                  MASTODON_HOST: ${{ secrets.MASTODON_HOST }}
+
+            #-----------------------------------------------------------------------------
             # @eslint/migrate-config
             #-----------------------------------------------------------------------------
 

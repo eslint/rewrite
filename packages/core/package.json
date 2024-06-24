@@ -1,0 +1,43 @@
+{
+  "name": "@eslint/core",
+  "version": "0.0.1",
+  "description": "Runtime-agnostic core of ESLint",
+  "type": "module",
+  "types": "./src/types.ts",
+  "files": [
+    "src"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test:jsr": "npx jsr@latest publish --dry-run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eslint/rewrite.git"
+  },
+  "keywords": [
+    "eslint",
+    "core"
+  ],
+  "author": "Nicholas C. Zakas",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/eslint/rewrite/issues"
+  },
+  "homepage": "https://github.com/eslint/rewrite#readme",
+  "devDependencies": {
+    "@types/eslint": "^8.56.10",
+    "eslint": "^9.0.0",
+    "mocha": "^10.4.0",
+    "typescript": "^5.4.5"
+  },
+  "engines": {
+    "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
+  }
+}

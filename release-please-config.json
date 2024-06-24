@@ -13,7 +13,7 @@
         }
       ]
     },
-    "packages/object-schema": {
+    "packages/config-array": {
       "release-type": "node",
       "extra-files": [
         {
@@ -23,7 +23,17 @@
         }
       ]
     },
-    "packages/config-array": {
+    "packages/core": {
+      "release-type": "node",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "jsr.json",
+          "jsonpath": "$.version"
+        }
+      ]
+    },
+    "packages/object-schema": {
       "release-type": "node",
       "extra-files": [
         {
