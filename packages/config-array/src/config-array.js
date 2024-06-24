@@ -60,6 +60,7 @@ const negatedMinimatchCache = new Map();
 const MINIMATCH_OPTIONS = {
 	// matchBase: true,
 	dot: true,
+	allowWindowsEscape: true,
 };
 
 /**
