@@ -35,7 +35,7 @@ export interface FileProblem {
  */
 export interface SyntaxElement {
 	loc: SourceLocation;
-	range?: [number, number];
+	range: [number, number];
 	[key: string]: any;
 }
 
@@ -53,7 +53,6 @@ export interface SourceLocation {
 export interface Position {
 	line: number;
 	column: number;
-	offset: number;
 }
 
 //------------------------------------------------------------------------------
@@ -95,6 +94,11 @@ export interface Language {
 	 * The property to read the node type from. Used in selector querying.
 	 */
 	nodeTypeKey: string;
+
+	/**
+	 * The traversal path that tools should take when evaluating the AST
+	 */
+	visitorKeys?: Record<string, Array<string>>;
 
 	/**
 	 * Validates languageOptions for this language.
@@ -168,7 +172,7 @@ export interface File {
 	/**
 	 * The body of the file to parse.
 	 */
-	body: string | ArrayBuffer;
+	body: string | Uint8Array;
 }
 
 /**
@@ -244,11 +248,6 @@ interface SourceCodeBase {
 	 * Root of the AST.
 	 */
 	ast: SyntaxElement;
-
-	/**
-	 * The traversal path that tools should take when evaluating the AST
-	 */
-	visitorKeys?: Record<string, Array<string>>;
 
 	/**
 	 * Traversal of AST.
