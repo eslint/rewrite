@@ -607,7 +607,11 @@ function createPlugins(plugins, migration) {
 				bindings: ["fixupPluginRules"],
 				added: true,
 			});
-		} else {
+		} else if (
+			!migration.imports
+				.get("@eslint/compat")
+				.bindings.includes("fixupPluginRules")
+		) {
 			migration.imports
 				.get("@eslint/compat")
 				.bindings.push("fixupPluginRules");
