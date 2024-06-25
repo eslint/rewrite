@@ -129,7 +129,7 @@ export interface Language {
 	 */
 	createSourceCode(
 		file: File,
-		input: ParseResult,
+		input: OkParseResult,
 		context: LanguageContext,
 	): SourceCode; // Future: | Promise<SourceCode>;
 }
@@ -250,6 +250,13 @@ interface SourceCodeBase {
 	ast: SyntaxElement;
 
 	/**
+	 * The traversal path that tools should take when evaluating the AST.
+	 * When present, this overrides the `visitorKeys` on the language for
+	 * just this source code object.
+	 */
+	visitorKeys?: Record<string, Array<string>>;
+
+	/**
 	 * Traversal of AST.
 	 */
 	traverse(): Iterable<TraversalStep>;
@@ -324,7 +331,6 @@ export type SourceCode = TextSourceCode | BinarySourceCode;
  * Represents a traversal step visiting the AST.
  */
 export interface VisitTraversalStep {
-	type: "visit";
 	kind: 1;
 	target: SyntaxElement;
 	phase: 1 /* enter */ | 2 /* exit */;
@@ -335,7 +341,6 @@ export interface VisitTraversalStep {
  * Represents a traversal step calling a function.
  */
 export interface CallTraversalStep {
-	type: "call";
 	kind: 2;
 	target: string;
 	phase?: string;
