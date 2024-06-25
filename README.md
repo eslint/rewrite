@@ -6,9 +6,10 @@ Monorepo for the rewrite of ESLint.
 
 This repository is the home of the following packages:
 
--   [`@eslint/object-schema`](packages/object-schema)
--   [`@eslint/config-array`](packages/config-array)
+-   [`@eslint/core`](packages/core)
 -   [`@eslint/compat`](packages/compat)
+-   [`@eslint/config-array`](packages/config-array)
+-   [`@eslint/object-schema`](packages/object-schema)
 -   [`@eslint/migrate-config`](packages/migrate-config)
 
 ## Sponsors
