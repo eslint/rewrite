@@ -33,6 +33,7 @@ const README_FILE_PATHS = [
 ];
 
 const heights = {
+	platinum: 128,
 	gold: 96,
 	silver: 64,
 	bronze: 32,
