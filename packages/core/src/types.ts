@@ -270,7 +270,7 @@ interface SourceCodeBase {
 	/**
 	 * Applies language options passed in from the ESLint core.
 	 */
-	applyLanguageOptions?(): void;
+	applyLanguageOptions?(languageOptions: LanguageOptions): void;
 
 	/**
 	 * Return all of the inline areas where ESLint should be disabled/enabled
