@@ -276,10 +276,10 @@ interface SourceCodeBase {
 	 * Return all of the inline areas where ESLint should be disabled/enabled
 	 * along with any problems found in evaluating the directives.
 	 */
-	getDisableDirectives?(): Array<{
+	getDisableDirectives?(): {
 		directives: Array<Directive>;
 		problems: Array<FileProblem>;
-	}>;
+	};
 
 	/**
 	 * Returns an array of all inline configuration nodes found in the
