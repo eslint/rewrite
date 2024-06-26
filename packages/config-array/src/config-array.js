@@ -14,6 +14,7 @@ import createDebug from "debug";
 import { ObjectSchema } from "@eslint/object-schema";
 import { baseSchema } from "./base-schema.js";
 import { filesAndIgnoresSchema } from "./files-and-ignores-schema.js";
+import toNamespacedPath from "./to-namespaced-path.js";
 
 //------------------------------------------------------------------------------
 // Types
@@ -91,10 +92,6 @@ const CONFIG_WITH_STATUS_UNCONFIGURED = Object.freeze({
 
 // Match two leading dots followed by a path separator or the end of input.
 const EXTERNAL_PATH_REGEX = new RegExp(`^\\.\\.($|\\${path.sep})`, "u");
-
-// Some `node:path` polyfills do not provide an implementation for `toNamespacedPath`.
-// In that case, return the argument unchanged like on POSIX systems.
-const toNamespacedPath = path.toNamespacedPath ?? (arg => arg);
 
 /**
  * Wrapper error for config validation errors that adds a name to the front of the
