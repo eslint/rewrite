@@ -262,12 +262,6 @@ interface SourceCodeBase {
 	traverse(): Iterable<TraversalStep>;
 
 	/**
-	 * Applies configuration found inside of the source code. This method is only
-	 * called when ESLint is running with inline configuration allowed.
-	 */
-	applyInlineConfig?(): void;
-
-	/**
 	 * Applies language options passed in from the ESLint core.
 	 */
 	applyLanguageOptions?(languageOptions: LanguageOptions): void;
