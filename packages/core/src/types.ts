@@ -291,10 +291,10 @@ interface SourceCodeBase {
 	 * Applies configuration found inside of the source code. This method is only
 	 * called when ESLint is running with inline configuration allowed.
 	 */
-	applyInlineConfig?(): Array<{
+	applyInlineConfig?(): {
 		configs: Array<InlineConfigElement>;
 		problems: Array<FileProblem>;
-	}>;
+	};
 
 	/**
 	 * Called by ESLint core to indicate that it has finished providing
