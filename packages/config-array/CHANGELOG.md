@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.17.0](https://github.com/eslint/rewrite/compare/config-array-v0.16.0...config-array-v0.17.0) (2024-06-26)
+
+
+### ⚠ BREAKING CHANGES
+
+* Allow escaping characters on Windows ([#61](https://github.com/eslint/rewrite/issues/61))
+
+### Bug Fixes
+
+* Allow escaping characters on Windows ([#61](https://github.com/eslint/rewrite/issues/61)) ([8501890](https://github.com/eslint/rewrite/commit/85018903815908bcfd940bbda347f3f17663e4bd))
+
 ## [0.16.0](https://github.com/eslint/rewrite/compare/config-array-v0.15.1...config-array-v0.16.0) (2024-06-12)
 
 
