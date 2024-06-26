@@ -25,6 +25,7 @@ const filePaths = [
 	"plugins-dedupe/.eslintrc.yml",
 	"gitignore-simple/.eslintrc.json",
 	"gitignore-complex/.eslintrc.json",
+	"import-duplicate/.eslintrc.cjs",
 ].map(file => `tests/fixtures/${file}`);
 
 //-----------------------------------------------------------------------------
