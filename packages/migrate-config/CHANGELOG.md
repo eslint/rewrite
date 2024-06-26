@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/eslint/rewrite/compare/migrate-config-v1.1.0...migrate-config-v1.1.1) (2024-06-26)
+
+
+### Bug Fixes
+
+* skip add plugin when already imported ([#70](https://github.com/eslint/rewrite/issues/70)) ([96f3e01](https://github.com/eslint/rewrite/commit/96f3e01333c0eaeefbed50e815c9467a1a3b30c9))
+
 ## [1.1.0](https://github.com/eslint/rewrite/compare/migrate-config-v1.0.1...migrate-config-v1.1.0) (2024-06-12)
 
 
