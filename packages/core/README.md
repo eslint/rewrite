@@ -4,7 +4,7 @@
 
 This package is the future home of the rewritten, runtime-agnostic ESLint core.
 
-Right now, it simply exports the core types necessary to implement language plugins.
+Right now, it exports the core types necessary to implement language plugins.
 
 ## License
 
