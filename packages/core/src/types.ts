@@ -213,7 +213,7 @@ export interface NotOkParseResult {
 	/**
 	 * Any parsing errors, whether fatal or not. (only when ok: false)
 	 */
-	errors?: Array<FileError>;
+	errors: Array<FileError>;
 
 	/**
 	 * Any additional data that the parser wants to provide.
