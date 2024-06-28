@@ -1,6 +1,7 @@
 /**
  * @fileoverview Polyfill for Node.js `path.toNamespacedPath`
- * @author Francesco Trotta
+ * @license
+ * Copyright Node.js contributors: https://github.com/nodejs/node/blob/v22.3.0/LICENSE
  */
 
 import { resolve, sep } from "node:path";
