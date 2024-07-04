@@ -32,6 +32,19 @@ describe("@eslint/compat", () => {
 			["!src/**", "!src/**/*"],
 			["*/foo.js", "*/foo.js"],
 			["*/foo.js/", "*/foo.js/"],
+			["src/{a,b}.js", "src/\\{a,b}.js"],
+			["src/?(a)b.js", "src/?\\(a)b.js"],
+			["{.js", "**/\\{.js"],
+			["(.js", "**/\\(.js"],
+			["(.js", "**/\\(.js"],
+			["{(.js", "**/\\{\\(.js"],
+			["{bar}/{baz}", "\\{bar}/\\{baz}"],
+			["\\[foo]/{bar}/{baz}", "\\[foo]/\\{bar}/\\{baz}"],
+			["src/\\{a}", "src/\\{a}"],
+			["src/\\(a)", "src/\\(a)"],
+			["src/\\{a}/{b}", "src/\\{a}/\\{b}"],
+			["src/\\(a)/(b)", "src/\\(a)/\\(b)"],
+			["a\\bc{de(f\\gh\\{i\\(j{(", "**/a\\bc\\{de\\(f\\gh\\{i\\(j\\{\\("],
 		];
 
 		tests.forEach(([pattern, expected]) => {

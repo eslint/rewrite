@@ -45,9 +45,24 @@ export function convertIgnorePatternToMinimatch(pattern) {
 	const patternWithoutLeadingSlash =
 		firstIndexOfSlash === 0 ? patternToTest.slice(1) : patternToTest;
 
+	/*
+	 * Escape `{` and `(` because in gitignore patterns they are just
+	 * literal characters without any specific syntactic meaning,
+	 * while in minimatch patterns they can form brace expansion or extglob syntax.
+	 *
+	 * For example, gitignore pattern `src/{a,b}.js` ignores file `src/{a,b}.js`.
+	 * But, the same minimatch pattern `src/{a,b}.js` ignores files `src/a.js` and `src/b.js`.
+	 * Minimatch pattern `src/\{a,b}.js` is equivalent to gitignore pattern `src/{a,b}.js`.
+	 */
+	const escapedPatternWithoutLeadingSlash =
+		patternWithoutLeadingSlash.replaceAll(
+			/(?=((?:\\.|[^{(])*))\1([{(])/guy,
+			"$1\\$2",
+		);
+
 	const matchInsideSuffix = patternToTest.endsWith("/**") ? "/*" : "";
 
-	return `${negatedPrefix}${matchEverywherePrefix}${patternWithoutLeadingSlash}${matchInsideSuffix}`;
+	return `${negatedPrefix}${matchEverywherePrefix}${escapedPatternWithoutLeadingSlash}${matchInsideSuffix}`;
 }
 
 /**
