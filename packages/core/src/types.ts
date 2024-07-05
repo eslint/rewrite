@@ -59,12 +59,56 @@ export interface Position {
 // Config
 //------------------------------------------------------------------------------
 
-export type RuleSeverity = 0 | 1 | 2 | "off" | "warn" | "error";
+/**
+ * The human readable severity level used in a configuration.
+ */
+export type SeverityName = "off" | "warn" | "error";
 
+/**
+ * The numeric severity level for a rule.
+ *
+ * - `0` means off.
+ * - `1` means warn.
+ * - `2` means error.
+ *
+ */
+export type SeverityLevel = 0 | 1 | 2;
+
+/**
+ * Represents the configuration options for the core linter.
+ */
+export interface LinterOptionsConfig {
+	/**
+	 * Indicates whether or not inline configuration is evaluated.
+	 */
+	allowInlineConfig?: boolean;
+
+	/**
+	 * Indicates what to do when an unused disable directive is found.
+	 */
+	reportUnusedDisableDirectives?: boolean | SeverityName;
+}
+
+/**
+ * Shared settings that are accessible from within plugins.
+ */
+export type SettingsConfig = Record<string, unknown>;
+
+/**
+ * The severity of a rule in a configuration.
+ */
+export type RuleSeverity = SeverityName | SeverityLevel;
+
+/**
+ * The configuration for a rule.
+ */
 export type RuleConfig = RuleSeverity | [RuleSeverity, ...any[]];
 
+/**
+ * A collection of rules and their configurations.
+ */
 export interface RulesConfig {
-	[key: string]: RuleConfig;
+	[ruleId: string]: RuleConfig;
 }
 
 //------------------------------------------------------------------------------
