@@ -75,6 +75,11 @@ export type SeverityName = "off" | "warn" | "error";
 export type SeverityLevel = 0 | 1 | 2;
 
 /**
+ * The severity of a rule in a configuration.
+ */
+export type Severity = SeverityName | SeverityLevel;
+
+/**
  * Represents the configuration options for the core linter.
  */
 export interface LinterOptionsConfig {
@@ -86,7 +91,7 @@ export interface LinterOptionsConfig {
 	/**
 	 * Indicates what to do when an unused disable directive is found.
 	 */
-	reportUnusedDisableDirectives?: boolean | SeverityName;
+	reportUnusedDisableDirectives?: boolean | Severity;
 }
 
 /**
@@ -95,14 +100,9 @@ export interface LinterOptionsConfig {
 export type SettingsConfig = Record<string, unknown>;
 
 /**
- * The severity of a rule in a configuration.
- */
-export type RuleSeverity = SeverityName | SeverityLevel;
-
-/**
  * The configuration for a rule.
  */
-export type RuleConfig = RuleSeverity | [RuleSeverity, ...any[]];
+export type RuleConfig = Severity | [Severity, ...any[]];
 
 /**
  * A collection of rules and their configurations.
