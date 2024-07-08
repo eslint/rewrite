@@ -86,7 +86,7 @@ export interface LinterOptionsConfig {
 	/**
 	 * Indicates whether or not inline configuration is evaluated.
 	 */
-	allowInlineConfig?: boolean;
+	noInlineConfig?: boolean;
 
 	/**
 	 * Indicates what to do when an unused disable directive is found.
