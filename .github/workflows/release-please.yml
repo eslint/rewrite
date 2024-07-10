@@ -54,7 +54,7 @@ jobs:
             #-----------------------------------------------------------------------------
 
             - name: Publish @eslint/compat package to npm
-              run: npm publish -w --provenance packages/compat
+              run: npm publish -w packages/compat --provenance
               if: ${{ steps.release.outputs['packages/compat--release_created'] }}
               env:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
@@ -87,7 +87,7 @@ jobs:
             #-----------------------------------------------------------------------------
 
             - name: Publish @eslint/core package to npm
-              run: npm publish -w --provenance packages/core
+              run: npm publish -w packages/core --provenance
               if: ${{ steps.release.outputs['packages/core--release_created'] }}
               env:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
@@ -120,7 +120,7 @@ jobs:
             #-----------------------------------------------------------------------------
 
             - name: Publish @eslint/migrate-config package to npm
-              run: npm publish -w --provenance packages/migrate-config
+              run: npm publish -w packages/migrate-config --provenance
               if: ${{ steps.release.outputs['packages/migrate-config--release_created'] }}
               env:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
@@ -148,7 +148,7 @@ jobs:
             #-----------------------------------------------------------------------------
 
             - name: Publish @eslint/object-schema package to npm
-              run: npm publish -w --provenance packages/object-schema
+              run: npm publish -w packages/object-schema --provenance
               if: ${{ steps.release.outputs['packages/object-schema--release_created'] }}
               env:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
@@ -179,7 +179,7 @@ jobs:
             #-----------------------------------------------------------------------------
 
             - name: Publish @eslint/config-array package to npm
-              run: npm publish -w --provenance packages/config-array
+              run: npm publish -w packages/config-array --provenance
               if: ${{ steps.release.outputs['packages/config-array--release_created'] }}
               env:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
