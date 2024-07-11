@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/eslint/rewrite/compare/compat-v1.1.0...compat-v1.1.1) (2024-07-11)
+
+
+### Bug Fixes
+
+* Escape `{` and `(` characters in `convertIgnorePatternToMinimatch` ([#79](https://github.com/eslint/rewrite/issues/79)) ([811c3d7](https://github.com/eslint/rewrite/commit/811c3d79de2588ca8aa10f6d9e8e706dae8986a4))
+
 ## [1.1.0](https://github.com/eslint/rewrite/compare/compat-v1.0.3...compat-v1.1.0) (2024-06-12)
 
 
