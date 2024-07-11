@@ -6,7 +6,7 @@ const eslintPluginJSDoc = eslintConfigESLint.find(
 
 export default [
 	{
-		ignores: ["**/tests/fixtures/", "**/dist/"],
+		ignores: ["**/tests/fixtures/", "**/dist/", "**/coverage/"],
 	},
 
 	...eslintConfigESLint,
