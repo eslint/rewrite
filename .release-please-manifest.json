@@ -1,7 +1,7 @@
 {
-  "packages/compat": "1.1.0",
+  "packages/compat": "1.1.1",
   "packages/config-array": "0.17.0",
-  "packages/core": "0.1.0",
-  "packages/migrate-config": "1.1.1",
+  "packages/core": "0.2.0",
+  "packages/migrate-config": "1.1.2",
   "packages/object-schema": "2.1.4"
 }
