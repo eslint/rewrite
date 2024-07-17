@@ -31,13 +31,31 @@ export interface FileProblem {
 //------------------------------------------------------------------------------
 
 /**
- * Represents an AST node or token with location information.
+ * Represents an AST node or token with location information in ESLint format.
  */
-export interface SyntaxElement {
+export interface ESLintSyntaxElement {
 	loc: SourceLocation;
-	range: [number, number];
-	[key: string]: any;
+	range: SourceRange;
 }
+
+/**
+ * Represents an AST node or token with location information in unist format.
+ */
+export interface UnistSyntaxElement {
+	position: SourceLocation;
+}
+
+/**
+ * Represents an AST node or token with location information in postcss format.
+ */
+export interface PostCSSSyntaxElement {
+	source: SourceLocation;
+}
+
+export type SyntaxElement =
+	| ESLintSyntaxElement
+	| UnistSyntaxElement
+	| PostCSSSyntaxElement;
 
 /**
  * Represents the start and end coordinates of a node inside the source.
@@ -48,12 +66,19 @@ export interface SourceLocation {
 }
 
 /**
- * Represents a location coordinate inside the source.
+ * Represents a location coordinate inside the source. ESLint-style formats
+ * have just `line` and `column` while others may have `offset` as well.
  */
 export interface Position {
 	line: number;
 	column: number;
+	offset?: number;
 }
+
+/**
+ * Represents a range of characters in the source.
+ */
+export type SourceRange = [number, number];
 
 //------------------------------------------------------------------------------
 // Config
@@ -299,6 +324,16 @@ interface SourceCodeBase {
 	 * just this source code object.
 	 */
 	visitorKeys?: Record<string, Array<string>>;
+
+	/**
+	 * Retrieves the equivalent of `loc` for a given node or token.
+	 */
+	getLoc(nodeOrToken: SyntaxElement): SourceLocation;
+
+	/**
+	 * Retrieves the equivalent of `range` for a given node or token.
+	 */
+	getRange(nodeOrToken: SyntaxElement): SourceRange;
 
 	/**
 	 * Traversal of AST.
