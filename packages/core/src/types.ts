@@ -33,36 +33,10 @@ export interface FileProblem {
 /**
  * Represents an AST node or token with location information in ESLint format.
  */
-export interface ESLintSyntaxElement {
+export interface SyntaxElement {
 	loc: SourceLocation;
 	range: SourceRange;
 }
-
-/**
- * Represents an AST node or token with location information containing offsets.
- */
-export interface LocSyntaxElement {
-	loc: SourceLocationWithOffset;
-}
-
-/**
- * Represents an AST node or token with location information in unist format.
- */
-export interface UnistSyntaxElement {
-	position: SourceLocationWithOffset;
-}
-
-/**
- * Represents an AST node or token with location information in postcss format.
- */
-export interface PostCSSSyntaxElement {
-	source: SourceLocationWithOffset;
-}
-
-export type SyntaxElement =
-	| ESLintSyntaxElement
-	| UnistSyntaxElement
-	| PostCSSSyntaxElement;
 
 /**
  * Represents the start and end coordinates of a node inside the source.
@@ -203,8 +177,8 @@ export interface Language {
 	 */
 	matchesSelectorClass?(
 		className: string,
-		node: SyntaxElement,
-		ancestry: Array<SyntaxElement>,
+		node: object,
+		ancestry: Array<object>,
 	): boolean;
 
 	/**
@@ -268,7 +242,7 @@ export interface File {
 /**
  * Represents the successful result of parsing a file.
  */
-export interface OkParseResult {
+export interface OkParseResult<T extends object = object> {
 	/**
 	 * Indicates if the parse was successful. If true, the parse was successful
 	 * and ESLint should continue on to create a SourceCode object and run rules;
@@ -280,7 +254,7 @@ export interface OkParseResult {
 	/**
 	 * The abstract syntax tree created by the parser. (only when ok: true)
 	 */
-	ast: SyntaxElement;
+	ast: T;
 
 	/**
 	 * Any additional data that the parser wants to provide.
@@ -311,7 +285,9 @@ export interface NotOkParseResult {
 	[key: string]: any;
 }
 
-export type ParseResult = OkParseResult | NotOkParseResult;
+export type ParseResult<T extends object = object> =
+	| OkParseResult<T>
+	| NotOkParseResult;
 
 /**
  * Represents inline configuration found in the source code.
@@ -337,7 +313,7 @@ interface SourceCodeBase {
 	/**
 	 * Root of the AST.
 	 */
-	ast: SyntaxElement;
+	ast: object;
 
 	/**
 	 * The traversal path that tools should take when evaluating the AST.
@@ -349,12 +325,12 @@ interface SourceCodeBase {
 	/**
 	 * Retrieves the equivalent of `loc` for a given node or token.
 	 */
-	getLoc(nodeOrToken: SyntaxElement): SourceLocation;
+	getLoc(nodeOrToken: object): SourceLocation;
 
 	/**
 	 * Retrieves the equivalent of `range` for a given node or token.
 	 */
-	getRange(nodeOrToken: SyntaxElement): SourceRange;
+	getRange(nodeOrToken: object): SourceRange;
 
 	/**
 	 * Traversal of AST.
@@ -379,7 +355,7 @@ interface SourceCodeBase {
 	 * Returns an array of all inline configuration nodes found in the
 	 * source code.
 	 */
-	getInlineConfigNodes?(): Array<SyntaxElement>;
+	getInlineConfigNodes?(): Array<object>;
 
 	/**
 	 * Applies configuration found inside of the source code. This method is only
@@ -426,7 +402,7 @@ export type SourceCode = TextSourceCode | BinarySourceCode;
  */
 export interface VisitTraversalStep {
 	kind: 1;
-	target: SyntaxElement;
+	target: object;
 	phase: 1 /* enter */ | 2 /* exit */;
 	args: Array<any>;
 }
@@ -455,7 +431,7 @@ export interface Directive {
 	/**
 	 * The node of the directive. May be in the AST or a comment/token.
 	 */
-	node: SyntaxElement;
+	node: object;
 
 	/**
 	 * The value of the directive.
