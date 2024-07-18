@@ -39,17 +39,24 @@ export interface ESLintSyntaxElement {
 }
 
 /**
+ * Represents an AST node or token with location information containing offsets.
+ */
+export interface LocSyntaxElement {
+	loc: SourceLocationWithOffset;
+}
+
+/**
  * Represents an AST node or token with location information in unist format.
  */
 export interface UnistSyntaxElement {
-	position: SourceLocation;
+	position: SourceLocationWithOffset;
 }
 
 /**
  * Represents an AST node or token with location information in postcss format.
  */
 export interface PostCSSSyntaxElement {
-	source: SourceLocation;
+	source: SourceLocationWithOffset;
 }
 
 export type SyntaxElement =
@@ -66,13 +73,27 @@ export interface SourceLocation {
 }
 
 /**
+ * Represents the start and end coordinates of a node inside the source with an offset.
+ */
+export interface SourceLocationWithOffset {
+	start: PositionWithOffset;
+	end: PositionWithOffset;
+}
+
+/**
  * Represents a location coordinate inside the source. ESLint-style formats
  * have just `line` and `column` while others may have `offset` as well.
  */
 export interface Position {
 	line: number;
 	column: number;
-	offset?: number;
+}
+
+/**
+ * Represents a location coordinate inside the source with an offset.
+ */
+export interface PositionWithOffset extends Position {
+	offset: number;
 }
 
 /**
