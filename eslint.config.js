@@ -1,4 +1,5 @@
 import eslintConfigESLint from "eslint-config-eslint";
+import tseslint from "typescript-eslint";
 
 const eslintPluginJSDoc = eslintConfigESLint.find(
 	config => config.plugins?.jsdoc,
@@ -51,6 +52,16 @@ export default [
 				before: "readonly",
 				after: "readonly",
 			},
+		},
+	},
+
+	// Typescript
+	{
+		files: ["**/*.ts"],
+		...tseslint.configs.recommended[0],
+		rules: {
+			...tseslint.configs.recommended[1].rules,
+			...tseslint.configs.recommended[2].rules,
 		},
 	},
 ];

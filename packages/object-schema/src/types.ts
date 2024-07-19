@@ -36,16 +36,19 @@ export interface PropertyDefinition {
 	/**
 	 * The strategy to merge the property.
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any -- This is a generic type
 	merge: BuiltInMergeStrategy | ((target: any, source: any) => any);
 
 	/**
 	 * The strategy to validate the property.
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any -- This is a generic type
 	validate: BuiltInValidationStrategy | ((value: any) => void);
 
 	/**
 	 * The schema for the object value of this property.
 	 */
+	// eslint-disable-next-line no-use-before-define -- Ignore for recursive type
 	schema?: ObjectDefinition;
 }
 
