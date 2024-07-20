@@ -1,4 +1,4 @@
-const react = require("eslint-plugin-react");
+const _import = require("eslint-plugin-import");
 
 const {
     fixupPluginRules,
@@ -8,7 +8,7 @@ const reactHooks = require("eslint-plugin-react-hooks");
 
 module.exports = [{
     plugins: {
-        react: fixupPluginRules(react),
+        import: fixupPluginRules(_import),
     },
 }, {
     plugins: {

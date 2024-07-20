@@ -6,6 +6,5 @@
 export default [
 	"eslint-plugin-ava",
 	"eslint-plugin-react-hooks",
-	"eslint-plugin-react",
 	"eslint-plugin-import",
 ];
