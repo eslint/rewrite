@@ -1071,6 +1071,64 @@ describe("ConfigArray", () => {
 				);
 			});
 
+			// https://github.com/eslint/eslint/issues/18706
+			it("should disregard `/` in global `ignores`", () => {
+				configs = new ConfigArray(
+					[
+						{
+							ignores: ["/"],
+						},
+						{
+							files: ["**/*.js"],
+							defs: {
+								severity: "error",
+							},
+						},
+					],
+					{ basePath, schema },
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfig(path.resolve(basePath, "file.js")).defs
+						.severity,
+					"error",
+				);
+
+				assert.strictEqual(
+					configs.getConfig(
+						path.resolve(basePath, "subdir", "file.js"),
+					).defs.severity,
+					"error",
+				);
+			});
+
+			it("should return config for an unignored file in basePath when all files are initially ignored by '**'", () => {
+				configs = new ConfigArray(
+					[
+						{
+							ignores: ["**", "!file.js"],
+						},
+						{
+							files: ["**/*.js"],
+							defs: {
+								severity: "error",
+							},
+						},
+					],
+					{ basePath, schema },
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfig(path.resolve(basePath, "file.js")).defs
+						.severity,
+					"error",
+				);
+			});
+
 			// https://github.com/eslint/eslint/issues/17103
 			describe("ignores patterns should be properly applied", () => {
 				it("should return undefined when a filename matches an ignores pattern but not a files pattern", () => {
@@ -2699,6 +2757,23 @@ describe("ConfigArray", () => {
 					),
 					true,
 				);
+			});
+
+			it("should always return false for basePath", () => {
+				configs = new ConfigArray(
+					[
+						{
+							ignores: ["**", "/"],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(configs.isDirectoryIgnored(basePath), false);
 			});
 
 			it("should return true when a directory is in ignores", () => {
