@@ -1,10 +1,10 @@
-import react from "eslint-plugin-react";
+import _import from "eslint-plugin-import";
 import { fixupPluginRules } from "@eslint/compat";
 import reactHooks from "eslint-plugin-react-hooks";
 
 export default [{
     plugins: {
-        react: fixupPluginRules(react),
+        import: fixupPluginRules(_import),
     },
 }, {
     plugins: {

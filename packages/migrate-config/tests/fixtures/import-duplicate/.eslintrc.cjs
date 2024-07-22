@@ -1,5 +1,5 @@
 module.exports = {
-  plugins: ["react"],
+  plugins: ["import"],
   overrides: [
     {
       plugins: ["react-hooks"],
