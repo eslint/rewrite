@@ -1024,6 +1024,11 @@ export class ConfigArray extends Array {
 			.relative(this.basePath, directoryPath)
 			.replace(/\\/gu, "/");
 
+		// basePath directory can never be ignored
+		if (relativeDirectoryPath === "") {
+			return false;
+		}
+
 		if (relativeDirectoryPath.startsWith("..")) {
 			return true;
 		}
