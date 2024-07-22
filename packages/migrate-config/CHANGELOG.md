@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/eslint/rewrite/compare/migrate-config-v1.1.2...migrate-config-v1.2.0) (2024-07-22)
+
+
+### Features
+
+* `eslint-plugin-react` supports ESLint v9 ([#91](https://github.com/eslint/rewrite/issues/91)) ([7664bf8](https://github.com/eslint/rewrite/commit/7664bf801995c4a6a15d600b4542d47075fc6194))
+
 ## [1.1.2](https://github.com/eslint/rewrite/compare/migrate-config-v1.1.1...migrate-config-v1.1.2) (2024-07-11)
 
 

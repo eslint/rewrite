@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.3.0](https://github.com/eslint/rewrite/compare/core-v0.2.0...core-v0.3.0) (2024-07-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* Add getLoc/getRange to SourceCode interface ([#89](https://github.com/eslint/rewrite/issues/89))
+
+### Features
+
+* Add getLoc/getRange to SourceCode interface ([#89](https://github.com/eslint/rewrite/issues/89)) ([d51f979](https://github.com/eslint/rewrite/commit/d51f9791aecd9aa80136a0926e57549df9e25ab3))
+
 ## [0.2.0](https://github.com/eslint/rewrite/compare/core-v0.1.0...core-v0.2.0) (2024-07-11)
 
 
