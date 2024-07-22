@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.17.1](https://github.com/eslint/rewrite/compare/config-array-v0.17.0...config-array-v0.17.1) (2024-07-22)
+
+
+### Bug Fixes
+
+* `basePath` directory can never be ignored ([#92](https://github.com/eslint/rewrite/issues/92)) ([c94ab2d](https://github.com/eslint/rewrite/commit/c94ab2dea6410698a4b6814f921b39774b0e56ab))
+
 ## [0.17.0](https://github.com/eslint/rewrite/compare/config-array-v0.16.0...config-array-v0.17.0) (2024-06-26)
 
 
