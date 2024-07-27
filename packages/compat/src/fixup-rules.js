@@ -9,7 +9,7 @@
 
 /** @typedef {import("eslint").ESLint.Plugin} FixupPluginDefinition */
 /** @typedef {import("eslint").Rule.RuleModule} FixupRuleDefinition */
-/** @typedef {import("eslint").Rule.OldStyleRule} FixupLegacyRuleDefinition */
+/** @typedef {FixupRuleDefinition["create"]} FixupLegacyRuleDefinition */
 /** @typedef {import("eslint").Linter.FlatConfig} FixupConfig */
 /** @typedef {Array<FixupConfig>} FixupConfigArray */
 

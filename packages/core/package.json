@@ -32,7 +32,7 @@
   },
   "homepage": "https://github.com/eslint/rewrite#readme",
   "devDependencies": {
-    "@types/eslint": "^8.56.10",
+    "@types/eslint": "^9.6.0",
     "eslint": "^9.0.0",
     "mocha": "^10.4.0",
     "typescript": "^5.4.5"
