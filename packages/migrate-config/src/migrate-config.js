@@ -18,7 +18,7 @@ import { convertIgnorePatternToMinimatch } from "@eslint/compat";
 //-----------------------------------------------------------------------------
 
 /** @typedef {import("eslint").Linter.FlatConfig} FlatConfig */
-/** @typedef {import("eslint").Linter.Config} Config  */
+/** @typedef {import("eslint").Linter.LegacyConfig} LegacyConfig  */
 /** @typedef {import("eslint").Linter.ConfigOverride} ConfigOverride  */
 /** @typedef {import("recast").types.namedTypes.ObjectExpression} ObjectExpression */
 /** @typedef {import("recast").types.namedTypes.ArrayExpression} ArrayExpression */
@@ -51,7 +51,7 @@ const linterOptionsKeysToCopy = [
 class Migration {
 	/**
 	 * The config to migrate.
-	 * @type {Config}
+	 * @type {LegacyConfig}
 	 */
 	config;
 
@@ -81,7 +81,7 @@ class Migration {
 
 	/**
 	 * Creates a new Migration object.
-	 * @param {Config} config The config to migrate.
+	 * @param {LegacyConfig} config The config to migrate.
 	 */
 	constructor(config) {
 		this.config = config;
@@ -266,7 +266,7 @@ function createGitignoreEntry(migration) {
 
 /**
  * Creates the globals object from the config.
- * @param {Config} config The config to create globals from.
+ * @param {LegacyConfig} config The config to create globals from.
  * @returns {ObjectExpression|undefined} The globals object or undefined if none.
  */
 function createGlobals(config) {
@@ -380,7 +380,7 @@ function createGlobals(config) {
 
 /**
  * Creates the linter options object from the config.
- * @param {Config} config The config to create linter options from.
+ * @param {LegacyConfig} config The config to create linter options from.
  * @returns {ObjectExpression|undefined} The linter options object or undefined if none.
  */
 function createLinterOptions(config) {
@@ -454,7 +454,7 @@ function createFilesArray(patterns) {
 /**
  * Creates an object expression for the language options.
  * @param {Migration} migration The migration object.
- * @param {Config} config The config to create language options from.
+ * @param {LegacyConfig} config The config to create language options from.
  * @returns {ObjectExpression|undefined} The AST for the object expression or undefined if none.
  */
 function createLanguageOptions(migration, config) {
@@ -623,7 +623,7 @@ function createPlugins(plugins, migration) {
 
 /**
  * Creates an object expression for the `ignorePatterns` property.
- * @param {Config} config The config to create the object expression for.
+ * @param {LegacyConfig} config The config to create the object expression for.
  * @returns {ObjectExpression} The AST for the object expression.
  */
 function createGlobalIgnores(config) {
@@ -835,7 +835,7 @@ function migrateConfigObject(migration, config) {
 
 /**
  * Migrates an eslintrc config to flat config format.
- * @param {Config} config The eslintrc config to migrate.
+ * @param {LegacyConfig} config The eslintrc config to migrate.
  * @param {Object} [options] Options for the migration.
  * @param {"module"|"commonjs"} [options.sourceType] The module type to use.
  * @param {boolean} [options.gitignore] `true` to include contents of a .gitignore file.
