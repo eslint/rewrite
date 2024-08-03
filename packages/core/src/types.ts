@@ -127,9 +127,7 @@ export type RuleConfig = Severity | [Severity, ...unknown[]];
 /**
  * A collection of rules and their configurations.
  */
-export interface RulesConfig {
-	[ruleId: string]: RuleConfig;
-}
+export type RulesConfig = Record<string, RuleConfig>;
 
 //------------------------------------------------------------------------------
 // Languages
@@ -215,7 +213,7 @@ export interface NotOkParseResult {
 	/**
 	 * Any parsing errors, whether fatal or not. (only when ok: false)
 	 */
-	errors: Array<FileError>;
+	errors: FileError[];
 
 	/**
 	 * Any additional data that the parser wants to provide.
@@ -252,7 +250,7 @@ export interface VisitTraversalStep {
 	kind: 1;
 	target: object;
 	phase: 1 /* enter */ | 2 /* exit */;
-	args: Array<unknown>;
+	args: unknown[];
 }
 
 /**
@@ -262,7 +260,7 @@ export interface CallTraversalStep {
 	kind: 2;
 	target: string;
 	phase?: string;
-	args: Array<unknown>;
+	args: unknown[];
 }
 
 export type TraversalStep = VisitTraversalStep | CallTraversalStep;
@@ -306,7 +304,7 @@ interface SourceCodeBase {
 	 * When present, this overrides the `visitorKeys` on the language for
 	 * just this source code object.
 	 */
-	visitorKeys?: Record<string, Array<string>>;
+	visitorKeys?: Record<string, string[]>;
 
 	/**
 	 * Retrieves the equivalent of `loc` for a given node or token.
@@ -333,23 +331,23 @@ interface SourceCodeBase {
 	 * along with any problems found in evaluating the directives.
 	 */
 	getDisableDirectives?(): {
-		directives: Array<Directive>;
-		problems: Array<FileProblem>;
+		directives: Directive[];
+		problems: FileProblem[];
 	};
 
 	/**
 	 * Returns an array of all inline configuration nodes found in the
 	 * source code.
 	 */
-	getInlineConfigNodes?(): Array<object>;
+	getInlineConfigNodes?(): object[];
 
 	/**
 	 * Applies configuration found inside of the source code. This method is only
 	 * called when ESLint is running with inline configuration allowed.
 	 */
 	applyInlineConfig?(): {
-		configs: Array<InlineConfigElement>;
-		problems: Array<FileProblem>;
+		configs: InlineConfigElement[];
+		problems: FileProblem[];
 	};
 
 	/**
@@ -410,7 +408,7 @@ export interface Language {
 	/**
 	 * The traversal path that tools should take when evaluating the AST
 	 */
-	visitorKeys?: Record<string, Array<string>>;
+	visitorKeys?: Record<string, string[]>;
 
 	/**
 	 * Validates languageOptions for this language.
@@ -426,7 +424,7 @@ export interface Language {
 	matchesSelectorClass?(
 		className: string,
 		node: object,
-		ancestry: Array<object>,
+		ancestry: object[],
 	): boolean;
 
 	/**
