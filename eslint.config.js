@@ -56,12 +56,16 @@ export default [
 	},
 
 	// Typescript
-	{
+	// {
+	// 	files: ["**/*.ts"],
+	// 	...tseslint.configs.recommended[0],
+	// 	rules: {
+	// 		...tseslint.configs.recommended[1].rules,
+	// 		...tseslint.configs.recommended[2].rules,
+	// 	},
+	// },
+	...tseslint.config({
 		files: ["**/*.ts"],
-		...tseslint.configs.recommended[0],
-		rules: {
-			...tseslint.configs.recommended[1].rules,
-			...tseslint.configs.recommended[2].rules,
-		},
-	},
+		extends: tseslint.configs.recommended,
+	}),
 ];
