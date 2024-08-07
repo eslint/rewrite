@@ -18,23 +18,6 @@ export interface FileError {
 }
 
 /**
- * Represents a location coordinate inside the source. ESLint-style formats
- * have just `line` and `column` while others may have `offset` as well.
- */
-export interface Position {
-	line: number;
-	column: number;
-}
-
-/**
- * Represents the start and end coordinates of a node inside the source.
- */
-export interface SourceLocation {
-	start: Position;
-	end: Position;
-}
-
-/**
  * Represents a problem found in a file.
  */
 export interface FileProblem {
@@ -48,16 +31,36 @@ export interface FileProblem {
 //------------------------------------------------------------------------------
 
 /**
- * Represents a range of characters in the source.
- */
-export type SourceRange = [number, number];
-
-/**
  * Represents an AST node or token with location information in ESLint format.
  */
 export interface SyntaxElement {
 	loc: SourceLocation;
 	range: SourceRange;
+}
+
+/**
+ * Represents the start and end coordinates of a node inside the source.
+ */
+export interface SourceLocation {
+	start: Position;
+	end: Position;
+}
+
+/**
+ * Represents the start and end coordinates of a node inside the source with an offset.
+ */
+export interface SourceLocationWithOffset {
+	start: PositionWithOffset;
+	end: PositionWithOffset;
+}
+
+/**
+ * Represents a location coordinate inside the source. ESLint-style formats
+ * have just `line` and `column` while others may have `offset` as well.
+ */
+export interface Position {
+	line: number;
+	column: number;
 }
 
 /**
@@ -68,12 +71,9 @@ export interface PositionWithOffset extends Position {
 }
 
 /**
- * Represents the start and end coordinates of a node inside the source with an offset.
+ * Represents a range of characters in the source.
  */
-export interface SourceLocationWithOffset {
-	start: PositionWithOffset;
-	end: PositionWithOffset;
-}
+export type SourceRange = [number, number];
 
 //------------------------------------------------------------------------------
 // Config
@@ -134,9 +134,79 @@ export type RulesConfig = Record<string, RuleConfig>;
 //------------------------------------------------------------------------------
 
 /**
+ * Represents a plugin language.
+ */
+export interface Language {
+	/**
+	 * Indicates how ESLint should read the file.
+	 */
+	fileType: "text"; // future will also support "binary"
+
+	/**
+	 * First line number returned from the parser (text mode only).
+	 */
+	lineStart: 0 | 1;
+
+	/**
+	 * First column number returned from the parser (text mode only).
+	 */
+	columnStart: 0 | 1;
+
+	/**
+	 * The property to read the node type from. Used in selector querying.
+	 */
+	nodeTypeKey: string;
+
+	/**
+	 * The traversal path that tools should take when evaluating the AST
+	 */
+	visitorKeys?: Record<string, string[]>;
+
+	/**
+	 * Validates languageOptions for this language.
+	 */
+	validateLanguageOptions(languageOptions: LanguageOptions): void;
+
+	/**
+	 * Helper for esquery that allows languages to match nodes against
+	 * class. esquery currently has classes like `function` that will
+	 * match all the various function nodes. This method allows languages
+	 * to implement similar shorthands.
+	 */
+	matchesSelectorClass?(
+		className: string,
+		node: object,
+		ancestry: object[],
+	): boolean;
+
+	/**
+	 * Parses the given file input into its component parts. This file should not
+	 * throws errors for parsing errors but rather should return any parsing
+	 * errors as parse of the ParseResult object.
+	 */
+	parse(file: File, context: LanguageContext): ParseResult; // Future: | Promise<ParseResult>;
+
+	/**
+	 * Creates SourceCode object that ESLint uses to work with a file.
+	 */
+	createSourceCode(
+		file: File,
+		input: OkParseResult,
+		context: LanguageContext,
+	): SourceCode; // Future: | Promise<SourceCode>;
+}
+
+/**
  * Plugin-defined options for the language.
  */
 export type LanguageOptions = Record<string, unknown>;
+
+/**
+ * The context object that is passed to the language plugin methods.
+ */
+export interface LanguageContext {
+	languageOptions: LanguageOptions;
+}
 
 /**
  * Represents a file read by ESLint.
@@ -168,13 +238,6 @@ export interface File {
 }
 
 /**
- * The context object that is passed to the language plugin methods.
- */
-export interface LanguageContext {
-	languageOptions: LanguageOptions;
-}
-
-/**
  * Represents the successful result of parsing a file.
  */
 export interface OkParseResult<T extends object = object> {
@@ -194,7 +257,7 @@ export interface OkParseResult<T extends object = object> {
 	/**
 	 * Any additional data that the parser wants to provide.
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any -- https://github.com/eslint/rewrite/pull/90/files#r1687133551
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any -- https://github.com/eslint/rewrite/pull/90#discussion_r1687133551
 	[key: string]: any;
 }
 
@@ -218,7 +281,7 @@ export interface NotOkParseResult {
 	/**
 	 * Any additional data that the parser wants to provide.
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any -- https://github.com/eslint/rewrite/pull/90/files#r1687133551
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any -- https://github.com/eslint/rewrite/pull/90#discussion_r1687133551
 	[key: string]: any;
 }
 
@@ -241,53 +304,6 @@ interface InlineConfigElement {
 	config: {
 		rules: RulesConfig;
 	};
-}
-
-/**
- * Represents a traversal step visiting the AST.
- */
-export interface VisitTraversalStep {
-	kind: 1;
-	target: object;
-	phase: 1 /* enter */ | 2 /* exit */;
-	args: unknown[];
-}
-
-/**
- * Represents a traversal step calling a function.
- */
-export interface CallTraversalStep {
-	kind: 2;
-	target: string;
-	phase?: string;
-	args: unknown[];
-}
-
-export type TraversalStep = VisitTraversalStep | CallTraversalStep;
-
-/**
- * Represents a disable directive.
- */
-export interface Directive {
-	/**
-	 * The type of directive.
-	 */
-	type: "disable" | "enable" | "disable-line" | "disable-next-line";
-
-	/**
-	 * The node of the directive. May be in the AST or a comment/token.
-	 */
-	node: object;
-
-	/**
-	 * The value of the directive.
-	 */
-	value: string;
-
-	/**
-	 * The justification for the directive.
-	 */
-	justification?: string;
 }
 
 /**
@@ -382,64 +398,48 @@ export interface BinarySourceCode extends SourceCodeBase {
 export type SourceCode = TextSourceCode | BinarySourceCode;
 
 /**
- * Represents a plugin language.
+ * Represents a traversal step visiting the AST.
  */
-export interface Language {
+export interface VisitTraversalStep {
+	kind: 1;
+	target: object;
+	phase: 1 /* enter */ | 2 /* exit */;
+	args: unknown[];
+}
+
+/**
+ * Represents a traversal step calling a function.
+ */
+export interface CallTraversalStep {
+	kind: 2;
+	target: string;
+	phase?: string;
+	args: unknown[];
+}
+
+export type TraversalStep = VisitTraversalStep | CallTraversalStep;
+
+/**
+ * Represents a disable directive.
+ */
+export interface Directive {
 	/**
-	 * Indicates how ESLint should read the file.
+	 * The type of directive.
 	 */
-	fileType: "text"; // future will also support "binary"
+	type: "disable" | "enable" | "disable-line" | "disable-next-line";
 
 	/**
-	 * First line number returned from the parser (text mode only).
+	 * The node of the directive. May be in the AST or a comment/token.
 	 */
-	lineStart: 0 | 1;
+	node: object;
 
 	/**
-	 * First column number returned from the parser (text mode only).
+	 * The value of the directive.
 	 */
-	columnStart: 0 | 1;
+	value: string;
 
 	/**
-	 * The property to read the node type from. Used in selector querying.
+	 * The justification for the directive.
 	 */
-	nodeTypeKey: string;
-
-	/**
-	 * The traversal path that tools should take when evaluating the AST
-	 */
-	visitorKeys?: Record<string, string[]>;
-
-	/**
-	 * Validates languageOptions for this language.
-	 */
-	validateLanguageOptions(languageOptions: LanguageOptions): void;
-
-	/**
-	 * Helper for esquery that allows languages to match nodes against
-	 * class. esquery currently has classes like `function` that will
-	 * match all the various function nodes. This method allows languages
-	 * to implement similar shorthands.
-	 */
-	matchesSelectorClass?(
-		className: string,
-		node: object,
-		ancestry: object[],
-	): boolean;
-
-	/**
-	 * Parses the given file input into its component parts. This file should not
-	 * throws errors for parsing errors but rather should return any parsing
-	 * errors as parse of the ParseResult object.
-	 */
-	parse(file: File, context: LanguageContext): ParseResult; // Future: | Promise<ParseResult>;
-
-	/**
-	 * Creates SourceCode object that ESLint uses to work with a file.
-	 */
-	createSourceCode(
-		file: File,
-		input: OkParseResult,
-		context: LanguageContext,
-	): SourceCode; // Future: | Promise<SourceCode>;
+	justification?: string;
 }

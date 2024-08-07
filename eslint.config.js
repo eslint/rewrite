@@ -55,9 +55,12 @@ export default [
 		},
 	},
 
-	// Typescript
+	// TypeScript
 	...tseslint.config({
 		files: ["**/*.ts"],
 		extends: [...tseslint.configs.strict, ...tseslint.configs.stylistic],
+		rules: {
+			"no-use-before-define": "off",
+		},
 	}),
 ];
