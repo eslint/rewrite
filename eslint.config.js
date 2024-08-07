@@ -1,4 +1,5 @@
 import eslintConfigESLint from "eslint-config-eslint";
+import tseslint from "typescript-eslint";
 
 const eslintPluginJSDoc = eslintConfigESLint.find(
 	config => config.plugins?.jsdoc,
@@ -53,4 +54,13 @@ export default [
 			},
 		},
 	},
+
+	// TypeScript
+	...tseslint.config({
+		files: ["**/*.ts"],
+		extends: [...tseslint.configs.strict, ...tseslint.configs.stylistic],
+		rules: {
+			"no-use-before-define": "off",
+		},
+	}),
 ];
