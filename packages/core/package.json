@@ -3,18 +3,22 @@
   "version": "0.3.0",
   "description": "Runtime-agnostic core of ESLint",
   "type": "module",
-  "types": "./src/types.ts",
+  "types": "./dist/esm/types.d.ts",
+  "exports": {
+    "types": {
+      "import": "./dist/esm/types.d.ts",
+      "require": "./dist/cjs/types.d.cts"
+    }
+  },
   "files": [
-    "src"
+    "dist"
   ],
   "publishConfig": {
     "access": "public"
   },
-  "directories": {
-    "test": "tests"
-  },
   "scripts": {
-    "build": "tsc",
+    "build:cts": "node -e \"fs.cpSync('dist/esm/types.d.ts', 'dist/cjs/types.d.cts')\"",
+    "build": "tsc && npm run build:cts",
     "test:jsr": "npx jsr@latest publish --dry-run"
   },
   "repository": {
@@ -32,9 +36,6 @@
   },
   "homepage": "https://github.com/eslint/rewrite#readme",
   "devDependencies": {
-    "@types/eslint": "^9.6.0",
-    "eslint": "^9.0.0",
-    "mocha": "^10.4.0",
     "typescript": "^5.4.5"
   },
   "engines": {
