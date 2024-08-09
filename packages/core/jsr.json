@@ -1,10 +1,11 @@
 {
   "name": "@eslint/core",
   "version": "0.3.0",
-  "exports": "./src/types.ts",
+  "exports": "./dist/esm/types.d.ts",
   "publish": {
     "include": [
-      "src/types.ts",
+      "dist/esm/types.d.ts",
+      "dist/cjs/types.d.cts",
       "README.md",
       "jsr.json",
       "LICENSE"
