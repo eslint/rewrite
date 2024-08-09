@@ -4,3 +4,4 @@
  */
 
 export { ConfigArray, ConfigArraySymbol } from "./config-array.js";
+export { ObjectSchema } from "@eslint/object-schema";
