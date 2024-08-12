@@ -5,7 +5,6 @@
   "publish": {
     "include": [
       "dist/esm/types.d.ts",
-      "dist/cjs/types.d.cts",
       "README.md",
       "jsr.json",
       "LICENSE"
