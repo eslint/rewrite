@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.18.0](https://github.com/eslint/rewrite/compare/config-array-v0.17.1...config-array-v0.18.0) (2024-08-12)
+
+
+### Features
+
+* Export ObjectSchema ([#101](https://github.com/eslint/rewrite/issues/101)) ([f149f85](https://github.com/eslint/rewrite/commit/f149f855e81d4ba798a48873c9ab780bf8a0ac3a))
+
 ## [0.17.1](https://github.com/eslint/rewrite/compare/config-array-v0.17.0...config-array-v0.17.1) (2024-07-22)
 
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/eslint/rewrite/compare/core-v0.3.0...core-v0.4.0) (2024-08-12)
+
+
+### Features
+
+* add CommonJS `core` types ([#102](https://github.com/eslint/rewrite/issues/102)) ([6caa5e1](https://github.com/eslint/rewrite/commit/6caa5e1408d94387277abc65ff2b6d6b1d005488))
+
 ## [0.3.0](https://github.com/eslint/rewrite/compare/core-v0.2.0...core-v0.3.0) (2024-07-22)
 
 
