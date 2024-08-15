@@ -28,6 +28,13 @@ bunx @eslint/migrate-config .eslintrc.json
 
 The tool will automatically find your `.eslintignore` file in the same directory and migrate that into your new configuration file.
 
+If you receive any npm errors while running using `npx`, install the package manually first:
+
+```shell
+npm i @eslint/migrate-config
+npx @eslint-migrate-config .eslintrc.json
+```
+
 ### CommonJS Output
 
 By default, this tool generates an ESM file (`.mjs` extension). If you'd like to generate a CommonJS file instead, pass the `--commonjs` flag:
