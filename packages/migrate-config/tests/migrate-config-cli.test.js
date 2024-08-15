@@ -26,6 +26,7 @@ const filePaths = [
 	"gitignore-simple/.eslintrc.json",
 	"gitignore-complex/.eslintrc.json",
 	"import-duplicate/.eslintrc.cjs",
+	"slash-package/.eslintrc.json",
 ].map(file => `tests/fixtures/${file}`);
 
 //-----------------------------------------------------------------------------
@@ -83,6 +84,7 @@ describe("@eslint/migrate-config", async () => {
 			// run the migration for mjs
 			execSync(
 				`node src/migrate-config-cli.js ${filePath} ${gitignoreFlag}`,
+				{ stdio: "inherit" },
 			);
 
 			// run the migration for cjs
