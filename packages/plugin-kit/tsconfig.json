@@ -8,6 +8,8 @@
     "outDir": "dist/esm",
     "target": "ES2022",
     "moduleResolution": "NodeNext",
-    "module": "NodeNext"
+    "module": "NodeNext",
+    "strict": true,
+    "typeRoots": ["node_modules/@types", "src/@types"]
   }
 }

@@ -4,4 +4,8 @@
  */
 
 export { ConfigCommentParser } from "./config-comment-parser.js";
-export { CallMethodStep, VisitNodeStep } from "./source-code.js";
+export {
+	CallMethodStep,
+	VisitNodeStep,
+	TextSourceCodeBase,
+} from "./source-code.js";
