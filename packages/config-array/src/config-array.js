@@ -564,26 +564,6 @@ export class ConfigArray extends Array {
 		 */
 		this.basePath = basePath;
 
-		/**
-		 * The path-handling implementations depend on whether basePath is a Window or a Unix path,
-		 * or unspecified.
-		 * If the base path is not specified, files will never be considered "external" (outside the
-		 * base path). This allows for some implementations to be heavily simplified.
-		 */
-		if (!basePath) {
-			this.path = {
-				dirname: null,
-				join: null,
-				relative: (from, to) => to,
-				SEPARATOR: "/",
-				toNamespacedPath: path => path,
-			};
-		} else if (isPosixPath(basePath)) {
-			this.path = posixPath;
-		} else {
-			this.path = windowsPath;
-		}
-
 		assertExtraConfigTypes(extraConfigTypes);
 
 		/**
@@ -620,7 +600,11 @@ export class ConfigArray extends Array {
 		// The namespaced base path is useful to make sure that calculated relative paths are always relative.
 		// On Unix, it is identical to the base path.
 		this.namespacedBasePath =
-			basePath && this.path.toNamespacedPath(basePath);
+			basePath &&
+			(isPosixPath(this.basePath)
+				? posixPath
+				: windowsPath
+			).toNamespacedPath(basePath);
 	}
 
 	/**
@@ -824,14 +808,21 @@ export class ConfigArray extends Array {
 			return cache.get(filePath);
 		}
 
+		// Select `path` implementations depending on base path.
+		// If base path is not specified, relative paths cannot be built.
+		// In this case, `path` implementations are selected depending on the specified argument.
+		const path = isPosixPath(this.basePath || filePath)
+			? posixPath
+			: windowsPath;
+
 		// check to see if the file is outside the base path
 
-		const relativeFilePath = this.path
-			.relative(
-				this.namespacedBasePath,
-				this.path.toNamespacedPath(filePath),
-			)
-			.replaceAll(this.path.SEPARATOR, "/");
+		const namespacedFilePath = path.toNamespacedPath(filePath);
+		const relativeFilePath = (
+			this.namespacedBasePath
+				? path.relative(this.namespacedBasePath, namespacedFilePath)
+				: namespacedFilePath
+		).replaceAll(path.SEPARATOR, "/");
 
 		if (EXTERNAL_PATH_REGEX.test(relativeFilePath)) {
 			debug(`No config for file ${filePath} outside of base path`);
@@ -843,13 +834,8 @@ export class ConfigArray extends Array {
 
 		// next check to see if the file should be ignored
 
-		// Use predetermined `dirname` implementation, or deduce from the argument.
-		const dirname =
-			this.path.dirname ??
-			(isPosixPath(filePath) ? posixPath.dirname : windowsPath.dirname);
-
 		// check if this should be ignored due to its directory
-		if (this.isDirectoryIgnored(dirname(filePath))) {
+		if (this.isDirectoryIgnored(path.dirname(filePath))) {
 			debug(`Ignoring ${filePath} based on directory pattern`);
 
 			// cache and return result
@@ -1052,12 +1038,22 @@ export class ConfigArray extends Array {
 	isDirectoryIgnored(directoryPath) {
 		assertNormalized(this);
 
-		const relativeDirectoryPath = this.path
-			.relative(
-				this.namespacedBasePath,
-				this.path.toNamespacedPath(directoryPath),
-			)
-			.replaceAll(this.path.SEPARATOR, "/");
+		// Select `path` implementations depending on base path.
+		// If base path is not specified, relative paths cannot be built.
+		// In this case, `path` implementations are selected depending on the specified argument.
+		const path = isPosixPath(this.basePath || directoryPath)
+			? posixPath
+			: windowsPath;
+
+		const namespacedDirectoryPath = path.toNamespacedPath(directoryPath);
+		const relativeDirectoryPath = (
+			this.namespacedBasePath
+				? path.relative(
+						this.namespacedBasePath,
+						namespacedDirectoryPath,
+					)
+				: namespacedDirectoryPath
+		).replaceAll(path.SEPARATOR, "/");
 
 		// basePath directory can never be ignored
 		if (relativeDirectoryPath === "") {
@@ -1079,11 +1075,6 @@ export class ConfigArray extends Array {
 		let relativeDirectoryToCheck = "";
 		let result;
 
-		// Use predetermined `join` implementation, or deduce from the argument.
-		const join =
-			this.path.join ??
-			(isPosixPath(directoryPath) ? posixPath.join : windowsPath.join);
-
 		/*
 		 * In order to get the correct gitignore-style ignores, where an
 		 * ignored parent directory cannot have any descendants unignored,
@@ -1098,7 +1089,7 @@ export class ConfigArray extends Array {
 
 			result = shouldIgnorePath(
 				this.ignores,
-				join(this.basePath, relativeDirectoryToCheck),
+				path.join(this.basePath, relativeDirectoryToCheck),
 				relativeDirectoryToCheck,
 			);
 
