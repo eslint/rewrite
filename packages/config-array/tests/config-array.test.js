@@ -2047,12 +2047,7 @@ describe("ConfigArray", () => {
 				});
 			});
 
-			describe("on Windows", () => {
-				// Windows only
-				if (process.platform !== "win32") {
-					return;
-				}
-
+			describe("Windows paths", () => {
 				it('should return "matched" for a file in the base directory with different capitalization', () => {
 					configs = new ConfigArray([{ files: ["**/*.js"] }], {
 						basePath: "C:\\DIR",
@@ -2079,19 +2074,18 @@ describe("ConfigArray", () => {
 					);
 				});
 
-				it('should return "external" for a file on a different drive when no base path is specified', () => {
-					const currentDriveLetter = process.cwd()[0];
-					const otherDriveLetter =
-						currentDriveLetter === "X" ? "Y" : "X";
-					const filePath = `${otherDriveLetter}:\\dir\\file.js`;
-
+				it('should return "matched" for files on different drives when no base path is specified', () => {
 					configs = new ConfigArray([{ files: ["**/*.js"] }]);
 
 					configs.normalizeSync();
 
 					assert.strictEqual(
-						configs.getConfigStatus(filePath),
-						"external",
+						configs.getConfigStatus("X:\\dir1\\file.js"),
+						"matched",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus("Y:\\dir2\\file.js"),
+						"matched",
 					);
 				});
 
