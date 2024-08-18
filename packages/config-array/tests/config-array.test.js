@@ -3204,6 +3204,25 @@ describe("ConfigArray", () => {
 				);
 			});
 
+			it("should return false when no basePath is specified", () => {
+				configs = new ConfigArray([
+					{
+						ignores: ["**/bar"],
+					},
+				]);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.isDirectoryIgnored("/foo/bar/baz"),
+					true,
+				);
+				assert.strictEqual(
+					configs.isDirectoryIgnored("C:\\foo\\bar\\baz"),
+					true,
+				);
+			});
+
 			it("should return true when the parent directory of a directory is ignored", () => {
 				configs = new ConfigArray(
 					[
