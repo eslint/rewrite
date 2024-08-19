@@ -487,12 +487,12 @@ function assertExtraConfigTypes(extraConfigTypes) {
 }
 
 /**
- * Determines if an absolute path is a POSIX path.
+ * Returns path-handling implementations for Unix or Windows, depending on a given absolute path.
  * @param {string} path The absolute path to check.
- * @returns {boolean} Whether the specified path is a POSIX path.
+ * @returns {typeof import("@jsr/std__path")} Path-handling implementations for the specified path.
  */
-function isPosixPath(path) {
-	return path.startsWith("/");
+function getPathImpl(path) {
+	return path.startsWith("/") ? posixPath : windowsPath;
 }
 
 //------------------------------------------------------------------------------
@@ -600,11 +600,7 @@ export class ConfigArray extends Array {
 		// The namespaced base path is useful to make sure that calculated relative paths are always relative.
 		// On Unix, it is identical to the base path.
 		this.namespacedBasePath =
-			basePath &&
-			(isPosixPath(this.basePath)
-				? posixPath
-				: windowsPath
-			).toNamespacedPath(basePath);
+			basePath && getPathImpl(this.basePath).toNamespacedPath(basePath);
 	}
 
 	/**
@@ -808,16 +804,14 @@ export class ConfigArray extends Array {
 			return cache.get(filePath);
 		}
 
-		// Select `path` implementations depending on base path.
-		// If base path is not specified, relative paths cannot be built.
-		// In this case, `path` implementations are selected depending on the specified argument.
-		const path = isPosixPath(this.basePath || filePath)
-			? posixPath
-			: windowsPath;
+		// Select path-handling implementations depending on the specified file path.
+		const path = getPathImpl(filePath);
 
 		// check to see if the file is outside the base path
 
 		const namespacedFilePath = path.toNamespacedPath(filePath);
+
+		// If base path is not specified, relative paths cannot be built.
 		const relativeFilePath = (
 			this.namespacedBasePath
 				? path.relative(this.namespacedBasePath, namespacedFilePath)
@@ -1038,14 +1032,12 @@ export class ConfigArray extends Array {
 	isDirectoryIgnored(directoryPath) {
 		assertNormalized(this);
 
-		// Select `path` implementations depending on base path.
-		// If base path is not specified, relative paths cannot be built.
-		// In this case, `path` implementations are selected depending on the specified argument.
-		const path = isPosixPath(this.basePath || directoryPath)
-			? posixPath
-			: windowsPath;
+		// Select path-handling implementations depending on the specified directory path.
+		const path = getPathImpl(directoryPath);
 
 		const namespacedDirectoryPath = path.toNamespacedPath(directoryPath);
+
+		// If base path is not specified, relative paths cannot be built.
 		const relativeDirectoryPath = (
 			this.namespacedBasePath
 				? path.relative(
