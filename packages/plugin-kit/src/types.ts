@@ -1,5 +1,5 @@
 /**
- * @fileoverview Types for the config-array package.
+ * @fileoverview Types for the plugin-kit package.
  * @author Nicholas C. Zakas
  */
 
