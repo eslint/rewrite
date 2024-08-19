@@ -32,7 +32,7 @@ If you receive any npm errors while running using `npx`, install the package man
 
 ```shell
 npm i @eslint/migrate-config
-npx @eslint-migrate-config .eslintrc.json
+npx @eslint/migrate-config .eslintrc.json
 ```
 
 ### CommonJS Output
