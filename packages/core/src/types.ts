@@ -3,6 +3,12 @@
  */
 
 //------------------------------------------------------------------------------
+// Imports
+//------------------------------------------------------------------------------
+
+import { JSONSchema4 } from "json-schema";
+
+//------------------------------------------------------------------------------
 // Helper Types
 //------------------------------------------------------------------------------
 
@@ -76,6 +82,365 @@ export interface PositionWithOffset extends Position {
 export type SourceRange = [number, number];
 
 //------------------------------------------------------------------------------
+// Rules
+//------------------------------------------------------------------------------
+
+/**
+ * What the rule is responsible for finding:
+ * - `problem` means the rule has noticed a potential error.
+ * - `suggestion` means the rule suggests an alternate or better approach.
+ * - `layout` means the rule is looking at spacing, indentation, etc.
+ */
+export type RuleType = "problem" | "suggestion" | "layout";
+
+/**
+ * The type of fix the rule can provide:
+ * - `code` means the rule can fix syntax.
+ * - `whitespace` means the rule can fix spacing and indentation.
+ */
+export type RuleFixType = "code" | "whitespace";
+
+/**
+ * An object containing visitor information for a rule. Each method is either the
+ * name of a node type or a selector, or is a method that will be called at specific
+ * times during the traversal.
+ */
+export interface RuleVisitor {
+	/**
+	 * Called for each node in the AST or at specific times during the traversal.
+	 */
+	[key: string]:
+		| ((node: unknown, parent?: unknown) => void)
+		| ((...unknown: unknown[]) => void);
+}
+
+/**
+ * Rule meta information used for documentation.
+ */
+export interface RulesMetaDocs {
+	/**
+	 * A short description of the rule.
+	 */
+	description?: string | undefined;
+
+	/**
+	 * The URL to the documentation for the rule.
+	 */
+	url?: string | undefined;
+
+	/**
+	 * The category the rule falls under.
+	 * @deprecated No longer used.
+	 */
+	category?: string | undefined;
+
+	/**
+	 * Indicates if the rule is generally recommended for all users.
+	 */
+	recommended?: boolean | undefined;
+}
+
+/**
+ * Meta information about a rule.
+ */
+export interface RulesMeta {
+	/**
+	 * Properties that are used when documenting the rule.
+	 */
+	docs?: RulesMetaDocs | undefined;
+
+	/**
+	 * The type of rule.
+	 */
+	type?: RuleType | undefined;
+
+	/**
+	 * The schema for the rule options. Required if the rule has options.
+	 */
+	schema?: JSONSchema4 | JSONSchema4[] | false | undefined;
+
+	/**
+	 * The messages that the rule can report.
+	 */
+	messages: Record<string, string>;
+
+	/**
+	 * The visitor keys for the rule.
+	 */
+	visitorKeys?: Record<string, string[]>;
+
+	/**
+	 * The deprecated rules for the rule.
+	 */
+	deprecated?: boolean | undefined;
+
+	/**
+	 * When a rule is deprecated, indicates the rule ID(s) that should be used instead.
+	 */
+	replacedBy?: string[] | undefined;
+
+	/**
+	 * Indicates if the rule is fixable, and if so, what type of fix it provides.
+	 */
+	fixable?: RuleFixType | undefined;
+
+	/**
+	 * Indicates if the rule may provide suggestions.
+	 */
+	hasSuggestions?: boolean | undefined;
+}
+
+/**
+ * Represents the context object that is passed to a rule. This object contains
+ * information about the current state of the linting process and is the rule's
+ * view into the outside world.
+ */
+export interface RuleContext {
+	/**
+	 * The current working directory for the session.
+	 */
+	cwd: string;
+
+	/**
+	 * Returns the current working directory for the session.
+	 * @deprecated Use `cwd` instead.
+	 */
+	getCwd(): string;
+
+	/**
+	 * The filename of the file being linted.
+	 */
+	filename: string;
+
+	/**
+	 * Returns the filename of the file being linted.
+	 * @deprecated Use `filename` instead.
+	 */
+	getFilename(): string;
+
+	/**
+	 * The physical filename of the file being linted.
+	 */
+	physicalFilename: string;
+
+	/**
+	 * Returns the physical filename of the file being linted.
+	 * @deprecated Use `physicalFilename` instead.
+	 */
+	getPhysicalFilename(): string;
+
+	/**
+	 * The source code object that the rule is running on.
+	 */
+	sourceCode: SourceCode;
+
+	/**
+	 * Returns the source code object that the rule is running on.
+	 * @deprecated Use `sourceCode` instead.
+	 */
+	getSourceCode(): SourceCode;
+
+	/**
+	 * Shared settings for the configuration.
+	 */
+	settings: Record<string, unknown>;
+
+	/**
+	 * Parser-specific options for the configuration.
+	 * @deprecated Use `languageOptions.parserOptions` instead.
+	 */
+	parserOptions: Record<string, unknown>;
+
+	/**
+	 * The language options for the configuration.
+	 */
+	languageOptions: LanguageOptions;
+
+	/**
+	 * The CommonJS path to the parser used while parsing this file.
+	 * @deprecated No longer used.
+	 */
+	parserPath: string;
+
+	/**
+	 * The rule ID.
+	 */
+	id: string;
+
+	/**
+	 * The rule's configured options.
+	 */
+	options: unknown[];
+
+	/**
+	 * The report function that the rule should use to report problems.
+	 * @param violation The violation to report.
+	 */
+	report(violation: ViolationReport): void;
+}
+
+// #region Rule Fixing
+
+/**
+ * Manager of text edits for a rule fix.
+ */
+export interface RuleTextEditor {
+	/**
+	 * Inserts text after the specified node or token.
+	 * @param nodeOrToken The node or token to insert after.
+	 * @param text The edit to insert after the node or token.
+	 */
+	insertTextAfter(nodeOrToken: object, text: string): RuleTextEdit;
+
+	/**
+	 * Inserts text after the specified range.
+	 * @param range The range to insert after.
+	 * @param text The edit to insert after the range.
+	 */
+	insertTextAfterRange(range: SourceRange, text: string): RuleTextEdit;
+
+	/**
+	 * Inserts text before the specified node or token.
+	 * @param nodeOrToken The node or token to insert before.
+	 * @param text The edit to insert before the node or token.
+	 */
+	insertTextBefore(nodeOrToken: object, text: string): RuleTextEdit;
+
+	/**
+	 * Inserts text before the specified range.
+	 * @param range The range to insert before.
+	 * @param text The edit to insert before the range.
+	 */
+	insertTextBeforeRange(range: SourceRange, text: string): RuleTextEdit;
+
+	/**
+	 * Removes the specified node or token.
+	 * @param nodeOrToken The node or token to remove.
+	 * @returns The edit to remove the node or token.
+	 */
+	remove(nodeOrToken: object): RuleTextEdit;
+
+	/**
+	 * Removes the specified range.
+	 * @param range The range to remove.
+	 * @returns The edit to remove the range.
+	 */
+	removeRange(range: SourceRange): RuleTextEdit;
+
+	/**
+	 * Replaces the specified node or token with the given text.
+	 * @param nodeOrToken The node or token to replace.
+	 * @param text The text to replace the node or token with.
+	 * @returns The edit to replace the node or token.
+	 */
+	replaceText(nodeOrToken: object, text: string): RuleTextEdit;
+
+	/**
+	 * Replaces the specified range with the given text.
+	 * @param range The range to replace.
+	 * @param text The text to replace the range with.
+	 * @returns The edit to replace the range.
+	 */
+	replaceTextRange(range: SourceRange, text: string): RuleTextEdit;
+}
+
+/**
+ * Represents a fix for a rule violation implemented as a text edit.
+ */
+export interface RuleTextEdit {
+	/**
+	 * The range to replace.
+	 */
+	range: SourceRange;
+
+	/**
+	 * The text to insert.
+	 */
+	text: string;
+}
+
+// #endregion
+
+interface ViolationReportBase {
+	/**
+	 * The type of node that the violation is for.
+	 * @deprecated May be removed in the future.
+	 */
+	nodeType?: string | undefined;
+
+	/**
+	 * The data to insert into the message.
+	 */
+	data?: Record<string, string> | undefined;
+
+	/**
+	 * The fix to be applied for the violation.
+	 * @param fixer The text editor to apply the fix.
+	 * @returns The fix(es) for the violation.
+	 */
+	fix?(
+		fixer: RuleTextEditor,
+	): RuleTextEdit | RuleTextEdit[] | IterableIterator<RuleTextEdit> | null;
+
+	/**
+	 * An array of suggested fixes for the problem. These fixes may change the
+	 * behavior of the code, so they are not applied automatically.
+	 */
+	suggest?: Array<SuggestedEdit>;
+}
+
+type ViolationMessage = { message: string } | { messageId: string };
+type ViolationLocation = { loc: SourceLocation } | { node: object };
+
+export type ViolationReport = ViolationReportBase &
+	ViolationMessage &
+	ViolationLocation;
+
+// #region Suggestions
+
+interface SuggestedEditBase {
+	/**
+	 * The data to insert into the message.
+	 */
+	data?: Record<string, string> | undefined;
+
+	/**
+	 * The fix to be applied for the suggestion.
+	 * @param fixer The text editor to apply the fix.
+	 * @returns The fix for the suggestion.
+	 */
+	fix?(
+		fixer: RuleTextEditor,
+	): RuleTextEdit | RuleTextEdit[] | IterableIterator<RuleTextEdit> | null;
+}
+
+type SuggestionMessage = { desc: string } | { messageId: string };
+
+/**
+ * A suggested edit for a rule violation.
+ */
+export type SuggestedEdit = SuggestedEditBase & SuggestionMessage;
+
+// #endregion
+
+/**
+ * The definition of an ESLint rule.
+ */
+export interface RuleDefinition<T extends RuleVisitor = RuleVisitor> {
+	/**
+	 * The meta information for the rule.
+	 */
+	meta?: RulesMeta;
+
+	/**
+	 * Creates the visitor that ESLint uses to apply the rule during traversal.
+	 * @param context The rule context.
+	 * @returns The rule visitor.
+	 */
+	create(context: RuleContext): T;
+}
+
+//------------------------------------------------------------------------------
 // Config
 //------------------------------------------------------------------------------
 
@@ -90,7 +455,6 @@ export type SeverityName = "off" | "warn" | "error";
  * - `0` means off.
  * - `1` means warn.
  * - `2` means error.
- *
  */
 export type SeverityLevel = 0 | 1 | 2;
 
