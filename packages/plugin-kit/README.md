@@ -75,7 +75,7 @@ console.log(Object.entries(strings)); // [["foo", "off"], ["bar", null]]
 const jsonLike = commentParser.parseJSONLikeConfig(
 	"semi:[error, never], prefer-const: warn",
 );
-console.log(Object.entries(list)); // [["semi", ["error", "never"]], ["prefer-const", "warn"]]
+console.log(Object.entries(jsonLike.config)); // [["semi", ["error", "never"]], ["prefer-const", "warn"]]
 ```
 
 ### `VisitNodeStep` and `CallMethodStep`
