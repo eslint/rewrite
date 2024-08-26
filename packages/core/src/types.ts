@@ -402,7 +402,7 @@ export type SourceCode = TextSourceCode | BinarySourceCode;
  */
 export interface VisitTraversalStep {
 	kind: 1;
-	target: object;
+	target: unknown;
 	phase: 1 /* enter */ | 2 /* exit */;
 	args: unknown[];
 }

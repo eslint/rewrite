@@ -3,5 +3,6 @@
   "packages/config-array": "0.18.0",
   "packages/core": "0.4.0",
   "packages/migrate-config": "1.2.0",
-  "packages/object-schema": "2.1.4"
+  "packages/object-schema": "2.1.4",
+  "packages/plugin-kit": "0.0.0"
 }
