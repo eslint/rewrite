@@ -20,11 +20,11 @@
     "pre-commit": "lint-staged"
   },
   "lint-staged": {
-    "*.js": [
+    "*.{js,ts}": [
       "eslint --fix",
       "prettier --write"
     ],
-    "!(*.js)": "prettier --write --ignore-unknown"
+    "!(*.{js,ts})": "prettier --write --ignore-unknown"
   },
   "devDependencies": {
     "common-tags": "^1.8.2",
