@@ -69,7 +69,7 @@ console.log(Object.entries(list)); // [["prefer-const", true], ["semi", true]]
 
 // string format
 const strings = commentParser.parseStringConfig("foo:off, bar");
-console.log(Object.entries(list)); // [["foo", "off"], ["bar", null]]
+console.log(Object.entries(strings)); // [["foo", "off"], ["bar", null]]
 
 // JSON-like config format
 const jsonLike = commentParser.parseJSONLikeConfig(
