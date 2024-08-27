@@ -11,6 +11,7 @@ import assert from "node:assert";
 import {
 	CallMethodStep,
 	VisitNodeStep,
+	Directive,
 	TextSourceCodeBase,
 } from "../src/source-code.js";
 
@@ -60,6 +61,27 @@ describe("source-code", () => {
 			assert.strictEqual(step.target, "foo");
 			assert.strictEqual(step.phase, 2);
 			assert.deepStrictEqual(step.args, ["bar"]);
+		});
+	});
+
+	describe("Directive", () => {
+		it("should create a new instance", () => {
+			const type = "disable";
+			const node = { foo: "bar" };
+			const value = "baz";
+			const justification = "qux";
+
+			const directive = new Directive({
+				type,
+				node,
+				value,
+				justification,
+			});
+
+			assert.strictEqual(directive.type, type);
+			assert.strictEqual(directive.node, node);
+			assert.strictEqual(directive.value, value);
+			assert.strictEqual(directive.justification, justification);
 		});
 	});
 
