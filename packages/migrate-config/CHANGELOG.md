@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/eslint/rewrite/compare/migrate-config-v1.2.0...migrate-config-v1.2.1) (2024-08-27)
+
+
+### Bug Fixes
+
+* Package-specific migration bugs ([#107](https://github.com/eslint/rewrite/issues/107)) ([7f416f4](https://github.com/eslint/rewrite/commit/7f416f4b819c0af8babafb6e59830a234041c406))
+
 ## [1.2.0](https://github.com/eslint/rewrite/compare/migrate-config-v1.1.2...migrate-config-v1.2.0) (2024-07-22)
 
 
