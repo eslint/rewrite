@@ -157,10 +157,7 @@ class MySourceCode {
 The `Directive` class represents a disable directive in the source code and implements the `Directive` interface from `@eslint/core`. You can tell ESLint about disable directives using the `SourceCode#getDisableDirectives()` method, where part of the return value is an array of `Directive` objects. Here's an example:
 
 ```js
-import {
-	Directive,
-	ConfigCommentParser,
-} from "@eslint/plugin-kit";
+import { Directive, ConfigCommentParser } from "@eslint/plugin-kit";
 
 class MySourceCode {
 	getDisableDirectives() {
