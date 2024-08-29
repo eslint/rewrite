@@ -158,8 +158,7 @@ The `Directive` class represents a disable directive in the source code and impl
 
 ```js
 import {
-	VisitNodeStep,
-	CallMethodStep,
+	Directive,
 	ConfigCommentParser,
 } from "@eslint/plugin-kit";
 
