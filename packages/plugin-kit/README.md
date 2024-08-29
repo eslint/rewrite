@@ -30,6 +30,7 @@ This package exports the following utilities:
 
 -   `ConfigCommentParser` - used to parse ESLint configuration comments (i.e., `/* eslint-disable rule */`)
 -   `VisitNodeStep` and `CallMethodStep` - used to help implement `SourceCode#traverse()`
+-   `Directive` - used to help implement `SourceCode#getDisableDirectives()`
 -   `TextSourceCodeBase` - base class to help implement the `SourceCode` interface
 
 ### `ConfigCommentParser`
@@ -148,6 +149,59 @@ class MySourceCode {
 
         return steps;
     }
+}
+```
+
+### `Directive`
+
+The `Directive` class represents a disable directive in the source code and implements the `Directive` interface from `@eslint/core`. You can tell ESLint about disable directives using the `SourceCode#getDisableDirectives()` method, where part of the return value is an array of `Directive` objects. Here's an example:
+
+```js
+import {
+	VisitNodeStep,
+	CallMethodStep,
+	ConfigCommentParser,
+} from "@eslint/plugin-kit";
+
+class MySourceCode {
+	getDisableDirectives() {
+		const directives = [];
+		const problems = [];
+		const commentParser = new ConfigCommentParser();
+
+		// read in the inline config nodes to check each one
+		this.getInlineConfigNodes().forEach(comment => {
+			// Step 1: Parse the directive
+			const { label, value, justification } =
+				commentParser.parseDirective(comment.value);
+
+			// Step 2: Extract the directive value and create the `Directive` object
+			switch (label) {
+				case "eslint-disable":
+				case "eslint-enable":
+				case "eslint-disable-next-line":
+				case "eslint-disable-line": {
+					const directiveType = label.slice("eslint-".length);
+
+					directives.push(
+						new Directive({
+							type: directiveType,
+							node: comment,
+							value,
+							justification,
+						}),
+					);
+				}
+
+				// ignore any comments that don't begin with known labels
+			}
+		});
+
+		return {
+			directives,
+			problems,
+		};
+	}
 }
 ```
 
