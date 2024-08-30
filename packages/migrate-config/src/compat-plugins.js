@@ -7,4 +7,5 @@ export default [
 	"eslint-plugin-ava",
 	"eslint-plugin-react-hooks",
 	"eslint-plugin-import",
+	"eslint-plugin-flowtype",
 ];
