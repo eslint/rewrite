@@ -16,6 +16,8 @@
 /** @typedef {import("@eslint/core").SourceLocation} SourceLocation */
 /** @typedef {import("@eslint/core").SourceLocationWithOffset} SourceLocationWithOffset */
 /** @typedef {import("@eslint/core").SourceRange} SourceRange */
+/** @typedef {import("@eslint/core").Directive} IDirective */
+/** @typedef {import("@eslint/core").DirectiveType} DirectiveType */
 
 //-----------------------------------------------------------------------------
 // Helpers
@@ -155,6 +157,56 @@ export class CallMethodStep {
 	constructor({ target, args }) {
 		this.target = target;
 		this.args = args;
+	}
+}
+
+/**
+ * A class to represent a directive comment.
+ * @implements {IDirective}
+ */
+export class Directive {
+	/**
+	 * The type of directive.
+	 * @type {DirectiveType}
+	 * @readonly
+	 */
+	type;
+
+	/**
+	 * The node representing the directive.
+	 * @type {unknown}
+	 * @readonly
+	 */
+	node;
+
+	/**
+	 * Everything after the "eslint-disable" portion of the directive,
+	 * but before the "--" that indicates the justification.
+	 * @type {string}
+	 * @readonly
+	 */
+	value;
+
+	/**
+	 * The justification for the directive.
+	 * @type {string}
+	 * @readonly
+	 */
+	justification;
+
+	/**
+	 * Creates a new instance.
+	 * @param {Object} options The options for the directive.
+	 * @param {"disable"|"enable"|"disable-next-line"|"disable-line"} options.type The type of directive.
+	 * @param {unknown} options.node The node representing the directive.
+	 * @param {string} options.value The value of the directive.
+	 * @param {string} options.justification The justification for the directive.
+	 */
+	constructor({ type, node, value, justification }) {
+		this.type = type;
+		this.node = node;
+		this.value = value;
+		this.justification = justification;
 	}
 }
 
