@@ -161,6 +161,7 @@ export function fixupRule(ruleDefinition) {
 					currentNode =
 						args[methodName === "onCodePathSegmentLoop" ? 2 : 1];
 
+					// @ts-expect-error -- method.call is any from Object.entries, but we know its type is fine
 					return method.call(visitor, ...args);
 				};
 
@@ -171,6 +172,7 @@ export function fixupRule(ruleDefinition) {
 			visitor[methodName] = (...args) => {
 				currentNode = args[0];
 
+				// @ts-expect-error -- method.call is any from Object.entries, but we know its type is fine
 				return method.call(visitor, ...args);
 			};
 		}
