@@ -174,7 +174,7 @@ export class Directive {
 
 	/**
 	 * The node representing the directive.
-	 * @type {object}
+	 * @type {unknown}
 	 * @readonly
 	 */
 	node;
@@ -198,7 +198,7 @@ export class Directive {
 	 * Creates a new instance.
 	 * @param {Object} options The options for the directive.
 	 * @param {"disable"|"enable"|"disable-next-line"|"disable-line"} options.type The type of directive.
-	 * @param {object} options.node The node representing the directive.
+	 * @param {unknown} options.node The node representing the directive.
 	 * @param {string} options.value The value of the directive.
 	 * @param {string} options.justification The justification for the directive.
 	 */
