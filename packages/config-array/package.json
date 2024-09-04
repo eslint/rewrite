@@ -47,7 +47,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@eslint/object-schema": "^2.1.4",
-    "@jsr/std__path": "^1.0.2",
+    "@jsr/std__path": "https://npm.jsr.io/~/11/@jsr/std__path/1.0.3.tgz",
     "debug": "^4.3.1",
     "minimatch": "^3.1.2"
   },
