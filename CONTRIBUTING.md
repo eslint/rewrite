@@ -10,7 +10,7 @@ This project adheres to the [OpenJS Foundation Code of Conduct](https://eslint.o
 
 ### Building
 
-[Rollup](https://rollupjs.org) and [TypeScript](https://www.typescriptlang.org) are used to turn source files in `packages/*/src/` into outputs in `packages/*/lib/`.
+[Rollup](https://rollupjs.org) and [TypeScript](https://www.typescriptlang.org) are used to turn source files in `packages/*/src/` into outputs in `packages/*/dist/`.
 
 ```shell
 npm run build
