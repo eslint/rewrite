@@ -8,6 +8,7 @@
     "build": "node scripts/build.js",
     "build:readme": "node tools/update-readme.js",
     "lint": "eslint .",
+    "tsc": "tsc",
     "lint:fix": "eslint --fix .",
     "fmt": "prettier --write .",
     "fmt:check": "prettier --check .",
@@ -27,6 +28,7 @@
     "!(*.{js,ts})": "prettier --write --ignore-unknown"
   },
   "devDependencies": {
+    "@types/mocha": "^10.0.7",
     "common-tags": "^1.8.2",
     "eslint": "^9.4.0",
     "eslint-config-eslint": "^11.0.0",
