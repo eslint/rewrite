@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------------
 
 import assert from "node:assert";
+import path from "node:path";
 import {
 	fixupRule,
 	fixupPluginRules,
@@ -133,7 +134,7 @@ describe("@eslint/backcompat", () => {
 			const linter = new Linter();
 			const code = "var foo = () => 123; function bar() { return 123; }";
 			const messages = linter.verify(code, config, {
-				filename: "test.js",
+				filename: path.resolve("test.js"),
 			});
 
 			assert.deepStrictEqual(
@@ -203,7 +204,7 @@ describe("@eslint/backcompat", () => {
 				const code =
 					"var foo = () => 123; function bar() { return 123; }";
 				const messages = linter.verify(code, config, {
-					filename: "test.js",
+					filename: path.resolve("test.js"),
 				});
 
 				assert.deepStrictEqual(
@@ -283,7 +284,7 @@ describe("@eslint/backcompat", () => {
 				const code =
 					"var foo = () => 123; function bar() { for (const x of y) { foo(); } }";
 				const messages = linter.verify(code, config, {
-					filename: "test.js",
+					filename: path.resolve("test.js"),
 				});
 
 				assert.deepStrictEqual(
@@ -507,7 +508,7 @@ describe("@eslint/backcompat", () => {
 						},
 					},
 					{
-						filename: "test.js",
+						filename: path.resolve("test.js"),
 					},
 				);
 
@@ -641,7 +642,7 @@ describe("@eslint/backcompat", () => {
 				const code =
 					"var foo = () => 123; function bar() { return 123; }";
 				const messages = linter.verify(code, fixupConfigRules(config), {
-					filename: "test.js",
+					filename: path.resolve("test.js"),
 				});
 
 				assert.deepStrictEqual(
