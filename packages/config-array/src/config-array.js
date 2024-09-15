@@ -490,9 +490,22 @@ function assertExtraConfigTypes(extraConfigTypes) {
  * Returns path-handling implementations for Unix or Windows, depending on a given absolute path.
  * @param {string} path The absolute path to check.
  * @returns {typeof import("@jsr/std__path")} Path-handling implementations for the specified path.
+ * @throws An error is thrown if the specified argument is not an absolute path.
  */
 function getPathImpl(path) {
-	return path.startsWith("/") ? posixPath : windowsPath;
+	// Posix absolute paths always start with a slash.
+	if (path.startsWith("/")) {
+		return posixPath;
+	}
+
+	// Windows absolute paths start with a letter followed by a colon and at least one backslash,
+	// or with two backslashes in the case of UNC paths.
+	// Forward slashed are automatically normalized to backslashes.
+	if (/^(?:[A-Za-z]:[/\\]|[/\\]{2})/u.test(path)) {
+		return windowsPath;
+	}
+
+	throw new Error(`Expected an absolute path but received "${path}"`);
 }
 
 //------------------------------------------------------------------------------
