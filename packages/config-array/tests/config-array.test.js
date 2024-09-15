@@ -495,6 +495,12 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 			}, "Config Error: Config (unnamed): Unexpected null config.");
 		});
+
+		it("should throw an error when basePath is a relative path", async () => {
+			assert.throws(() => {
+				void new ConfigArray([{}], { basePath: "foo/bar" });
+			}, /Expected an absolute path/u);
+		});
 	});
 
 	describe("ConfigArray members", () => {
@@ -646,6 +652,12 @@ describe("ConfigArray", () => {
 				}, /normalized/u);
 			});
 
+			it("should throw an error when passed a relative path", () => {
+				assert.throws(() => {
+					configs.getConfigWithStatus("./foo/bar.js");
+				}, /Expected an absolute path/u);
+			});
+
 			describe("should return expected results", () => {
 				it("for a file outside the base path", () => {
 					const filename = path.resolve(basePath, "../foo.js");
@@ -754,6 +766,12 @@ describe("ConfigArray", () => {
 				assert.throws(() => {
 					unnormalizedConfigs.getConfig(filename);
 				}, /normalized/u);
+			});
+
+			it("should throw an error when passed a relative path", () => {
+				assert.throws(() => {
+					configs.getConfig("foo/bar.js");
+				}, /Expected an absolute path/u);
 			});
 
 			it("should calculate correct config when passed JS filename", () => {
@@ -1238,6 +1256,12 @@ describe("ConfigArray", () => {
 				assert.throws(() => {
 					unnormalizedConfigs.getConfigStatus(filename);
 				}, /normalized/u);
+			});
+
+			it("should throw an error when passed a relative path", () => {
+				assert.throws(() => {
+					configs.getConfigStatus("foo.js");
+				}, /Expected an absolute path/u);
 			});
 
 			it('should return "matched" when passed JS filename', () => {
@@ -2179,6 +2203,16 @@ describe("ConfigArray", () => {
 						"unconfigured",
 					);
 				});
+
+				it("should throw an error when passed a relative path with a drive letter", () => {
+					configs = new ConfigArray([], { basePath: "C:\\dir" });
+
+					configs.normalizeSync();
+
+					assert.throws(() => {
+						configs.getConfigStatus("C:file.js");
+					}, /Expected an absolute path/u);
+				});
 			});
 		});
 
@@ -2189,6 +2223,13 @@ describe("ConfigArray", () => {
 					unnormalizedConfigs.isIgnored(filename);
 				}, /normalized/u);
 			});
+
+			it("should throw an error when passed a relative path", () => {
+				assert.throws(() => {
+					configs.isIgnored("foo.js");
+				}, /Expected an absolute path/u);
+			});
+
 			it("should return false when passed JS filename", () => {
 				const filename = path.resolve(basePath, "foo.js");
 				assert.strictEqual(configs.isIgnored(filename), false);
@@ -2258,6 +2299,12 @@ describe("ConfigArray", () => {
 				assert.throws(() => {
 					unnormalizedConfigs.isFileIgnored(filename);
 				}, /normalized/u);
+			});
+
+			it("should throw an error when passed a relative path", () => {
+				assert.throws(() => {
+					configs.isFileIgnored("foo.js");
+				}, /Expected an absolute path/u);
 			});
 
 			it("should return false when passed JS filename", () => {
@@ -3154,8 +3201,18 @@ describe("ConfigArray", () => {
 					},
 				);
 				assert.throws(() => {
-					configs.isDirectoryIgnored("foo/bar");
+					configs.isDirectoryIgnored("/foo/bar");
 				}, /normalized/u);
+			});
+
+			it("should throw an error when a relative path is specified", () => {
+				configs = new ConfigArray([]);
+
+				configs.normalizeSync();
+
+				assert.throws(() => {
+					configs.isDirectoryIgnored("foo/bar");
+				}, /Expected an absolute path/u);
 			});
 
 			it("should return true when the directory is outside of the basePath", () => {
