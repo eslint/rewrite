@@ -55,6 +55,14 @@
     "rollup": "^4.16.2",
     "typescript": "^5.4.5"
   },
+  "peerDependencies": {
+    "@types/eslint": "^9.6.0"
+  },
+  "peerDependenciesMeta": {
+    "@types/eslint": {
+      "optional": true
+    }
+  },
   "engines": {
     "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
   }
