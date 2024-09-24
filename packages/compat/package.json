@@ -56,10 +56,10 @@
     "typescript": "^5.4.5"
   },
   "peerDependencies": {
-    "@types/eslint": "^9.6.0"
+    "eslint": "^9.10.0"
   },
   "peerDependenciesMeta": {
-    "@types/eslint": {
+    "eslint": {
       "optional": true
     }
   },
