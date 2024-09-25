@@ -167,11 +167,6 @@ export interface RulesMeta {
 	messages: Record<string, string>;
 
 	/**
-	 * The visitor keys for the rule.
-	 */
-	visitorKeys?: Record<string, string[]>;
-
-	/**
 	 * The deprecated rules for the rule.
 	 */
 	deprecated?: boolean | undefined;
