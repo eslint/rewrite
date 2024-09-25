@@ -185,8 +185,9 @@ export interface RulesMeta {
  * view into the outside world.
  */
 export interface RuleContext<
-	Code extends SourceCode = SourceCode,
 	LangOptions = LanguageOptions,
+	Code extends SourceCode = SourceCode,
+	RuleOptions = unknown[],
 > {
 	/**
 	 * The current working directory for the session.
@@ -262,7 +263,7 @@ export interface RuleContext<
 	/**
 	 * The rule's configured options.
 	 */
-	options: unknown[];
+	options: RuleOptions;
 
 	/**
 	 * The report function that the rule should use to report problems.
@@ -428,9 +429,10 @@ export type SuggestedEdit = SuggestedEditBase & SuggestionMessage;
  * The definition of an ESLint rule.
  */
 export interface RuleDefinition<
-	Visitor extends RuleVisitor = RuleVisitor,
-	Code extends SourceCode = SourceCode,
 	LangOptions = LanguageOptions,
+	Code extends SourceCode = SourceCode,
+	RuleOptions = unknown[],
+	Visitor extends RuleVisitor = RuleVisitor,
 > {
 	/**
 	 * The meta information for the rule.
@@ -442,7 +444,7 @@ export interface RuleDefinition<
 	 * @param context The rule context.
 	 * @returns The rule visitor.
 	 */
-	create(context: RuleContext<Code, LangOptions>): Visitor;
+	create(context: RuleContext<LangOptions, Code, RuleOptions>): Visitor;
 }
 
 //------------------------------------------------------------------------------
