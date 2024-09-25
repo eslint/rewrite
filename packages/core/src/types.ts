@@ -100,6 +100,7 @@ export type RuleType = "problem" | "suggestion" | "layout";
  */
 export type RuleFixType = "code" | "whitespace";
 
+/* eslint-disable @typescript-eslint/consistent-indexed-object-style -- Needs to be interface so people can extend it. */
 /**
  * An object containing visitor information for a rule. Each method is either the
  * name of a node type or a selector, or is a method that will be called at specific
@@ -113,6 +114,7 @@ export interface RuleVisitor {
 		| ((node: unknown, parent?: unknown) => void)
 		| ((...unknown: unknown[]) => void);
 }
+/* eslint-enable @typescript-eslint/consistent-indexed-object-style -- Needs to be interface so people can extend it. */
 
 /**
  * Rule meta information used for documentation.
@@ -386,7 +388,7 @@ interface ViolationReportBase {
 	 * An array of suggested fixes for the problem. These fixes may change the
 	 * behavior of the code, so they are not applied automatically.
 	 */
-	suggest?: Array<SuggestedEdit>;
+	suggest?: SuggestedEdit[];
 }
 
 type ViolationMessage = { message: string } | { messageId: string };
