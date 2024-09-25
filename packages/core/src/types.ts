@@ -188,6 +188,7 @@ export interface RuleContext<
 	LangOptions = LanguageOptions,
 	Code extends SourceCode = SourceCode,
 	RuleOptions = unknown[],
+	Node = unknown,
 > {
 	/**
 	 * The current working directory for the session.
@@ -269,7 +270,7 @@ export interface RuleContext<
 	 * The report function that the rule should use to report problems.
 	 * @param violation The violation to report.
 	 */
-	report(violation: ViolationReport): void;
+	report(violation: ViolationReport<Node>): void;
 }
 
 // #region Rule Fixing
@@ -392,11 +393,11 @@ interface ViolationReportBase {
 }
 
 type ViolationMessage = { message: string } | { messageId: string };
-type ViolationLocation = { loc: SourceLocation } | { node: object };
+type ViolationLocation<Node> = { loc: SourceLocation } | { node: Node };
 
-export type ViolationReport = ViolationReportBase &
+export type ViolationReport<Node = unknown> = ViolationReportBase &
 	ViolationMessage &
-	ViolationLocation;
+	ViolationLocation<Node>;
 
 // #region Suggestions
 
