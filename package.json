@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "common-tags": "^1.8.2",
-    "eslint": "^9.4.0",
+    "eslint": "^9.11.1",
     "eslint-config-eslint": "^11.0.0",
     "got": "^14.4.1",
     "lint-staged": "^15.2.0",
