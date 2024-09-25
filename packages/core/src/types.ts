@@ -37,14 +37,6 @@ export interface FileProblem {
 //------------------------------------------------------------------------------
 
 /**
- * Represents an AST node or token with location information in ESLint format.
- */
-export interface SyntaxElement {
-	loc: SourceLocation;
-	range: SourceRange;
-}
-
-/**
  * Represents the start and end coordinates of a node inside the source.
  */
 export interface SourceLocation {
@@ -281,13 +273,16 @@ export interface RuleContext {
 /**
  * Manager of text edits for a rule fix.
  */
-export interface RuleTextEditor {
+export interface RuleTextEditor<EditableSyntaxElement = unknown> {
 	/**
 	 * Inserts text after the specified node or token.
-	 * @param nodeOrToken The node or token to insert after.
+	 * @param syntaxElement The node or token to insert after.
 	 * @param text The edit to insert after the node or token.
 	 */
-	insertTextAfter(nodeOrToken: object, text: string): RuleTextEdit;
+	insertTextAfter(
+		syntaxElement: EditableSyntaxElement,
+		text: string,
+	): RuleTextEdit;
 
 	/**
 	 * Inserts text after the specified range.
@@ -298,10 +293,13 @@ export interface RuleTextEditor {
 
 	/**
 	 * Inserts text before the specified node or token.
-	 * @param nodeOrToken The node or token to insert before.
+	 * @param syntaxElement A syntax element with location information to insert before.
 	 * @param text The edit to insert before the node or token.
 	 */
-	insertTextBefore(nodeOrToken: object, text: string): RuleTextEdit;
+	insertTextBefore(
+		syntaxElement: EditableSyntaxElement,
+		text: string,
+	): RuleTextEdit;
 
 	/**
 	 * Inserts text before the specified range.
@@ -312,10 +310,10 @@ export interface RuleTextEditor {
 
 	/**
 	 * Removes the specified node or token.
-	 * @param nodeOrToken The node or token to remove.
+	 * @param syntaxElement A syntax element with location information to remove.
 	 * @returns The edit to remove the node or token.
 	 */
-	remove(nodeOrToken: object): RuleTextEdit;
+	remove(syntaxElement: EditableSyntaxElement): RuleTextEdit;
 
 	/**
 	 * Removes the specified range.
@@ -326,11 +324,14 @@ export interface RuleTextEditor {
 
 	/**
 	 * Replaces the specified node or token with the given text.
-	 * @param nodeOrToken The node or token to replace.
+	 * @param syntaxElement A syntax element with location information to replace.
 	 * @param text The text to replace the node or token with.
 	 * @returns The edit to replace the node or token.
 	 */
-	replaceText(nodeOrToken: object, text: string): RuleTextEdit;
+	replaceText(
+		syntaxElement: EditableSyntaxElement,
+		text: string,
+	): RuleTextEdit;
 
 	/**
 	 * Replaces the specified range with the given text.
