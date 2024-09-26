@@ -434,6 +434,7 @@ export interface RuleDefinition<
 	Code extends SourceCode = SourceCode,
 	RuleOptions = unknown[],
 	Visitor extends RuleVisitor = RuleVisitor,
+	Node = unknown,
 > {
 	/**
 	 * The meta information for the rule.
@@ -445,7 +446,7 @@ export interface RuleDefinition<
 	 * @param context The rule context.
 	 * @returns The rule visitor.
 	 */
-	create(context: RuleContext<LangOptions, Code, RuleOptions>): Visitor;
+	create(context: RuleContext<LangOptions, Code, RuleOptions, Node>): Visitor;
 }
 
 //------------------------------------------------------------------------------
