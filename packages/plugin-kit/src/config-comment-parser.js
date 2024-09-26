@@ -122,7 +122,8 @@ export class ConfigCommentParser {
 	parseJSONLikeConfig(string) {
 		// Parses a JSON-like comment by the same way as parsing CLI option.
 		try {
-			const items = levn.parse("Object", string) || {};
+			const items =
+				/** @type {RulesConfig} */ (levn.parse("Object", string)) || {};
 
 			/*
 			 * When the configuration has any invalid severities, it should be completely
