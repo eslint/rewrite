@@ -57,6 +57,12 @@ async function calculatePackageDependencies(packageDirs) {
 					}
 				}
 
+				if (pkg.devDependencies) {
+					for (const dep of Object.keys(pkg.devDependencies)) {
+						dependencies.add(dep);
+					}
+				}
+
 				return [
 					pkg.name,
 					{ name: pkg.name, dir: packageDir, dependencies },

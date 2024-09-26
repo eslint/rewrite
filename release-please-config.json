@@ -45,6 +45,16 @@
     },
     "packages/migrate-config": {
       "release-type": "node"
+    },
+    "packages/plugin-kit": {
+      "release-type": "node",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "jsr.json",
+          "jsonpath": "$.version"
+        }
+      ]
     }
   }
 }

@@ -18,6 +18,8 @@ body:
                 required: false
               - label: "`@eslint/object-schema`"
                 required: false
+              - label: "`@eslint/plugin-kit`"
+                required: false
     - type: textarea
       attributes:
           label: What problem do you want to solve?

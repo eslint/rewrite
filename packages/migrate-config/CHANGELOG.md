@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.3.0](https://github.com/eslint/rewrite/compare/migrate-config-v1.2.1...migrate-config-v1.3.0) (2024-08-30)
+
+
+### Features
+
+* Add eslint-plugin-flowtype to compat plugins ([#115](https://github.com/eslint/rewrite/issues/115)) ([5cb3919](https://github.com/eslint/rewrite/commit/5cb3919085ed60331e253c472c72a5870a9b9c11))
+
+## [1.2.1](https://github.com/eslint/rewrite/compare/migrate-config-v1.2.0...migrate-config-v1.2.1) (2024-08-27)
+
+
+### Bug Fixes
+
+* Package-specific migration bugs ([#107](https://github.com/eslint/rewrite/issues/107)) ([7f416f4](https://github.com/eslint/rewrite/commit/7f416f4b819c0af8babafb6e59830a234041c406))
+
 ## [1.2.0](https://github.com/eslint/rewrite/compare/migrate-config-v1.1.2...migrate-config-v1.2.0) (2024-07-22)
 
 

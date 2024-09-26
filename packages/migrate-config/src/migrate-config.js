@@ -11,6 +11,7 @@ import * as recast from "recast";
 import { Legacy } from "@eslint/eslintrc";
 import camelCase from "camelcase";
 import pluginsNeedingCompat from "./compat-plugins.js";
+import configsNeedingCompat from "./compat-configs.js";
 import { convertIgnorePatternToMinimatch } from "@eslint/compat";
 
 //-----------------------------------------------------------------------------
@@ -148,6 +149,23 @@ function pluginNeedsCompat(pluginName) {
 }
 
 /**
+ * Determines if a shareable config needs the compat utility.
+ * @param {string} configName The name of the config.
+ * @returns {boolean} `true` if the config needs the compat utility.
+ */
+function configNeedsCompat(configName) {
+	const configNameToTest = configName.includes("/")
+		? configName.slice(0, configName.indexOf("/"))
+		: configName;
+
+	const fullConfigName = naming.normalizePackageName(
+		configNameToTest,
+		"eslint-config",
+	);
+	return configsNeedingCompat.includes(fullConfigName);
+}
+
+/**
  * Gets the name of the variable to use for the plugin. If the plugin name
  * contains slashes or an @ symbol, it will be normalized to a camelcase name.
  * If the name is "import" or "export", it will be prefixed with an underscore.
@@ -164,6 +182,9 @@ function getPluginVariableName(pluginName) {
 	if (name.startsWith("@")) {
 		name = name.slice(1);
 	}
+
+	// replace slash with uppercase of following letter
+	name = name.replace(/\/(.)/gu, (_, letter) => letter.toUpperCase());
 
 	return camelCase(name);
 }
@@ -682,11 +703,19 @@ function migrateConfigObject(migration, config) {
 
 		// Check if any of the extends are plugins that need the compat utility
 		const needsCompat = extendsArray.some(extend => {
-			if (!extend.startsWith("plugin:")) {
+			if (
+				extend.startsWith("eslint:") ||
+				extend.startsWith(".") ||
+				extend.startsWith("/")
+			) {
 				return false;
 			}
 
-			return pluginNeedsCompat(extend.slice(7));
+			if (extend.startsWith("plugin:")) {
+				return pluginNeedsCompat(extend.slice(7));
+			}
+
+			return configNeedsCompat(extend);
 		});
 
 		if (needsCompat) {

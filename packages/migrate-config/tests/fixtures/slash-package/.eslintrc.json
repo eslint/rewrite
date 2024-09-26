@@ -1,0 +1,12 @@
+{
+    "extends": [
+        "react-app",
+        "prettier",
+        "plugin:jsx-a11y/recommended",
+        "plugin:@tanstack/eslint-plugin-query/recommended"
+    ],
+    "plugins": [
+        "jsx-a11y",
+        "@tanstack/query"
+    ]
+}

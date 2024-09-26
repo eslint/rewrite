@@ -402,7 +402,7 @@ export type SourceCode = TextSourceCode | BinarySourceCode;
  */
 export interface VisitTraversalStep {
 	kind: 1;
-	target: object;
+	target: unknown;
 	phase: 1 /* enter */ | 2 /* exit */;
 	args: unknown[];
 }
@@ -420,18 +420,27 @@ export interface CallTraversalStep {
 export type TraversalStep = VisitTraversalStep | CallTraversalStep;
 
 /**
+ * The type of disable directive. This determines how ESLint will disable rules.
+ */
+export type DirectiveType =
+	| "disable"
+	| "enable"
+	| "disable-line"
+	| "disable-next-line";
+
+/**
  * Represents a disable directive.
  */
 export interface Directive {
 	/**
 	 * The type of directive.
 	 */
-	type: "disable" | "enable" | "disable-line" | "disable-next-line";
+	type: DirectiveType;
 
 	/**
 	 * The node of the directive. May be in the AST or a comment/token.
 	 */
-	node: object;
+	node: unknown;
 
 	/**
 	 * The value of the directive.
