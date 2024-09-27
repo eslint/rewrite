@@ -488,24 +488,47 @@ function assertExtraConfigTypes(extraConfigTypes) {
 
 /**
  * Returns path-handling implementations for Unix or Windows, depending on a given absolute path.
- * @param {string} path The absolute path to check.
+ * @param {string} fileOrDirPath The absolute path to check.
  * @returns {typeof import("@jsr/std__path")} Path-handling implementations for the specified path.
  * @throws An error is thrown if the specified argument is not an absolute path.
  */
-function getPathImpl(path) {
+function getPathImpl(fileOrDirPath) {
 	// Posix absolute paths always start with a slash.
-	if (path.startsWith("/")) {
+	if (fileOrDirPath.startsWith("/")) {
 		return posixPath;
 	}
 
 	// Windows absolute paths start with a letter followed by a colon and at least one backslash,
 	// or with two backslashes in the case of UNC paths.
 	// Forward slashed are automatically normalized to backslashes.
-	if (/^(?:[A-Za-z]:[/\\]|[/\\]{2})/u.test(path)) {
+	if (/^(?:[A-Za-z]:[/\\]|[/\\]{2})/u.test(fileOrDirPath)) {
 		return windowsPath;
 	}
 
-	throw new Error(`Expected an absolute path but received "${path}"`);
+	throw new Error(
+		`Expected an absolute path but received "${fileOrDirPath}"`,
+	);
+}
+
+/**
+ * Converts a given path to a relative path.
+ * @param {string} fileOrDirPath The absolute path to convert.
+ * @param {string} namespacedBasePath The namespaced base path of the directory to which the calulated bath shall be relative.
+ * 		If this argument is falsy, an absolute path will be returned.
+ * @param {typeof import("@jsr/std__path")} path Path-handling implementations.
+ * @returns {string} A relative path if `namespacedBasePath` is specified; otherwise, a namespaced relative path.
+ */
+function toRelativePath(fileOrDirPath, namespacedBasePath, path) {
+	let relativePath;
+	if (namespacedBasePath) {
+		const fullPath = path.resolve(namespacedBasePath, fileOrDirPath);
+		const namespacedFullPath = path.toNamespacedPath(fullPath);
+		relativePath = path.relative(namespacedBasePath, namespacedFullPath);
+	} else {
+		// If no base path is specified, relative paths cannot be built.
+		relativePath = path.toNamespacedPath(fileOrDirPath);
+	}
+	return relativePath.replaceAll(path.SEPARATOR, "/");
 }
 
 //------------------------------------------------------------------------------
@@ -801,7 +824,8 @@ export class ConfigArray extends Array {
 
 	/**
 	 * Returns the config object for a given file path and a status that can be used to determine why a file has no config.
-	 * @param {string} filePath The complete path of a file to get a config for.
+	 * @param {string} filePath The path of a file to get a config for.
+	 * 		This must be an absolute path if the current `ConfigArray` instance has no base path.
 	 * @returns {{ config?: Object, status: "ignored"|"external"|"unconfigured"|"matched" }}
 	 * An object with an optional property `config` and property `status`.
 	 * `config` is the config object for the specified file as returned by {@linkcode ConfigArray.getConfig},
@@ -817,19 +841,17 @@ export class ConfigArray extends Array {
 			return cache.get(filePath);
 		}
 
-		// Select path-handling implementations depending on the specified file path.
-		const path = getPathImpl(filePath);
+		// Select path-handling implementations depending on the base path if specified, or on the
+		// provided file path.
+		const path = getPathImpl(this.basePath || filePath);
 
 		// check to see if the file is outside the base path
 
-		const namespacedFilePath = path.toNamespacedPath(filePath);
-
-		// If base path is not specified, relative paths cannot be built.
-		const relativeFilePath = (
-			this.namespacedBasePath
-				? path.relative(this.namespacedBasePath, namespacedFilePath)
-				: namespacedFilePath
-		).replaceAll(path.SEPARATOR, "/");
+		const relativeFilePath = toRelativePath(
+			filePath,
+			this.namespacedBasePath,
+			path,
+		);
 
 		if (EXTERNAL_PATH_REGEX.test(relativeFilePath)) {
 			debug(`No config for file ${filePath} outside of base path`);
@@ -992,7 +1014,8 @@ export class ConfigArray extends Array {
 
 	/**
 	 * Returns the config object for a given file path.
-	 * @param {string} filePath The complete path of a file to get a config for.
+	 * @param {string} filePath The path of a file to get a config for.
+	 * 		This must be an absolute path if the current `ConfigArray` instance has no base path.
 	 * @returns {Object|undefined} The config object for this file or `undefined`.
 	 */
 	getConfig(filePath) {
@@ -1001,7 +1024,8 @@ export class ConfigArray extends Array {
 
 	/**
 	 * Determines whether a file has a config or why it doesn't.
-	 * @param {string} filePath The complete path of the file to check.
+	 * @param {string} filePath The path of the file to check.
+	 * 		This must be an absolute path if the current `ConfigArray` instance has no base path.
 	 * @returns {"ignored"|"external"|"unconfigured"|"matched"} One of the following values:
 	 * * `"ignored"`: the file is ignored
 	 * * `"external"`: the file is outside the base path
@@ -1014,7 +1038,8 @@ export class ConfigArray extends Array {
 
 	/**
 	 * Determines if the given filepath is ignored based on the configs.
-	 * @param {string} filePath The complete path of a file to check.
+	 * @param {string} filePath The path of a file to check.
+	 * 		This must be an absolute path if the current `ConfigArray` instance has no base path.
 	 * @returns {boolean} True if the path is ignored, false if not.
 	 * @deprecated Use `isFileIgnored` instead.
 	 */
@@ -1024,7 +1049,8 @@ export class ConfigArray extends Array {
 
 	/**
 	 * Determines if the given filepath is ignored based on the configs.
-	 * @param {string} filePath The complete path of a file to check.
+	 * @param {string} filePath The path of a file to check.
+	 * 		This must be an absolute path if the current `ConfigArray` instance has no base path.
 	 * @returns {boolean} True if the path is ignored, false if not.
 	 */
 	isFileIgnored(filePath) {
@@ -1037,7 +1063,8 @@ export class ConfigArray extends Array {
 	 * same config. A pattern such as `/foo` be considered to ignore the directory
 	 * while a pattern such as `/foo/**` is not considered to ignore the
 	 * directory because it is matching files.
-	 * @param {string} directoryPath The complete path of a directory to check.
+	 * @param {string} directoryPath The path of a directory to check.
+	 * 		This must be an absolute path if the current `ConfigArray` instance has no base path.
 	 * @returns {boolean} True if the directory is ignored, false if not. Will
 	 * 		return true for any directory that is not inside of `basePath`.
 	 * @throws {Error} When the `ConfigArray` is not normalized.
@@ -1045,20 +1072,15 @@ export class ConfigArray extends Array {
 	isDirectoryIgnored(directoryPath) {
 		assertNormalized(this);
 
-		// Select path-handling implementations depending on the specified directory path.
-		const path = getPathImpl(directoryPath);
+		// Select path-handling implementations depending on the base path if specified, or on the
+		// provided directory path.
+		const path = getPathImpl(this.basePath || directoryPath);
 
-		const namespacedDirectoryPath = path.toNamespacedPath(directoryPath);
-
-		// If base path is not specified, relative paths cannot be built.
-		const relativeDirectoryPath = (
-			this.namespacedBasePath
-				? path.relative(
-						this.namespacedBasePath,
-						namespacedDirectoryPath,
-					)
-				: namespacedDirectoryPath
-		).replaceAll(path.SEPARATOR, "/");
+		const relativeDirectoryPath = toRelativePath(
+			directoryPath,
+			this.namespacedBasePath,
+			path,
+		);
 
 		// basePath directory can never be ignored
 		if (relativeDirectoryPath === "") {
