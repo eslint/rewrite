@@ -137,11 +137,14 @@ export interface RulesMetaDocs {
 /**
  * Meta information about a rule.
  */
-export interface RulesMeta {
+export interface RulesMeta<
+	MessageIds extends string = string,
+	ExtRuleDocs = unknown,
+> {
 	/**
 	 * Properties that are used when documenting the rule.
 	 */
-	docs?: RulesMetaDocs | undefined;
+	docs?: (RulesMetaDocs & ExtRuleDocs) | undefined;
 
 	/**
 	 * The type of rule.
@@ -156,7 +159,7 @@ export interface RulesMeta {
 	/**
 	 * The messages that the rule can report.
 	 */
-	messages: Record<string, string>;
+	messages: Record<MessageIds, string>;
 
 	/**
 	 * The deprecated rules for the rule.
@@ -180,15 +183,27 @@ export interface RulesMeta {
 }
 
 /**
+ * Generic type for `RuleContext`.
+ */
+export interface RuleContextTypeOptions {
+	LangOptions?: LanguageOptions;
+	Code?: SourceCode;
+	RuleOptions?: unknown[];
+	Node?: unknown;
+}
+
+/**
  * Represents the context object that is passed to a rule. This object contains
  * information about the current state of the linting process and is the rule's
  * view into the outside world.
  */
 export interface RuleContext<
-	LangOptions = LanguageOptions,
-	Code extends SourceCode = SourceCode,
-	RuleOptions = unknown[],
-	Node = unknown,
+	Options extends RuleContextTypeOptions = {
+		LangOptions: LanguageOptions;
+		Code: SourceCode;
+		RuleOptions: unknown[];
+		Node: unknown;
+	},
 > {
 	/**
 	 * The current working directory for the session.
@@ -226,13 +241,13 @@ export interface RuleContext<
 	/**
 	 * The source code object that the rule is running on.
 	 */
-	sourceCode: Code;
+	sourceCode: Options["Code"];
 
 	/**
 	 * Returns the source code object that the rule is running on.
 	 * @deprecated Use `sourceCode` instead.
 	 */
-	getSourceCode(): Code;
+	getSourceCode(): Options["Code"];
 
 	/**
 	 * Shared settings for the configuration.
@@ -248,7 +263,7 @@ export interface RuleContext<
 	/**
 	 * The language options for the configuration.
 	 */
-	languageOptions: LangOptions;
+	languageOptions: Options["LangOptions"];
 
 	/**
 	 * The CommonJS path to the parser used while parsing this file.
@@ -264,13 +279,13 @@ export interface RuleContext<
 	/**
 	 * The rule's configured options.
 	 */
-	options: RuleOptions;
+	options: Options["RuleOptions"];
 
 	/**
 	 * The report function that the rule should use to report problems.
 	 * @param violation The violation to report.
 	 */
-	report(violation: ViolationReport<Node>): void;
+	report(violation: ViolationReport<Options["Node"]>): void;
 }
 
 // #region Rule Fixing
@@ -427,26 +442,40 @@ export type SuggestedEdit = SuggestedEditBase & SuggestionMessage;
 // #endregion
 
 /**
+ * Generic options for the `RuleDefinition` type.
+ */
+export interface RuleDefinitionTypeOptions {
+	LangOptions?: LanguageOptions;
+	Code?: SourceCode;
+	RuleOptions?: unknown[];
+	Visitor?: RuleVisitor;
+	Node?: unknown;
+	MessageIds?: string;
+	ExtRuleDocs?: unknown;
+}
+
+/**
  * The definition of an ESLint rule.
  */
-export interface RuleDefinition<
-	LangOptions = LanguageOptions,
-	Code extends SourceCode = SourceCode,
-	RuleOptions = unknown[],
-	Visitor extends RuleVisitor = RuleVisitor,
-	Node = unknown,
-> {
+export interface RuleDefinition<Options extends RuleDefinitionTypeOptions> {
 	/**
 	 * The meta information for the rule.
 	 */
-	meta?: RulesMeta;
+	meta?: RulesMeta<Options["MessageIds"], Options["ExtRuleDocs"]>;
 
 	/**
 	 * Creates the visitor that ESLint uses to apply the rule during traversal.
 	 * @param context The rule context.
 	 * @returns The rule visitor.
 	 */
-	create(context: RuleContext<LangOptions, Code, RuleOptions, Node>): Visitor;
+	create(
+		context: RuleContext<{
+			LangOptions: Options["LangOptions"];
+			Code: Options["Code"];
+			RuleOptions: Options["RuleOptions"];
+			Node: Options["Node"];
+		}>,
+	): Options["Visitor"];
 }
 
 //------------------------------------------------------------------------------
@@ -507,13 +536,19 @@ export type RulesConfig = Record<string, RuleConfig>;
 //------------------------------------------------------------------------------
 
 /**
+ * Generic options for the `Language` type.
+ */
+export interface LanguageTypeOptions {
+	LangOptions?: LanguageOptions;
+	Code?: SourceCode;
+	RootNode?: unknown;
+	Node: unknown;
+}
+
+/**
  * Represents a plugin language.
  */
-export interface Language<
-	LangOptions = LanguageOptions,
-	Code extends SourceCode = SourceCode,
-	RootNode = unknown,
-> {
+export interface Language<Options extends LanguageTypeOptions> {
 	/**
 	 * Indicates how ESLint should read the file.
 	 */
@@ -547,7 +582,7 @@ export interface Language<
 	/**
 	 * Validates languageOptions for this language.
 	 */
-	validateLanguageOptions(languageOptions: LangOptions): void;
+	validateLanguageOptions(languageOptions: Options["LangOptions"]): void;
 
 	/**
 	 * Helper for esquery that allows languages to match nodes against
@@ -557,8 +592,8 @@ export interface Language<
 	 */
 	matchesSelectorClass?(
 		className: string,
-		node: object,
-		ancestry: object[],
+		node: Options["Node"],
+		ancestry: Options["Node"][],
 	): boolean;
 
 	/**
@@ -568,17 +603,17 @@ export interface Language<
 	 */
 	parse(
 		file: File,
-		context: LanguageContext<LangOptions>,
-	): ParseResult<RootNode>; // Future: | Promise<ParseResult>;
+		context: LanguageContext<Options["LangOptions"]>,
+	): ParseResult<Options["RootNode"]>; // Future: | Promise<ParseResult>;
 
 	/**
 	 * Creates SourceCode object that ESLint uses to work with a file.
 	 */
 	createSourceCode(
 		file: File,
-		input: OkParseResult<RootNode>,
-		context: LanguageContext<LangOptions>,
-	): Code; // Future: | Promise<Code>;
+		input: OkParseResult<Options["RootNode"]>,
+		context: LanguageContext<Options["LangOptions"]>,
+	): Options["Code"]; // Future: | Promise<Code>;
 }
 
 /**
@@ -692,18 +727,30 @@ interface InlineConfigElement {
 }
 
 /**
+ * Generic options for the `SourceCodeBase` type.
+ */
+interface SourceCodeBaseTypeOptions {
+	LangOptions?: LanguageOptions;
+	RootNode?: unknown;
+	SyntaxElementWithLoc?: unknown;
+	ConfigNode?: unknown;
+}
+
+/**
  * Represents the basic interface for a source code object.
  */
 interface SourceCodeBase<
-	LangOptions = LanguageOptions,
-	RootNode = unknown,
-	SyntaxElementWithLoc = unknown,
-	ConfigNode = unknown,
+	Options extends SourceCodeBaseTypeOptions = {
+		LangOptions: LanguageOptions;
+		RootNode: unknown;
+		SyntaxElementWithLoc: unknown;
+		ConfigNode: unknown;
+	},
 > {
 	/**
 	 * Root of the AST.
 	 */
-	ast: RootNode;
+	ast: Options["RootNode"];
 
 	/**
 	 * The traversal path that tools should take when evaluating the AST.
@@ -717,14 +764,14 @@ interface SourceCodeBase<
 	 * @param syntaxElement The node or token to get the location for.
 	 * @returns The location of the node or token.
 	 */
-	getLoc(syntaxElement: SyntaxElementWithLoc): SourceLocation;
+	getLoc(syntaxElement: Options["SyntaxElementWithLoc"]): SourceLocation;
 
 	/**
 	 * Retrieves the equivalent of `range` for a given node or token.
 	 * @param syntaxElement The node or token to get the range for.
 	 * @returns The range of the node or token.
 	 */
-	getRange(syntaxElement: SyntaxElementWithLoc): SourceRange;
+	getRange(syntaxElement: Options["SyntaxElementWithLoc"]): SourceRange;
 
 	/**
 	 * Traversal of AST.
@@ -734,7 +781,7 @@ interface SourceCodeBase<
 	/**
 	 * Applies language options passed in from the ESLint core.
 	 */
-	applyLanguageOptions?(languageOptions: LangOptions): void;
+	applyLanguageOptions?(languageOptions: Options["LangOptions"]): void;
 
 	/**
 	 * Return all of the inline areas where ESLint should be disabled/enabled
@@ -749,7 +796,7 @@ interface SourceCodeBase<
 	 * Returns an array of all inline configuration nodes found in the
 	 * source code.
 	 */
-	getInlineConfigNodes?(): ConfigNode[];
+	getInlineConfigNodes?(): Options["ConfigNode"][];
 
 	/**
 	 * Applies configuration found inside of the source code. This method is only
@@ -773,16 +820,13 @@ interface SourceCodeBase<
  * Represents the source of a text file being linted.
  */
 export interface TextSourceCode<
-	LangOptions = LanguageOptions,
-	RootNode = unknown,
-	SyntaxElementWithLoc = unknown,
-	ConfigNode = unknown,
-> extends SourceCodeBase<
-		LangOptions,
-		RootNode,
-		SyntaxElementWithLoc,
-		ConfigNode
-	> {
+	Options extends SourceCodeBaseTypeOptions = {
+		LangOptions: LanguageOptions;
+		RootNode: unknown;
+		SyntaxElementWithLoc: unknown;
+		ConfigNode: unknown;
+	},
+> extends SourceCodeBase<Options> {
 	/**
 	 * The body of the file that you'd like rule developers to access.
 	 */
@@ -793,16 +837,13 @@ export interface TextSourceCode<
  * Represents the source of a binary file being linted.
  */
 export interface BinarySourceCode<
-	LangOptions = LanguageOptions,
-	RootNode = unknown,
-	SyntaxElementWithLoc = unknown,
-	ConfigNode = unknown,
-> extends SourceCodeBase<
-		LangOptions,
-		RootNode,
-		SyntaxElementWithLoc,
-		ConfigNode
-	> {
+	Options extends SourceCodeBaseTypeOptions = {
+		LangOptions: LanguageOptions;
+		RootNode: unknown;
+		SyntaxElementWithLoc: unknown;
+		ConfigNode: unknown;
+	},
+> extends SourceCodeBase<Options> {
 	/**
 	 * The body of the file that you'd like rule developers to access.
 	 */
