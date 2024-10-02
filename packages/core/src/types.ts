@@ -546,7 +546,14 @@ export interface LanguageTypeOptions {
 /**
  * Represents a plugin language.
  */
-export interface Language<Options extends LanguageTypeOptions> {
+export interface Language<
+	Options extends LanguageTypeOptions = {
+		LangOptions: LanguageOptions;
+		Code: SourceCode;
+		RootNode: unknown;
+		Node: unknown;
+	},
+> {
 	/**
 	 * Indicates how ESLint should read the file.
 	 */
