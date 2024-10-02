@@ -102,9 +102,7 @@ export interface RuleVisitor {
 	/**
 	 * Called for each node in the AST or at specific times during the traversal.
 	 */
-	[key: string]:
-		| ((node: unknown, parent?: unknown) => void)
-		| ((...unknown: unknown[]) => void);
+	[key: string]: (...args: unknown[]) => void;
 }
 /* eslint-enable @typescript-eslint/consistent-indexed-object-style -- Needs to be interface so people can extend it. */
 
@@ -850,7 +848,14 @@ export interface BinarySourceCode<
 	body: Uint8Array;
 }
 
-export type SourceCode = TextSourceCode | BinarySourceCode;
+export type SourceCode<
+	Options extends SourceCodeBaseTypeOptions = {
+		LangOptions: LanguageOptions;
+		RootNode: unknown;
+		SyntaxElementWithLoc: unknown;
+		ConfigNode: unknown;
+	},
+> = TextSourceCode<Options> | BinarySourceCode<Options>;
 
 /**
  * Represents a traversal step visiting the AST.
