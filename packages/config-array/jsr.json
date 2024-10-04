@@ -8,6 +8,8 @@
       "dist/esm/index.d.ts",
       "dist/esm/types.ts",
       "dist/esm/types.d.ts",
+      "dist/esm/std__path/posix.js",
+      "dist/esm/std__path/windows.js",
       "README.md",
       "jsr.json",
       "LICENSE"
