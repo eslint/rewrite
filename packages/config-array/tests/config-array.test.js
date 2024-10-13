@@ -630,6 +630,14 @@ describe("ConfigArray", () => {
 				assert.strictEqual(unnormalizedConfigs.basePath, basePath);
 				assert.strictEqual(configs.basePath, basePath);
 			});
+
+			it("should default basePath property to '/'", () => {
+				assert.strictEqual(new ConfigArray([]).basePath, "/");
+				assert.strictEqual(
+					new ConfigArray([], { basePath: "" }).basePath,
+					"/",
+				);
+			});
 		});
 
 		describe("isNormalized()", () => {
@@ -649,18 +657,6 @@ describe("ConfigArray", () => {
 				assert.throws(() => {
 					unnormalizedConfigs.getConfigWithStatus(filename);
 				}, /normalized/u);
-			});
-
-			it("should throw an error when no base path is specified if a relative path is passed", () => {
-				const noBasePathConfigs = new ConfigArray([]).normalizeSync();
-
-				assert.throws(() => {
-					noBasePathConfigs.getConfigWithStatus("./foo/bar.js");
-				}, /Expected an absolute path/u);
-
-				assert.doesNotThrow(() => {
-					noBasePathConfigs.getConfigWithStatus("/foo/bar.js");
-				});
 			});
 
 			describe("should return expected results", () => {
@@ -762,18 +758,6 @@ describe("ConfigArray", () => {
 				assert.throws(() => {
 					unnormalizedConfigs.getConfig(filename);
 				}, /normalized/u);
-			});
-
-			it("should throw an error when no base path is specified if a relative path is passed", () => {
-				const noBasePathConfigs = new ConfigArray([]).normalizeSync();
-
-				assert.throws(() => {
-					noBasePathConfigs.getConfig("foo/bar.js");
-				}, /Expected an absolute path/u);
-
-				assert.doesNotThrow(() => {
-					noBasePathConfigs.getConfig("/foo/bar.js");
-				});
 			});
 
 			it("should calculate correct config when passed JS filename", () => {
@@ -1233,18 +1217,6 @@ describe("ConfigArray", () => {
 				assert.throws(() => {
 					unnormalizedConfigs.getConfigStatus(filename);
 				}, /normalized/u);
-			});
-
-			it("should throw an error when no base path is specified if a relative path is passed", () => {
-				const noBasePathConfigs = new ConfigArray([]).normalizeSync();
-
-				assert.throws(() => {
-					noBasePathConfigs.getConfigStatus("foo.js");
-				}, /Expected an absolute path/u);
-
-				assert.doesNotThrow(() => {
-					noBasePathConfigs.getConfigStatus("/foo.js");
-				});
 			});
 
 			it('should return "matched" when passed JS filename', () => {
@@ -2028,7 +2000,7 @@ describe("ConfigArray", () => {
 					);
 				});
 
-				it('should return "external" for a file on a different drive when a base path is specified', () => {
+				it('should return "external" for a file on a different drive', () => {
 					configs = new ConfigArray([{ files: ["**/*.js"] }], {
 						basePath: "C:\\dir",
 					});
@@ -2038,21 +2010,6 @@ describe("ConfigArray", () => {
 					assert.strictEqual(
 						configs.getConfigStatus("D:\\dir\\file.js"),
 						"external",
-					);
-				});
-
-				it('should return "matched" for files on different drives when no base path is specified', () => {
-					configs = new ConfigArray([{ files: ["**/*.js"] }]);
-
-					configs.normalizeSync();
-
-					assert.strictEqual(
-						configs.getConfigStatus("X:\\dir1\\file.js"),
-						"matched",
-					);
-					assert.strictEqual(
-						configs.getConfigStatus("Y:\\dir2\\file.js"),
-						"matched",
 					);
 				});
 
@@ -2146,20 +2103,6 @@ describe("ConfigArray", () => {
 						"unconfigured",
 					);
 				});
-
-				it("should throw an error when no base path is specified if a relative path with a drive letter is passed", () => {
-					const noBasePathConfigs = new ConfigArray(
-						[],
-					).normalizeSync();
-
-					assert.throws(() => {
-						noBasePathConfigs.getConfigStatus("C:file.js");
-					}, /Expected an absolute path/u);
-
-					assert.doesNotThrow(() => {
-						noBasePathConfigs.getConfigStatus("C:\\file.js");
-					});
-				});
 			});
 		});
 
@@ -2169,18 +2112,6 @@ describe("ConfigArray", () => {
 				assert.throws(() => {
 					unnormalizedConfigs.isIgnored(filename);
 				}, /normalized/u);
-			});
-
-			it("should throw an error when no base path is specified if a relative path is passed", () => {
-				const noBasePathConfigs = new ConfigArray([]).normalizeSync();
-
-				assert.throws(() => {
-					noBasePathConfigs.isIgnored("foo.js");
-				}, /Expected an absolute path/u);
-
-				assert.doesNotThrow(() => {
-					noBasePathConfigs.isIgnored("/foo.js");
-				});
 			});
 
 			it("should return false when passed JS filename", () => {
@@ -2246,18 +2177,6 @@ describe("ConfigArray", () => {
 				assert.throws(() => {
 					unnormalizedConfigs.isFileIgnored(filename);
 				}, /normalized/u);
-			});
-
-			it("should throw an error when no base path is specified if a relative path is passed", () => {
-				const noBasePathConfigs = new ConfigArray([]).normalizeSync();
-
-				assert.throws(() => {
-					noBasePathConfigs.isFileIgnored("foo.js");
-				}, /Expected an absolute path/u);
-
-				assert.doesNotThrow(() => {
-					noBasePathConfigs.isFileIgnored("/foo.js");
-				});
 			});
 
 			it("should return false when passed JS filename", () => {
@@ -3043,20 +2962,6 @@ describe("ConfigArray", () => {
 				}, /normalized/u);
 			});
 
-			it("should throw an error when no base path is specified if a relative path is passed", () => {
-				configs = new ConfigArray([]);
-
-				configs.normalizeSync();
-
-				assert.throws(() => {
-					configs.isDirectoryIgnored("foo/bar");
-				}, /Expected an absolute path/u);
-
-				assert.doesNotThrow(() => {
-					configs.isDirectoryIgnored("/foo/bar");
-				});
-			});
-
 			it("should return true when the directory is outside of the basePath", () => {
 				configs = new ConfigArray(
 					[
@@ -3093,25 +2998,6 @@ describe("ConfigArray", () => {
 
 				assert.strictEqual(configs.isDirectoryIgnored(".."), true);
 				assert.strictEqual(configs.isDirectoryIgnored("../"), true);
-			});
-
-			it("should return false when no basePath is specified", () => {
-				configs = new ConfigArray([
-					{
-						ignores: ["**/bar"],
-					},
-				]);
-
-				configs.normalizeSync();
-
-				assert.strictEqual(
-					configs.isDirectoryIgnored("/foo/bar/baz"),
-					true,
-				);
-				assert.strictEqual(
-					configs.isDirectoryIgnored("C:\\foo\\bar\\baz"),
-					true,
-				);
 			});
 
 			it("should return true when the parent directory of a directory is ignored", () => {
