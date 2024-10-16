@@ -163,6 +163,11 @@ export interface Language {
 	visitorKeys?: Record<string, string[]>;
 
 	/**
+	 * Default language options. User-defined options are merged with this object.
+	 */
+	defaultLanguageOptions?: LanguageOptions;
+
+	/**
 	 * Validates languageOptions for this language.
 	 */
 	validateLanguageOptions(languageOptions: LanguageOptions): void;
