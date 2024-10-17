@@ -1,6 +1,10 @@
+import { createRequire } from "node:module";
+
+const { resolve } = createRequire(import.meta.url);
+
 export default [
 	{
-		input: "../../node_modules/@jsr/std__path/posix/mod.js",
+		input: resolve("@jsr/std__path/posix"),
 		output: [
 			{
 				file: "./dist/cjs/std__path/posix.cjs",
@@ -13,7 +17,7 @@ export default [
 		],
 	},
 	{
-		input: "../../node_modules/@jsr/std__path/windows/mod.js",
+		input: resolve("@jsr/std__path/windows"),
 		output: [
 			{
 				file: "./dist/cjs/std__path/windows.cjs",
