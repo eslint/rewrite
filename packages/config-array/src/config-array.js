@@ -545,6 +545,12 @@ const dataCache = new WeakMap();
  * those config objects.
  */
 export class ConfigArray extends Array {
+	/** The namespaced path of the config file directory. */
+	#namespacedBasePath;
+
+	/** Path-handling implementations */
+	#path;
+
 	/**
 	 * Creates a new instance of ConfigArray.
 	 * @param {Iterable|Function|Object} configs An iterable yielding config
@@ -628,12 +634,12 @@ export class ConfigArray extends Array {
 		}
 
 		// select path-handling implementations depending on the base path
-		this.path = getPathImpl(this.basePath);
+		this.#path = getPathImpl(this.basePath);
 
 		// On Windows, `path.relative()` returns an absolute path when given two paths on different drives.
 		// The namespaced base path is useful to make sure that calculated relative paths are always relative.
 		// On Unix, it is identical to the base path.
-		this.namespacedBasePath = this.path.toNamespacedPath(this.basePath);
+		this.#namespacedBasePath = this.#path.toNamespacedPath(this.basePath);
 	}
 
 	/**
@@ -841,8 +847,8 @@ export class ConfigArray extends Array {
 
 		const relativeFilePath = toRelativePath(
 			filePath,
-			this.namespacedBasePath,
-			this.path,
+			this.#namespacedBasePath,
+			this.#path,
 		);
 
 		if (EXTERNAL_PATH_REGEX.test(relativeFilePath)) {
@@ -856,7 +862,7 @@ export class ConfigArray extends Array {
 		// next check to see if the file should be ignored
 
 		// check if this should be ignored due to its directory
-		if (this.isDirectoryIgnored(this.path.dirname(filePath))) {
+		if (this.isDirectoryIgnored(this.#path.dirname(filePath))) {
 			debug(`Ignoring ${filePath} based on directory pattern`);
 
 			// cache and return result
@@ -1061,8 +1067,8 @@ export class ConfigArray extends Array {
 
 		const relativeDirectoryPath = toRelativePath(
 			directoryPath,
-			this.namespacedBasePath,
-			this.path,
+			this.#namespacedBasePath,
+			this.#path,
 		);
 
 		// basePath directory can never be ignored
@@ -1099,7 +1105,7 @@ export class ConfigArray extends Array {
 
 			result = shouldIgnorePath(
 				this.ignores,
-				this.path.join(this.basePath, relativeDirectoryToCheck),
+				this.#path.join(this.basePath, relativeDirectoryToCheck),
 				relativeDirectoryToCheck,
 			);
 
