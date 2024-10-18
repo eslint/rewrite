@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/eslint/rewrite/compare/core-v0.6.0...core-v0.7.0) (2024-10-18)
+
+
+### Features
+
+* Add `Language.defaultLanguageOptions` ([#123](https://github.com/eslint/rewrite/issues/123)) ([1ecf0f8](https://github.com/eslint/rewrite/commit/1ecf0f88808a7629e06e949dea8eb1ec4fd2f472))
+
 ## [0.6.0](https://github.com/eslint/rewrite/compare/core-v0.5.0...core-v0.6.0) (2024-08-30)
 
 
