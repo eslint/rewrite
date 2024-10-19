@@ -25,7 +25,7 @@ jobs:
                   npm run build
 
             - name: Type Check Files
-              run: npm run tsc
+              run: npm run test:types
 
     verify_files:
         name: Verify Files

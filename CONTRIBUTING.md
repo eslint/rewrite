@@ -30,11 +30,11 @@ npm run lint
 This project is written in JavaScript and uses [TypeScript](https://www.typescriptlang.org) to validate types declared in JSDoc comments.
 
 ```shell
-npm run tsc
+npm run test:types
 ```
 
 Add `--watch` to run in a "watch" mode:
 
 ```shell
-npm run tsc -- --watch
+npm run test:types -- --watch
 ```
