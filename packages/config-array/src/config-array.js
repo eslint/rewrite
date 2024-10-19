@@ -91,7 +91,7 @@ const CONFIG_WITH_STATUS_UNCONFIGURED = Object.freeze({
 });
 
 // Match two leading dots followed by a slash or the end of input.
-const EXTERNAL_PATH_REGEX = /^\.\.(\/|$)/u;
+const EXTERNAL_PATH_REGEX = /^\.\.(?:\/|$)/u;
 
 /**
  * Wrapper error for config validation errors that adds a name to the front of the
