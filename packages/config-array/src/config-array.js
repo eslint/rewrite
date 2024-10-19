@@ -553,7 +553,7 @@ export class ConfigArray extends Array {
 	#namespacedBasePath;
 
 	/**
-	 * Path-handling implementations
+	 * Path-handling implementations.
 	 * @type {PathImpl}
 	 */
 	#path;
