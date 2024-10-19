@@ -8,15 +8,15 @@
 //-----------------------------------------------------------------------------
 
 import { ConfigArray, ConfigArraySymbol } from "../src/config-array.js";
-import path from "node:path";
 import assert from "node:assert";
+import { fileURLToPath } from "node:url";
 
 //-----------------------------------------------------------------------------
 // Helpers
 //-----------------------------------------------------------------------------
 
 // calculate base path using import.meta
-const basePath = path.dirname(new URL(import.meta.url).pathname);
+const basePath = fileURLToPath(new URL(".", import.meta.url));
 
 const schema = {
 	language: {
@@ -443,7 +443,7 @@ describe("ConfigArray", () => {
 			await configs.normalize();
 
 			assert.throws(() => {
-				configs.getConfig(path.resolve(basePath, "foo.js"));
+				configs.getConfig("foo.js");
 			}, 'Config Error: Config (unnamed): Key "name": Property must be a string.');
 		});
 
@@ -457,7 +457,7 @@ describe("ConfigArray", () => {
 			await configs.normalize();
 
 			assert.throws(() => {
-				configs.getConfig(path.resolve(basePath, "foo.js"));
+				configs.getConfig("foo.js");
 			}, 'Config Error: Config (unnamed): Key "name": Property must be a string.');
 		});
 
@@ -494,6 +494,12 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 			}, "Config Error: Config (unnamed): Unexpected null config.");
 		});
+
+		it("should throw an error when basePath is a relative path", async () => {
+			assert.throws(() => {
+				void new ConfigArray([{}], { basePath: "foo/bar" });
+			}, /Expected an absolute path/u);
+		});
 	});
 
 	describe("ConfigArray members", () => {
@@ -515,7 +521,7 @@ describe("ConfigArray", () => {
 					name: "from-context",
 				});
 
-				const filename = path.resolve(basePath, "foo.js");
+				const filename = "foo.js";
 				const config = configs.getConfig(filename);
 				assert.strictEqual(config.name, "from-finalize");
 			});
@@ -530,7 +536,7 @@ describe("ConfigArray", () => {
 					name: "from-context",
 				});
 
-				const filename = path.resolve(basePath, "foo.js");
+				const filename = "foo.js";
 				const config = configs.getConfig(filename);
 				assert.strictEqual(config.name, "from-finalize");
 			});
@@ -557,7 +563,7 @@ describe("ConfigArray", () => {
 					name: "from-context",
 				});
 
-				const filename = path.resolve(basePath, "foo.js");
+				const filename = "foo.js";
 				const config = configs.getConfig(filename);
 				assert.strictEqual(config.defs.name, "foo:bar");
 			});
@@ -624,6 +630,14 @@ describe("ConfigArray", () => {
 				assert.strictEqual(unnormalizedConfigs.basePath, basePath);
 				assert.strictEqual(configs.basePath, basePath);
 			});
+
+			it("should default basePath property to '/'", () => {
+				assert.strictEqual(new ConfigArray([]).basePath, "/");
+				assert.strictEqual(
+					new ConfigArray([], { basePath: "" }).basePath,
+					"/",
+				);
+			});
 		});
 
 		describe("isNormalized()", () => {
@@ -638,7 +652,7 @@ describe("ConfigArray", () => {
 
 		describe("getConfigWithStatus()", () => {
 			it("should throw an error when not normalized", () => {
-				const filename = path.resolve(basePath, "foo.js");
+				const filename = "foo.js";
 
 				assert.throws(() => {
 					unnormalizedConfigs.getConfigWithStatus(filename);
@@ -647,7 +661,7 @@ describe("ConfigArray", () => {
 
 			describe("should return expected results", () => {
 				it("for a file outside the base path", () => {
-					const filename = path.resolve(basePath, "../foo.js");
+					const filename = "../foo.js";
 					const configWithStatus =
 						configs.getConfigWithStatus(filename);
 
@@ -655,7 +669,7 @@ describe("ConfigArray", () => {
 					assert.strictEqual(configWithStatus.config, undefined);
 					assert.strictEqual(configWithStatus.status, "external");
 
-					const newFilename = path.resolve(basePath, "../bar.js");
+					const newFilename = "../bar.js";
 					const newConfigWithStatus =
 						configs.getConfigWithStatus(newFilename);
 
@@ -664,10 +678,7 @@ describe("ConfigArray", () => {
 				});
 
 				it("for a file ignored based on directory pattern", () => {
-					const filename = path.resolve(
-						basePath,
-						"node_modules/foo.js",
-					);
+					const filename = "node_modules/foo.js";
 					const configWithStatus =
 						configs.getConfigWithStatus(filename);
 
@@ -675,10 +686,7 @@ describe("ConfigArray", () => {
 					assert.strictEqual(configWithStatus.config, undefined);
 					assert.strictEqual(configWithStatus.status, "ignored");
 
-					const newFilename = path.resolve(
-						basePath,
-						"node_modules/bar.js",
-					);
+					const newFilename = "node_modules/bar.js";
 					const newConfigWithStatus =
 						configs.getConfigWithStatus(newFilename);
 
@@ -687,7 +695,7 @@ describe("ConfigArray", () => {
 				});
 
 				it("for a file ignored based on file pattern", () => {
-					const filename = path.resolve(basePath, ".gitignore");
+					const filename = ".gitignore";
 					const configWithStatus =
 						configs.getConfigWithStatus(filename);
 
@@ -695,10 +703,7 @@ describe("ConfigArray", () => {
 					assert.strictEqual(configWithStatus.config, undefined);
 					assert.strictEqual(configWithStatus.status, "ignored");
 
-					const newFilename = path.resolve(
-						basePath,
-						"dir/.gitignore",
-					);
+					const newFilename = "dir/.gitignore";
 					const newConfigWithStatus =
 						configs.getConfigWithStatus(newFilename);
 
@@ -717,7 +722,7 @@ describe("ConfigArray", () => {
 					);
 
 					configs.normalizeSync();
-					const filename = path.resolve(basePath, "foo.bar");
+					const filename = "foo.bar";
 					const configWithStatus =
 						configs.getConfigWithStatus(filename);
 
@@ -725,7 +730,7 @@ describe("ConfigArray", () => {
 					assert.strictEqual(configWithStatus.config, undefined);
 					assert.strictEqual(configWithStatus.status, "unconfigured");
 
-					const newFilename = path.resolve(basePath, "foo.baz");
+					const newFilename = "foo.baz";
 					const newConfigWithStatus =
 						configs.getConfigWithStatus(newFilename);
 
@@ -734,7 +739,7 @@ describe("ConfigArray", () => {
 				});
 
 				it("for a file with a config", () => {
-					const filename = path.resolve(basePath, "foo.js");
+					const filename = "foo.js";
 					const configWithStatus =
 						configs.getConfigWithStatus(filename);
 					const { config } = configWithStatus;
@@ -748,7 +753,7 @@ describe("ConfigArray", () => {
 
 		describe("getConfig()", () => {
 			it("should throw an error when not normalized", () => {
-				const filename = path.resolve(basePath, "foo.js");
+				const filename = "foo.js";
 
 				assert.throws(() => {
 					unnormalizedConfigs.getConfig(filename);
@@ -756,7 +761,7 @@ describe("ConfigArray", () => {
 			});
 
 			it("should calculate correct config when passed JS filename", () => {
-				const filename = path.resolve(basePath, "foo.js");
+				const filename = "foo.js";
 				const config = configs.getConfig(filename);
 
 				assert.strictEqual(config.language, JSLanguage);
@@ -767,7 +772,7 @@ describe("ConfigArray", () => {
 			});
 
 			it("should calculate correct config when passed XYZ filename", () => {
-				const filename = path.resolve(basePath, "tests/.bar/foo.xyz");
+				const filename = "tests/.bar/foo.xyz";
 
 				const config = configs.getConfig(filename);
 
@@ -778,7 +783,7 @@ describe("ConfigArray", () => {
 			});
 
 			it("should calculate correct config when passed HTML filename", () => {
-				const filename = path.resolve(basePath, "foo.html");
+				const filename = "foo.html";
 
 				const config = configs.getConfig(filename);
 
@@ -788,7 +793,7 @@ describe("ConfigArray", () => {
 			});
 
 			it("should return undefined when passed ignored .gitignore filename", () => {
-				const filename = path.resolve(basePath, ".gitignore");
+				const filename = ".gitignore";
 
 				const config = configs.getConfig(filename);
 
@@ -796,7 +801,7 @@ describe("ConfigArray", () => {
 			});
 
 			it("should calculate correct config when passed JS filename that matches two configs", () => {
-				const filename = path.resolve(basePath, "foo.test.js");
+				const filename = "foo.test.js";
 
 				const config = configs.getConfig(filename);
 
@@ -808,7 +813,7 @@ describe("ConfigArray", () => {
 			});
 
 			it("should calculate correct config when passed JS filename that matches a function config", () => {
-				const filename = path.resolve(basePath, "bar.test.js");
+				const filename = "bar.test.js";
 
 				const config = configs.getConfig(filename);
 
@@ -820,8 +825,8 @@ describe("ConfigArray", () => {
 			});
 
 			it("should not match a filename that doesn't explicitly match a files pattern", () => {
-				const matchingFilename = path.resolve(basePath, "foo.js");
-				const notMatchingFilename = path.resolve(basePath, "foo.md");
+				const matchingFilename = "foo.js";
+				const notMatchingFilename = "foo.md";
 				configs = new ConfigArray(
 					[
 						{},
@@ -860,7 +865,7 @@ describe("ConfigArray", () => {
 			});
 
 			it("should throw an error when passed JS filename that matches a async function config and normalizeSync() is called", async () => {
-				const filename = path.resolve(basePath, "async.test.js");
+				const filename = "async.test.js";
 				const configsToTest = createConfigArray();
 				configsToTest.push(context =>
 					Promise.resolve([
@@ -900,21 +905,21 @@ describe("ConfigArray", () => {
 
 				await configsToTest.normalize();
 
-				const filename = path.resolve(basePath, "foo.js");
+				const filename = "foo.js";
 				assert.throws(() => {
 					configsToTest.getConfig(filename);
 				}, /Config "bar": Key "defs": Object expected./u);
 			});
 
 			it("should calculate correct config when passed JS filename that matches a function config returning an array", () => {
-				const filename1 = path.resolve(basePath, "baz.test.js");
+				const filename1 = "baz.test.js";
 				const config1 = configs.getConfig(filename1);
 
 				assert.strictEqual(typeof config1.defs, "object");
 				assert.strictEqual(config1.language, JSLanguage);
 				assert.strictEqual(config1.defs.name, "baz-from-context");
 
-				const filename2 = path.resolve(basePath, "baz.test.js");
+				const filename2 = "baz.test.js";
 				const config2 = configs.getConfig(filename2);
 
 				assert.strictEqual(config2.language, JSLanguage);
@@ -924,7 +929,7 @@ describe("ConfigArray", () => {
 			});
 
 			it("should calculate correct config when passed CSS filename", () => {
-				const filename = path.resolve(basePath, "foo.css");
+				const filename = "foo.css";
 
 				const config = configs.getConfig(filename);
 				assert.strictEqual(config.language, CSSLanguage);
@@ -934,7 +939,7 @@ describe("ConfigArray", () => {
 			});
 
 			it("should calculate correct config when passed JS filename that matches AND pattern", () => {
-				const filename = path.resolve(basePath, "foo.and.js");
+				const filename = "foo.and.js";
 
 				const config = configs.getConfig(filename);
 				assert.strictEqual(config.language, JSLanguage);
@@ -945,7 +950,7 @@ describe("ConfigArray", () => {
 			});
 
 			it("should return the same config when called with the same filename twice (caching)", () => {
-				const filename = path.resolve(basePath, "foo.js");
+				const filename = "foo.js";
 
 				const config1 = configs.getConfig(filename);
 				const config2 = configs.getConfig(filename);
@@ -954,8 +959,8 @@ describe("ConfigArray", () => {
 			});
 
 			it("should return the same config when called with two filenames that match the same configs (caching)", () => {
-				const filename1 = path.resolve(basePath, "foo1.js");
-				const filename2 = path.resolve(basePath, "foo2.js");
+				const filename1 = "foo1.js";
+				const filename2 = "foo2.js";
 
 				const config1 = configs.getConfig(filename1);
 				const config2 = configs.getConfig(filename2);
@@ -964,7 +969,7 @@ describe("ConfigArray", () => {
 			});
 
 			it("should return empty config when called with ignored node_modules filename", () => {
-				const filename = path.resolve(basePath, "node_modules/foo.js");
+				const filename = "node_modules/foo.js";
 				const config = configs.getConfig(filename);
 
 				assert.strictEqual(config, undefined);
@@ -986,17 +991,10 @@ describe("ConfigArray", () => {
 
 				configs.normalizeSync();
 
+				assert.strictEqual(configs.getConfig("src/a.js"), undefined);
+				assert.strictEqual(configs.getConfig("src/b.js"), undefined);
 				assert.strictEqual(
-					configs.getConfig(path.resolve(basePath, "src", "a.js")),
-					undefined,
-				);
-				assert.strictEqual(
-					configs.getConfig(path.resolve(basePath, "src", "b.js")),
-					undefined,
-				);
-				assert.strictEqual(
-					configs.getConfig(path.resolve(basePath, "src", "{a,b}.js"))
-						.defs.severity,
+					configs.getConfig("src/{a,b}.js").defs.severity,
 					"error",
 				);
 			});
@@ -1018,19 +1016,15 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.getConfig(path.resolve(basePath, "src", "a.js"))
-						.defs.severity,
+					configs.getConfig("src/a.js").defs.severity,
 					"error",
 				);
 				assert.strictEqual(
-					configs.getConfig(path.resolve(basePath, "src", "b.js"))
-						.defs.severity,
+					configs.getConfig("src/b.js").defs.severity,
 					"error",
 				);
 				assert.strictEqual(
-					configs.getConfig(
-						path.resolve(basePath, "src", "{a,b}.js"),
-					),
+					configs.getConfig("src/{a,b}.js"),
 					undefined,
 				);
 			});
@@ -1054,19 +1048,15 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.getConfig(path.resolve(basePath, "src", "a.js"))
-						.defs.severity,
+					configs.getConfig("src/a.js").defs.severity,
 					"error",
 				);
 				assert.strictEqual(
-					configs.getConfig(path.resolve(basePath, "src", "b.js"))
-						.defs.severity,
+					configs.getConfig("src/b.js").defs.severity,
 					"error",
 				);
 				assert.strictEqual(
-					configs.getConfig(
-						path.resolve(basePath, "src", "{a,b}.js"),
-					),
+					configs.getConfig("src/{a,b}.js"),
 					undefined,
 				);
 			});
@@ -1091,15 +1081,12 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.getConfig(path.resolve(basePath, "file.js")).defs
-						.severity,
+					configs.getConfig("file.js").defs.severity,
 					"error",
 				);
 
 				assert.strictEqual(
-					configs.getConfig(
-						path.resolve(basePath, "subdir", "file.js"),
-					).defs.severity,
+					configs.getConfig("subdir/file.js").defs.severity,
 					"error",
 				);
 			});
@@ -1123,8 +1110,7 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.getConfig(path.resolve(basePath, "file.js")).defs
-						.severity,
+					configs.getConfig("file.js").defs.severity,
 					"error",
 				);
 			});
@@ -1132,11 +1118,8 @@ describe("ConfigArray", () => {
 			// https://github.com/eslint/eslint/issues/17103
 			describe("ignores patterns should be properly applied", () => {
 				it("should return undefined when a filename matches an ignores pattern but not a files pattern", () => {
-					const matchingFilename = path.resolve(basePath, "foo.js");
-					const notMatchingFilename = path.resolve(
-						basePath,
-						"foo.md",
-					);
+					const matchingFilename = "foo.js";
+					const notMatchingFilename = "foo.md";
 					configs = new ConfigArray(
 						[
 							{
@@ -1164,11 +1147,8 @@ describe("ConfigArray", () => {
 				});
 
 				it("should apply config with only ignores when a filename matches a files pattern", () => {
-					const matchingFilename = path.resolve(basePath, "foo.js");
-					const notMatchingFilename = path.resolve(
-						basePath,
-						"foo.md",
-					);
+					const matchingFilename = "foo.js";
+					const notMatchingFilename = "foo.md";
 					configs = new ConfigArray(
 						[
 							{
@@ -1198,8 +1178,8 @@ describe("ConfigArray", () => {
 				});
 
 				it("should not apply config with only ignores when a filename should be ignored", () => {
-					const matchingFilename = path.resolve(basePath, "foo.js");
-					const ignoredFilename = path.resolve(basePath, "bar.js");
+					const matchingFilename = "foo.js";
+					const ignoredFilename = "bar.js";
 					configs = new ConfigArray(
 						[
 							{
@@ -1233,14 +1213,23 @@ describe("ConfigArray", () => {
 
 		describe("getConfigStatus()", () => {
 			it("should throw an error when not normalized", () => {
-				const filename = path.resolve(basePath, "foo.js");
+				const filename = "foo.js";
 				assert.throws(() => {
 					unnormalizedConfigs.getConfigStatus(filename);
 				}, /normalized/u);
 			});
 
 			it('should return "matched" when passed JS filename', () => {
-				const filename = path.resolve(basePath, "foo.js");
+				const filename = "foo.js";
+
+				assert.strictEqual(
+					configs.getConfigStatus(filename),
+					"matched",
+				);
+			});
+
+			it('should return "matched" when passed JS filename that starts with ".."', () => {
+				const filename = "..foo.js";
 
 				assert.strictEqual(
 					configs.getConfigStatus(filename),
@@ -1249,7 +1238,7 @@ describe("ConfigArray", () => {
 			});
 
 			it('should return "external" when passed JS filename in parent directory', () => {
-				const filename = path.resolve(basePath, "../foo.js");
+				const filename = "../foo.js";
 
 				assert.strictEqual(
 					configs.getConfigStatus(filename),
@@ -1258,7 +1247,7 @@ describe("ConfigArray", () => {
 			});
 
 			it('should return "matched" when passed HTML filename', () => {
-				const filename = path.resolve(basePath, "foo.html");
+				const filename = "foo.html";
 
 				assert.strictEqual(
 					configs.getConfigStatus(filename),
@@ -1267,7 +1256,7 @@ describe("ConfigArray", () => {
 			});
 
 			it('should return "ignored" when passed ignored .gitignore filename', () => {
-				const filename = path.resolve(basePath, ".gitignore");
+				const filename = ".gitignore";
 
 				assert.strictEqual(
 					configs.getConfigStatus(filename),
@@ -1276,7 +1265,7 @@ describe("ConfigArray", () => {
 			});
 
 			it('should return "matched" when passed CSS filename', () => {
-				const filename = path.resolve(basePath, "foo.css");
+				const filename = "foo.css";
 
 				assert.strictEqual(
 					configs.getConfigStatus(filename),
@@ -1285,7 +1274,7 @@ describe("ConfigArray", () => {
 			});
 
 			it('should return "matched" when passed docx filename', () => {
-				const filename = path.resolve(basePath, "sss.docx");
+				const filename = "sss.docx";
 
 				assert.strictEqual(
 					configs.getConfigStatus(filename),
@@ -1294,7 +1283,7 @@ describe("ConfigArray", () => {
 			});
 
 			it('should return "ignored" when passed ignored node_modules filename', () => {
-				const filename = path.resolve(basePath, "node_modules/foo.js");
+				const filename = "node_modules/foo.js";
 
 				assert.strictEqual(
 					configs.getConfigStatus(filename),
@@ -1317,7 +1306,7 @@ describe("ConfigArray", () => {
 				);
 
 				configs.normalizeSync();
-				const filename = path.resolve(basePath, "fixtures/test.xsl");
+				const filename = "fixtures/test.xsl";
 
 				assert.strictEqual(
 					configs.getConfigStatus(filename),
@@ -1341,11 +1330,11 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.getConfigStatus(path.join(basePath, "bar.txt")),
+					configs.getConfigStatus("bar.txt"),
 					"unconfigured",
 				);
 				assert.strictEqual(
-					configs.getConfigStatus(path.join(basePath, "foo.txt")),
+					configs.getConfigStatus("foo.txt"),
 					"matched",
 				);
 			});
@@ -1365,11 +1354,11 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.getConfigStatus(path.join(basePath, "bar.txt")),
+					configs.getConfigStatus("bar.txt"),
 					"ignored",
 				);
 				assert.strictEqual(
-					configs.getConfigStatus(path.join(basePath, "foo.txt")),
+					configs.getConfigStatus("foo.txt"),
 					"ignored",
 				);
 			});
@@ -1390,11 +1379,11 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.getConfigStatus(path.join(basePath, "bar.test.js")),
+					configs.getConfigStatus("bar.test.js"),
 					"unconfigured",
 				);
 				assert.strictEqual(
-					configs.getConfigStatus(path.join(basePath, "foo.test.js")),
+					configs.getConfigStatus("foo.test.js"),
 					"matched",
 				);
 			});
@@ -1417,9 +1406,7 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.getConfigStatus(
-						path.join(basePath, "ignoreme/foo.js"),
-					),
+					configs.getConfigStatus("ignoreme/foo.js"),
 					"ignored",
 				);
 			});
@@ -1442,9 +1429,7 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.getConfigStatus(
-						path.join(basePath, "foo/bar/a.js"),
-					),
+					configs.getConfigStatus("foo/bar/a.js"),
 					"matched",
 				);
 			});
@@ -1466,10 +1451,7 @@ describe("ConfigArray", () => {
 
 				configs.normalizeSync();
 
-				assert.strictEqual(
-					configs.getConfigStatus(path.join(basePath, "a.js")),
-					"ignored",
-				);
+				assert.strictEqual(configs.getConfigStatus("a.js"), "ignored");
 			});
 
 			it('should return "ignored" when the parent directory of a file is ignored', () => {
@@ -1490,9 +1472,7 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.getConfigStatus(
-						path.join(basePath, "foo/bar/a.js"),
-					),
+					configs.getConfigStatus("foo/bar/a.js"),
 					"ignored",
 				);
 			});
@@ -1518,9 +1498,7 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.getConfigStatus(
-						path.join(basePath, "node_modules/package/a.js"),
-					),
+					configs.getConfigStatus("node_modules/package/a.js"),
 					"ignored",
 				);
 			});
@@ -1546,9 +1524,7 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.getConfigStatus(
-						path.join(basePath, "node_modules/package/a.js"),
-					),
+					configs.getConfigStatus("node_modules/package/a.js"),
 					"ignored",
 				);
 			});
@@ -1568,7 +1544,7 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.getConfigStatus(path.join(basePath, "foo/a.js")),
+					configs.getConfigStatus("foo/a.js"),
 					"unconfigured",
 				);
 			});
@@ -1588,7 +1564,7 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.getConfigStatus(path.join(basePath, "foo/a.js")),
+					configs.getConfigStatus("foo/a.js"),
 					"unconfigured",
 				);
 			});
@@ -1608,7 +1584,7 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.getConfigStatus(path.join(basePath, "a.js")),
+					configs.getConfigStatus("a.js"),
 					"unconfigured",
 				);
 			});
@@ -1628,7 +1604,7 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.getConfigStatus(path.join(basePath, "foo/a.js")),
+					configs.getConfigStatus("foo/a.js"),
 					"matched",
 				);
 			});
@@ -1650,10 +1626,7 @@ describe("ConfigArray", () => {
 
 				configs.normalizeSync();
 
-				assert.strictEqual(
-					configs.getConfigStatus(path.join(basePath, "foo")),
-					"matched",
-				);
+				assert.strictEqual(configs.getConfigStatus("foo"), "matched");
 			});
 
 			it('should return "matched" when file is in the parent directory of directories that are ignored by a pattern that ends with `/`', () => {
@@ -1674,7 +1647,7 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.getConfigStatus(path.join(basePath, "foo/a.js")),
+					configs.getConfigStatus("foo/a.js"),
 					"matched",
 				);
 			});
@@ -1697,7 +1670,7 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.getConfigStatus(path.join(basePath, "foo/a.js")),
+					configs.getConfigStatus("foo/a.js"),
 					"ignored",
 				);
 			});
@@ -1720,7 +1693,7 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.getConfigStatus(path.join(basePath, "foo/a.js")),
+					configs.getConfigStatus("foo/a.js"),
 					"ignored",
 				);
 			});
@@ -1743,7 +1716,7 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.getConfigStatus(path.join(basePath, "foo/a.js")),
+					configs.getConfigStatus("foo/a.js"),
 					"matched",
 				);
 			});
@@ -1771,7 +1744,7 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.getConfigStatus(path.join(basePath, "foo/a.js")),
+					configs.getConfigStatus("foo/a.js"),
 					"ignored",
 				);
 			});
@@ -1799,7 +1772,7 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.getConfigStatus(path.join(basePath, "foo/a.js")),
+					configs.getConfigStatus("foo/a.js"),
 					"ignored",
 				);
 			});
@@ -1827,7 +1800,7 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.getConfigStatus(path.join(basePath, "foo/a.js")),
+					configs.getConfigStatus("foo/a.js"),
 					"matched",
 				);
 			});
@@ -1849,10 +1822,7 @@ describe("ConfigArray", () => {
 
 				configs.normalizeSync();
 
-				assert.strictEqual(
-					configs.getConfigStatus(path.join(basePath, "foo")),
-					"ignored",
-				);
+				assert.strictEqual(configs.getConfigStatus("foo"), "ignored");
 			});
 
 			it('should return "ignored" when file is in a directory that is ignored even if an unignore pattern that ends with `/*` matches the file', () => {
@@ -1873,7 +1843,7 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.getConfigStatus(path.join(basePath, "foo/a.js")),
+					configs.getConfigStatus("foo/a.js"),
 					"ignored",
 				);
 			});
@@ -1906,29 +1876,20 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.getConfigStatus(
-						path.join(basePath, "tests/format/foo.js"),
-					),
+					configs.getConfigStatus("tests/format/foo.js"),
 					"ignored",
 				);
 				assert.strictEqual(
-					configs.getConfigStatus(
-						path.join(basePath, "tests/format/jsfmt.spec.js"),
-					),
+					configs.getConfigStatus("tests/format/jsfmt.spec.js"),
 					"matched",
 				);
 				assert.strictEqual(
-					configs.getConfigStatus(
-						path.join(basePath, "tests/format/subdir/foo.js"),
-					),
+					configs.getConfigStatus("tests/format/subdir/foo.js"),
 					"ignored",
 				);
 				assert.strictEqual(
 					configs.getConfigStatus(
-						path.join(
-							basePath,
-							"tests/format/subdir/jsfmt.spec.js",
-						),
+						"tests/format/subdir/jsfmt.spec.js",
 					),
 					"matched",
 				);
@@ -1950,10 +1911,7 @@ describe("ConfigArray", () => {
 					);
 
 					configs.normalizeSync();
-					const filename = path.resolve(
-						basePath,
-						"node_modules/foo/bar.js",
-					);
+					const filename = "node_modules/foo/bar.js";
 
 					assert.strictEqual(
 						configs.getConfigStatus(filename),
@@ -1975,10 +1933,7 @@ describe("ConfigArray", () => {
 					);
 
 					configs.normalizeSync();
-					const filename = path.resolve(
-						basePath,
-						"node_modules/foo/bar.js",
-					);
+					const filename = "node_modules/foo/bar.js";
 
 					assert.strictEqual(
 						configs.getConfigStatus(filename),
@@ -2000,10 +1955,7 @@ describe("ConfigArray", () => {
 					);
 
 					configs.normalizeSync();
-					const filename = path.resolve(
-						basePath,
-						"node_modules/foo/bar.js",
-					);
+					const filename = "node_modules/foo/bar.js";
 
 					assert.strictEqual(
 						configs.getConfigStatus(filename),
@@ -2025,10 +1977,7 @@ describe("ConfigArray", () => {
 					);
 
 					configs.normalizeSync();
-					const filename = path.resolve(
-						basePath,
-						"node_modules/foo/bar.js",
-					);
+					const filename = "node_modules/foo/bar.js";
 
 					assert.strictEqual(
 						configs.getConfigStatus(filename),
@@ -2036,49 +1985,169 @@ describe("ConfigArray", () => {
 					);
 				});
 			});
+
+			describe("Windows paths", () => {
+				it('should return "matched" for a file in the base directory with different capitalization', () => {
+					configs = new ConfigArray([{ files: ["**/*.js"] }], {
+						basePath: "C:\\DIR",
+					});
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus("c:\\dir\\subdir\\file.js"),
+						"matched",
+					);
+				});
+
+				it('should return "external" for a file on a different drive', () => {
+					configs = new ConfigArray([{ files: ["**/*.js"] }], {
+						basePath: "C:\\dir",
+					});
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus("D:\\dir\\file.js"),
+						"external",
+					);
+				});
+
+				it('should return "external" for a file with a UNC path on a different drive', () => {
+					configs = new ConfigArray([{ files: ["**/*.js"] }], {
+						basePath: "C:\\dir",
+					});
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus("\\\\NAS\\Share\\file.js"),
+						"external",
+					);
+				});
+
+				it('should return "matched" for a file with a UNC path in the base directory', () => {
+					configs = new ConfigArray([{ files: ["**/*.js"] }], {
+						basePath: "\\\\NAS\\Share",
+					});
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus("\\\\NAS\\Share\\dir\\file.js"),
+						"matched",
+					);
+				});
+
+				it('should return "matched" for a file with a namespaced path in the base directory', () => {
+					configs = new ConfigArray([{ files: ["**/*.js"] }], {
+						basePath: "C:\\dir",
+					});
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus("\\\\?\\c:\\dir\\file.js"),
+						"matched",
+					);
+				});
+
+				it('should return "matched" for a file with a namespaced UNC path in the base directory', () => {
+					configs = new ConfigArray([{ files: ["**/*.js"] }], {
+						basePath: "\\\\NAS\\Share",
+					});
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus(
+							"\\\\?\\UNC\\NAS\\Share\\file.js",
+						),
+						"matched",
+					);
+				});
+
+				it('should return "ignored" for a file with a namespaced path in a directory matched by a global ignore pattern', () => {
+					configs = new ConfigArray(
+						[{ files: ["**/*.js"] }, { ignores: ["dist"] }],
+						{ basePath: "C:\\dir" },
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus(
+							"\\\\?\\C:\\dir\\dist\\file.js",
+						),
+						"ignored",
+					);
+				});
+
+				it('should return "unconfigured" for a file with a namespaced path matched by a non-global ignore pattern', () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+								ignores: ["dist/**"],
+							},
+						],
+						{ basePath: "C:\\dir" },
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus(
+							"\\\\?\\C:\\dir\\dist\\file.js",
+						),
+						"unconfigured",
+					);
+				});
+			});
 		});
 
 		describe("isIgnored()", () => {
 			it("should throw an error when not normalized", () => {
-				const filename = path.resolve(basePath, "foo.js");
+				const filename = "foo.js";
 				assert.throws(() => {
 					unnormalizedConfigs.isIgnored(filename);
 				}, /normalized/u);
 			});
+
 			it("should return false when passed JS filename", () => {
-				const filename = path.resolve(basePath, "foo.js");
+				const filename = "foo.js";
 				assert.strictEqual(configs.isIgnored(filename), false);
 			});
 
 			it("should return false when passed JS filename in parent directory", () => {
-				const filename = path.resolve(basePath, "../foo.js");
+				const filename = "../foo.js";
 				assert.strictEqual(configs.isIgnored(filename), false);
 			});
 
 			it("should return false when passed HTML filename", () => {
-				const filename = path.resolve(basePath, "foo.html");
+				const filename = "foo.html";
 				assert.strictEqual(configs.isIgnored(filename), false);
 			});
 
 			it("should return true when passed ignored .gitignore filename", () => {
-				const filename = path.resolve(basePath, ".gitignore");
+				const filename = ".gitignore";
 				assert.strictEqual(configs.isIgnored(filename), true);
 			});
 
 			it("should return false when passed CSS filename", () => {
-				const filename = path.resolve(basePath, "foo.css");
+				const filename = "foo.css";
 
 				assert.strictEqual(configs.isIgnored(filename), false);
 			});
 
 			it("should return false when passed docx filename", () => {
-				const filename = path.resolve(basePath, "sss.docx");
+				const filename = "sss.docx";
 
 				assert.strictEqual(configs.isIgnored(filename), false);
 			});
 
 			it("should return true when passed ignored node_modules filename", () => {
-				const filename = path.resolve(basePath, "node_modules/foo.js");
+				const filename = "node_modules/foo.js";
 
 				assert.strictEqual(configs.isIgnored(filename), true);
 			});
@@ -2097,63 +2166,57 @@ describe("ConfigArray", () => {
 
 				configs.normalizeSync();
 
-				assert.strictEqual(
-					configs.isIgnored(path.join(basePath, "bar.txt")),
-					true,
-				);
-				assert.strictEqual(
-					configs.isIgnored(path.join(basePath, "foo.txt")),
-					true,
-				);
+				assert.strictEqual(configs.isIgnored("bar.txt"), true);
+				assert.strictEqual(configs.isIgnored("foo.txt"), true);
 			});
 		});
 
 		describe("isFileIgnored()", () => {
 			it("should throw an error when not normalized", () => {
-				const filename = path.resolve(basePath, "foo.js");
+				const filename = "foo.js";
 				assert.throws(() => {
 					unnormalizedConfigs.isFileIgnored(filename);
 				}, /normalized/u);
 			});
 
 			it("should return false when passed JS filename", () => {
-				const filename = path.resolve(basePath, "foo.js");
+				const filename = "foo.js";
 
 				assert.strictEqual(configs.isFileIgnored(filename), false);
 			});
 
 			it("should return false when passed JS filename in parent directory", () => {
-				const filename = path.resolve(basePath, "../foo.js");
+				const filename = "../foo.js";
 
 				assert.strictEqual(configs.isFileIgnored(filename), false);
 			});
 
 			it("should return false when passed HTML filename", () => {
-				const filename = path.resolve(basePath, "foo.html");
+				const filename = "foo.html";
 
 				assert.strictEqual(configs.isFileIgnored(filename), false);
 			});
 
 			it("should return true when passed ignored .gitignore filename", () => {
-				const filename = path.resolve(basePath, ".gitignore");
+				const filename = ".gitignore";
 
 				assert.strictEqual(configs.isFileIgnored(filename), true);
 			});
 
 			it("should return false when passed CSS filename", () => {
-				const filename = path.resolve(basePath, "foo.css");
+				const filename = "foo.css";
 
 				assert.strictEqual(configs.isFileIgnored(filename), false);
 			});
 
 			it("should return false when passed docx filename", () => {
-				const filename = path.resolve(basePath, "sss.docx");
+				const filename = "sss.docx";
 
 				assert.strictEqual(configs.isFileIgnored(filename), false);
 			});
 
 			it("should return true when passed ignored node_modules filename", () => {
-				const filename = path.resolve(basePath, "node_modules/foo.js");
+				const filename = "node_modules/foo.js";
 
 				assert.strictEqual(configs.isFileIgnored(filename), true);
 			});
@@ -2172,14 +2235,8 @@ describe("ConfigArray", () => {
 
 				configs.normalizeSync();
 
-				assert.strictEqual(
-					configs.isFileIgnored(path.join(basePath, "bar.txt")),
-					true,
-				);
-				assert.strictEqual(
-					configs.isFileIgnored(path.join(basePath, "foo.txt")),
-					true,
-				);
+				assert.strictEqual(configs.isFileIgnored("bar.txt"), true);
+				assert.strictEqual(configs.isFileIgnored("foo.txt"), true);
 			});
 
 			it("should return true when file is inside of ignored directory", () => {
@@ -2200,9 +2257,7 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.isFileIgnored(
-						path.join(basePath, "ignoreme/foo.js"),
-					),
+					configs.isFileIgnored("ignoreme/foo.js"),
 					true,
 				);
 			});
@@ -2225,7 +2280,7 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.isFileIgnored(path.join(basePath, "foo/bar/a.js")),
+					configs.isFileIgnored("foo/bar/a.js"),
 					false,
 				);
 			});
@@ -2247,10 +2302,7 @@ describe("ConfigArray", () => {
 
 				configs.normalizeSync();
 
-				assert.strictEqual(
-					configs.isFileIgnored(path.join(basePath, "a.js")),
-					true,
-				);
+				assert.strictEqual(configs.isFileIgnored("a.js"), true);
 			});
 
 			it("should return true when the parent directory of a file is ignored", () => {
@@ -2270,10 +2322,7 @@ describe("ConfigArray", () => {
 
 				configs.normalizeSync();
 
-				assert.strictEqual(
-					configs.isFileIgnored(path.join(basePath, "foo/bar/a.js")),
-					true,
-				);
+				assert.strictEqual(configs.isFileIgnored("foo/bar/a.js"), true);
 			});
 
 			it("should return true when an ignored directory is later negated with **", () => {
@@ -2297,9 +2346,7 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.isFileIgnored(
-						path.join(basePath, "node_modules/package/a.js"),
-					),
+					configs.isFileIgnored("node_modules/package/a.js"),
 					true,
 				);
 			});
@@ -2325,9 +2372,7 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.isFileIgnored(
-						path.join(basePath, "node_modules/package/a.js"),
-					),
+					configs.isFileIgnored("node_modules/package/a.js"),
 					true,
 				);
 			});
@@ -2349,10 +2394,7 @@ describe("ConfigArray", () => {
 
 				configs.normalizeSync();
 
-				assert.strictEqual(
-					configs.isFileIgnored(path.join(basePath, "foo")),
-					false,
-				);
+				assert.strictEqual(configs.isFileIgnored("foo"), false);
 			});
 
 			it("should return false when file is in the parent directory of directories that are ignored by a pattern that ends with `/`", () => {
@@ -2372,10 +2414,7 @@ describe("ConfigArray", () => {
 
 				configs.normalizeSync();
 
-				assert.strictEqual(
-					configs.isFileIgnored(path.join(basePath, "foo/a.js")),
-					false,
-				);
+				assert.strictEqual(configs.isFileIgnored("foo/a.js"), false);
 			});
 
 			it("should return true when file is in a directory that is ignored by a pattern that ends with `/`", () => {
@@ -2395,10 +2434,7 @@ describe("ConfigArray", () => {
 
 				configs.normalizeSync();
 
-				assert.strictEqual(
-					configs.isFileIgnored(path.join(basePath, "foo/a.js")),
-					true,
-				);
+				assert.strictEqual(configs.isFileIgnored("foo/a.js"), true);
 			});
 
 			it("should return true when file is in a directory that is ignored by a pattern that does not end with `/`", () => {
@@ -2418,10 +2454,7 @@ describe("ConfigArray", () => {
 
 				configs.normalizeSync();
 
-				assert.strictEqual(
-					configs.isFileIgnored(path.join(basePath, "foo/a.js")),
-					true,
-				);
+				assert.strictEqual(configs.isFileIgnored("foo/a.js"), true);
 			});
 
 			it("should return false when file is in a directory that is ignored and then unignored by pattern that ends with `/`", () => {
@@ -2441,10 +2474,7 @@ describe("ConfigArray", () => {
 
 				configs.normalizeSync();
 
-				assert.strictEqual(
-					configs.isFileIgnored(path.join(basePath, "foo/a.js")),
-					false,
-				);
+				assert.strictEqual(configs.isFileIgnored("foo/a.js"), false);
 			});
 
 			it("should return true when file is in a directory that is ignored along with its files by a pattern that ends with `/**` and then unignored by pattern that ends with `/`", () => {
@@ -2469,10 +2499,7 @@ describe("ConfigArray", () => {
 
 				configs.normalizeSync();
 
-				assert.strictEqual(
-					configs.isFileIgnored(path.join(basePath, "foo/a.js")),
-					true,
-				);
+				assert.strictEqual(configs.isFileIgnored("foo/a.js"), true);
 			});
 
 			it("should return true when file is in a directory that is ignored along with its files by a pattern that ends with `/**` and then unignored by pattern that does not end with `/`", () => {
@@ -2497,10 +2524,7 @@ describe("ConfigArray", () => {
 
 				configs.normalizeSync();
 
-				assert.strictEqual(
-					configs.isFileIgnored(path.join(basePath, "foo/a.js")),
-					true,
-				);
+				assert.strictEqual(configs.isFileIgnored("foo/a.js"), true);
 			});
 
 			it("should return false when file is in a directory that is ignored along its files by pattern that ends with `/**` and then unignored along its files by pattern that ends with `/**`", () => {
@@ -2525,10 +2549,7 @@ describe("ConfigArray", () => {
 
 				configs.normalizeSync();
 
-				assert.strictEqual(
-					configs.isFileIgnored(path.join(basePath, "foo/a.js")),
-					false,
-				);
+				assert.strictEqual(configs.isFileIgnored("foo/a.js"), false);
 			});
 
 			it("should return true when file is ignored by a pattern and there are unignore patterns that target files of a directory with the same name", () => {
@@ -2548,10 +2569,7 @@ describe("ConfigArray", () => {
 
 				configs.normalizeSync();
 
-				assert.strictEqual(
-					configs.isFileIgnored(path.join(basePath, "foo")),
-					true,
-				);
+				assert.strictEqual(configs.isFileIgnored("foo"), true);
 			});
 
 			it("should return true when file is in a directory that is ignored even if an unignore pattern that ends with `/*` matches the file", () => {
@@ -2571,10 +2589,7 @@ describe("ConfigArray", () => {
 
 				configs.normalizeSync();
 
-				assert.strictEqual(
-					configs.isFileIgnored(path.join(basePath, "foo/a.js")),
-					true,
-				);
+				assert.strictEqual(configs.isFileIgnored("foo/a.js"), true);
 			});
 
 			// https://github.com/eslint/eslint/issues/17964#issuecomment-1879840650
@@ -2605,30 +2620,19 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.isFileIgnored(
-						path.join(basePath, "tests/format/foo.js"),
-					),
+					configs.isFileIgnored("tests/format/foo.js"),
 					true,
 				);
 				assert.strictEqual(
-					configs.isFileIgnored(
-						path.join(basePath, "tests/format/jsfmt.spec.js"),
-					),
+					configs.isFileIgnored("tests/format/jsfmt.spec.js"),
 					false,
 				);
 				assert.strictEqual(
-					configs.isFileIgnored(
-						path.join(basePath, "tests/format/subdir/foo.js"),
-					),
+					configs.isFileIgnored("tests/format/subdir/foo.js"),
 					true,
 				);
 				assert.strictEqual(
-					configs.isFileIgnored(
-						path.join(
-							basePath,
-							"tests/format/subdir/jsfmt.spec.js",
-						),
-					),
+					configs.isFileIgnored("tests/format/subdir/jsfmt.spec.js"),
 					false,
 				);
 			});
@@ -2649,10 +2653,7 @@ describe("ConfigArray", () => {
 					);
 
 					configs.normalizeSync();
-					const filename = path.resolve(
-						basePath,
-						"node_modules/foo/bar.js",
-					);
+					const filename = "node_modules/foo/bar.js";
 
 					assert.strictEqual(configs.isFileIgnored(filename), true);
 				});
@@ -2671,10 +2672,7 @@ describe("ConfigArray", () => {
 					);
 
 					configs.normalizeSync();
-					const filename = path.resolve(
-						basePath,
-						"node_modules/foo/bar.js",
-					);
+					const filename = "node_modules/foo/bar.js";
 
 					assert.strictEqual(configs.isFileIgnored(filename), true);
 				});
@@ -2693,10 +2691,7 @@ describe("ConfigArray", () => {
 					);
 
 					configs.normalizeSync();
-					const filename = path.resolve(
-						basePath,
-						"node_modules/foo/bar.js",
-					);
+					const filename = "node_modules/foo/bar.js";
 
 					assert.strictEqual(configs.isFileIgnored(filename), true);
 				});
@@ -2715,10 +2710,7 @@ describe("ConfigArray", () => {
 					);
 
 					configs.normalizeSync();
-					const filename = path.resolve(
-						basePath,
-						"node_modules/foo/bar.js",
-					);
+					const filename = "node_modules/foo/bar.js";
 
 					assert.strictEqual(configs.isFileIgnored(filename), true);
 				});
@@ -2744,17 +2736,11 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.isDirectoryIgnored(
-						path.join(basePath, "node_modules"),
-						"No trailing slash",
-					),
+					configs.isDirectoryIgnored("node_modules"), // No trailing slash
 					true,
 				);
 				assert.strictEqual(
-					configs.isDirectoryIgnored(
-						`${path.join(basePath, "node_modules")}/`,
-						"Trailing slash",
-					),
+					configs.isDirectoryIgnored("node_modules/"), // Trailing slash
 					true,
 				);
 			});
@@ -2791,17 +2777,11 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.isDirectoryIgnored(
-						path.join(basePath, "node_modules"),
-						"No trailing slash",
-					),
+					configs.isDirectoryIgnored("node_modules"), // No trailing slash
 					true,
 				);
 				assert.strictEqual(
-					configs.isDirectoryIgnored(
-						`${path.join(basePath, "node_modules")}/`,
-						"Trailing slash",
-					),
+					configs.isDirectoryIgnored("node_modules/"), // Trailing slash
 					true,
 				);
 			});
@@ -2821,16 +2801,11 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.isDirectoryIgnored(
-						path.join(basePath, "node_modules"),
-					),
+					configs.isDirectoryIgnored("node_modules"),
 					true,
 				);
 				assert.strictEqual(
-					configs.isDirectoryIgnored(
-						`${path.join(basePath, "node_modules")}/`,
-						"Trailing slash",
-					),
+					configs.isDirectoryIgnored("node_modules/"), // Trailing slash
 					true,
 				);
 			});
@@ -2850,15 +2825,11 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.isDirectoryIgnored(
-						path.join(basePath, "node_modules"),
-					),
+					configs.isDirectoryIgnored("node_modules"),
 					true,
 				);
 				assert.strictEqual(
-					configs.isDirectoryIgnored(
-						`${path.join(basePath, "node_modules")}/`,
-					),
+					configs.isDirectoryIgnored("node_modules/"),
 					true,
 				);
 			});
@@ -2879,16 +2850,11 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.isDirectoryIgnored(
-						path.join(basePath, "node_modules"),
-					),
+					configs.isDirectoryIgnored("node_modules"),
 					false,
 				);
 				assert.strictEqual(
-					configs.isDirectoryIgnored(
-						`${path.join(basePath, "node_modules")}/`,
-						"Trailing slash",
-					),
+					configs.isDirectoryIgnored("node_modules/"), // Trailing slash
 					false,
 				);
 			});
@@ -2907,15 +2873,9 @@ describe("ConfigArray", () => {
 
 				configs.normalizeSync();
 
+				assert.strictEqual(configs.isDirectoryIgnored("foo"), true);
 				assert.strictEqual(
-					configs.isDirectoryIgnored(path.join(basePath, "foo")),
-					true,
-				);
-				assert.strictEqual(
-					configs.isDirectoryIgnored(
-						`${path.join(basePath, "foo")}/`,
-						"Trailing slash",
-					),
+					configs.isDirectoryIgnored("foo/"), // Trailing slash
 					true,
 				);
 			});
@@ -2934,15 +2894,9 @@ describe("ConfigArray", () => {
 
 				configs.normalizeSync();
 
+				assert.strictEqual(configs.isDirectoryIgnored("bar"), false);
 				assert.strictEqual(
-					configs.isDirectoryIgnored(path.join(basePath, "bar")),
-					false,
-				);
-				assert.strictEqual(
-					configs.isDirectoryIgnored(
-						`${path.join(basePath, "bar")}/`,
-						"Trailing slash",
-					),
+					configs.isDirectoryIgnored("bar/"), // Trailing slash
 					false,
 				);
 			});
@@ -2962,11 +2916,11 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.isDirectoryIgnored(path.join(basePath, "foo/bar")),
+					configs.isDirectoryIgnored("foo/bar"),
 					false,
 				);
 				assert.strictEqual(
-					configs.isDirectoryIgnored(path.join(basePath, "foo/bar/")),
+					configs.isDirectoryIgnored("foo/bar/"),
 					false,
 				);
 			});
@@ -2985,15 +2939,9 @@ describe("ConfigArray", () => {
 
 				configs.normalizeSync();
 
+				assert.strictEqual(configs.isDirectoryIgnored("foo/bar"), true);
 				assert.strictEqual(
-					configs.isDirectoryIgnored(path.join(basePath, "foo/bar")),
-					true,
-				);
-				assert.strictEqual(
-					configs.isDirectoryIgnored(
-						`${path.join(basePath, "foo/bar")}/`,
-						"Trailing slash",
-					),
+					configs.isDirectoryIgnored("foo/bar/"), // Trailing slash
 					true,
 				);
 			});
@@ -3010,7 +2958,7 @@ describe("ConfigArray", () => {
 					},
 				);
 				assert.throws(() => {
-					configs.isDirectoryIgnored("foo/bar");
+					configs.isDirectoryIgnored("/foo/bar");
 				}, /normalized/u);
 			});
 
@@ -3029,11 +2977,27 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.isDirectoryIgnored(
-						path.resolve(basePath, "../foo/bar"),
-					),
+					configs.isDirectoryIgnored("../foo/bar"),
 					true,
 				);
+			});
+
+			it("should return true when the directory is the parent of the base path", () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["**/*.js"],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(configs.isDirectoryIgnored(".."), true);
+				assert.strictEqual(configs.isDirectoryIgnored("../"), true);
 			});
 
 			it("should return true when the parent directory of a directory is ignored", () => {
@@ -3053,12 +3017,9 @@ describe("ConfigArray", () => {
 
 				configs.normalizeSync();
 
+				assert.strictEqual(configs.isDirectoryIgnored("foo/bar"), true);
 				assert.strictEqual(
-					configs.isDirectoryIgnored(path.join(basePath, "foo/bar")),
-					true,
-				);
-				assert.strictEqual(
-					configs.isDirectoryIgnored(path.join(basePath, "foo/bar/")),
+					configs.isDirectoryIgnored("foo/bar/"),
 					true,
 				);
 			});
@@ -3087,15 +3048,11 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.isDirectoryIgnored(
-						path.join(basePath, "node_modules/package"),
-					),
+					configs.isDirectoryIgnored("node_modules/package"),
 					true,
 				);
 				assert.strictEqual(
-					configs.isDirectoryIgnored(
-						path.join(basePath, "node_modules/package/"),
-					),
+					configs.isDirectoryIgnored("node_modules/package/"),
 					true,
 				);
 			});
@@ -3121,15 +3078,11 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.isDirectoryIgnored(
-						path.join(basePath, "node_modules"),
-					),
+					configs.isDirectoryIgnored("node_modules"),
 					false,
 				);
 				assert.strictEqual(
-					configs.isDirectoryIgnored(
-						path.join(basePath, "node_modules/"),
-					),
+					configs.isDirectoryIgnored("node_modules/"),
 					false,
 				);
 			});
@@ -3155,15 +3108,11 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.isDirectoryIgnored(
-						path.join(basePath, "node_modules"),
-					),
+					configs.isDirectoryIgnored("node_modules"),
 					true,
 				);
 				assert.strictEqual(
-					configs.isDirectoryIgnored(
-						path.join(basePath, "node_modules/"),
-					),
+					configs.isDirectoryIgnored("node_modules/"),
 					true,
 				);
 			});
@@ -3189,15 +3138,11 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.isDirectoryIgnored(
-						path.join(basePath, "node_modules/package"),
-					),
+					configs.isDirectoryIgnored("node_modules/package"),
 					true,
 				);
 				assert.strictEqual(
-					configs.isDirectoryIgnored(
-						path.join(basePath, "node_modules/package/"),
-					),
+					configs.isDirectoryIgnored("node_modules/package/"),
 					true,
 				);
 			});
@@ -3218,10 +3163,7 @@ describe("ConfigArray", () => {
 					);
 
 					configs.normalizeSync();
-					const directoryPath = path.resolve(
-						basePath,
-						"node_modules/foo",
-					);
+					const directoryPath = "node_modules/foo";
 
 					assert.strictEqual(
 						configs.isDirectoryIgnored(directoryPath),
@@ -3240,10 +3182,7 @@ describe("ConfigArray", () => {
 					);
 
 					configs.normalizeSync();
-					const directoryPath = path.resolve(
-						basePath,
-						"node_modules/foo",
-					);
+					const directoryPath = "node_modules/foo";
 
 					assert.strictEqual(
 						configs.isDirectoryIgnored(directoryPath),
@@ -3265,10 +3204,7 @@ describe("ConfigArray", () => {
 					);
 
 					configs.normalizeSync();
-					const directoryPath = path.resolve(
-						basePath,
-						"node_modules/foo",
-					);
+					const directoryPath = "node_modules/foo";
 
 					assert.strictEqual(
 						configs.isDirectoryIgnored(directoryPath),
@@ -3290,10 +3226,7 @@ describe("ConfigArray", () => {
 					);
 
 					configs.normalizeSync();
-					const directoryPath = path.resolve(
-						basePath,
-						"node_modules/foo",
-					);
+					const directoryPath = "node_modules/foo";
 
 					assert.strictEqual(
 						configs.isDirectoryIgnored(directoryPath),
@@ -3358,9 +3291,7 @@ describe("ConfigArray", () => {
 				configs.normalizeSync();
 
 				assert.strictEqual(
-					configs.isFileIgnored(
-						path.join(basePath, "ignoreme/foo.js"),
-					),
+					configs.isFileIgnored("ignoreme/foo.js"),
 					true,
 				);
 				assert.deepStrictEqual(configs.ignores, ["ignoreme"]);
