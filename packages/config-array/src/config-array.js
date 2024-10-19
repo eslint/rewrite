@@ -25,6 +25,7 @@ import { filesAndIgnoresSchema } from "./files-and-ignores-schema.js";
 /** @typedef {import("./types.ts").ConfigObject} ConfigObject */
 /** @typedef {import("minimatch").IMinimatchStatic} IMinimatchStatic */
 /** @typedef {import("minimatch").IMinimatch} IMinimatch */
+/** @typedef {import("@jsr/std__path")} PathImpl */
 
 /*
  * This is a bit of a hack to make TypeScript happy with the Rollup-created
@@ -490,7 +491,7 @@ function assertExtraConfigTypes(extraConfigTypes) {
 /**
  * Returns path-handling implementations for Unix or Windows, depending on a given absolute path.
  * @param {string} fileOrDirPath The absolute path to check.
- * @returns {typeof import("@jsr/std__path")} Path-handling implementations for the specified path.
+ * @returns {PathImpl} Path-handling implementations for the specified path.
  * @throws An error is thrown if the specified argument is not an absolute path.
  */
 function getPathImpl(fileOrDirPath) {
@@ -515,7 +516,7 @@ function getPathImpl(fileOrDirPath) {
  * Converts a given path to a relative path with all separator characters replaced by forward slashes (`"/"`).
  * @param {string} fileOrDirPath The unprocessed path to convert.
  * @param {string} namespacedBasePath The namespaced base path of the directory to which the calculated path shall be relative.
- * @param {typeof import("@jsr/std__path")} path Path-handling implementations.
+ * @param {PathImpl} path Path-handling implementations.
  * @returns {string} A relative path with all separator characters replaced by forward slashes.
  */
 function toRelativePath(fileOrDirPath, namespacedBasePath, path) {
@@ -545,10 +546,16 @@ const dataCache = new WeakMap();
  * those config objects.
  */
 export class ConfigArray extends Array {
-	/** The namespaced path of the config file directory. */
+	/**
+	 * The namespaced path of the config file directory.
+	 * @type {string}
+	 */
 	#namespacedBasePath;
 
-	/** Path-handling implementations */
+	/**
+	 * Path-handling implementations
+	 * @type {PathImpl}
+	 */
 	#path;
 
 	/**
