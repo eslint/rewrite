@@ -514,7 +514,7 @@ function getPathImpl(fileOrDirPath) {
 /**
  * Converts a given path to a relative path with all separator characters replaced by forward slashes (`"/"`).
  * @param {string} fileOrDirPath The unprocessed path to convert.
- * @param {string} namespacedBasePath The namespaced base path of the directory to which the calulated bath shall be relative.
+ * @param {string} namespacedBasePath The namespaced base path of the directory to which the calculated path shall be relative.
  * @param {typeof import("@jsr/std__path")} path Path-handling implementations.
  * @returns {string} A relative path with all separator characters replaced by forward slashes.
  */
