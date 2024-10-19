@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.2.1](https://github.com/eslint/rewrite/compare/compat-v1.2.0...compat-v1.2.1) (2024-10-18)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @eslint/core bumped from ^0.6.0 to ^0.7.0
+
+## [1.2.0](https://github.com/eslint/rewrite/compare/compat-v1.1.1...compat-v1.2.0) (2024-10-01)
+
+
+### Features
+
+* add eslint peer dependency ([#106](https://github.com/eslint/rewrite/issues/106)) ([ae01ec3](https://github.com/eslint/rewrite/commit/ae01ec385015724cb37020b0f50a2910dc032fa7))
+
+
+### Bug Fixes
+
+* Upgrade ESLint to fix type errors ([#120](https://github.com/eslint/rewrite/issues/120)) ([d0c879e](https://github.com/eslint/rewrite/commit/d0c879e202f8b5f13a4334bffde6f22a9f80a195))
+
 ## [1.1.1](https://github.com/eslint/rewrite/compare/compat-v1.1.0...compat-v1.1.1) (2024-07-11)
 
 

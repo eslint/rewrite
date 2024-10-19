@@ -29,7 +29,6 @@
   },
   "devDependencies": {
     "@types/mocha": "^10.0.7",
-    "common-tags": "^1.8.2",
     "eslint": "^9.11.1",
     "eslint-config-eslint": "^11.0.0",
     "got": "^14.4.1",
