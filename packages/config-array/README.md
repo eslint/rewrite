@@ -170,7 +170,7 @@ export default [
 
 In this example, the array contains both config objects and a config array. When a config array is normalized (see details below), it is flattened so only config objects remain. However, the order of evaluation remains the same.
 
-If the `files` array contains a function, then that function is called with the absolute path of the file and is expected to return `true` if there is a match and `false` if not. (The `ignores` array can also contain functions.)
+If the `files` array contains a function, then that function is called with the path of the file as it was passed in. The function is expected to return `true` if there is a match and `false` if not. (The `ignores` array can also contain functions.)
 
 If the `files` array contains an item that is an array of strings and functions, then all patterns must match in order for the config to match. In the preceding examples, both `*.test.*` and `*.js` must match in order for the config object to be used.
 
@@ -273,7 +273,7 @@ await configs.normalizeSync({
 To get the config for a file, use the `getConfig()` method on a normalized config array and pass in the filename to get a config for:
 
 ```js
-// pass in absolute filename
+// pass in filename
 const fileConfig = configs.getConfig(
 	path.resolve(process.cwd(), "package.json"),
 );
@@ -283,14 +283,14 @@ The config array always returns an object, even if there are no configs matching
 
 A few things to keep in mind:
 
--   You must pass in the absolute filename to get a config for.
+-   If a filename is not an absolute path, it will be resolved relative to the base path directory.
 -   The returned config object never has `files`, `ignores`, or `name` properties; the only properties on the object will be the other configuration options specified.
 -   The config array caches configs, so subsequent calls to `getConfig()` with the same filename will return in a fast lookup rather than another calculation.
 -   A config will only be generated if the filename matches an entry in a `files` key. A config will not be generated without matching a `files` key (configs without a `files` key are only applied when another config with a `files` key is applied; configs without `files` are never applied on their own). Any config with a `files` key entry that is `*` or ends with `/**` or `/*` will only be applied if another entry in the same `files` key matches or another config matches.
 
 ## Determining Ignored Paths
 
-You can determine if a file is ignored by using the `isFileIgnored()` method and passing in the absolute path of any file, as in this example:
+You can determine if a file is ignored by using the `isFileIgnored()` method and passing in the path of any file, as in this example:
 
 ```js
 const ignored = configs.isFileIgnored("/foo/bar/baz.txt");
@@ -304,7 +304,7 @@ A file is considered ignored if any of the following is true:
 -   **If it matches an entry in `files` and also in `ignores`.** For example, if `**/*.js` is in `files` and `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
 -   **The file is outside the `basePath`.** If the `basePath` is `/usr/me`, then `/foo/a.js` is considered ignored.
 
-For directories, use the `isDirectoryIgnored()` method and pass in the absolute path of any directory, as in this example:
+For directories, use the `isDirectoryIgnored()` method and pass in the path of any directory, as in this example:
 
 ```js
 const ignored = configs.isDirectoryIgnored("/foo/bar/");
