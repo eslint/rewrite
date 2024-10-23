@@ -500,6 +500,12 @@ describe("ConfigArray", () => {
 				void new ConfigArray([{}], { basePath: "foo/bar" });
 			}, /Expected an absolute path/u);
 		});
+
+		it("should throw an error when basePath is an empty string", async () => {
+			assert.throws(() => {
+				void new ConfigArray([{}], { basePath: "" });
+			}, /Expected an absolute path/u);
+		});
 	});
 
 	describe("ConfigArray members", () => {
@@ -633,10 +639,6 @@ describe("ConfigArray", () => {
 
 			it("should default basePath property to '/'", () => {
 				assert.strictEqual(new ConfigArray([]).basePath, "/");
-				assert.strictEqual(
-					new ConfigArray([], { basePath: "" }).basePath,
-					"/",
-				);
 			});
 		});
 

@@ -563,8 +563,8 @@ export class ConfigArray extends Array {
 	 * @param {Iterable|Function|Object} configs An iterable yielding config
 	 *      objects, or a config function, or a config object.
 	 * @param {Object} options The options for the ConfigArray.
-	 * @param {string} [options.basePath] The absolute path of the config file directory.
-	 * 		Defaults to `"/"` if not specified or empty.
+	 * @param {string} [options.basePath="/"] The absolute path of the config file directory.
+	 * 		Defaults to `"/"`.
 	 * @param {boolean} [options.normalized=false] Flag indicating if the
 	 *      configs have already been normalized.
 	 * @param {Object} [options.schema] The additional schema
@@ -574,7 +574,7 @@ export class ConfigArray extends Array {
 	constructor(
 		configs,
 		{
-			basePath,
+			basePath = "/",
 			normalized = false,
 			schema: customSchema,
 			extraConfigTypes = [],
@@ -606,7 +606,7 @@ export class ConfigArray extends Array {
 		 * @property basePath
 		 * @type {string}
 		 */
-		this.basePath = basePath || "/";
+		this.basePath = basePath;
 
 		assertExtraConfigTypes(extraConfigTypes);
 
@@ -641,12 +641,12 @@ export class ConfigArray extends Array {
 		}
 
 		// select path-handling implementations depending on the base path
-		this.#path = getPathImpl(this.basePath);
+		this.#path = getPathImpl(basePath);
 
 		// On Windows, `path.relative()` returns an absolute path when given two paths on different drives.
 		// The namespaced base path is useful to make sure that calculated relative paths are always relative.
 		// On Unix, it is identical to the base path.
-		this.#namespacedBasePath = this.#path.toNamespacedPath(this.basePath);
+		this.#namespacedBasePath = this.#path.toNamespacedPath(basePath);
 	}
 
 	/**
