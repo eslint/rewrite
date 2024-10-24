@@ -250,7 +250,7 @@ export interface RuleContext<
 	/**
 	 * Shared settings for the configuration.
 	 */
-	settings: Record<string, unknown>;
+	settings: SettingsConfig;
 
 	/**
 	 * Parser-specific options for the configuration.
