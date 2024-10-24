@@ -413,7 +413,7 @@ describe("ConfigArray", () => {
 				'Config "foo": Key "ignores": Expected array to only contain strings and functions.',
 		});
 
-		it("should throw an error when a config is not an object", async () => {
+		it("should throw an error when a config is not an object", () => {
 			configs = new ConfigArray(
 				[
 					{
@@ -461,7 +461,7 @@ describe("ConfigArray", () => {
 			}, 'Config Error: Config (unnamed): Key "name": Property must be a string.');
 		});
 
-		it("should throw an error when base config is undefined", async () => {
+		it("should throw an error when base config is undefined", () => {
 			configs = new ConfigArray([undefined], { basePath });
 
 			assert.throws(() => {
@@ -469,7 +469,7 @@ describe("ConfigArray", () => {
 			}, "ConfigError: Config (unnamed): Unexpected undefined config.");
 		});
 
-		it("should throw an error when base config is null", async () => {
+		it("should throw an error when base config is null", () => {
 			configs = new ConfigArray([null], { basePath });
 
 			assert.throws(() => {
@@ -477,7 +477,7 @@ describe("ConfigArray", () => {
 			}, "Config Error: Config (unnamed): Unexpected null config.");
 		});
 
-		it("should throw an error when additional config is undefined", async () => {
+		it("should throw an error when additional config is undefined", () => {
 			configs = new ConfigArray([{}], { basePath });
 			configs.push(undefined);
 
@@ -486,7 +486,7 @@ describe("ConfigArray", () => {
 			}, "Config Error: Config (unnamed): Unexpected undefined config.");
 		});
 
-		it("should throw an error when additional config is null", async () => {
+		it("should throw an error when additional config is null", () => {
 			configs = new ConfigArray([{}], { basePath });
 			configs.push(null);
 
@@ -495,13 +495,13 @@ describe("ConfigArray", () => {
 			}, "Config Error: Config (unnamed): Unexpected null config.");
 		});
 
-		it("should throw an error when basePath is a relative path", async () => {
+		it("should throw an error when basePath is a relative path", () => {
 			assert.throws(() => {
 				void new ConfigArray([{}], { basePath: "foo/bar" });
 			}, /Expected an absolute path/u);
 		});
 
-		it("should throw an error when basePath is an empty string", async () => {
+		it("should throw an error when basePath is an empty string", () => {
 			assert.throws(
 				() => {
 					void new ConfigArray([{}], { basePath: "" });
@@ -513,7 +513,7 @@ describe("ConfigArray", () => {
 			);
 		});
 
-		it("should throw an error when basePath is not a string", async () => {
+		it("should throw an error when basePath is not a string", () => {
 			assert.throws(
 				() => {
 					void new ConfigArray([{}], { basePath: ["/tmp/foo"] });
@@ -550,7 +550,7 @@ describe("ConfigArray", () => {
 				assert.strictEqual(config.name, "from-finalize");
 			});
 
-			it("should allow finalizeConfig to alter config before returning when calling normalizeSync()", async () => {
+			it("should allow finalizeConfig to alter config before returning when calling normalizeSync()", () => {
 				configs = createConfigArray();
 				configs[ConfigArraySymbol.finalizeConfig] = () => ({
 					name: "from-finalize",
@@ -620,7 +620,7 @@ describe("ConfigArray", () => {
 				assert.strictEqual(internalThis, configs);
 			});
 
-			it('should have "this" inside of function be equal to config array when calling normalizeSync()', async () => {
+			it('should have "this" inside of function be equal to config array when calling normalizeSync()', () => {
 				configs = createConfigArray();
 				configs.push("foo:bar");
 				let internalThis;
