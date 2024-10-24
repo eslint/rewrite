@@ -600,6 +600,10 @@ export class ConfigArray extends Array {
 			Object.assign({}, customSchema, baseSchema),
 		);
 
+		if (!isString(basePath) || !basePath) {
+			throw new TypeError("basePath must be a non-empty string");
+		}
+
 		/**
 		 * The path of the config file that this array was loaded from.
 		 * This is used to calculate filename matches.

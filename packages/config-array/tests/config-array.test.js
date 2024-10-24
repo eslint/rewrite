@@ -502,9 +502,27 @@ describe("ConfigArray", () => {
 		});
 
 		it("should throw an error when basePath is an empty string", async () => {
-			assert.throws(() => {
-				void new ConfigArray([{}], { basePath: "" });
-			}, /Expected an absolute path/u);
+			assert.throws(
+				() => {
+					void new ConfigArray([{}], { basePath: "" });
+				},
+				{
+					constructor: TypeError,
+					message: "basePath must be a non-empty string",
+				},
+			);
+		});
+
+		it("should throw an error when basePath is not a string", async () => {
+			assert.throws(
+				() => {
+					void new ConfigArray([{}], { basePath: ["/tmp/foo"] });
+				},
+				{
+					constructor: TypeError,
+					message: "basePath must be a non-empty string",
+				},
+			);
 		});
 	});
 
