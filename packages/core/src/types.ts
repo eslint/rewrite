@@ -427,7 +427,7 @@ interface SuggestedEditBase {
 	 */
 	fix?(
 		fixer: RuleTextEditor,
-	): RuleTextEdit | RuleTextEdit[] | IterableIterator<RuleTextEdit> | null;
+	): RuleTextEdit | Iterable<RuleTextEdit> | null;
 }
 
 type SuggestionMessage = { desc: string } | { messageId: string };
