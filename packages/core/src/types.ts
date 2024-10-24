@@ -396,7 +396,7 @@ interface ViolationReportBase {
 	 */
 	fix?(
 		fixer: RuleTextEditor,
-	): RuleTextEdit | RuleTextEdit[] | IterableIterator<RuleTextEdit> | null;
+	): RuleTextEdit | Iterable<RuleTextEdit> | null;
 
 	/**
 	 * An array of suggested fixes for the problem. These fixes may change the
