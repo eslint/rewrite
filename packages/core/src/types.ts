@@ -93,6 +93,7 @@ export type RuleType = "problem" | "suggestion" | "layout";
 export type RuleFixType = "code" | "whitespace";
 
 /* eslint-disable @typescript-eslint/consistent-indexed-object-style -- Needs to be interface so people can extend it. */
+/* eslint-disable @typescript-eslint/no-explicit-any -- Necessary to allow subclasses to work correctly */
 /**
  * An object containing visitor information for a rule. Each method is either the
  * name of a node type or a selector, or is a method that will be called at specific
@@ -102,9 +103,10 @@ export interface RuleVisitor {
 	/**
 	 * Called for each node in the AST or at specific times during the traversal.
 	 */
-	[key: string]: (...args: unknown[]) => void;
+	[key: string]: (...args: any[]) => void;
 }
 /* eslint-enable @typescript-eslint/consistent-indexed-object-style -- Needs to be interface so people can extend it. */
+/* eslint-enable @typescript-eslint/no-explicit-any -- Necessary to allow subclasses to work correctly */
 
 /**
  * Rule meta information used for documentation.
@@ -157,7 +159,7 @@ export interface RulesMeta<
 	/**
 	 * The messages that the rule can report.
 	 */
-	messages: Record<MessageIds, string>;
+	messages?: Record<MessageIds, string>;
 
 	/**
 	 * The deprecated rules for the rule.
@@ -394,9 +396,7 @@ interface ViolationReportBase {
 	 * @param fixer The text editor to apply the fix.
 	 * @returns The fix(es) for the violation.
 	 */
-	fix?(
-		fixer: RuleTextEditor,
-	): RuleTextEdit | Iterable<RuleTextEdit> | null;
+	fix?(fixer: RuleTextEditor): RuleTextEdit | Iterable<RuleTextEdit> | null;
 
 	/**
 	 * An array of suggested fixes for the problem. These fixes may change the
@@ -425,9 +425,7 @@ interface SuggestedEditBase {
 	 * @param fixer The text editor to apply the fix.
 	 * @returns The fix for the suggestion.
 	 */
-	fix?(
-		fixer: RuleTextEditor,
-	): RuleTextEdit | Iterable<RuleTextEdit> | null;
+	fix?(fixer: RuleTextEditor): RuleTextEdit | Iterable<RuleTextEdit> | null;
 }
 
 type SuggestionMessage = { desc: string } | { messageId: string };
