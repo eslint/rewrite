@@ -269,7 +269,7 @@ export interface RuleContext<
 	 * The CommonJS path to the parser used while parsing this file.
 	 * @deprecated No longer used.
 	 */
-	parserPath: string;
+	parserPath: string | undefined;
 
 	/**
 	 * The rule ID.
