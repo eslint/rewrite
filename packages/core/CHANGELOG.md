@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.0](https://github.com/eslint/rewrite/compare/core-v0.7.0...core-v0.8.0) (2024-10-25)
+
+
+### Features
+
+* Add rule types ([#110](https://github.com/eslint/rewrite/issues/110)) ([ffa176f](https://github.com/eslint/rewrite/commit/ffa176f0c80c14c8ba088d2ba359af4b2805c4f5))
+
 ## [0.7.0](https://github.com/eslint/rewrite/compare/core-v0.6.0...core-v0.7.0) (2024-10-18)
 
 
