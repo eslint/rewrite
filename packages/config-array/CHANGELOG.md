@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.19.0](https://github.com/eslint/rewrite/compare/config-array-v0.18.0...config-array-v0.19.0) (2024-10-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* correctly detect if file is outside base path on Windows ([#59](https://github.com/eslint/rewrite/issues/59))
+
+### Bug Fixes
+
+* correctly detect if file is outside base path on Windows ([#59](https://github.com/eslint/rewrite/issues/59)) ([f93aa4c](https://github.com/eslint/rewrite/commit/f93aa4ca0a9a68b5c90847cd3d24801196abb405))
+
 ## [0.18.0](https://github.com/eslint/rewrite/compare/config-array-v0.17.1...config-array-v0.18.0) (2024-08-12)
 
 
