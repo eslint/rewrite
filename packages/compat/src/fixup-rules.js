@@ -183,6 +183,21 @@ export function fixupRule(ruleDefinition) {
 		create: ruleCreate,
 	};
 
+	// copy `schema` property of function-style rule or top-level `schema` property of object-style rule into `meta` object
+	// @ts-ignore -- top-level `schema` property was not offically supported for object-style rules so it doesn't exist in types
+	const { schema } = ruleDefinition;
+	if (schema) {
+		if (!newRuleDefinition.meta) {
+			newRuleDefinition.meta = { schema };
+		} else {
+			newRuleDefinition.meta = {
+				...newRuleDefinition.meta,
+				// top-level `schema` had precedence over `meta.schema` so it's okay to overwrite `meta.schema` if it exists
+				schema,
+			};
+		}
+	}
+
 	// cache the fixed up rule
 	fixedUpRuleReplacements.set(ruleDefinition, newRuleDefinition);
 	fixedUpRules.add(newRuleDefinition);
