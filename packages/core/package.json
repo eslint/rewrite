@@ -1,6 +1,6 @@
 {
   "name": "@eslint/core",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Runtime-agnostic core of ESLint",
   "type": "module",
   "types": "./dist/esm/types.d.ts",
@@ -36,6 +36,7 @@
   },
   "homepage": "https://github.com/eslint/rewrite#readme",
   "devDependencies": {
+    "json-schema": "^0.4.0",
     "typescript": "^5.4.5"
   },
   "engines": {

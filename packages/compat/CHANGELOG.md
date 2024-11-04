@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.2.2](https://github.com/eslint/rewrite/compare/compat-v1.2.1...compat-v1.2.2) (2024-10-25)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @eslint/core bumped from ^0.7.0 to ^0.8.0
+
 ## [1.2.1](https://github.com/eslint/rewrite/compare/compat-v1.2.0...compat-v1.2.1) (2024-10-18)
 
 

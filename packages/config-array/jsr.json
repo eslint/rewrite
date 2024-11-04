@@ -1,6 +1,6 @@
 {
   "name": "@eslint/config-array",
-  "version": "0.18.0",
+  "version": "0.19.0",
   "exports": "./dist/esm/index.js",
   "publish": {
     "include": [
@@ -8,6 +8,8 @@
       "dist/esm/index.d.ts",
       "dist/esm/types.ts",
       "dist/esm/types.d.ts",
+      "dist/esm/std__path/posix.js",
+      "dist/esm/std__path/windows.js",
       "README.md",
       "jsr.json",
       "LICENSE"

@@ -76,6 +76,184 @@ describe("@eslint/backcompat", () => {
 			assert.strictEqual(fixedUpRule, fixedUpRule2);
 		});
 
+		it("should return a new rule object with `meta.schema` when a rule with top-level `schema` and without `meta` is passed to fixupRule", () => {
+			const schema = [{ type: "string" }];
+			const rule = {
+				schema,
+				create(context) {
+					return {
+						Identifier(node) {
+							context.report(node, context.options[0]);
+						},
+					};
+				},
+			};
+			const fixedUpRule = fixupRule(rule);
+
+			assert.notStrictEqual(rule, fixedUpRule);
+			assert.deepStrictEqual(Object.keys(fixedUpRule), [
+				...Object.keys(rule),
+				"meta",
+			]);
+			assert.strictEqual(typeof fixedUpRule.meta, "object");
+			assert.deepStrictEqual(fixedUpRule.meta.schema, schema);
+
+			const config = {
+				plugins: {
+					test: {
+						rules: {
+							"test-rule": fixedUpRule,
+						},
+					},
+				},
+				rules: {
+					"test/test-rule": ["error", "my-option"],
+				},
+			};
+
+			const linter = new Linter();
+			const code = "var foo;";
+			const messages = linter.verify(code, config, {
+				filename: "test.js",
+			});
+
+			assert.strictEqual(messages.length, 1);
+			assert.strictEqual(messages[0].message, "my-option");
+		});
+
+		it("should return a new rule object with `meta.schema` when a rule with top-level `schema` and with `meta` is passed to fixupRule", () => {
+			const schema = [{ type: "string" }];
+			const rule = {
+				schema,
+				meta: {
+					docs: {},
+				},
+				create(context) {
+					return {
+						Identifier(node) {
+							context.report(node, context.options[0]);
+						},
+					};
+				},
+			};
+			const fixedUpRule = fixupRule(rule);
+
+			assert.notStrictEqual(rule, fixedUpRule);
+			assert.deepStrictEqual(Object.keys(rule), Object.keys(fixedUpRule));
+			assert.deepStrictEqual(Object.keys(fixedUpRule.meta), [
+				...Object.keys(rule.meta),
+				"schema",
+			]);
+			assert.deepStrictEqual(fixedUpRule.meta.schema, schema);
+
+			const config = {
+				plugins: {
+					test: {
+						rules: {
+							"test-rule": fixedUpRule,
+						},
+					},
+				},
+				rules: {
+					"test/test-rule": ["error", "my-option"],
+				},
+			};
+
+			const linter = new Linter();
+			const code = "var foo;";
+			const messages = linter.verify(code, config, {
+				filename: "test.js",
+			});
+
+			assert.strictEqual(messages.length, 1);
+			assert.strictEqual(messages[0].message, "my-option");
+		});
+
+		it("should return a rule object when a function-style rule is passed to fixupRule", () => {
+			function rule(context) {
+				return {
+					Identifier(node) {
+						context.report(node, "My message.");
+					},
+				};
+			}
+			const fixedUpRule = fixupRule(rule);
+
+			assert.strictEqual(typeof fixedUpRule, "object");
+			assert.deepStrictEqual(Object.keys(fixedUpRule), ["create"]);
+			assert.strictEqual(typeof fixedUpRule.create, "function");
+			assert.notStrictEqual(rule, fixedUpRule.create); // the original rule should be wrapped in `create`
+
+			const config = {
+				plugins: {
+					test: {
+						rules: {
+							"test-rule": fixedUpRule,
+						},
+					},
+				},
+				rules: {
+					"test/test-rule": "error",
+				},
+			};
+
+			const linter = new Linter();
+			const code = "var foo;";
+			const messages = linter.verify(code, config, {
+				filename: "test.js",
+			});
+
+			assert.strictEqual(messages.length, 1);
+			assert.strictEqual(messages[0].message, "My message.");
+		});
+
+		it("should return a rule object with `meta.schema` when a function-style rule with schema is passed to fixupRule", () => {
+			function rule(context) {
+				return {
+					Identifier(node) {
+						context.report(node, context.options[0]);
+					},
+				};
+			}
+
+			const schema = [{ type: "string" }];
+			rule.schema = schema;
+
+			const fixedUpRule = fixupRule(rule);
+
+			assert.strictEqual(typeof fixedUpRule, "object");
+			assert.deepStrictEqual(Object.keys(fixedUpRule), [
+				"create",
+				"meta",
+			]);
+			assert.strictEqual(typeof fixedUpRule.create, "function");
+			assert.notStrictEqual(rule, fixedUpRule.create); // the original rule should be wrapped in `create`
+			assert.strictEqual(typeof fixedUpRule.meta, "object");
+			assert.deepStrictEqual(fixedUpRule.meta.schema, schema);
+
+			const config = {
+				plugins: {
+					test: {
+						rules: {
+							"test-rule": fixedUpRule,
+						},
+					},
+				},
+				rules: {
+					"test/test-rule": ["error", "my-option"],
+				},
+			};
+
+			const linter = new Linter();
+			const code = "var foo;";
+			const messages = linter.verify(code, config, {
+				filename: "test.js",
+			});
+
+			assert.strictEqual(messages.length, 1);
+			assert.strictEqual(messages[0].message, "my-option");
+		});
+
 		it("should create a rule where getDeclaredVariables() returns the same value as sourceCode.getDeclaredVariables(node)", () => {
 			const rule = {
 				create(context) {
