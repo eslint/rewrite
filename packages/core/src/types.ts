@@ -588,6 +588,13 @@ export interface Language<
 	validateLanguageOptions(languageOptions: Options["LangOptions"]): void;
 
 	/**
+	 * Normalizes languageOptions for this language.
+	 */
+	normalizeLanguageOptions?(
+		languageOptions: Options["LangOptions"],
+	): Options["LangOptions"];
+
+	/**
 	 * Helper for esquery that allows languages to match nodes against
 	 * class. esquery currently has classes like `function` that will
 	 * match all the various function nodes. This method allows languages
