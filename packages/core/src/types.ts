@@ -186,10 +186,10 @@ export interface RulesMeta<
  * Generic type for `RuleContext`.
  */
 export interface RuleContextTypeOptions {
-	LangOptions?: LanguageOptions;
-	Code?: SourceCode;
-	RuleOptions?: unknown[];
-	Node?: unknown;
+	LangOptions: LanguageOptions;
+	Code: SourceCode;
+	RuleOptions: unknown[];
+	Node: unknown;
 }
 
 /**
@@ -441,13 +441,13 @@ export type SuggestedEdit = SuggestedEditBase & SuggestionMessage;
  * Generic options for the `RuleDefinition` type.
  */
 export interface RuleDefinitionTypeOptions {
-	LangOptions?: LanguageOptions;
-	Code?: SourceCode;
-	RuleOptions?: unknown[];
-	Visitor?: RuleVisitor;
-	Node?: unknown;
-	MessageIds?: string;
-	ExtRuleDocs?: unknown;
+	LangOptions: LanguageOptions;
+	Code: SourceCode;
+	RuleOptions: unknown[];
+	Visitor: RuleVisitor;
+	Node: unknown;
+	MessageIds: string;
+	ExtRuleDocs: unknown;
 }
 
 /**
@@ -535,9 +535,9 @@ export type RulesConfig = Record<string, RuleConfig>;
  * Generic options for the `Language` type.
  */
 export interface LanguageTypeOptions {
-	LangOptions?: LanguageOptions;
-	Code?: SourceCode;
-	RootNode?: unknown;
+	LangOptions: LanguageOptions;
+	Code: SourceCode;
+	RootNode: unknown;
 	Node: unknown;
 }
 
@@ -733,10 +733,10 @@ interface InlineConfigElement {
  * Generic options for the `SourceCodeBase` type.
  */
 interface SourceCodeBaseTypeOptions {
-	LangOptions?: LanguageOptions;
-	RootNode?: unknown;
-	SyntaxElementWithLoc?: unknown;
-	ConfigNode?: unknown;
+	LangOptions: LanguageOptions;
+	RootNode: unknown;
+	SyntaxElementWithLoc: unknown;
+	ConfigNode: unknown;
 }
 
 /**
