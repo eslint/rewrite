@@ -122,7 +122,6 @@ describe("ConfigCommentParser", () => {
 				d: "4",
 			});
 		});
-
 	});
 
 	describe("parseListConfig", () => {
