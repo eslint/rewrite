@@ -1,6 +1,6 @@
 {
   "name": "@eslint/compat",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "exports": "./dist/esm/index.js",
   "publish": {
     "include": [
