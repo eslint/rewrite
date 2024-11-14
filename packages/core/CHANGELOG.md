@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.9.0](https://github.com/eslint/rewrite/compare/core-v0.8.0...core-v0.9.0) (2024-11-14)
+
+
+### Features
+
+* Add Language#normalizeLanguageOptions() ([#131](https://github.com/eslint/rewrite/issues/131)) ([3591a78](https://github.com/eslint/rewrite/commit/3591a7805a060cb130d40d61f200431b782431d8))
+
+
+### Bug Fixes
+
+* non-optional properties in generic interfaces ([#132](https://github.com/eslint/rewrite/issues/132)) ([d0b2e70](https://github.com/eslint/rewrite/commit/d0b2e705c49709cfb92a9110c65cd628c91aaa29))
+
 ## [0.8.0](https://github.com/eslint/rewrite/compare/core-v0.7.0...core-v0.8.0) (2024-10-25)
 
 

@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.2.3](https://github.com/eslint/rewrite/compare/compat-v1.2.2...compat-v1.2.3) (2024-11-14)
+
+
+### Bug Fixes
+
+* Support legacy `schema` properties ([#128](https://github.com/eslint/rewrite/issues/128)) ([3a87bbb](https://github.com/eslint/rewrite/commit/3a87bbb7f0b501c74507f32083c289304d6c03a6))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @eslint/core bumped from ^0.8.0 to ^0.9.0
+
 ## [1.2.2](https://github.com/eslint/rewrite/compare/compat-v1.2.1...compat-v1.2.2) (2024-10-25)
 
 
