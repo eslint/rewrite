@@ -74,6 +74,54 @@ describe("ConfigCommentParser", () => {
 				b: null,
 			});
 		});
+
+		it("should return an empty object for an empty string", () => {
+			const code = "";
+			const result = commentParser.parseStringConfig(code, comment);
+
+			assert.deepStrictEqual(result, {});
+		});
+
+		it("should parse string config with one item, no value, and leading whitespace", () => {
+			const code = `${" ".repeat(100000)}a`;
+			const result = commentParser.parseStringConfig(code, comment);
+
+			assert.deepStrictEqual(result, {
+				a: null,
+			});
+		});
+
+		it("should parse string config with one item, no value, and trailing whitespace", () => {
+			const code = `a${" ".repeat(100000)}`;
+			const result = commentParser.parseStringConfig(code, comment);
+
+			assert.deepStrictEqual(result, {
+				a: null,
+			});
+		});
+
+		it("should parse string config with two items, no values, and whitespace in the middle", () => {
+			const code = `a${" ".repeat(100000)}b`;
+			const result = commentParser.parseStringConfig(code, comment);
+
+			assert.deepStrictEqual(result, {
+				a: null,
+				b: null,
+			});
+		});
+
+		it("should parse string config with multiple items with values separated by commas and lots of whitespace", () => {
+			const whitespace = " ".repeat(100000);
+			const code = `a: 1${whitespace},${whitespace}b: 2${whitespace},${whitespace}c: 3${whitespace},${whitespace}d: 4`;
+			const result = commentParser.parseStringConfig(code, comment);
+
+			assert.deepStrictEqual(result, {
+				a: "1",
+				b: "2",
+				c: "3",
+				d: "4",
+			});
+		});
 	});
 
 	describe("parseListConfig", () => {

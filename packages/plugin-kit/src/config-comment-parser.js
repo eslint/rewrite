@@ -98,7 +98,9 @@ export class ConfigCommentParser {
 		const items = /** @type {StringConfig} */ ({});
 
 		// Collapse whitespace around `:` and `,` to make parsing easier
-		const trimmedString = string.replace(/\s*([:,])\s*/gu, "$1");
+		const trimmedString = string
+			.trim()
+			.replace(/(?<!\s)\s*([:,])\s*/gu, "$1");
 
 		trimmedString.split(/\s|,+/u).forEach(name => {
 			if (!name) {
