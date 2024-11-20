@@ -20,10 +20,9 @@ jobs:
                   node-version: "lts/*"
 
             - name: Install Packages
-              run: npm install
-
-            - name: Type Check Files
-              run: npm run test:types
+              run: |
+                  npm install
+                  npm run build
 
     verify_files:
         name: Verify Files
