@@ -1,13 +1,7 @@
 {
+  "extends": "../../tsconfig.base.json",
   "files": ["src/migrate-config-cli.js"],
   "compilerOptions": {
-    "declaration": true,
-    "emitDeclarationOnly": true,
-    "allowJs": true,
-    "checkJs": true,
-    "outDir": "dist/esm",
-    "target": "ES2022",
-    "moduleResolution": "NodeNext",
-    "module": "NodeNext"
+    "outDir": "dist/esm"
   }
 }

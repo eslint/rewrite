@@ -11,7 +11,8 @@
     "lint:fix": "eslint --fix .",
     "fmt": "prettier --write .",
     "fmt:check": "prettier --check .",
-    "test:jsr": "npm run test:jsr --workspaces --if-present"
+    "test:jsr": "npm run test:jsr --workspaces --if-present",
+    "test:types": "tsc"
   },
   "workspaces": [
     "packages/*"
@@ -27,6 +28,7 @@
     "!(*.{js,ts})": "prettier --write --ignore-unknown"
   },
   "devDependencies": {
+    "@types/mocha": "^10.0.7",
     "eslint": "^9.11.1",
     "eslint-config-eslint": "^11.0.0",
     "got": "^14.4.1",

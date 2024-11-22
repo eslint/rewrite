@@ -73,8 +73,8 @@ async function calculatePackageDependencies(packageDirs) {
 }
 
 /**
- * Creates an array of directories to be built in order to sastify dependencies.
- * @param {Map<string,{name:string,dir:string,dependencies:Set<string>}} dependencies The
+ * Creates an array of directories to be built in order to satisfy dependencies.
+ * @param {Map<string,{name:string,dir:string,dependencies:Set<string>}>} dependencies The
  * dependencies between packages.
  * @returns {Array<string>} An array of directories to be built in order.
  */
