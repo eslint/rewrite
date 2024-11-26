@@ -98,7 +98,7 @@ export type RuleFixType = "code" | "whitespace";
  * name of a node type or a selector, or is a method that will be called at specific
  * times during the traversal.
  */
-export type RuleVisitor = Record<string, (...args: any[]) => void>;
+export type RuleVisitor = Record<string, ((...args: any[]) => void) | undefined>;
 
 /* eslint-enable @typescript-eslint/no-explicit-any -- Necessary to allow subclasses to work correctly */
 
