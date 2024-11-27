@@ -26,13 +26,13 @@ We do not intend to take over full maintenance of `@types/eslint`. Instead, we w
 
 For the ESLint team, this decision will:
 
--   Ensure we have control over our type definitions.
--   Allow us to design a more coherent and well-integrated type system in the new `@eslint/core`.
--   Provide a clear path for integrating these types with `@types/eslint`, improving consistency across the ecosystem.
+- Ensure we have control over our type definitions.
+- Allow us to design a more coherent and well-integrated type system in the new `@eslint/core`.
+- Provide a clear path for integrating these types with `@types/eslint`, improving consistency across the ecosystem.
 
 For the community, this decision may:
 
--   Require adjustments to adapt to the new type definitions in `@eslint/core`.
--   Improve the accuracy and reliability of type definitions used in ESLint-related projects.
+- Require adjustments to adapt to the new type definitions in `@eslint/core`.
+- Improve the accuracy and reliability of type definitions used in ESLint-related projects.
 
 We recognize that this may frustrate or anger some contributors, but we believe that this approach balances the need for accurate type definitions with the practicalities of maintaining a complex project like ESLint.

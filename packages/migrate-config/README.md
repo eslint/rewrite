@@ -10,9 +10,9 @@ This package aids in the migration of the legacy ESLint configuration file forma
 
 This tool currently works well for the following config file formats:
 
--   `.eslintrc`
--   `.eslintrc.json`
--   `.eslintrc.yml`
+- `.eslintrc`
+- `.eslintrc.json`
+- `.eslintrc.yml`
 
 If you are using a JavaScript configuration file (`.eslintrc.js`, `.eslintrc.cjs`, `.eslintrc.mjs`), this tool currently is only capable of migrating the _evaluated_ configuration. That means any logic you may have inside of the file will be lost. If your configuration file is mostly static, then you'll get a good result; if your configuration file is more complex (using functions, calculating paths, etc.) then this tool will not provide an equivalent configuration file.
 

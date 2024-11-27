@@ -92,20 +92,17 @@ export type RuleType = "problem" | "suggestion" | "layout";
  */
 export type RuleFixType = "code" | "whitespace";
 
-/* eslint-disable @typescript-eslint/consistent-indexed-object-style -- Needs to be interface so people can extend it. */
 /* eslint-disable @typescript-eslint/no-explicit-any -- Necessary to allow subclasses to work correctly */
 /**
  * An object containing visitor information for a rule. Each method is either the
  * name of a node type or a selector, or is a method that will be called at specific
  * times during the traversal.
  */
-export interface RuleVisitor {
-	/**
-	 * Called for each node in the AST or at specific times during the traversal.
-	 */
-	[key: string]: (...args: any[]) => void;
-}
-/* eslint-enable @typescript-eslint/consistent-indexed-object-style -- Needs to be interface so people can extend it. */
+export type RuleVisitor = Record<
+	string,
+	((...args: any[]) => void) | undefined
+>;
+
 /* eslint-enable @typescript-eslint/no-explicit-any -- Necessary to allow subclasses to work correctly */
 
 /**
