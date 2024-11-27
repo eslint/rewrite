@@ -283,10 +283,10 @@ The config array always returns an object, even if there are no configs matching
 
 A few things to keep in mind:
 
--   If a filename is not an absolute path, it will be resolved relative to the base path directory.
--   The returned config object never has `files`, `ignores`, or `name` properties; the only properties on the object will be the other configuration options specified.
--   The config array caches configs, so subsequent calls to `getConfig()` with the same filename will return in a fast lookup rather than another calculation.
--   A config will only be generated if the filename matches an entry in a `files` key. A config will not be generated without matching a `files` key (configs without a `files` key are only applied when another config with a `files` key is applied; configs without `files` are never applied on their own). Any config with a `files` key entry that is `*` or ends with `/**` or `/*` will only be applied if another entry in the same `files` key matches or another config matches.
+- If a filename is not an absolute path, it will be resolved relative to the base path directory.
+- The returned config object never has `files`, `ignores`, or `name` properties; the only properties on the object will be the other configuration options specified.
+- The config array caches configs, so subsequent calls to `getConfig()` with the same filename will return in a fast lookup rather than another calculation.
+- A config will only be generated if the filename matches an entry in a `files` key. A config will not be generated without matching a `files` key (configs without a `files` key are only applied when another config with a `files` key is applied; configs without `files` are never applied on their own). Any config with a `files` key entry that is `*` or ends with `/**` or `/*` will only be applied if another entry in the same `files` key matches or another config matches.
 
 ## Determining Ignored Paths
 
@@ -298,11 +298,11 @@ const ignored = configs.isFileIgnored("/foo/bar/baz.txt");
 
 A file is considered ignored if any of the following is true:
 
--   **It's parent directory is ignored.** For example, if `foo` is in `ignores`, then `foo/a.js` is considered ignored.
--   **It has an ancestor directory that is ignored.** For example, if `foo` is in `ignores`, then `foo/baz/a.js` is considered ignored.
--   **It matches an ignored file pattern.** For example, if `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
--   **If it matches an entry in `files` and also in `ignores`.** For example, if `**/*.js` is in `files` and `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
--   **The file is outside the `basePath`.** If the `basePath` is `/usr/me`, then `/foo/a.js` is considered ignored.
+- **It's parent directory is ignored.** For example, if `foo` is in `ignores`, then `foo/a.js` is considered ignored.
+- **It has an ancestor directory that is ignored.** For example, if `foo` is in `ignores`, then `foo/baz/a.js` is considered ignored.
+- **It matches an ignored file pattern.** For example, if `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
+- **If it matches an entry in `files` and also in `ignores`.** For example, if `**/*.js` is in `files` and `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
+- **The file is outside the `basePath`.** If the `basePath` is `/usr/me`, then `/foo/a.js` is considered ignored.
 
 For directories, use the `isDirectoryIgnored()` method and pass in the path of any directory, as in this example:
 
@@ -312,11 +312,11 @@ const ignored = configs.isDirectoryIgnored("/foo/bar/");
 
 A directory is considered ignored if any of the following is true:
 
--   **It's parent directory is ignored.** For example, if `foo` is in `ignores`, then `foo/baz` is considered ignored.
--   **It has an ancestor directory that is ignored.** For example, if `foo` is in `ignores`, then `foo/bar/baz/a.js` is considered ignored.
--   **It matches and ignored file pattern.** For example, if `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
--   **If it matches an entry in `files` and also in `ignores`.** For example, if `**/*.js` is in `files` and `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
--   **The file is outside the `basePath`.** If the `basePath` is `/usr/me`, then `/foo/a.js` is considered ignored.
+- **It's parent directory is ignored.** For example, if `foo` is in `ignores`, then `foo/baz` is considered ignored.
+- **It has an ancestor directory that is ignored.** For example, if `foo` is in `ignores`, then `foo/bar/baz/a.js` is considered ignored.
+- **It matches and ignored file pattern.** For example, if `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
+- **If it matches an entry in `files` and also in `ignores`.** For example, if `**/*.js` is in `files` and `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
+- **The file is outside the `basePath`.** If the `basePath` is `/usr/me`, then `/foo/a.js` is considered ignored.
 
 **Important:** A pattern such as `foo/**` means that `foo` and `foo/` are _not_ ignored whereas `foo/bar` is ignored. If you want to ignore `foo` and all of its subdirectories, use the pattern `foo` or `foo/` in `ignores`.
 
@@ -331,9 +331,9 @@ Each `ConfigArray` aggressively caches configuration objects to avoid unnecessar
 
 The design of this project was influenced by feedback on the ESLint RFC, and incorporates ideas from:
 
--   Teddy Katz (@not-an-aardvark)
--   Toru Nagashima (@mysticatea)
--   Kai Cataldo (@kaicataldo)
+- Teddy Katz (@not-an-aardvark)
+- Toru Nagashima (@mysticatea)
+- Kai Cataldo (@kaicataldo)
 
 ## License
 

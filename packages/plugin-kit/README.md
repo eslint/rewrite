@@ -28,10 +28,10 @@ deno add @eslint/plugin-kit
 
 This package exports the following utilities:
 
--   `ConfigCommentParser` - used to parse ESLint configuration comments (i.e., `/* eslint-disable rule */`)
--   `VisitNodeStep` and `CallMethodStep` - used to help implement `SourceCode#traverse()`
--   `Directive` - used to help implement `SourceCode#getDisableDirectives()`
--   `TextSourceCodeBase` - base class to help implement the `SourceCode` interface
+- `ConfigCommentParser` - used to parse ESLint configuration comments (i.e., `/* eslint-disable rule */`)
+- `VisitNodeStep` and `CallMethodStep` - used to help implement `SourceCode#traverse()`
+- `Directive` - used to help implement `SourceCode#getDisableDirectives()`
+- `TextSourceCodeBase` - base class to help implement the `SourceCode` interface
 
 ### `ConfigCommentParser`
 
@@ -85,9 +85,9 @@ The `VisitNodeStep` and `CallMethodStep` classes represent steps in the traversa
 
 The `VisitNodeStep` class is the more common of the two, where you are describing a visit to a particular node during the traversal. The constructor accepts three arguments:
 
--   `target` - the node being visited. This is used to determine the method to call inside of a rule. For instance, if the node's type is `Literal` then ESLint will call a method named `Literal()` on the rule (if present).
--   `phase` - either 1 for enter or 2 for exit.
--   `args` - an array of arguments to pass into the visitor method of a rule.
+- `target` - the node being visited. This is used to determine the method to call inside of a rule. For instance, if the node's type is `Literal` then ESLint will call a method named `Literal()` on the rule (if present).
+- `phase` - either 1 for enter or 2 for exit.
+- `args` - an array of arguments to pass into the visitor method of a rule.
 
 For example:
 
@@ -115,8 +115,8 @@ class MySourceCode {
 
 The `CallMethodStep` class is less common and is used to tell ESLint to call a specific method on the rule. The constructor accepts two arguments:
 
--   `target` - the name of the method to call, frequently beginning with `"on"` such as `"onCodePathStart"`.
--   `args` - an array of arguments to pass to the method.
+- `target` - the name of the method to call, frequently beginning with `"on"` such as `"onCodePathStart"`.
+- `args` - an array of arguments to pass to the method.
 
 For example:
 
@@ -205,11 +205,11 @@ class MySourceCode {
 
 The `TextSourceCodeBase` class is intended to be a base class that has several of the common members found in `SourceCode` objects already implemented. Those members are:
 
--   `lines` - an array of text lines that is created automatically when the constructor is called.
--   `getLoc(node)` - gets the location of a node. Works for nodes that have the ESLint-style `loc` property and nodes that have the Unist-style [`position` property](https://github.com/syntax-tree/unist?tab=readme-ov-file#position). If you're using an AST with a different location format, you'll still need to implement this method yourself.
--   `getRange(node)` - gets the range of a node within the source text. Works for nodes that have the ESLint-style `range` property and nodes that have the Unist-style [`position` property](https://github.com/syntax-tree/unist?tab=readme-ov-file#position). If you're using an AST with a different range format, you'll still need to implement this method yourself.
--   `getText(nodeOrToken, charsBefore, charsAfter)` - gets the source text for the given node or token that has range information attached. Optionally, can return additional characters before and after the given node or token. As long as `getRange()` is properly implemented, this method will just work.
--   `getAncestors(node)` - returns the ancestry of the node. In order for this to work, you must implement the `getParent()` method yourself.
+- `lines` - an array of text lines that is created automatically when the constructor is called.
+- `getLoc(node)` - gets the location of a node. Works for nodes that have the ESLint-style `loc` property and nodes that have the Unist-style [`position` property](https://github.com/syntax-tree/unist?tab=readme-ov-file#position). If you're using an AST with a different location format, you'll still need to implement this method yourself.
+- `getRange(node)` - gets the range of a node within the source text. Works for nodes that have the ESLint-style `range` property and nodes that have the Unist-style [`position` property](https://github.com/syntax-tree/unist?tab=readme-ov-file#position). If you're using an AST with a different range format, you'll still need to implement this method yourself.
+- `getText(nodeOrToken, charsBefore, charsAfter)` - gets the source text for the given node or token that has range information attached. Optionally, can return additional characters before and after the given node or token. As long as `getRange()` is properly implemented, this method will just work.
+- `getAncestors(node)` - returns the ancestry of the node. In order for this to work, you must implement the `getParent()` method yourself.
 
 Here's an example:
 

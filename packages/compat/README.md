@@ -30,10 +30,10 @@ deno add @eslint/compat
 
 This package exports the following functions in both ESM and CommonJS format:
 
--   `fixupRule(rule)` - wraps the given rule in a compatibility layer and returns the result
--   `fixupPluginRules(plugin)` - wraps each rule in the given plugin using `fixupRule()` and returns a new object that represents the plugin with the fixed-up rules
--   `fixupConfigRules(configs)` - wraps all plugins found in an array of config objects using `fixupPluginRules()`
--   `includeIgnoreFile(path)` - reads an ignore file (like `.gitignore`) and converts the patterns into the correct format for the config file
+- `fixupRule(rule)` - wraps the given rule in a compatibility layer and returns the result
+- `fixupPluginRules(plugin)` - wraps each rule in the given plugin using `fixupRule()` and returns a new object that represents the plugin with the fixed-up rules
+- `fixupConfigRules(configs)` - wraps all plugins found in an array of config objects using `fixupPluginRules()`
+- `includeIgnoreFile(path)` - reads an ignore file (like `.gitignore`) and converts the patterns into the correct format for the config file
 
 ### Fixing Rules
 

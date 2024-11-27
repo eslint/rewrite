@@ -6,7 +6,7 @@
 
 #### Prerequisites checklist
 
--   [ ] I have read the [contributing guidelines](https://github.com/eslint/eslint/blob/HEAD/CONTRIBUTING.md).
+- [ ] I have read the [contributing guidelines](https://github.com/eslint/eslint/blob/HEAD/CONTRIBUTING.md).
 
 <!--
     Please ensure your pull request is ready:
