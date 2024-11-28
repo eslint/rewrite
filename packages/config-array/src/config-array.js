@@ -526,6 +526,15 @@ function toRelativePath(fileOrDirPath, namespacedBasePath, path) {
 	return relativePath.replaceAll(path.SEPARATOR, "/");
 }
 
+/**
+ * Strips leading "./" from a file path.
+ * @param {string} filePath The file path to normalize.
+ * @returns {string} The normalized file path.
+ */
+function normalizeFilePath(filePath) {
+	return filePath.replace(/^\.\//u, "");
+}
+
 //------------------------------------------------------------------------------
 // Public Interface
 //------------------------------------------------------------------------------
@@ -637,12 +646,27 @@ export class ConfigArray extends Array {
 			ignores: undefined,
 		});
 
+		const normalizedConfigs = Array.isArray(configs)
+			? [...configs]
+			: [configs];
+		// strip leading "./" from file paths, refs: https://github.com/eslint/eslint/issues/18757
+		normalizedConfigs.forEach(config => {
+			const files = config.files;
+			if (Array.isArray(files)) {
+				config.files = files.map(file => {
+					if (typeof file === "string") {
+						return normalizeFilePath(file);
+					}
+					if (Array.isArray(file)) {
+						return file.map(f => normalizeFilePath(f));
+					}
+					return file;
+				});
+			}
+		});
+
 		// load the configs into this array
-		if (Array.isArray(configs)) {
-			this.push(...configs);
-		} else {
-			this.push(configs);
-		}
+		this.push(...normalizedConfigs);
 
 		// select path-handling implementations depending on the base path
 		this.#path = getPathImpl(basePath);
