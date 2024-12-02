@@ -37,6 +37,7 @@
   },
   "homepage": "https://github.com/eslint/rewrite#readme",
   "devDependencies": {
+    "@types/json-schema": "^7.0.15",
     "json-schema": "^0.4.0",
     "typescript": "^5.4.5"
   },
