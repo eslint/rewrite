@@ -54,6 +54,24 @@ jobs:
               env:
                   CI: true
 
+    test_types:
+        name: Test Types (core)
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "lts/*"
+
+            - name: npm install and test types
+              working-directory: packages/core
+              run: |
+                  npm install
+                  npm run build
+                  npm run test:types
+
     jsr_test:
         name: Verify JSR Publish
         runs-on: ubuntu-latest
