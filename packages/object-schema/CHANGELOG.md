@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.5](https://github.com/eslint/rewrite/compare/object-schema-v2.1.4...object-schema-v2.1.5) (2024-12-04)
+
+
+### Bug Fixes
+
+* Update RuleVisitor type ([#135](https://github.com/eslint/rewrite/issues/135)) ([156d601](https://github.com/eslint/rewrite/commit/156d601181deb362a2864c4d47d4e3da8609500b))
+
 ## [2.1.4](https://github.com/eslint/rewrite/compare/object-schema-v2.1.3...object-schema-v2.1.4) (2024-06-12)
 
 

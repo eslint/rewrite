@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.2.4](https://github.com/eslint/rewrite/compare/plugin-kit-v0.2.3...plugin-kit-v0.2.4) (2024-12-04)
+
+
+### Bug Fixes
+
+* Update RuleVisitor type ([#135](https://github.com/eslint/rewrite/issues/135)) ([156d601](https://github.com/eslint/rewrite/commit/156d601181deb362a2864c4d47d4e3da8609500b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @eslint/core bumped from ^0.9.0 to ^0.9.1
+
 ## [0.2.3](https://github.com/eslint/rewrite/compare/plugin-kit-v0.2.2...plugin-kit-v0.2.3) (2024-11-14)
 
 

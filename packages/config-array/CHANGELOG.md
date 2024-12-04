@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.19.1](https://github.com/eslint/rewrite/compare/config-array-v0.19.0...config-array-v0.19.1) (2024-12-04)
+
+
+### Bug Fixes
+
+* Update RuleVisitor type ([#135](https://github.com/eslint/rewrite/issues/135)) ([156d601](https://github.com/eslint/rewrite/commit/156d601181deb362a2864c4d47d4e3da8609500b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/object-schema bumped from ^2.1.4 to ^2.1.5
+
 ## [0.19.0](https://github.com/eslint/rewrite/compare/config-array-v0.18.0...config-array-v0.19.0) (2024-10-25)
 
 
