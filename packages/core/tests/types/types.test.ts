@@ -1,3 +1,12 @@
+/**
+ * @fileoverview Type tests for ESLint Core.
+ * @author Francesco Trotta
+ */
+
+//-----------------------------------------------------------------------------
+// Imports
+//-----------------------------------------------------------------------------
+
 import type {
 	File,
 	FileProblem,
@@ -19,9 +28,9 @@ import type {
 	TraversalStep,
 } from "@eslint/core";
 
-interface TestLanguageOptions extends LanguageOptions {
-	howMuch?: "yes" | true;
-}
+//-----------------------------------------------------------------------------
+// Helper types
+//-----------------------------------------------------------------------------
 
 interface TestNode {
 	type: string;
@@ -33,6 +42,14 @@ interface TestRootNode {
 	type: "root";
 	start: number;
 	length: number;
+}
+
+//-----------------------------------------------------------------------------
+// Tests for shared types
+//-----------------------------------------------------------------------------
+
+interface TestLanguageOptions extends LanguageOptions {
+	howMuch?: "yes" | "no" | boolean;
 }
 
 class TestSourceCode
@@ -94,26 +111,42 @@ class TestSourceCode
 	/* eslint-enable class-methods-use-this -- not all methods need `this` */
 }
 
+//-----------------------------------------------------------------------------
+// Tests for language-related types
+//-----------------------------------------------------------------------------
+
+interface TestNormalizedLanguageOptions extends TestLanguageOptions {
+	howMuch: boolean; // option is required and must be a boolean
+}
+
 const testLanguage: Language = {
 	fileType: "text",
 	lineStart: 1,
 	columnStart: 1,
 	nodeTypeKey: "type",
+
 	validateLanguageOptions(languageOptions: TestLanguageOptions): void {
-		if (!["yes", true, undefined].includes(languageOptions.howMuch)) {
+		if (
+			!["yes", "no", true, false, undefined].includes(
+				languageOptions.howMuch,
+			)
+		) {
 			throw Error("Invalid options.");
 		}
 	},
+
 	normalizeLanguageOptions(
 		languageOptions: TestLanguageOptions,
-	): TestLanguageOptions {
-		return languageOptions ?? {};
+	): TestNormalizedLanguageOptions {
+		const { howMuch } = languageOptions;
+		return { howMuch: howMuch === "yes" || howMuch === true };
 	},
+
 	parse(
 		file: File,
-		context: { languageOptions: TestLanguageOptions },
+		context: { languageOptions: TestNormalizedLanguageOptions },
 	): ParseResult<TestRootNode> {
-		context.languageOptions.howMuch satisfies string | boolean | undefined;
+		context.languageOptions.howMuch satisfies boolean;
 		return {
 			ok: true,
 			ast: {
@@ -123,17 +156,22 @@ const testLanguage: Language = {
 			},
 		};
 	},
+
 	createSourceCode(
 		file: File,
 		input: OkParseResult<TestRootNode>,
-		context: LanguageContext<TestLanguageOptions>,
+		context: LanguageContext<TestNormalizedLanguageOptions>,
 	): TestSourceCode {
-		context.languageOptions.howMuch satisfies string | boolean | undefined;
+		context.languageOptions.howMuch satisfies boolean;
 		return new TestSourceCode(String(file.body), input.ast);
 	},
 };
 
 testLanguage.defaultLanguageOptions satisfies LanguageOptions | undefined;
+
+//-----------------------------------------------------------------------------
+// Tests for rule-related types
+//-----------------------------------------------------------------------------
 
 interface TestRuleVisitor extends RuleVisitor {
 	Node?: (node: TestNode) => void;
@@ -163,6 +201,7 @@ const testRule: RuleDefinition<{
 			wrongBar: "fix this bar",
 		},
 	},
+
 	create(context: TestRuleContext): TestRuleVisitor {
 		return {
 			Foo(node: TestNode) {
