@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.3.5](https://github.com/eslint/rewrite/compare/migrate-config-v1.3.4...migrate-config-v1.3.5) (2024-12-04)
+
+
+### Bug Fixes
+
+* Update RuleVisitor type ([#135](https://github.com/eslint/rewrite/issues/135)) ([156d601](https://github.com/eslint/rewrite/commit/156d601181deb362a2864c4d47d4e3da8609500b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/compat bumped from ^1.2.3 to ^1.2.4
+
 ## [1.3.4](https://github.com/eslint/rewrite/compare/migrate-config-v1.3.3...migrate-config-v1.3.4) (2024-11-14)
 
 
