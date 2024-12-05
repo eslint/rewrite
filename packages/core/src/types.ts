@@ -451,15 +451,7 @@ export interface RuleDefinitionTypeOptions {
  * The definition of an ESLint rule.
  */
 export interface RuleDefinition<
-	Options extends RuleDefinitionTypeOptions = {
-		LangOptions: LanguageOptions;
-		Code: SourceCode;
-		RuleOptions: unknown[];
-		Visitor: RuleVisitor;
-		Node: unknown;
-		MessageIds: string;
-		ExtRuleDocs: unknown;
-	},
+	Options extends RuleDefinitionTypeOptions = RuleDefinitionTypeOptions,
 > {
 	/**
 	 * The meta information for the rule.
