@@ -450,7 +450,9 @@ export interface RuleDefinitionTypeOptions {
 /**
  * The definition of an ESLint rule.
  */
-export interface RuleDefinition<Options extends RuleDefinitionTypeOptions> {
+export interface RuleDefinition<
+	Options extends RuleDefinitionTypeOptions = RuleDefinitionTypeOptions,
+> {
 	/**
 	 * The meta information for the rule.
 	 */
