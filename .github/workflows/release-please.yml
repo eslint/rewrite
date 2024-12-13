@@ -26,6 +26,8 @@ jobs:
                   echo "packages/compat--release_created:" ${{ steps.release.outputs['packages/compat--release_created'] }}
                   echo "packages/object-schema--release_created:" ${{ steps.release.outputs['packages/object-schema--release_created'] }}
                   echo "packages/config-array--release_created" ${{ steps.release.outputs['packages/config-array--release_created'] }}
+                  echo "packages/migrate-config--release_created" ${{ steps.release.outputs['packages/migrate-config--release_created'] }}
+                  echo "packages/plugin-kit--release_created" ${{ steps.release.outputs['packages/plugin-kit--release_created'] }}
 
             # Check to see if we need to do any releases and if so check out the repo
             - uses: actions/checkout@v4
@@ -66,21 +68,19 @@ jobs:
               working-directory: packages/compat
               if: ${{ steps.release.outputs['packages/compat--release_created'] }}
 
-            - name: Tweet Release Announcement
-              run: npx @humanwhocodes/tweet "eslint/compat v${{ steps.release.outputs['packages/compat--major'] }}.${{ steps.release.outputs['packages/compat--minor'] }}.${{ steps.release.outputs['packages/compat--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/${{ steps.release.outputs['packages/compat--tag_name'] }}"
+            - name: Post Release Announcement
+              run: npx @humanwhocodes/crosspost -t -b -m "eslint/compat v${{ steps.release.outputs['packages/compat--major'] }}.${{ steps.release.outputs['packages/compat--minor'] }}.${{ steps.release.outputs['packages/compat--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/${{ steps.release.outputs['packages/compat--tag_name'] }}"
               if: ${{ steps.release.outputs['packages/compat--release_created'] }}
               env:
-                  TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
-                  TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
+                  TWITTER_API_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
+                  TWITTER_API_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
                   TWITTER_ACCESS_TOKEN_KEY: ${{ secrets.TWITTER_ACCESS_TOKEN_KEY }}
                   TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
-
-            - name: Toot Release Announcement
-              run: npx @humanwhocodes/toot "eslint/compat v${{ steps.release.outputs['packages/compat--major'] }}.${{ steps.release.outputs['packages/compat--minor'] }}.${{ steps.release.outputs['packages/compat--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/${{ steps.release.outputs['packages/compat--tag_name'] }}"
-              if: ${{ steps.release.outputs['packages/compat--release_created'] }}
-              env:
                   MASTODON_ACCESS_TOKEN: ${{ secrets.MASTODON_ACCESS_TOKEN }}
                   MASTODON_HOST: ${{ secrets.MASTODON_HOST }}
+                  BLUESKY_IDENTIFIER: ${{ vars.BLUESKY_IDENTIFIER }}
+                  BLUESKY_PASSWORD: ${{ secrets.BLUESKY_PASSWORD }}
+                  BLUESKY_HOST: ${{ vars.BLUESKY_HOST }}
 
             #-----------------------------------------------------------------------------
             # @eslint/core
@@ -99,21 +99,19 @@ jobs:
               working-directory: packages/core
               if: ${{ steps.release.outputs['packages/core--release_created'] }}
 
-            - name: Tweet Release Announcement
-              run: npx @humanwhocodes/tweet "eslint/core v${{ steps.release.outputs['packages/core--major'] }}.${{ steps.release.outputs['packages/core--minor'] }}.${{ steps.release.outputs['packages/core--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/${{ steps.release.outputs['packages/core--tag_name'] }}"
+            - name: Post Release Announcement
+              run: npx @humanwhocodes/crosspost -t -b -m "eslint/core v${{ steps.release.outputs['packages/core--major'] }}.${{ steps.release.outputs['packages/core--minor'] }}.${{ steps.release.outputs['packages/core--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/${{ steps.release.outputs['packages/core--tag_name'] }}"
               if: ${{ steps.release.outputs['packages/core--release_created'] }}
               env:
-                  TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
-                  TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
+                  TWITTER_API_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
+                  TWITTER_API_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
                   TWITTER_ACCESS_TOKEN_KEY: ${{ secrets.TWITTER_ACCESS_TOKEN_KEY }}
                   TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
-
-            - name: Toot Release Announcement
-              run: npx @humanwhocodes/toot "eslint/core v${{ steps.release.outputs['packages/core--major'] }}.${{ steps.release.outputs['packages/core--minor'] }}.${{ steps.release.outputs['packages/core--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/${{ steps.release.outputs['packages/core--tag_name'] }}"
-              if: ${{ steps.release.outputs['packages/core--release_created'] }}
-              env:
                   MASTODON_ACCESS_TOKEN: ${{ secrets.MASTODON_ACCESS_TOKEN }}
                   MASTODON_HOST: ${{ secrets.MASTODON_HOST }}
+                  BLUESKY_IDENTIFIER: ${{ vars.BLUESKY_IDENTIFIER }}
+                  BLUESKY_PASSWORD: ${{ secrets.BLUESKY_PASSWORD }}
+                  BLUESKY_HOST: ${{ vars.BLUESKY_HOST }}
 
             #-----------------------------------------------------------------------------
             # @eslint/migrate-config
@@ -127,21 +125,19 @@ jobs:
 
             # NOTE: No JSR package because JSR doesn't support CLIs
 
-            - name: Tweet Release Announcement
-              run: npx @humanwhocodes/tweet "eslint/migrate-config v${{ steps.release.outputs['packages/migrate-config--major'] }}.${{ steps.release.outputs['packages/migrate-config--minor'] }}.${{ steps.release.outputs['packages/migrate-config--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/${{ steps.release.outputs['packages/migrate-config--tag_name'] }}"
+            - name: Post Release Announcement
+              run: npx @humanwhocodes/crosspost -t -b -m "eslint/migrate-config v${{ steps.release.outputs['packages/migrate-config--major'] }}.${{ steps.release.outputs['packages/migrate-config--minor'] }}.${{ steps.release.outputs['packages/migrate-config--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/${{ steps.release.outputs['packages/migrate-config--tag_name'] }}"
               if: ${{ steps.release.outputs['packages/migrate-config--release_created'] }}
               env:
-                  TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
-                  TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
+                  TWITTER_API_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
+                  TWITTER_API_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
                   TWITTER_ACCESS_TOKEN_KEY: ${{ secrets.TWITTER_ACCESS_TOKEN_KEY }}
                   TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
-
-            - name: Toot Release Announcement
-              run: npx @humanwhocodes/toot "eslint/migrate-config v${{ steps.release.outputs['packages/migrate-config--major'] }}.${{ steps.release.outputs['packages/migrate-config--minor'] }}.${{ steps.release.outputs['packages/migrate-config--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/${{ steps.release.outputs['packages/migrate-config--tag_name'] }}"
-              if: ${{ steps.release.outputs['packages/migrate-config--release_created'] }}
-              env:
                   MASTODON_ACCESS_TOKEN: ${{ secrets.MASTODON_ACCESS_TOKEN }}
                   MASTODON_HOST: ${{ secrets.MASTODON_HOST }}
+                  BLUESKY_IDENTIFIER: ${{ vars.BLUESKY_IDENTIFIER }}
+                  BLUESKY_PASSWORD: ${{ secrets.BLUESKY_PASSWORD }}
+                  BLUESKY_HOST: ${{ vars.BLUESKY_HOST }}
 
             #-----------------------------------------------------------------------------
             # @eslint/object-schema
@@ -158,21 +154,19 @@ jobs:
               working-directory: packages/object-schema
               if: ${{ steps.release.outputs['packages/object-schema--release_created'] }}
 
-            - name: Tweet Release Announcement
-              run: npx @humanwhocodes/tweet "eslint/object-schema v${{ steps.release.outputs['packages/object-schema--major'] }}.${{ steps.release.outputs['packages/object-schema--minor'] }}.${{ steps.release.outputs['packages/object-schema--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/${{ steps.release.outputs['packages/object-schema--tag_name'] }}"
+            - name: Post Release Announcement
+              run: npx @humanwhocodes/crosspost -t -b -m "eslint/object-schema v${{ steps.release.outputs['packages/object-schema--major'] }}.${{ steps.release.outputs['packages/object-schema--minor'] }}.${{ steps.release.outputs['packages/object-schema--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/${{ steps.release.outputs['packages/object-schema--tag_name'] }}"
               if: ${{ steps.release.outputs['packages/object-schema--release_created'] }}
               env:
-                  TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
-                  TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
+                  TWITTER_API_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
+                  TWITTER_API_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
                   TWITTER_ACCESS_TOKEN_KEY: ${{ secrets.TWITTER_ACCESS_TOKEN_KEY }}
                   TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
-
-            - name: Toot Release Announcement
-              run: npx @humanwhocodes/toot "eslint/object-schema v${{ steps.release.outputs['packages/object-schema--major'] }}.${{ steps.release.outputs['packages/object-schema--minor'] }}.${{ steps.release.outputs['packages/object-schema--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/${{ steps.release.outputs['packages/object-schema--tag_name'] }}"
-              if: ${{ steps.release.outputs['packages/object-schema--release_created'] }}
-              env:
                   MASTODON_ACCESS_TOKEN: ${{ secrets.MASTODON_ACCESS_TOKEN }}
                   MASTODON_HOST: ${{ secrets.MASTODON_HOST }}
+                  BLUESKY_IDENTIFIER: ${{ vars.BLUESKY_IDENTIFIER }}
+                  BLUESKY_PASSWORD: ${{ secrets.BLUESKY_PASSWORD }}
+                  BLUESKY_HOST: ${{ vars.BLUESKY_HOST }}
 
             #-----------------------------------------------------------------------------
             # @eslint/config-array
@@ -189,21 +183,19 @@ jobs:
               working-directory: packages/config-array
               if: ${{ steps.release.outputs['packages/config-array--release_created'] }}
 
-            - name: Tweet Release Announcement
-              run: npx @humanwhocodes/tweet "eslint/config-array v${{ steps.release.outputs['packages/config-array--major'] }}.${{ steps.release.outputs['packages/config-array--minor'] }}.${{ steps.release.outputs['packages/config-array--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/${{ steps.release.outputs['packages/config-array--tag_name'] }}"
+            - name: Post Release Announcement
+              run: npx @humanwhocodes/crosspost -t -b -m "eslint/config-array v${{ steps.release.outputs['packages/config-array--major'] }}.${{ steps.release.outputs['packages/config-array--minor'] }}.${{ steps.release.outputs['packages/config-array--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/${{ steps.release.outputs['packages/config-array--tag_name'] }}"
               if: ${{ steps.release.outputs['packages/config-array--release_created'] }}
               env:
-                  TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
-                  TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
+                  TWITTER_API_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
+                  TWITTER_API_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
                   TWITTER_ACCESS_TOKEN_KEY: ${{ secrets.TWITTER_ACCESS_TOKEN_KEY }}
                   TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
-
-            - name: Toot Release Announcement
-              run: npx @humanwhocodes/toot "eslint/config-array v${{ steps.release.outputs['packages/config-array--major'] }}.${{ steps.release.outputs['packages/config-array--minor'] }}.${{ steps.release.outputs['packages/config-array--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/${{ steps.release.outputs['packages/config-array--tag_name'] }}"
-              if: ${{ steps.release.outputs['packages/config-array--release_created'] }}
-              env:
                   MASTODON_ACCESS_TOKEN: ${{ secrets.MASTODON_ACCESS_TOKEN }}
                   MASTODON_HOST: ${{ secrets.MASTODON_HOST }}
+                  BLUESKY_IDENTIFIER: ${{ vars.BLUESKY_IDENTIFIER }}
+                  BLUESKY_PASSWORD: ${{ secrets.BLUESKY_PASSWORD }}
+                  BLUESKY_HOST: ${{ vars.BLUESKY_HOST }}
 
             #-----------------------------------------------------------------------------
             # @eslint/plugin-kit
@@ -220,18 +212,16 @@ jobs:
               working-directory: packages/plugin-kit
               if: ${{ steps.release.outputs['packages/plugin-kit--release_created'] }}
 
-            - name: Tweet Release Announcement
-              run: npx @humanwhocodes/tweet "eslint/plugin-kit v${{ steps.release.outputs['packages/plugin-kit--major'] }}.${{ steps.release.outputs['packages/plugin-kit--minor'] }}.${{ steps.release.outputs['packages/plugin-kit--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/${{ steps.release.outputs['packages/plugin-kit--tag_name'] }}"
+            - name: Post Release Announcement
+              run: npx @humanwhocodes/crosspost -t -b -m "eslint/plugin-kit v${{ steps.release.outputs['packages/plugin-kit--major'] }}.${{ steps.release.outputs['packages/plugin-kit--minor'] }}.${{ steps.release.outputs['packages/plugin-kit--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/${{ steps.release.outputs['packages/plugin-kit--tag_name'] }}"
               if: ${{ steps.release.outputs['packages/plugin-kit--release_created'] }}
               env:
-                  TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
-                  TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
+                  TWITTER_API_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
+                  TWITTER_API_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
                   TWITTER_ACCESS_TOKEN_KEY: ${{ secrets.TWITTER_ACCESS_TOKEN_KEY }}
                   TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
-
-            - name: Toot Release Announcement
-              run: npx @humanwhocodes/toot "eslint/plugin-kit v${{ steps.release.outputs['packages/plugin-kit--major'] }}.${{ steps.release.outputs['packages/plugin-kit--minor'] }}.${{ steps.release.outputs['packages/plugin-kit--patch'] }} has been released!\n\n${{ github.event.repository.html_url }}/releases/tag/${{ steps.release.outputs['packages/plugin-kit--tag_name'] }}"
-              if: ${{ steps.release.outputs['packages/plugin-kit--release_created'] }}
-              env:
                   MASTODON_ACCESS_TOKEN: ${{ secrets.MASTODON_ACCESS_TOKEN }}
                   MASTODON_HOST: ${{ secrets.MASTODON_HOST }}
+                  BLUESKY_IDENTIFIER: ${{ vars.BLUESKY_IDENTIFIER }}
+                  BLUESKY_PASSWORD: ${{ secrets.BLUESKY_PASSWORD }}
+                  BLUESKY_HOST: ${{ vars.BLUESKY_HOST }}
