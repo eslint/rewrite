@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.2](https://github.com/eslint/rewrite/compare/core-v0.9.1...core-v0.9.2) (2024-12-23)
+
+
+### Bug Fixes
+
+* Update RuleDefinition type ([#138](https://github.com/eslint/rewrite/issues/138)) ([0a0ea6f](https://github.com/eslint/rewrite/commit/0a0ea6fbac827b354ee18f5b10eefad2bc0794f7))
+
 ## [0.9.1](https://github.com/eslint/rewrite/compare/core-v0.9.0...core-v0.9.1) (2024-12-04)
 
 
