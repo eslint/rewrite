@@ -17,8 +17,8 @@ import levn from "levn";
 
 /** @typedef {import("@eslint/core").RuleConfig} RuleConfig */
 /** @typedef {import("@eslint/core").RulesConfig} RulesConfig */
-/** @typedef {import("./types.ts", { with: { "resolution-mode": "import" } }).StringConfig} StringConfig */
-/** @typedef {import("./types.ts", { with: { "resolution-mode": "import" } }).BooleanConfig} BooleanConfig */
+/** @typedef {import("./types.ts").StringConfig} StringConfig */
+/** @typedef {import("./types.ts").BooleanConfig} BooleanConfig */
 
 //-----------------------------------------------------------------------------
 // Helpers
