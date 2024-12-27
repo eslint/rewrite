@@ -55,8 +55,11 @@ jobs:
                   CI: true
 
     test_types:
-        name: Test Types (core)
+        name: Test Types (${ matrix.package })
         runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                package: [core, plugin-kit]
         steps:
             - uses: actions/checkout@v4
 
@@ -66,7 +69,7 @@ jobs:
                   node-version: "lts/*"
 
             - name: npm install and test types
-              working-directory: packages/core
+              working-directory: packages/${ matrix.package }
               run: |
                   npm install
                   npm run build

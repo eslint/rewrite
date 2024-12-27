@@ -37,7 +37,8 @@
     "test:jsr": "npx jsr@latest publish --dry-run",
     "pretest": "npm run build",
     "test": "mocha tests/",
-    "test:coverage": "c8 npm test"
+    "test:coverage": "c8 npm test",
+    "test:types": "tsc -p tests/types/tsconfig.json"
   },
   "keywords": [
     "eslint",
