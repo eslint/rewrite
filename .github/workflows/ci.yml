@@ -55,7 +55,7 @@ jobs:
                   CI: true
 
     test_types:
-        name: Test Types (${ matrix.package })
+        name: Test Types (${{ matrix.package }})
         runs-on: ubuntu-latest
         strategy:
             matrix:
@@ -69,7 +69,7 @@ jobs:
                   node-version: "lts/*"
 
             - name: npm install and test types
-              working-directory: packages/${ matrix.package }
+              working-directory: packages/${{ matrix.package }}
               run: |
                   npm install
                   npm run build
