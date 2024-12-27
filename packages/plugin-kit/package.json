@@ -46,8 +46,11 @@
     "eslint-plugin"
   ],
   "license": "Apache-2.0",
-  "devDependencies": {
+  "dependencies": {
     "@eslint/core": "^0.9.1",
+    "levn": "^0.4.1"
+  },
+  "devDependencies": {
     "@types/levn": "^0.4.0",
     "c8": "^9.1.0",
     "mocha": "^10.4.0",
@@ -57,8 +60,5 @@
   },
   "engines": {
     "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
-  },
-  "dependencies": {
-    "levn": "^0.4.1"
   }
 }
