@@ -72,10 +72,10 @@ const MINIMATCH_OPTIONS = {
 const CONFIG_TYPES = new Set(["array", "function"]);
 
 /**
- * Fields that are considered metadata and not part of the config object.
+ * Default fields that are considered metadata and not part of the config object.
  * @type {Set<string>}
  */
-const META_FIELDS = new Set(["name"]);
+const DEFAULT_META_FIELDS = new Set(["name"]);
 
 /**
  * A schema containing just files and ignores for early validation.
@@ -391,12 +391,18 @@ function shouldIgnorePath(ignores, filePath, relativeFilePath) {
  * @param {string} relativeFilePath The path of the file to check relative to the base path,
  * 		using forward slash (`"/"`) as a separator.
  * @param {Object} config The config object to check.
+ * @param {Set<string>} metaFields Fields that are considered metadata and not part of the config object.
  * @returns {boolean} True if the file path is matched by the config,
  *      false if not.
  */
-function pathMatchesIgnores(filePath, relativeFilePath, config) {
+function pathMatchesIgnores(
+	filePath,
+	relativeFilePath,
+	config,
+	metaFields = DEFAULT_META_FIELDS,
+) {
 	return (
-		Object.keys(config).filter(key => !META_FIELDS.has(key)).length > 1 &&
+		Object.keys(config).filter(key => !metaFields.has(key)).length > 1 &&
 		!shouldIgnorePath(config.ignores, filePath, relativeFilePath)
 	);
 }
@@ -569,6 +575,9 @@ export class ConfigArray extends Array {
 	 *      configs have already been normalized.
 	 * @param {Object} [options.schema] The additional schema
 	 *      definitions to use for the ConfigArray schema.
+	 * @param {Array<string>} [options.UNSAFE_extraMetaFields] Extra fields that are
+	 * 			considered metadata and not part of the config object.
+	 * 			These fields will be combined with DEFAULT_META_FIELDS.
 	 * @param {Array<string>} [options.extraConfigTypes] List of config types supported.
 	 */
 	constructor(
@@ -577,6 +586,7 @@ export class ConfigArray extends Array {
 			basePath = "/",
 			normalized = false,
 			schema: customSchema,
+			UNSAFE_extraMetaFields: extraMetaFields = [],
 			extraConfigTypes = [],
 		} = {},
 	) {
@@ -611,6 +621,14 @@ export class ConfigArray extends Array {
 		 * @type {string}
 		 */
 		this.basePath = basePath;
+
+		/**
+		 * Fields that are considered metadata and not part of the config object.
+		 * @property metaFields
+		 * @type {Set<string>}
+		 */
+		this.metaFields = new Set([...DEFAULT_META_FIELDS, ...extraMetaFields]);
+		Object.freeze(this.metaFields);
 
 		assertExtraConfigTypes(extraConfigTypes);
 
@@ -729,7 +747,7 @@ export class ConfigArray extends Array {
 			 */
 			if (
 				config.ignores &&
-				Object.keys(config).filter(key => !META_FIELDS.has(key))
+				Object.keys(config).filter(key => !this.metaFields.has(key))
 					.length === 1
 			) {
 				result.push(...config.ignores);
@@ -903,7 +921,14 @@ export class ConfigArray extends Array {
 					return;
 				}
 
-				if (pathMatchesIgnores(filePath, relativeFilePath, config)) {
+				if (
+					pathMatchesIgnores(
+						filePath,
+						relativeFilePath,
+						config,
+						this.metaFields,
+					)
+				) {
 					debug(
 						`Matching config found for ${filePath} (based on ignores: ${config.ignores})`,
 					);
