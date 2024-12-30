@@ -24,9 +24,10 @@ jobs:
               run: |
                   echo "releases_created:" ${{ steps.release.outputs.releases_created }}
                   echo "packages/compat--release_created:" ${{ steps.release.outputs['packages/compat--release_created'] }}
-                  echo "packages/object-schema--release_created:" ${{ steps.release.outputs['packages/object-schema--release_created'] }}
                   echo "packages/config-array--release_created" ${{ steps.release.outputs['packages/config-array--release_created'] }}
+                  echo "packages/core--release_created" ${{ steps.release.outputs['packages/core--release_created'] }}
                   echo "packages/migrate-config--release_created" ${{ steps.release.outputs['packages/migrate-config--release_created'] }}
+                  echo "packages/object-schema--release_created:" ${{ steps.release.outputs['packages/object-schema--release_created'] }}
                   echo "packages/plugin-kit--release_created" ${{ steps.release.outputs['packages/plugin-kit--release_created'] }}
 
             # Check to see if we need to do any releases and if so check out the repo
