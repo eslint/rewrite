@@ -3316,6 +3316,54 @@ describe("ConfigArray", () => {
 				);
 				assert.deepStrictEqual(configs.ignores, ["ignoreme"]);
 			});
+
+			it("should not count global ignores when there are extra fields except for those match metaFields", () => {
+				configs = new ConfigArray(
+					[
+						{
+							name: "foo",
+							ignores: ["ignoreme"],
+							extraField: "EXTRA",
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.isFileIgnored("ignoreme/foo/bar.js"),
+					false,
+				);
+				assert.deepStrictEqual(configs.ignores, []);
+			});
+
+			it("should not count global ignores when there are extra fields except for those match metaFields", () => {
+				configs = new ConfigArray(
+					[
+						{
+							name: "foo",
+							ignores: ["ignoreme"],
+							extraField: "EXTRA",
+						},
+					],
+					{
+						basePath,
+						// eslint-disable-next-line camelcase -- unsafe field assignment
+						UNSAFE_extraMetaFields: ["extraField"],
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.isFileIgnored("ignoreme/bar/foo.js"),
+					true,
+				);
+				assert.deepStrictEqual(configs.ignores, ["ignoreme"]);
+			});
 		});
 
 		describe("push()", () => {
