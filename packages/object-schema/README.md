@@ -189,8 +189,6 @@ console.log("date" in result); // false
 If you'd like the presence of one key to require the presence of another key, you can use the `requires` property to specify an array of other properties that any key requires. For example:
 
 ```js
-const schema = new ObjectSchema();
-
 const schema = new ObjectSchema({
 	date: {
 		merge() {
