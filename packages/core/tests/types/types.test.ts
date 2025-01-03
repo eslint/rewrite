@@ -177,11 +177,14 @@ interface TestRuleVisitor extends RuleVisitor {
 	Node?: (node: TestNode) => void;
 }
 
+type TestMessageIds = "badFoo" | "wrongBar";
+
 type TestRuleContext = RuleContext<{
 	LangOptions: TestLanguageOptions;
 	Code: TestSourceCode;
 	RuleOptions: [{ foo: string; bar: number }];
 	Node: TestNode;
+	MessageIds: TestMessageIds;
 }>;
 
 const testRule: RuleDefinition<{

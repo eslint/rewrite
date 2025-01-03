@@ -187,6 +187,7 @@ export interface RuleContextTypeOptions {
 	Code: SourceCode;
 	RuleOptions: unknown[];
 	Node: unknown;
+	MessageIds: string;
 }
 
 /**
@@ -195,12 +196,7 @@ export interface RuleContextTypeOptions {
  * view into the outside world.
  */
 export interface RuleContext<
-	Options extends RuleContextTypeOptions = {
-		LangOptions: LanguageOptions;
-		Code: SourceCode;
-		RuleOptions: unknown[];
-		Node: unknown;
-	},
+	Options extends RuleContextTypeOptions = RuleContextTypeOptions,
 > {
 	/**
 	 * The current working directory for the session.
@@ -282,7 +278,9 @@ export interface RuleContext<
 	 * The report function that the rule should use to report problems.
 	 * @param violation The violation to report.
 	 */
-	report(violation: ViolationReport<Options["Node"]>): void;
+	report(
+		violation: ViolationReport<Options["Node"], Options["MessageIds"]>,
+	): void;
 }
 
 // #region Rule Fixing
@@ -402,11 +400,16 @@ interface ViolationReportBase {
 	suggest?: SuggestedEdit[];
 }
 
-type ViolationMessage = { message: string } | { messageId: string };
+type ViolationMessage<MessageIds = string> =
+	| { message: string }
+	| { messageId: MessageIds };
 type ViolationLocation<Node> = { loc: SourceLocation } | { node: Node };
 
-export type ViolationReport<Node = unknown> = ViolationReportBase &
-	ViolationMessage &
+export type ViolationReport<
+	Node = unknown,
+	MessageIds = string,
+> = ViolationReportBase &
+	ViolationMessage<MessageIds> &
 	ViolationLocation<Node>;
 
 // #region Suggestions
@@ -469,6 +472,7 @@ export interface RuleDefinition<
 			Code: Options["Code"];
 			RuleOptions: Options["RuleOptions"];
 			Node: Options["Node"];
+			MessageIds: Options["MessageIds"];
 		}>,
 	): Options["Visitor"];
 }
