@@ -1,8 +1,8 @@
 {
-  "packages/compat": "1.2.4",
+  "packages/compat": "1.2.5",
   "packages/config-array": "0.19.1",
-  "packages/core": "0.9.1",
-  "packages/migrate-config": "1.3.5",
+  "packages/core": "0.10.0",
+  "packages/migrate-config": "1.3.6",
   "packages/object-schema": "2.1.5",
-  "packages/plugin-kit": "0.2.4"
+  "packages/plugin-kit": "0.2.5"
 }
