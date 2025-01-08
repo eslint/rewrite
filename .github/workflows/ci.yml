@@ -55,7 +55,7 @@ jobs:
                   CI: true
 
     test_types:
-        name: Test Types (core)
+        name: Test Types
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
@@ -65,8 +65,15 @@ jobs:
               with:
                   node-version: "lts/*"
 
-            - name: npm install and test types
+            - name: npm install and test types (core)
               working-directory: packages/core
+              run: |
+                  npm install
+                  npm run build
+                  npm run test:types
+
+            - name: npm install and test types (plugin-kit)
+              working-directory: packages/plugin-kit
               run: |
                   npm install
                   npm run build
