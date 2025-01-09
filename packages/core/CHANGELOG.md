@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.10.0](https://github.com/eslint/rewrite/compare/core-v0.9.1...core-v0.10.0) (2025-01-09)
+
+
+### Features
+
+* Check messageIds in context.report() ([#140](https://github.com/eslint/rewrite/issues/140)) ([1c9ca4d](https://github.com/eslint/rewrite/commit/1c9ca4d0a4726218948a92ebc2e8be7a13d224d4))
+
+
+### Bug Fixes
+
+* make `plugin-kit` types usable in CommonJS ([#143](https://github.com/eslint/rewrite/issues/143)) ([f77ba17](https://github.com/eslint/rewrite/commit/f77ba177d4e4c5d2ed828cfd9a5149df2ccb3a7f))
+* Update RuleDefinition type ([#138](https://github.com/eslint/rewrite/issues/138)) ([0a0ea6f](https://github.com/eslint/rewrite/commit/0a0ea6fbac827b354ee18f5b10eefad2bc0794f7))
+
 ## [0.9.1](https://github.com/eslint/rewrite/compare/core-v0.9.0...core-v0.9.1) (2024-12-04)
 
 

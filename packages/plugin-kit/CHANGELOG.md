@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.2.5](https://github.com/eslint/rewrite/compare/plugin-kit-v0.2.4...plugin-kit-v0.2.5) (2025-01-09)
+
+
+### Bug Fixes
+
+* make `plugin-kit` types usable in CommonJS ([#143](https://github.com/eslint/rewrite/issues/143)) ([f77ba17](https://github.com/eslint/rewrite/commit/f77ba177d4e4c5d2ed828cfd9a5149df2ccb3a7f))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^0.9.1 to ^0.10.0
+
 ## [0.2.4](https://github.com/eslint/rewrite/compare/plugin-kit-v0.2.3...plugin-kit-v0.2.4) (2024-12-04)
 
 
