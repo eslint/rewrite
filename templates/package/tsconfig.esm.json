@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.json",
+  "files": ["dist/esm/index.js"],
+  "compilerOptions": {
+    "strict": false
+  }
+}
