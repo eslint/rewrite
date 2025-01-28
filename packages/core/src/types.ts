@@ -166,7 +166,7 @@ export interface RulesMeta<
 	/**
 	 * When a rule is deprecated, indicates the rule ID(s) that should be used instead.
 	 */
-	replacedBy?: string[] | undefined;
+	replacedBy?: readonly string[] | undefined;
 
 	/**
 	 * Indicates if the rule is fixable, and if so, what type of fix it provides.
