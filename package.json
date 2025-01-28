@@ -7,6 +7,7 @@
     "test": "npm test --workspaces --if-present",
     "build": "node scripts/build.js",
     "build:readme": "node tools/update-readme.js",
+    "build:new-pkg": "node tools/new-pkg.js",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "fmt": "prettier --write .",
@@ -26,6 +27,9 @@
       "prettier --write"
     ],
     "!(*.{js,ts})": "prettier --write --ignore-unknown"
+  },
+  "engines": {
+    "node": ">= 22.3.0"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.7",

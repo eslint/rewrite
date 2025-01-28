@@ -8,6 +8,8 @@ body:
       attributes:
           label: Which packages would you like to change?
           options:
+              # NOTE: Package names are automatically generated. Do not manually edit.
+              # packages-start
               - label: "`@eslint/compat`"
                 required: false
               - label: "`@eslint/config-array`"
@@ -20,6 +22,8 @@ body:
                 required: false
               - label: "`@eslint/plugin-kit`"
                 required: false
+              # packages-end
+
     - type: textarea
       attributes:
           label: What problem do you want to solve?
