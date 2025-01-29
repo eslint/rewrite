@@ -31,6 +31,7 @@ export default [
 	{
 		files: [
 			"scripts/**",
+			"tools/**",
 			"packages/migrate-config/src/migrate-config-cli.js",
 		],
 		rules: {

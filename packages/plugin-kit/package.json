@@ -32,7 +32,7 @@
   "homepage": "https://github.com/eslint/rewrite#readme",
   "scripts": {
     "build:dedupe-types": "node ../../tools/dedupe-types.js dist/cjs/index.cjs dist/esm/index.js",
-    "build:cts": "node ./build-cts.js",
+    "build:cts": "node ../../tools/build-cts.js dist/esm/index.d.ts dist/cjs/index.d.cts",
     "build": "rollup -c && npm run build:dedupe-types && tsc -p tsconfig.esm.json && npm run build:cts",
     "pretest": "npm run build",
     "test": "mocha tests/",
