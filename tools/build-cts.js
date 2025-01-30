@@ -3,7 +3,7 @@
  * This script creates "dist/cjs/index.d.cts" from "dist/esm/index.d.ts" by modifying imports
  * from `"./types.ts"` to `"./types.cts"`.
  *
- *    node tools/build-cts.js /path/to/index.d.ts path/to/cjs/index.d.cts
+ *    node tools/build-cts.js /path/to/esm/index.d.ts path/to/cjs/index.d.cts
  *
  * @author Francesco Trotta
  */
