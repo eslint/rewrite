@@ -129,6 +129,11 @@ export interface RulesMetaDocs {
 	 * Indicates if the rule is generally recommended for all users.
 	 */
 	recommended?: boolean | undefined;
+
+	/**
+	 * Indicates if the rule is frozen (no longer accepting feature requests).
+	 */
+	frozen?: boolean | undefined;
 }
 
 /**
@@ -159,12 +164,13 @@ export interface RulesMeta<
 	messages?: Record<MessageIds, string>;
 
 	/**
-	 * The deprecated rules for the rule.
+	 * Indicates whether the rule has been deprecated or provides additional metadata about the deprecation. Omit if not deprecated.
 	 */
-	deprecated?: boolean | undefined;
+	deprecated?: boolean | DeprecatedInfo | undefined;
 
 	/**
-	 * When a rule is deprecated, indicates the rule ID(s) that should be used instead.
+	 * @deprecated Use deprecated.replacedBy instead.
+	 * The name of the rule(s) this rule was replaced by, if it was deprecated.
 	 */
 	replacedBy?: readonly string[] | undefined;
 
@@ -177,6 +183,82 @@ export interface RulesMeta<
 	 * Indicates if the rule may provide suggestions.
 	 */
 	hasSuggestions?: boolean | undefined;
+}
+
+/**
+ * Provides additional metadata about a deprecation.
+ */
+export interface DeprecatedInfo {
+	/**
+	 * General message presented to the user, e.g. for the key rule why the rule
+	 * is deprecated or for info how to replace the rule.
+	 */
+	message?: string;
+
+	/**
+	 * URL to more information about this deprecation in general.
+	 */
+	url?: string;
+
+	/**
+	 * An empty array explicitly states that there is no replacement.
+	 */
+	replacedBy?: ReplacedByInfo[];
+
+	/**
+	 * The package version since when the rule is deprecated (should use full
+	 * semver without a leading "v").
+	 */
+	deprecatedSince?: string;
+
+	/**
+	 * The estimated version when the rule is removed (probably the next major
+	 * version). null means the rule is "frozen" (will be available but will not
+	 * be changed).
+	 */
+	availableUntil?: string | null;
+}
+
+/**
+ * Provides metadata about a replacement
+ */
+export interface ReplacedByInfo {
+	/**
+	 * General message presented to the user, e.g. how to replace the rule
+	 */
+	message?: string;
+
+	/**
+	 * URL to more information about this replacement in general
+	 */
+	url?: string;
+
+	/**
+	 * Name should be "eslint" if the replacement is an ESLint core rule. Omit
+	 * the property if the replacement is in the same plugin.
+	 */
+	plugin?: ExternalSpecifier;
+
+	/**
+	 * Name and documentation of the replacement rule
+	 */
+	rule?: ExternalSpecifier;
+}
+
+/**
+ * Specifies the name and url of an external resource. At least one property
+ * should be set.
+ */
+export interface ExternalSpecifier {
+	/**
+	 * Name of the referenced plugin / rule.
+	 */
+	name?: string;
+
+	/**
+	 * URL pointing to documentation for the plugin / rule.
+	 */
+	url?: string;
 }
 
 /**
