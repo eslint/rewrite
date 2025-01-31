@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.19.2](https://github.com/eslint/rewrite/compare/config-array-v0.19.1...config-array-v0.19.2) (2025-01-31)
+
+
+### Bug Fixes
+
+* CommonJS types in all packages ([#148](https://github.com/eslint/rewrite/issues/148)) ([c91866c](https://github.com/eslint/rewrite/commit/c91866cc9fe16fb62bc48fc1cc7f9e18c6fea013))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/object-schema bumped from ^2.1.5 to ^2.1.6
+
 ## [0.19.1](https://github.com/eslint/rewrite/compare/config-array-v0.19.0...config-array-v0.19.1) (2024-12-04)
 
 

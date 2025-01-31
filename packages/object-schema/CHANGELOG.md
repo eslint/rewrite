@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.6](https://github.com/eslint/rewrite/compare/object-schema-v2.1.5...object-schema-v2.1.6) (2025-01-31)
+
+
+### Bug Fixes
+
+* CommonJS types in all packages ([#148](https://github.com/eslint/rewrite/issues/148)) ([c91866c](https://github.com/eslint/rewrite/commit/c91866cc9fe16fb62bc48fc1cc7f9e18c6fea013))
+
 ## [2.1.5](https://github.com/eslint/rewrite/compare/object-schema-v2.1.4...object-schema-v2.1.5) (2024-12-04)
 
 
