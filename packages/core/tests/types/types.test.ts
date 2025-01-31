@@ -199,6 +199,24 @@ const testRule: RuleDefinition<{
 	meta: {
 		type: "problem",
 		fixable: "code",
+		deprecated: {
+			message: "use something else",
+			url: "https://example.com",
+			replacedBy: [
+				{
+					message: "use this instead",
+					url: "https://example.com",
+					rule: {
+						name: "new-rule",
+						url: "https://example.com/rules/new-rule",
+					},
+					plugin: {
+						name: "new-plugin",
+						url: "https://example.com/plugins/new-plugin",
+					},
+				},
+			],
+		},
 		messages: {
 			badFoo: "change this foo",
 			wrongBar: "fix this bar",
