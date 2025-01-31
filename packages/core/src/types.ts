@@ -158,6 +158,9 @@ export interface RulesMeta<
 	 */
 	schema?: JSONSchema4 | JSONSchema4[] | false | undefined;
 
+	/** Any default options to be recursively merged on top of any user-provided options. */
+	defaultOptions?: unknown[];
+
 	/**
 	 * The messages that the rule can report.
 	 */
