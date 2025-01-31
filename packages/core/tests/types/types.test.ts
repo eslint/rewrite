@@ -217,6 +217,21 @@ const testRule: RuleDefinition<{
 				},
 			],
 		},
+		schema: [
+			{
+				type: "object",
+				properties: {
+					foo: {
+						type: "string",
+					},
+					bar: {
+						type: "integer",
+					},
+				},
+				additionalProperties: false,
+			},
+		],
+		defaultOptions: [{ foo: "always", bar: 5 }],
 		messages: {
 			badFoo: "change this foo",
 			wrongBar: "fix this bar",
@@ -227,21 +242,23 @@ const testRule: RuleDefinition<{
 		return {
 			Foo(node: TestNode) {
 				// node.type === "Foo"
-				context.report({
-					messageId: "badFoo",
-					loc: {
-						start: { line: node.start, column: 1 },
-						end: { line: node.start + 1, column: Infinity },
-					},
-					fix(fixer: RuleTextEditor): RuleTextEdit {
-						return fixer.replaceText(
-							node,
-							context.languageOptions.howMuch === "yes"
-								? "👍"
-								: "👎",
-						);
-					},
-				});
+				if (context.options[0].foo === "always") {
+					context.report({
+						messageId: "badFoo",
+						loc: {
+							start: { line: node.start, column: 1 },
+							end: { line: node.start + 1, column: Infinity },
+						},
+						fix(fixer: RuleTextEditor): RuleTextEdit {
+							return fixer.replaceText(
+								node,
+								context.languageOptions.howMuch === "yes"
+									? "👍"
+									: "👎",
+							);
+						},
+					});
+				}
 			},
 			Bar(node: TestNode) {
 				// node.type === "Bar"
