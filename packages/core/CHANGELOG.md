@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.11.0](https://github.com/eslint/rewrite/compare/core-v0.10.0...core-v0.11.0) (2025-01-31)
+
+
+### Features
+
+* Update RuleDefinition for frozen and deprecations ([#149](https://github.com/eslint/rewrite/issues/149)) ([4964322](https://github.com/eslint/rewrite/commit/49643228d230f2d0edce6d2a310ccf3131b72d89))
+* Update RuleDefinition with `meta.defaultOptions` ([#150](https://github.com/eslint/rewrite/issues/150)) ([e9a987e](https://github.com/eslint/rewrite/commit/e9a987e8d92a6383e9782332e515aa2a719a18af))
+
+
+### Bug Fixes
+
+* Make meta.replacedBy read only ([#146](https://github.com/eslint/rewrite/issues/146)) ([7dfc0d9](https://github.com/eslint/rewrite/commit/7dfc0d92e617108c0e9493f09db3f86919e02fd1))
+
 ## [0.10.0](https://github.com/eslint/rewrite/compare/core-v0.9.1...core-v0.10.0) (2025-01-09)
 
 
