@@ -30,7 +30,7 @@ const PACKAGES_DIR = path.resolve(__dirname, "..", "packages");
  * Gets a list of directories in the packages directory.
  * @returns {Promise<string[]>} A promise that resolves with an array of package directories.
  */
-async function getPackageDirs() {
+export async function getPackageDirs() {
 	const packageDirs = await fsp.readdir(PACKAGES_DIR);
 	return packageDirs.map(entry => `packages/${entry}`);
 }
@@ -40,7 +40,7 @@ async function getPackageDirs() {
  * @param {Array<string>} packageDirs An array of package directories.
  * @returns {Map<string, Set<string>>} A map of package names to the set of dependencies.
  */
-async function calculatePackageDependencies(packageDirs) {
+export async function calculatePackageDependencies(packageDirs) {
 	return new Map(
 		await Promise.all(
 			packageDirs.map(async packageDir => {
@@ -78,7 +78,7 @@ async function calculatePackageDependencies(packageDirs) {
  * dependencies between packages.
  * @returns {Array<string>} An array of directories to be built in order.
  */
-function createBuildOrder(dependencies) {
+export function createBuildOrder(dependencies) {
 	const buildOrder = [];
 	const seen = new Set();
 
