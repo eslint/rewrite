@@ -2,18 +2,34 @@
  * @fileoverview Publishes all of the packages in dependency order
  * via GitHub workflow.
  *
+ * Usage:
+ *
+ *   node scripts/publish.js [--dry-run]
+ *
  * @author Nicholas C. Zakas
  */
-
 
 //-----------------------------------------------------------------------------
 // Imports
 //-----------------------------------------------------------------------------
 
-import { getPackageDirs, calculatePackageDependencies, createBuildOrder } from "./build.js";
+import {
+	getPackageDirs,
+	calculatePackageDependencies,
+	createBuildOrder,
+} from "./shared.js";
 import { execSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+
+//-----------------------------------------------------------------------------
+// Read CLI Args
+//-----------------------------------------------------------------------------
+
+const dryRun = process.argv.includes("--dry-run");
+
+// for dry runs only output to console and don't execute anything
+const exec = dryRun ? text => console.log(text) : execSync;
 
 //-----------------------------------------------------------------------------
 // Helpers
@@ -26,16 +42,16 @@ import { join } from "node:path";
  * @returns {string} The environment variable name
  */
 function convertOutputToEnvVar(stepId, outputName) {
-    // Convert step ID to uppercase and replace hyphens with underscores
-    const normalizedStepId = stepId.toUpperCase().replace(/-/gu, '_');
+	// Convert step ID to uppercase and replace hyphens with underscores
+	const normalizedStepId = stepId.toUpperCase().replace(/-/gu, "_");
 
-    // Convert output name to uppercase and replace slashes with double underscores
-    const normalizedOutputName = outputName
-        .toUpperCase()
-        .replace(/\//gu, '__')
-        .replace(/-/gu, '_');
+	// Convert output name to uppercase and replace slashes with double underscores
+	const normalizedOutputName = outputName
+		.toUpperCase()
+		.replace(/\//gu, "__")
+		.replace(/-/gu, "_");
 
-    return `STEPS_${normalizedStepId}_OUTPUTS_${normalizedOutputName}`;
+	return `STEPS_${normalizedStepId}_OUTPUTS_${normalizedOutputName}`;
 }
 
 /**
@@ -45,7 +61,9 @@ function convertOutputToEnvVar(stepId, outputName) {
  * @return {string} The output value.
  */
 function getReleaseOutput(packageDir, name) {
-    return process.env[convertOutputToEnvVar('release', `${packageDir}--${name}`)];
+	return process.env[
+		convertOutputToEnvVar("release", `${packageDir}--${name}`)
+	];
 }
 
 /**
@@ -53,117 +71,134 @@ function getReleaseOutput(packageDir, name) {
  * @param {Array<string>} packageDirs The list of package directories.
  * @return {Array<string>} The list of packages to publish.
  */
-function getPackagesToPublish(packageDirs) {    
-    return packageDirs.filter(packageDir => getReleaseOutput(packageDir, "release_created") === "true");
+function getPackagesToPublish(packageDirs) {
+	return packageDirs.filter(
+		packageDir =>
+			getReleaseOutput(packageDir, "release_created") === "true",
+	);
 }
 
 /**
  * Publishes the packages to npm. If one package fails to publish, the rest
  * will still be published.
  * @param {Array<string>} packageDirs The list of package directories.
- * @return {Map<string,boolean>} A map of package directory to whether it was published successfully.
+ * @return {Map<string,string>} A map of package directory to whether it was published successfully.
  */
 function publishPackagesToNpm(packageDirs) {
-    console.log(`Publishing packages to npm in this order: ${packageDirs.join(", ")}`);
-    
-    const results = new Map();
+	console.log(
+		`Publishing packages to npm in this order: ${packageDirs.join(", ")}`,
+	);
 
-    for (const packageDir of packageDirs) {
-        console.log(`Publishing ${packageDir}...`);
-        try {
-            execSync(`npm publish -w ${packageDir} --provenance`, {
-                stdio: "inherit",
-                env: process.env
-            });
-            
-            results.set(packageDir, "ok");
-        } catch (error) {
-            console.error(`Failed to publish ${packageDir} to npm`);
-            console.log(error.message);
-            
-            results.set(packageDir, error.message);
-        }
-    }
+	const results = new Map();
 
-    console.log("Done publishing packages to npm.");
+	for (const packageDir of packageDirs) {
+		console.log(`Publishing ${packageDir}...`);
+		try {
+			exec(`npm publish -w ${packageDir} --provenance`, {
+				stdio: "inherit",
+				env: process.env,
+			});
+
+			results.set(packageDir, "ok");
+		} catch (error) {
+			console.error(`Failed to publish ${packageDir} to npm`);
+			console.log(error.message);
+
+			results.set(packageDir, error.message);
+		}
+	}
+
+	console.log("Done publishing packages to npm.");
+	return results;
 }
 
 /**
  * Publishes the packages to JSR. If one package fails to publish, the rest
  * will still be published.
  * @param {Array<string>} packageDirs The list of package directories.
- * @return {Map<string,boolean>} A map of package directory to whether it was published successfully.
+ * @return {Map<string,string>} A map of package directory to whether it was published successfully.
  **/
 function publishPackagesToJsr(packageDirs) {
-    console.log(`Publishing packages to JSR in this order: ${packageDirs.join(", ")}`);
-    
-    const results = new Map();
+	console.log(
+		`Publishing packages to JSR in this order: ${packageDirs.join(", ")}`,
+	);
 
-    for (const packageDir of packageDirs) {
-        
-        // Skip if no jsr.json exists
-        if (!existsSync(join(packageDir, "jsr.json"))) {
-            console.log(`Skipping ${packageDir} (no jsr.json found)`);
-            results.set(packageDir, "ok (skipped)");
-            continue;
-        }
+	const results = new Map();
 
-        console.log(`Publishing ${packageDir}...`);
-        try {
-            execSync(`npx jsr publish`, {
-                stdio: "inherit",
-                env: process.env,
-                cwd: packageDir
-            });
-            
-            results.set(packageDir, "ok");
-        } catch (error) {
-            console.error(`Failed to publish ${packageDir} to npm`);
-            console.log(error.message);
-            
-            results.set(packageDir, error.message);
-        }
-    }
+	for (const packageDir of packageDirs) {
+		// Skip if no jsr.json exists
+		if (!existsSync(join(packageDir, "jsr.json"))) {
+			console.log(`Skipping ${packageDir} (no jsr.json found)`);
+			results.set(packageDir, "ok (skipped)");
+			continue;
+		}
 
-    console.log("Done publishing packages to JSR.");
-    return results;
+		console.log(`Publishing ${packageDir}...`);
+		try {
+			exec(`npx jsr publish`, {
+				stdio: "inherit",
+				env: process.env,
+				cwd: packageDir,
+			});
+
+			results.set(packageDir, "ok");
+		} catch (error) {
+			console.error(`Failed to publish ${packageDir} to npm`);
+			console.log(error.message);
+
+			results.set(packageDir, error.message);
+		}
+	}
+
+	console.log("Done publishing packages to JSR.");
+	return results;
 }
 
+/**
+ * Posts the results to social media.
+ * @param {Map<string,string>} npmPublishResults The results of the npm publish.
+ * @return {void}
+ */
 function postResultToSocialMedia(npmPublishResults) {
+	const messages = [];
 
-    const messages = [];    
+	for (const [packageDir, result] of npmPublishResults) {
+		if (result !== "ok") {
+			continue;
+		}
 
-    for (const [packageDir, result] of npmPublishResults.entries()) {
-        
-        if (result !== "ok") {
-            continue;
-        }
-        
-        const packageJson = JSON.parse(readFileSync(join(packageDir, "package.json"), "utf8"));
-        const packageName = packageJson.name.slice(1); // remove leading @
-        const packageVersion = packageJson.version;
-        
-        messages.push(`${packageName} v${packageVersion}\n${getReleaseOutput(packageDir, "html_url")}`);
-    }
-    
-    // group four messages per post to avoid post limits
-    const messageChunks = [];
-    for (let i = 0; i < messages.length; i += 4) {
-        messageChunks.push(messages.slice(i, i + 4).join("\n\n"));
-    }
-    
-    for (const messageChunk of messageChunks) {
-        const message = `Just released:\n\n${messageChunk}`;
-   
-        console.log(message);
-        
-        // execSync(`npx @humanwhocodes/crosspost -t -b -m ${JSON.stringify(message)}`, {
-        //     stdio: "inherit",
-        //     env: process.env
-        // });
-    }
+		const packageJson = JSON.parse(
+			readFileSync(join(packageDir, "package.json"), "utf8"),
+		);
+		const packageName = packageJson.name.slice(1); // remove leading @
+		const packageVersion = packageJson.version;
 
-    console.log("Posted to social media.");
+		messages.push(
+			`${packageName} v${packageVersion}\n${getReleaseOutput(packageDir, "html_url")}`,
+		);
+	}
+
+	// group four messages per post to avoid post limits
+	const messageChunks = [];
+	for (let i = 0; i < messages.length; i += 4) {
+		messageChunks.push(messages.slice(i, i + 4).join("\n\n"));
+	}
+
+	for (const messageChunk of messageChunks) {
+		const message = `Just released:\n\n${messageChunk}`;
+
+		console.log(message);
+
+		exec(
+			`npx @humanwhocodes/crosspost -t -b -m ${JSON.stringify(message)}`,
+			{
+				stdio: "inherit",
+				env: process.env,
+			},
+		);
+	}
+
+	console.log("Posted to social media.");
 }
 
 //-----------------------------------------------------------------------------
@@ -176,32 +211,17 @@ const buildOrder = createBuildOrder(dependencies);
 const packagesToPublish = getPackagesToPublish(buildOrder);
 
 if (packagesToPublish.length === 0) {
-    console.log("No packages to publish.");
-    process.exit(0);
+	console.log("No packages to publish.");
+	process.exit(0);
 }
-
-console.log("The following packages will be published:");
-console.log(packagesToPublish.join("\n"));
 
 const npmPublishResults = publishPackagesToNpm(packagesToPublish);
 const jsrPublishResults = publishPackagesToJsr(packagesToPublish);
 
-console.log("\nSummary of npm results:");
-console.log(
-    [...npmPublishResults.entries()]
-        .map(([dir, result]) => `- ${dir}: ${result}`)
-        .join("\n"),
-);
+postResultToSocialMedia(npmPublishResults);
 
-console.log("\nSummary of JSR results:");
-console.log(
-    [...jsrPublishResults.entries()]
-        .map(([dir, result]) => `- ${dir}: ${result}`)
-        .join("\n"),
-);
-
-
-
-
-
-process.exitCode = [...npmPublishResults, ...jsrPublishResults].some(([, value]) => !value.startsWith("ok")) ? 1 : 0;
+process.exitCode = [...npmPublishResults, ...jsrPublishResults].some(
+	([, value]) => !value.startsWith("ok"),
+)
+	? 1
+	: 0;

@@ -47,6 +47,29 @@ jobs:
               if: ${{ steps.release.outputs.releases_created == 'true' }}
 
             #-----------------------------------------------------------------------------
+            # NOTE: This script currently doesn't do anything. It just outputs the
+            # release information to the console. We will do this for a few releases
+            # to make sure everything is working correctly before we switch to use this
+            # script exclusively.
+            #-----------------------------------------------------------------------------
+
+            - name: Publish using new script
+              run: node scripts/publish.js --dry-run
+              if: ${{ steps.release.outputs.releases_created == 'true' }}
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+                  TWITTER_API_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
+                  TWITTER_API_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
+                  TWITTER_ACCESS_TOKEN_KEY: ${{ secrets.TWITTER_ACCESS_TOKEN_KEY }}
+                  TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+                  MASTODON_ACCESS_TOKEN: ${{ secrets.MASTODON_ACCESS_TOKEN }}
+                  MASTODON_HOST: ${{ secrets.MASTODON_HOST }}
+                  BLUESKY_IDENTIFIER: ${{ vars.BLUESKY_IDENTIFIER }}
+                  BLUESKY_PASSWORD: ${{ secrets.BLUESKY_PASSWORD }}
+                  BLUESKY_HOST: ${{ vars.BLUESKY_HOST }}
+
+            #-----------------------------------------------------------------------------
             # NOTE: Packages are released in order of dependency. The packages with the
             # fewest internal dependencies are released first and the packages with the
             # most internal dependencies are released last.
