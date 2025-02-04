@@ -1,0 +1,634 @@
+/**
+ * @fileoverview Tests for defineConfig helper
+ * @author Nicholas C. Zakas
+ */
+
+//-----------------------------------------------------------------------------
+// Imports
+//-----------------------------------------------------------------------------
+
+import { defineConfig } from "../src/define-config.js";
+import assert from "node:assert";
+
+//-----------------------------------------------------------------------------
+// Tests
+//-----------------------------------------------------------------------------
+
+describe("defineConfig()", () => {
+	describe("extends", () => {
+		describe("extending objects", () => {
+			it("should extend two config objects without files", () => {
+				const config = defineConfig({
+					extends: [
+						{ rules: { "no-console": "error" } },
+						{ rules: { "no-alert": "error" } },
+					],
+					rules: {
+						"no-debugger": "error",
+					},
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "UserConfig[0] > ExtendedConfig[0]",
+						rules: { "no-console": "error" },
+					},
+					{
+						name: "UserConfig[0] > ExtendedConfig[1]",
+						rules: { "no-alert": "error" },
+					},
+					{ rules: { "no-debugger": "error" } },
+				]);
+			});
+
+			it("should extend two config objects with names", () => {
+				const config = defineConfig({
+					name: "Base Config",
+					extends: [
+						{ name: "Console", rules: { "no-console": "error" } },
+						{ name: "Alert", rules: { "no-alert": "error" } },
+					],
+					rules: {
+						"no-debugger": "error",
+					},
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "Base Config > Console",
+						rules: { "no-console": "error" },
+					},
+					{
+						name: "Base Config > Alert",
+						rules: { "no-alert": "error" },
+					},
+					{ name: "Base Config", rules: { "no-debugger": "error" } },
+				]);
+			});
+
+			it("should extend two config objects with files", () => {
+				const config = defineConfig({
+					files: ["*.js"],
+					extends: [
+						{ rules: { "no-console": "error" } },
+						{ rules: { "no-alert": "error" } },
+					],
+					rules: {
+						"no-debugger": "error",
+					},
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "UserConfig[0] > ExtendedConfig[0]",
+						files: ["*.js"],
+						rules: { "no-console": "error" },
+					},
+					{
+						name: "UserConfig[0] > ExtendedConfig[1]",
+						files: ["*.js"],
+						rules: { "no-alert": "error" },
+					},
+					{ files: ["*.js"], rules: { "no-debugger": "error" } },
+				]);
+			});
+
+			it("should extend two config objects with files and ignores", () => {
+				const config = defineConfig({
+					name: "Base",
+					files: ["*.js"],
+					ignores: ["foo.js"],
+					extends: [
+						{ name: "Ext1", rules: { "no-console": "error" } },
+						{ name: "Ext2", rules: { "no-alert": "error" } },
+					],
+					rules: {
+						"no-debugger": "error",
+					},
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "Base > Ext1",
+						files: ["*.js"],
+						ignores: ["foo.js"],
+						rules: { "no-console": "error" },
+					},
+					{
+						name: "Base > Ext2",
+						files: ["*.js"],
+						ignores: ["foo.js"],
+						rules: { "no-alert": "error" },
+					},
+					{
+						name: "Base",
+						files: ["*.js"],
+						ignores: ["foo.js"],
+						rules: { "no-debugger": "error" },
+					},
+				]);
+			});
+
+			it("should extend two config objects with files and ignores in all configs", () => {
+				const config = defineConfig({
+					name: "Base",
+					files: ["*.js"],
+					ignores: ["foo.js"],
+					extends: [
+						{
+							name: "Ext1",
+							files: ["*.jsx"],
+							ignores: ["bar.js"],
+							rules: { "no-console": "error" },
+						},
+						{
+							name: "Ext2",
+							files: ["foo*.js"],
+							ignores: ["baz.js"],
+							rules: { "no-alert": "error" },
+						},
+					],
+					rules: {
+						"no-debugger": "error",
+					},
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "Base > Ext1",
+						files: [["*.js", "*.jsx"]],
+						ignores: ["foo.js", "bar.js"],
+						rules: { "no-console": "error" },
+					},
+					{
+						name: "Base > Ext2",
+						files: [["*.js", "foo*.js"]],
+						ignores: ["foo.js", "baz.js"],
+						rules: { "no-alert": "error" },
+					},
+					{
+						name: "Base",
+						files: ["*.js"],
+						ignores: ["foo.js"],
+						rules: { "no-debugger": "error" },
+					},
+				]);
+			});
+
+			it("should extend two config objects with files and ignores and multiple configs passed in as an array", () => {
+				const config = defineConfig([
+					{
+						name: "Base",
+						files: ["*.js"],
+						ignores: ["foo.js"],
+						extends: [
+							{ name: "Ext1", rules: { "no-console": "error" } },
+							{ name: "Ext2", rules: { "no-alert": "error" } },
+						],
+						rules: {
+							"no-debugger": "error",
+						},
+					},
+					{
+						name: "Base 2",
+						files: ["*.ts"],
+						ignores: ["bar.js"],
+						extends: [
+							{ name: "Ext3", rules: { "no-console": "error" } },
+							{ name: "Ext4", rules: { "no-alert": "error" } },
+						],
+						rules: {
+							"no-debugger": "error",
+						},
+					},
+				]);
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "Base > Ext1",
+						files: ["*.js"],
+						ignores: ["foo.js"],
+						rules: { "no-console": "error" },
+					},
+					{
+						name: "Base > Ext2",
+						files: ["*.js"],
+						ignores: ["foo.js"],
+						rules: { "no-alert": "error" },
+					},
+					{
+						name: "Base",
+						files: ["*.js"],
+						ignores: ["foo.js"],
+						rules: { "no-debugger": "error" },
+					},
+					{
+						name: "Base 2 > Ext3",
+						files: ["*.ts"],
+						ignores: ["bar.js"],
+						rules: { "no-console": "error" },
+					},
+					{
+						name: "Base 2 > Ext4",
+						files: ["*.ts"],
+						ignores: ["bar.js"],
+						rules: { "no-alert": "error" },
+					},
+					{
+						name: "Base 2",
+						files: ["*.ts"],
+						ignores: ["bar.js"],
+						rules: { "no-debugger": "error" },
+					},
+				]);
+			});
+
+			it("should extend two config objects with files and ignores and multiple configs passed in as arguments", () => {
+				const config = defineConfig(
+					{
+						name: "Base",
+						files: ["*.js"],
+						ignores: ["foo.js"],
+						extends: [
+							{ name: "Ext1", rules: { "no-console": "error" } },
+							{ name: "Ext2", rules: { "no-alert": "error" } },
+						],
+						rules: {
+							"no-debugger": "error",
+						},
+					},
+					{
+						name: "Base 2",
+						files: ["*.ts"],
+						ignores: ["bar.js"],
+						extends: [
+							{ name: "Ext3", rules: { "no-console": "error" } },
+							{ name: "Ext4", rules: { "no-alert": "error" } },
+						],
+						rules: {
+							"no-debugger": "error",
+						},
+					},
+				);
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "Base > Ext1",
+						files: ["*.js"],
+						ignores: ["foo.js"],
+						rules: { "no-console": "error" },
+					},
+					{
+						name: "Base > Ext2",
+						files: ["*.js"],
+						ignores: ["foo.js"],
+						rules: { "no-alert": "error" },
+					},
+					{
+						name: "Base",
+						files: ["*.js"],
+						ignores: ["foo.js"],
+						rules: { "no-debugger": "error" },
+					},
+					{
+						name: "Base 2 > Ext3",
+						files: ["*.ts"],
+						ignores: ["bar.js"],
+						rules: { "no-console": "error" },
+					},
+					{
+						name: "Base 2 > Ext4",
+						files: ["*.ts"],
+						ignores: ["bar.js"],
+						rules: { "no-alert": "error" },
+					},
+					{
+						name: "Base 2",
+						files: ["*.ts"],
+						ignores: ["bar.js"],
+						rules: { "no-debugger": "error" },
+					},
+				]);
+			});
+		});
+
+		describe("extending arrays", () => {
+			it("should extend two config arrays without files", () => {
+				const config = defineConfig({
+					extends: [
+						[{ rules: { "no-console": "error" } }],
+						[{ rules: { "no-alert": "error" } }],
+					],
+					rules: {
+						"no-debugger": "error",
+					},
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "UserConfig[0] > ExtendedConfig[0][0]",
+						rules: { "no-console": "error" },
+					},
+					{
+						name: "UserConfig[0] > ExtendedConfig[1][0]",
+						rules: { "no-alert": "error" },
+					},
+					{ rules: { "no-debugger": "error" } },
+				]);
+			});
+
+			it("should extend two config arrays each with two elements and files in base config", () => {
+				const config = defineConfig({
+					files: ["*.js"],
+					extends: [
+						[
+							{ rules: { "no-console": "error" } },
+							{ rules: { "no-debugger": "error" } },
+						],
+						[
+							{ rules: { "no-alert": "error" } },
+							{
+								rules: {
+									"no-warning-comments": [
+										"error",
+										{ terms: ["todo"], location: "start" },
+									],
+								},
+							},
+						],
+					],
+					rules: {
+						"no-unreachable": "error",
+					},
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "UserConfig[0] > ExtendedConfig[0][0]",
+						files: ["*.js"],
+						rules: { "no-console": "error" },
+					},
+					{
+						name: "UserConfig[0] > ExtendedConfig[0][1]",
+						files: ["*.js"],
+						rules: { "no-debugger": "error" },
+					},
+					{
+						name: "UserConfig[0] > ExtendedConfig[1][0]",
+						files: ["*.js"],
+						rules: { "no-alert": "error" },
+					},
+					{
+						name: "UserConfig[0] > ExtendedConfig[1][1]",
+						files: ["*.js"],
+						rules: {
+							"no-warning-comments": [
+								"error",
+								{ terms: ["todo"], location: "start" },
+							],
+						},
+					},
+					{ files: ["*.js"], rules: { "no-unreachable": "error" } },
+				]);
+			});
+
+			it("should extend two config arrays each with two elements and names, and files in base config", () => {
+				const config = defineConfig({
+					name: "Base",
+					files: ["*.js"],
+					extends: [
+						[
+							{ name: "Ext1", rules: { "no-console": "error" } },
+							{ name: "Ext2", rules: { "no-debugger": "error" } },
+						],
+						[
+							{ name: "Ext3", rules: { "no-alert": "error" } },
+							{
+								name: "Ext4",
+								rules: {
+									"no-warning-comments": [
+										"error",
+										{ terms: ["todo"], location: "start" },
+									],
+								},
+							},
+						],
+					],
+					rules: {
+						"no-unreachable": "error",
+					},
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "Base > Ext1",
+						files: ["*.js"],
+						rules: { "no-console": "error" },
+					},
+					{
+						name: "Base > Ext2",
+						files: ["*.js"],
+						rules: { "no-debugger": "error" },
+					},
+					{
+						name: "Base > Ext3",
+						files: ["*.js"],
+						rules: { "no-alert": "error" },
+					},
+					{
+						name: "Base > Ext4",
+						files: ["*.js"],
+						rules: {
+							"no-warning-comments": [
+								"error",
+								{ terms: ["todo"], location: "start" },
+							],
+						},
+					},
+					{
+						name: "Base",
+						files: ["*.js"],
+						rules: { "no-unreachable": "error" },
+					},
+				]);
+			});
+		});
+
+		describe("extending strings", () => {
+			it("should extend two configs by string names", () => {
+				const test1Plugin = {
+					configs: {
+						config1: {
+							rules: { "no-console": "error" },
+						},
+					},
+				};
+
+				const test2Plugin = {
+					configs: {
+						config2: {
+							rules: { "no-alert": "error" },
+						},
+					},
+				};
+
+				const config = defineConfig({
+					plugins: {
+						test1: test1Plugin,
+						test2: test2Plugin,
+					},
+					extends: ["test1/config1", "test2/config2"],
+					rules: {
+						"no-debugger": "error",
+					},
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "UserConfig[0] > test1/config1",
+						rules: { "no-console": "error" },
+					},
+					{
+						name: "UserConfig[0] > test2/config2",
+						rules: { "no-alert": "error" },
+					},
+					{
+						plugins: { test1: test1Plugin, test2: test2Plugin },
+						rules: { "no-debugger": "error" },
+					},
+				]);
+			});
+
+			it("should extend two array configs by string names", () => {
+				const test1Plugin = {
+					configs: {
+						config1: [
+							{ rules: { "no-console": "error" } },
+							{ rules: { "no-debugger": "error" } },
+						],
+					},
+				};
+
+				const test2Plugin = {
+					configs: {
+						config2: [
+							{ name: "Ext3", rules: { "no-alert": "error" } },
+							{
+								name: "Ext4",
+								rules: {
+									"no-warning-comments": [
+										"error",
+										{ terms: ["todo"], location: "start" },
+									],
+								},
+							},
+						],
+					},
+				};
+
+				const config = defineConfig({
+					name: "Base",
+					files: ["*.js"],
+					plugins: {
+						test1: test1Plugin,
+						test2: test2Plugin,
+					},
+					extends: ["test1/config1", "test2/config2"],
+					rules: {
+						"no-unreachable": "error",
+					},
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "Base > test1/config1[0]",
+						files: ["*.js"],
+						rules: { "no-console": "error" },
+					},
+					{
+						name: "Base > test1/config1[1]",
+						files: ["*.js"],
+						rules: { "no-debugger": "error" },
+					},
+					{
+						name: "Base > test2/config2[0]",
+						files: ["*.js"],
+						rules: { "no-alert": "error" },
+					},
+					{
+						name: "Base > test2/config2[1]",
+						files: ["*.js"],
+						rules: {
+							"no-warning-comments": [
+								"error",
+								{ terms: ["todo"], location: "start" },
+							],
+						},
+					},
+					{
+						name: "Base",
+						plugins: { test1: test1Plugin, test2: test2Plugin },
+						files: ["*.js"],
+						rules: { "no-unreachable": "error" },
+					},
+				]);
+			});
+
+			it("should throw an error when a plugin is not found", () => {
+				assert.throws(() => {
+					defineConfig({
+						extends: ["test1/config1"],
+						rules: {
+							"no-debugger": "error",
+						},
+					});
+				}, /Plugin "test1" not found\./u);
+			});
+
+			it("should throw an error when a plugin config is not found", () => {
+				const testPlugin = {
+					configs: {
+						config1: {
+							rules: { "no-console": "error" },
+						},
+					},
+				};
+
+				assert.throws(() => {
+					defineConfig({
+						plugins: {
+							test: testPlugin,
+						},
+						extends: ["test/config2"],
+						rules: {
+							"no-debugger": "error",
+						},
+					});
+				}, /Plugin config "test\/config2" not found\./u);
+			});
+
+			it("should throw an error when a plugin config is in eslintrc format", () => {
+				const testPlugin = {
+					configs: {
+						config1: {
+							root: true,
+							rules: { "no-console": "error" },
+						},
+					},
+				};
+
+				assert.throws(() => {
+					defineConfig({
+						plugins: {
+							test: testPlugin,
+						},
+						extends: ["test/config1"],
+						rules: {
+							"no-debugger": "error",
+						},
+					});
+				}, /Plugin config "test\/config1" is an eslintrc config and cannot be used in this context\./u);
+			});
+		});
+	});
+});
