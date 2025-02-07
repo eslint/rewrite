@@ -8,6 +8,7 @@
     "build": "node scripts/build.js",
     "build:readme": "node tools/update-readme.js",
     "build:new-pkg": "node tools/new-pkg.js",
+    "prepare": "npm run build",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "fmt": "prettier --write .",
@@ -32,6 +33,7 @@
     "node": ">= 22.3.0"
   },
   "devDependencies": {
+    "@eslint/config-helpers": "file:packages/config-helpers",
     "@types/mocha": "^10.0.7",
     "eslint": "^9.11.1",
     "eslint-config-eslint": "^11.0.0",
