@@ -630,5 +630,120 @@ describe("defineConfig()", () => {
 				}, /Plugin config "test\/config1" is an eslintrc config and cannot be used in this context\./u);
 			});
 		});
+
+		describe("extending mixed types", () => {
+			it("should extend configs using mix of strings, objects and arrays", () => {
+				const testPlugin = {
+					configs: {
+						recommended: {
+							rules: { "no-console": "error" },
+						},
+					},
+				};
+
+				const config = defineConfig({
+					name: "Base",
+					files: ["*.js"],
+					plugins: { test: testPlugin },
+					extends: [
+						"test/recommended",
+						{ name: "Object", rules: { "no-alert": "error" } },
+						[
+							{ rules: { "no-debugger": "error" } },
+							{
+								name: "ArrayConfig",
+								rules: { "no-eval": "error" },
+							},
+						],
+					],
+					rules: {
+						"no-var": "error",
+					},
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "Base > test/recommended",
+						files: ["*.js"],
+						rules: { "no-console": "error" },
+					},
+					{
+						name: "Base > Object",
+						files: ["*.js"],
+						rules: { "no-alert": "error" },
+					},
+					{
+						name: "Base > ExtendedConfig[2][0]",
+						files: ["*.js"],
+						rules: { "no-debugger": "error" },
+					},
+					{
+						name: "Base > ArrayConfig",
+						files: ["*.js"],
+						rules: { "no-eval": "error" },
+					},
+					{
+						name: "Base",
+						files: ["*.js"],
+						plugins: { test: testPlugin },
+						rules: { "no-var": "error" },
+					},
+				]);
+			});
+		});
+
+		describe("extending multidimensional arrays", () => {
+			it("should handle a two-dimensional array of configs", () => {
+				const config = defineConfig([
+					[
+						{
+							name: "Base1",
+							files: ["*.js"],
+							rules: { "no-console": "error" },
+						},
+						{
+							name: "Base2",
+							files: ["*.ts"],
+							rules: { "no-alert": "error" },
+						},
+					],
+					[
+						{
+							name: "Base3",
+							files: ["*.jsx"],
+							rules: { "no-debugger": "error" },
+						},
+						{
+							name: "Base4",
+							files: ["*.tsx"],
+							rules: { "no-unused-vars": "error" },
+						},
+					],
+				]);
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "Base1",
+						files: ["*.js"],
+						rules: { "no-console": "error" },
+					},
+					{
+						name: "Base2",
+						files: ["*.ts"],
+						rules: { "no-alert": "error" },
+					},
+					{
+						name: "Base3",
+						files: ["*.jsx"],
+						rules: { "no-debugger": "error" },
+					},
+					{
+						name: "Base4",
+						files: ["*.tsx"],
+						rules: { "no-unused-vars": "error" },
+					},
+				]);
+			});
+		});
 	});
 });
