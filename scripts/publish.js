@@ -143,7 +143,7 @@ function publishPackagesToJsr(packageDirs) {
 
 			results.set(packageDir, "ok");
 		} catch (error) {
-			console.error(`Failed to publish ${packageDir} to npm`);
+			console.error(`Failed to publish ${packageDir} to JSR`);
 			console.log(error.message);
 
 			results.set(packageDir, error.message);
