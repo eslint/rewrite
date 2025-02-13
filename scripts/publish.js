@@ -79,12 +79,38 @@ function getPackagesToPublish(packageDirs) {
 }
 
 /**
+ * Maps the dependencies into a structure where they keys are package
+ * paths and the values are an array of package paths.
+ * @param {Map<string, { name:string, dir: string, dependencies: Set<string> }>} dependencies The dependencies to map.
+ * @return {Map<string, Set<string>>} The mapped dependencies.
+ */
+function mapDependenciesToPaths(dependencies) {
+	const mappedDependencies = new Map();
+
+	for (const [, { dir: packageDir, dependencies: deps }] of dependencies) {
+		const pathDeps = [...deps]
+			.filter(dep => dependencies.has(dep))
+			.map(dep => {
+				const depDir = dependencies.get(dep);
+				if (depDir) {
+					return depDir.dir;
+				}
+				return dep;
+			});
+		mappedDependencies.set(packageDir, new Set(pathDeps));
+	}
+
+	return mappedDependencies;
+}
+
+/**
  * Publishes the packages to npm. If one package fails to publish, the rest
  * will still be published.
  * @param {Array<string>} packageDirs The list of package directories.
+ * @param {Map<string, Set<string>>} dependencies The dependencies between packages.
  * @return {Map<string,string>} A map of package directory to whether it was published successfully.
  */
-function publishPackagesToNpm(packageDirs) {
+function publishPackagesToNpm(packageDirs, dependencies) {
 	console.log(
 		`Publishing packages to npm in this order: ${packageDirs.join(", ")}`,
 	);
@@ -92,6 +118,15 @@ function publishPackagesToNpm(packageDirs) {
 	const results = new Map();
 
 	for (const packageDir of packageDirs) {
+		// check if any dependencies previously failed
+		const deps = dependencies.get(packageDir);
+
+		if (deps && [...deps].some(dep => results.get(dep) !== "ok")) {
+			console.log(`Skipping ${packageDir} (missing dependencies)`);
+			results.set(packageDir, "Skipped (missing dependencies)");
+			continue;
+		}
+
 		console.log(`Publishing ${packageDir}...`);
 		try {
 			exec(`npm publish -w ${packageDir} --provenance`, {
@@ -215,7 +250,10 @@ if (packagesToPublish.length === 0) {
 	process.exit(0);
 }
 
-const npmPublishResults = publishPackagesToNpm(packagesToPublish);
+const npmPublishResults = publishPackagesToNpm(
+	packagesToPublish,
+	mapDependenciesToPaths(dependencies),
+);
 const jsrPublishResults = publishPackagesToJsr(packagesToPublish);
 
 postResultToSocialMedia(npmPublishResults);
