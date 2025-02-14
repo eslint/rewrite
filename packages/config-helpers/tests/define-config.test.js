@@ -745,5 +745,193 @@ describe("defineConfig()", () => {
 				]);
 			});
 		});
+
+		describe("package namespace", () => {
+			it("should extend one config by string names when plugin has a namespace", () => {
+				const testPlugin = {
+					meta: {
+						namespace: "test",
+					},
+					configs: {
+						config1: {
+							rules: { "test/no-console": "error" },
+						},
+					},
+				};
+
+				const config = defineConfig({
+					plugins: {
+						test1: testPlugin,
+					},
+					extends: ["test1/config1"],
+					rules: {
+						"no-debugger": "error",
+					},
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "UserConfig[0] > test1/config1",
+						rules: { "test1/no-console": "error" },
+					},
+					{
+						plugins: { test1: testPlugin },
+						rules: { "no-debugger": "error" },
+					},
+				]);
+			});
+
+			it("should extend one config with complex rule name by string names when plugin has a namespace", () => {
+				const testPlugin = {
+					meta: {
+						namespace: "test",
+					},
+					configs: {
+						config1: {
+							rules: { "test/no-console/foo": "error" },
+						},
+					},
+				};
+
+				const config = defineConfig({
+					plugins: {
+						test1: testPlugin,
+					},
+					extends: ["test1/config1"],
+					rules: {
+						"no-debugger": "error",
+					},
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "UserConfig[0] > test1/config1",
+						rules: { "test1/no-console/foo": "error" },
+					},
+					{
+						plugins: { test1: testPlugin },
+						rules: { "no-debugger": "error" },
+					},
+				]);
+			});
+
+			it("should extend one config with processor by string names when plugin has a namespace", () => {
+				const testPlugin = {
+					meta: {
+						namespace: "test",
+					},
+					configs: {
+						config1: {
+							processor: "test/processor",
+						},
+					},
+				};
+
+				const config = defineConfig({
+					plugins: {
+						test1: testPlugin,
+					},
+					extends: ["test1/config1"],
+					rules: {
+						"no-debugger": "error",
+					},
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "UserConfig[0] > test1/config1",
+						processor: "test1/processor",
+					},
+					{
+						plugins: { test1: testPlugin },
+						rules: { "no-debugger": "error" },
+					},
+				]);
+			});
+
+			it("should extend a config array by string names when plugin has a namespace", () => {
+				const test1Plugin = {
+					meta: {
+						namespace: "testx",
+					},
+					configs: {
+						config1: [
+							{ rules: { "testx/no-console": "error" } },
+							{ rules: { "testx/no-debugger": "error" } },
+						],
+					},
+				};
+
+				const test2Plugin = {
+					meta: {
+						namespace: "testy",
+					},
+					configs: {
+						config2: [
+							{
+								name: "Ext3",
+								rules: { "testy/no-alert": "error" },
+							},
+							{
+								name: "Ext4",
+								rules: {
+									"testy/no-warning-comments": [
+										"error",
+										{ terms: ["todo"], location: "start" },
+									],
+								},
+							},
+						],
+					},
+				};
+
+				const config = defineConfig({
+					name: "Base",
+					files: ["*.js"],
+					plugins: {
+						test1: test1Plugin,
+						test2: test2Plugin,
+					},
+					extends: ["test1/config1", "test2/config2"],
+					rules: {
+						"no-unreachable": "error",
+					},
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "Base > test1/config1[0]",
+						files: ["*.js"],
+						rules: { "test1/no-console": "error" },
+					},
+					{
+						name: "Base > test1/config1[1]",
+						files: ["*.js"],
+						rules: { "test1/no-debugger": "error" },
+					},
+					{
+						name: "Base > test2/config2[0]",
+						files: ["*.js"],
+						rules: { "test2/no-alert": "error" },
+					},
+					{
+						name: "Base > test2/config2[1]",
+						files: ["*.js"],
+						rules: {
+							"test2/no-warning-comments": [
+								"error",
+								{ terms: ["todo"], location: "start" },
+							],
+						},
+					},
+					{
+						name: "Base",
+						plugins: { test1: test1Plugin, test2: test2Plugin },
+						files: ["*.js"],
+						rules: { "no-unreachable": "error" },
+					},
+				]);
+			});
+		});
 	});
 });

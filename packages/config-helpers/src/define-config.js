@@ -9,6 +9,8 @@
 
 /** @typedef {import("eslint").Linter.Config} Config */
 /** @typedef {import("eslint").Linter.LegacyConfig} LegacyConfig */
+/** @typedef {import("eslint").ESLint.Plugin} Plugin */
+/** @typedef {import("eslint").Linter.RuleEntry} RuleEntry */
 /** @typedef {import("./types.ts").ExtendsElement} ExtendsElement */
 /** @typedef {import("./types.ts").SimpleExtendsElement} SimpleExtendsElement */
 /** @typedef {import("./types.ts").ConfigWithExtends} ConfigWithExtends */
@@ -79,17 +81,80 @@ function isLegacyConfig(config) {
 }
 
 /**
+ * Normalizes the plugin config by replacing the namespace with the plugin namespace.
+ * @param {string} userNamespace The namespace of the plugin.
+ * @param {Plugin} plugin The plugin config object.
+ * @param {Config} config The config object to normalize.
+ * @return {Config} The normalized config object.
+ */
+function normalizePluginConfig(userNamespace, plugin, config) {
+	// @ts-ignore -- ESLint types aren't updated yet
+	const pluginNamespace = plugin.meta?.namespace;
+
+	// don't do anything if the plugin doesn't have a namespace or rules
+	if (!pluginNamespace || (!config.rules && !config.processor)) {
+		return config;
+	}
+
+	// update the rules
+
+	const result = { ...config };
+
+	if (result.rules) {
+		const ruleIds = Object.keys(result.rules);
+
+		/** @type {Record<string,RuleEntry|undefined>} */
+		const newRules = {};
+
+		for (let i = 0; i < ruleIds.length; i++) {
+			const ruleId = ruleIds[i];
+			const firstSlashIndex = ruleId.indexOf("/");
+
+			if (firstSlashIndex === -1) {
+				continue;
+			}
+
+			const ruleNamespace = ruleId.slice(0, firstSlashIndex);
+			const ruleName = ruleId.slice(firstSlashIndex + 1);
+
+			if (ruleNamespace === pluginNamespace) {
+				newRules[`${userNamespace}/${ruleName}`] = result.rules[ruleId];
+			}
+		}
+
+		result.rules = newRules;
+	}
+
+	// update the processor
+
+	if (typeof result.processor === "string") {
+		const firstSlashIndex = result.processor.indexOf("/");
+
+		if (firstSlashIndex !== -1) {
+			const ruleNamespace = result.processor.slice(0, firstSlashIndex);
+			const ruleName = result.processor.slice(firstSlashIndex + 1);
+
+			if (ruleNamespace === pluginNamespace) {
+				result.processor = `${userNamespace}/${ruleName}`;
+			}
+		}
+	}
+
+	return result;
+}
+
+/**
  * Finds a plugin config by name in the given config.
  * @param {Config} config The config object.
  * @param {string} pluginConfigName The name of the plugin config.
  * @return {Config|Config[]} The plugin config.
  */
 function findPluginConfig(config, pluginConfigName) {
-	const [pluginName, configName] = pluginConfigName.split("/");
-	const plugin = config.plugins?.[pluginName];
+	const [userPluginNamespace, configName] = pluginConfigName.split("/");
+	const plugin = config.plugins?.[userPluginNamespace];
 
 	if (!plugin) {
-		throw new TypeError(`Plugin "${pluginName}" not found.`);
+		throw new TypeError(`Plugin "${userPluginNamespace}" not found.`);
 	}
 
 	const pluginConfig = plugin.configs?.[configName];
@@ -100,7 +165,9 @@ function findPluginConfig(config, pluginConfigName) {
 
 	// if it's an array then it's definitely a new config
 	if (Array.isArray(pluginConfig)) {
-		return pluginConfig;
+		return pluginConfig.map(pluginSubConfig =>
+			normalizePluginConfig(userPluginNamespace, plugin, pluginSubConfig),
+		);
 	}
 
 	// if it's a legacy config, throw an error
@@ -110,7 +177,7 @@ function findPluginConfig(config, pluginConfigName) {
 		);
 	}
 
-	return pluginConfig;
+	return normalizePluginConfig(userPluginNamespace, plugin, pluginConfig);
 }
 
 /**
