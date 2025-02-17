@@ -933,5 +933,16 @@ describe("defineConfig()", () => {
 				]);
 			});
 		});
+
+		it("should throw an error when extends is not an array", () => {
+			assert.throws(() => {
+				defineConfig({
+					extends: "test/recommended",
+					rules: {
+						"no-debugger": "error",
+					},
+				});
+			}, /The `extends` property must be an array\./u);
+		});
 	});
 });

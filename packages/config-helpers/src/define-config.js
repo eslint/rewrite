@@ -284,6 +284,10 @@ function processExtends(config, configNames) {
 		return [config];
 	}
 
+	if (!Array.isArray(config.extends)) {
+		throw new TypeError("The `extends` property must be an array.");
+	}
+
 	const {
 		/** @type {Config[]} */
 		extends: extendsList,
