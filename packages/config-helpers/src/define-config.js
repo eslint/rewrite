@@ -81,6 +81,43 @@ function isLegacyConfig(config) {
 }
 
 /**
+ * Parses a plugin member ID (rule, processor, etc.) and returns
+ * the namespace and member name.
+ * @param {string} id The ID to parse.
+ * @returns {{namespace:string, name:string}} The namespace and member name.
+ */
+function getPluginMember(id) {
+	const firstSlashIndex = id.indexOf("/");
+
+	if (firstSlashIndex === -1) {
+		return { namespace: "", name: id };
+	}
+
+	let namespace = id.slice(0, firstSlashIndex);
+
+	/*
+	 * Special cases:
+	 * 1. The namespace is `@`, that means it's referring to the
+	 *    core plugin so `@` is the full namespace.
+	 * 2. The namespace starts with `@`, that means it's referring to
+	 *    an npm scoped package. That means the namespace is the scope
+	 *    and the package name (i.e., `@eslint/core`).
+	 */
+	if (namespace[0] === "@" && namespace !== "@") {
+		const secondSlashIndex = id.indexOf("/", firstSlashIndex + 1);
+		if (secondSlashIndex === -1) {
+			return { namespace, name: id };
+		}
+		namespace = id.slice(0, secondSlashIndex);
+		return { namespace, name: id.slice(secondSlashIndex + 1) };
+	}
+
+	const name = id.slice(firstSlashIndex + 1);
+
+	return { namespace, name };
+}
+
+/**
  * Normalizes the plugin config by replacing the namespace with the plugin namespace.
  * @param {string} userNamespace The namespace of the plugin.
  * @param {Plugin} plugin The plugin config object.
@@ -110,14 +147,8 @@ function normalizePluginConfig(userNamespace, plugin, config) {
 
 		for (let i = 0; i < ruleIds.length; i++) {
 			const ruleId = ruleIds[i];
-			const firstSlashIndex = ruleId.indexOf("/");
-
-			if (firstSlashIndex === -1) {
-				continue;
-			}
-
-			const ruleNamespace = ruleId.slice(0, firstSlashIndex);
-			const ruleName = ruleId.slice(firstSlashIndex + 1);
+			const { namespace: ruleNamespace, name: ruleName } =
+				getPluginMember(ruleId);
 
 			if (ruleNamespace === pluginNamespace) {
 				newRules[`${userNamespace}/${ruleName}`] = result.rules[ruleId];
@@ -130,29 +161,23 @@ function normalizePluginConfig(userNamespace, plugin, config) {
 	// update the processor
 
 	if (typeof result.processor === "string") {
-		const firstSlashIndex = result.processor.indexOf("/");
+		const { namespace: processorNamespace, name: processorName } =
+			getPluginMember(result.processor);
 
-		if (firstSlashIndex !== -1) {
-			const ruleNamespace = result.processor.slice(0, firstSlashIndex);
-			const ruleName = result.processor.slice(firstSlashIndex + 1);
-
-			if (ruleNamespace === pluginNamespace) {
-				result.processor = `${userNamespace}/${ruleName}`;
+		if (processorNamespace) {
+			if (processorNamespace === pluginNamespace) {
+				result.processor = `${userNamespace}/${processorName}`;
 			}
 		}
 	}
 
 	// update the language
 	if (typeof result.language === "string") {
-		const firstSlashIndex = result.language.indexOf("/");
+		const { namespace: languageNamespace, name: languageName } =
+			getPluginMember(result.language);
 
-		if (firstSlashIndex !== -1) {
-			const languageNamespace = result.language.slice(0, firstSlashIndex);
-			const languageName = result.language.slice(firstSlashIndex + 1);
-
-			if (languageNamespace === pluginNamespace) {
-				result.language = `${userNamespace}/${languageName}`;
-			}
+		if (languageNamespace === pluginNamespace) {
+			result.language = `${userNamespace}/${languageName}`;
 		}
 	}
 
@@ -166,7 +191,8 @@ function normalizePluginConfig(userNamespace, plugin, config) {
  * @return {Config|Config[]} The plugin config.
  */
 function findPluginConfig(config, pluginConfigName) {
-	const [userPluginNamespace, configName] = pluginConfigName.split("/");
+	const { namespace: userPluginNamespace, name: configName } =
+		getPluginMember(pluginConfigName);
 	const plugin = config.plugins?.[userPluginNamespace];
 
 	if (!plugin) {

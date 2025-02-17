@@ -997,17 +997,126 @@ describe("defineConfig()", () => {
 					},
 				]);
 			});
-		});
 
-		it("should throw an error when extends is not an array", () => {
-			assert.throws(() => {
-				defineConfig({
-					extends: "test/recommended",
+			it("should properly find a config with two slashes in the name", () => {
+				const testPlugin = {
+					configs: {
+						"config1/config2": {
+							rules: { "no-console": "error" },
+						},
+					},
+				};
+
+				const config = defineConfig({
+					plugins: {
+						test1: testPlugin,
+					},
+					extends: ["test1/config1/config2"],
 					rules: {
 						"no-debugger": "error",
 					},
 				});
-			}, /The `extends` property must be an array\./u);
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "UserConfig[0] > test1/config1/config2",
+						rules: { "no-console": "error" },
+					},
+					{
+						plugins: { test1: testPlugin },
+						rules: { "no-debugger": "error" },
+					},
+				]);
+			});
+
+			it("should preserve rules that don't start with the plugin namespace", () => {
+				const testPlugin = {
+					configs: {
+						config1: {
+							rules: { "foo/no-console": "error" },
+						},
+						config2: {
+							rules: { "no-alert": "error" },
+						},
+					},
+				};
+
+				const config = defineConfig({
+					plugins: {
+						test1: testPlugin,
+					},
+					extends: ["test1/config1", "test1/config2"],
+					rules: {
+						"no-debugger": "error",
+						"no-alert": "warn",
+					},
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "UserConfig[0] > test1/config1",
+						rules: { "foo/no-console": "error" },
+					},
+					{
+						name: "UserConfig[0] > test1/config2",
+						rules: { "no-alert": "error" },
+					},
+					{
+						plugins: { test1: testPlugin },
+						rules: { "no-debugger": "error", "no-alert": "warn" },
+					},
+				]);
+			});
+
+			it("should extend objects with multiple plugin rules and maintain all rules", () => {
+				const testPlugin = {
+					configs: {
+						config1: {
+							rules: { "no-console": "error" },
+						},
+						config2: {
+							rules: { "no-alert": "error" },
+						},
+					},
+				};
+
+				const config = defineConfig({
+					plugins: {
+						test1: testPlugin,
+					},
+					extends: ["test1/config1", "test1/config2"],
+					rules: {
+						"no-debugger": "error",
+					},
+				});
+				assert.deepStrictEqual(config, [
+					{
+						name: "UserConfig[0] > test1/config1",
+						rules: { "no-console": "error" },
+					},
+					{
+						name: "UserConfig[0] > test1/config2",
+						rules: { "no-alert": "error" },
+					},
+					{
+						plugins: { test1: testPlugin },
+						rules: { "no-debugger": "error" },
+					},
+				]);
+			});
+		});
+
+		describe("Errors", () => {
+			it("should throw an error when extends is not an array", () => {
+				assert.throws(() => {
+					defineConfig({
+						extends: "test/recommended",
+						rules: {
+							"no-debugger": "error",
+						},
+					});
+				}, /The `extends` property must be an array\./u);
+			});
 		});
 	});
 });
