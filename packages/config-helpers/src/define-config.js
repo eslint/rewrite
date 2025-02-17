@@ -413,8 +413,18 @@ export function defineConfig(...args) {
 	const configNames = new WeakMap();
 	const configs = [];
 
+	if (args.length === 0) {
+		throw new TypeError("Expected one or more arguments.");
+	}
+
 	// first flatten the list of configs and get the names
 	for (const { indexPath, value } of flatTraverse(args)) {
+		if (typeof value !== "object" || value === null) {
+			throw new TypeError(
+				`Expected an object but received ${String(value)}.`,
+			);
+		}
+
 		const config = /** @type {ConfigWithExtends} */ (value);
 
 		// save config name for easy reference later

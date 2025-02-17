@@ -1117,6 +1117,18 @@ describe("defineConfig()", () => {
 					});
 				}, /The `extends` property must be an array\./u);
 			});
+
+			it("should throw an error when null is passed to defineConfig", () => {
+				assert.throws(() => {
+					defineConfig(null);
+				}, /Expected an object but received null\./u);
+			});
+
+			it("should throw an error when no arguments are passed to defineConfig", () => {
+				assert.throws(() => {
+					defineConfig();
+				}, /Expected one or more arguments\./u);
+			});
 		});
 	});
 });
