@@ -131,6 +131,7 @@ function normalizePluginConfig(userNamespace, plugin, config) {
 	// don't do anything if the plugin doesn't have a namespace or rules
 	if (
 		!pluginNamespace ||
+		pluginNamespace === userNamespace ||
 		(!config.rules && !config.processor && !config.language)
 	) {
 		return config;
