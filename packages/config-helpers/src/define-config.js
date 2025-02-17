@@ -92,14 +92,16 @@ function normalizePluginConfig(userNamespace, plugin, config) {
 	const pluginNamespace = plugin.meta?.namespace;
 
 	// don't do anything if the plugin doesn't have a namespace or rules
-	if (!pluginNamespace || (!config.rules && !config.processor)) {
+	if (
+		!pluginNamespace ||
+		(!config.rules && !config.processor && !config.language)
+	) {
 		return config;
 	}
 
-	// update the rules
-
 	const result = { ...config };
 
+	// update the rules
 	if (result.rules) {
 		const ruleIds = Object.keys(result.rules);
 
@@ -136,6 +138,20 @@ function normalizePluginConfig(userNamespace, plugin, config) {
 
 			if (ruleNamespace === pluginNamespace) {
 				result.processor = `${userNamespace}/${ruleName}`;
+			}
+		}
+	}
+
+	// update the language
+	if (typeof result.language === "string") {
+		const firstSlashIndex = result.language.indexOf("/");
+
+		if (firstSlashIndex !== -1) {
+			const languageNamespace = result.language.slice(0, firstSlashIndex);
+			const languageName = result.language.slice(firstSlashIndex + 1);
+
+			if (languageNamespace === pluginNamespace) {
+				result.language = `${userNamespace}/${languageName}`;
 			}
 		}
 	}

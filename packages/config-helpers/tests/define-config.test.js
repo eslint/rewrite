@@ -932,6 +932,71 @@ describe("defineConfig()", () => {
 					},
 				]);
 			});
+
+			it("should extend one config with language by string names when plugin has a namespace", () => {
+				const testPlugin = {
+					meta: {
+						namespace: "test",
+					},
+					configs: {
+						config1: {
+							language: "test/typescript",
+						},
+					},
+				};
+
+				const config = defineConfig({
+					plugins: {
+						test1: testPlugin,
+					},
+					extends: ["test1/config1"],
+					rules: {
+						"no-debugger": "error",
+					},
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "UserConfig[0] > test1/config1",
+						language: "test1/typescript",
+					},
+					{
+						plugins: { test1: testPlugin },
+						rules: { "no-debugger": "error" },
+					},
+				]);
+			});
+
+			it("should not modify language when plugin has no namespace", () => {
+				const testPlugin = {
+					configs: {
+						config1: {
+							language: "test/typescript",
+						},
+					},
+				};
+
+				const config = defineConfig({
+					plugins: {
+						test1: testPlugin,
+					},
+					extends: ["test1/config1"],
+					rules: {
+						"no-debugger": "error",
+					},
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "UserConfig[0] > test1/config1",
+						language: "test/typescript",
+					},
+					{
+						plugins: { test1: testPlugin },
+						rules: { "no-debugger": "error" },
+					},
+				]);
+			});
 		});
 
 		it("should throw an error when extends is not an array", () => {
