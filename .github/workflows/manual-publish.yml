@@ -51,7 +51,7 @@ jobs:
             - name: Get package version
               id: get-version
               run: |
-                  VERSION=$(node -p "require('./${{ inputs.package }}/package.json').version")
+                  VERSION=$(node -p "require('./packages/${{ inputs.package }}/package.json').version")
                   echo "version=${VERSION}" >> $GITHUB_OUTPUT
 
             - name: Build
