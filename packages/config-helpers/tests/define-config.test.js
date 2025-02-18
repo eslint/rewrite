@@ -335,6 +335,21 @@ describe("defineConfig()", () => {
 					},
 				]);
 			});
+
+			it("should omit base config when it only has ignores", () => {
+				const config = defineConfig({
+					ignores: ["test/*.js"],
+					extends: [{ rules: { "no-console": "error" } }],
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "UserConfig[0] > ExtendedConfig[0]",
+						ignores: ["test/*.js"],
+						rules: { "no-console": "error" },
+					},
+				]);
+			});
 		});
 
 		describe("extending arrays", () => {

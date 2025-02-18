@@ -401,8 +401,19 @@ function processExtends(config, configNames) {
 		);
 	}
 
-	// original config last
-	result.push(configObject);
+	/*
+	 * If the base config object has only `ignores` and `extends`, then
+	 * removing `extends` turns it into a global ignores, which is not what
+	 * we want. So we need to check if the base config object is a global ignores
+	 * and if so, we don't add it to the array.
+	 *
+	 * (The other option would be to add a `files` entry, but that would result
+	 * in a config that didn't actually do anything because there are no
+	 * other keys in the config.)
+	 */
+	if (!isGlobalIgnores(configObject)) {
+		result.push(configObject);
+	}
 
 	return result.flat();
 }
