@@ -153,6 +153,8 @@ function normalizePluginConfig(userNamespace, plugin, config) {
 
 			if (ruleNamespace === pluginNamespace) {
 				newRules[`${userNamespace}/${ruleName}`] = result.rules[ruleId];
+			} else {
+				newRules[ruleId] = result.rules[ruleId];
 			}
 		}
 

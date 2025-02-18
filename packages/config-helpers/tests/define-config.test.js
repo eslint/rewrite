@@ -1070,12 +1070,17 @@ describe("defineConfig()", () => {
 
 			it("should extend objects with multiple plugin rules and maintain all rules", () => {
 				const testPlugin = {
+					meta: {
+						namespace: "test",
+					},
 					configs: {
 						config1: {
-							rules: { "no-console": "error" },
+							plugins: { x: {} },
+							rules: { "x/no-console": "error" },
 						},
 						config2: {
-							rules: { "no-alert": "error" },
+							plugins: { y: {} },
+							rules: { "y/no-alert": "error" },
 						},
 					},
 				};
@@ -1092,11 +1097,13 @@ describe("defineConfig()", () => {
 				assert.deepStrictEqual(config, [
 					{
 						name: "UserConfig[0] > test1/config1",
-						rules: { "no-console": "error" },
+						plugins: { x: {} },
+						rules: { "x/no-console": "error" },
 					},
 					{
 						name: "UserConfig[0] > test1/config2",
-						rules: { "no-alert": "error" },
+						plugins: { y: {} },
+						rules: { "y/no-alert": "error" },
 					},
 					{
 						plugins: { test1: testPlugin },
