@@ -65,18 +65,19 @@ jobs:
               with:
                   node-version: "lts/*"
 
-            - name: npm install and test types (core)
-              working-directory: packages/core
+            - name: Install Packages
               run: |
                   npm install
                   npm run build
+
+            - name: npm install and test types (core)
+              working-directory: packages/core
+              run: |
                   npm run test:types
 
             - name: npm install and test types (plugin-kit)
               working-directory: packages/plugin-kit
               run: |
-                  npm install
-                  npm run build
                   npm run test:types
 
     jsr_test:
