@@ -310,6 +310,31 @@ describe("defineConfig()", () => {
 					},
 				]);
 			});
+
+			it("should extend two config objects that are global ignores", () => {
+				const config = defineConfig({
+					files: ["*.js"],
+					extends: [{ ignores: ["foo.js"] }, { ignores: ["bar.js"] }],
+					rules: {
+						"no-debugger": "error",
+					},
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "UserConfig[0] > ExtendedConfig[0]",
+						ignores: ["foo.js"],
+					},
+					{
+						name: "UserConfig[0] > ExtendedConfig[1]",
+						ignores: ["bar.js"],
+					},
+					{
+						files: ["*.js"],
+						rules: { "no-debugger": "error" },
+					},
+				]);
+			});
 		});
 
 		describe("extending arrays", () => {

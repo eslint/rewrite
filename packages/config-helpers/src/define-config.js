@@ -33,6 +33,8 @@ const eslintrcKeys = [
 	"root",
 ];
 
+const allowedGlobalIgnoreKeys = new Set(["ignores", "name"]);
+
 /**
  * Gets the name of a config object.
  * @param {Config} config The config object.
@@ -78,6 +80,15 @@ function isLegacyConfig(config) {
 	}
 
 	return false;
+}
+
+/**
+ * Determines if a config object is a global ignores config.
+ * @param {Config} config The config object to check.
+ * @return {boolean} `true` if the config object is a global ignores config.
+ */
+function isGlobalIgnores(config) {
+	return !Object.keys(config).some(key => !allowedGlobalIgnoreKeys.has(key));
 }
 
 /**
@@ -303,14 +314,17 @@ function extendConfigFiles(baseFiles = [], extensionFiles = []) {
 function extendConfig(baseConfig, baseConfigName, extension, extensionName) {
 	const result = { ...extension };
 
-	// for files we need to create every combination of base and extension files
-	if (baseConfig.files) {
-		result.files = extendConfigFiles(baseConfig.files, extension.files);
-	}
+	// for global ignores there is no further work to be done, we just keep everything
+	if (!isGlobalIgnores(extension)) {
+		// for files we need to create every combination of base and extension files
+		if (baseConfig.files) {
+			result.files = extendConfigFiles(baseConfig.files, extension.files);
+		}
 
-	// for ignores we just concatenation the extension ignores onto the base ignores
-	if (baseConfig.ignores) {
-		result.ignores = baseConfig.ignores.concat(extension.ignores ?? []);
+		// for ignores we just concatenation the extension ignores onto the base ignores
+		if (baseConfig.ignores) {
+			result.ignores = baseConfig.ignores.concat(extension.ignores ?? []);
+		}
 	}
 
 	result.name = `${baseConfigName} > ${extensionName}`;
