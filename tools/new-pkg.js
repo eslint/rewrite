@@ -133,6 +133,35 @@ issueTemplateFiles.forEach(file => {
 });
 
 //-----------------------------------------------------------------------------
+// Update manual-publish.yml
+//-----------------------------------------------------------------------------
+
+console.log("\nUpdating manual-publish.yml...");
+
+const publishPath = "./.github/workflows/manual-publish.yml";
+const publishContent = readFileSync(publishPath, "utf8");
+const publishLines = publishContent.split(/\r?\n/gu);
+const publishStartIndex = publishLines.findIndex(line =>
+	line.includes("# packages-start"),
+);
+const publishEndIndex = publishLines.findIndex(line =>
+	line.includes("# packages-end"),
+);
+const newPublishLines = packageNames.map(
+	packageName => `${" ".repeat(20)}- ${packageName}`,
+);
+
+publishLines.splice(
+	publishStartIndex + 1,
+	publishEndIndex - publishStartIndex - 1,
+	...newPublishLines,
+);
+
+writeFileSync(publishPath, publishLines.join("\n"), "utf8");
+
+console.log("✅ Updated", publishPath);
+
+//-----------------------------------------------------------------------------
 // Update README
 //-----------------------------------------------------------------------------
 

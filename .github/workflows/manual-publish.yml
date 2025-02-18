@@ -1,0 +1,81 @@
+name: Manual Package Publish
+
+on:
+    workflow_dispatch:
+        inputs:
+            package:
+                description: "Package to publish"
+                required: true
+                type: choice
+                options:
+                    # NOTE: Package names are automatically generated. Do not manually edit.
+                    # packages-start
+                    - compat
+                    - config-array
+                    - core
+                    - migrate-config
+                    - object-schema
+                    - plugin-kit
+                    # packages-end
+
+permissions:
+    contents: read
+    id-token: write
+
+jobs:
+    publish:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: lts/*
+                  registry-url: "https://registry.npmjs.org"
+
+            - name: Install dependencies
+              run: npm install
+
+            - name: Get latest release tag
+              id: get-latest-release
+              run: |
+                  LATEST_TAG=$(git tag -l "${{ inputs.package }}*" --sort=-v:refname | head -n 1)
+                  echo "latest_tag=${LATEST_TAG}" >> $GITHUB_OUTPUT
+
+            - name: Check out latest release
+              id: checkout-latest-release
+              run: |
+                  git fetch --tags origin ${{ steps.get-latest-release.outputs.latest_tag }}
+                  git checkout ${{ steps.get-latest-release.outputs.latest_tag }}
+
+            - name: Get package version
+              id: get-version
+              run: |
+                  VERSION=$(node -p "require('./packages/${{ inputs.package }}/package.json').version")
+                  echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+            - name: Build
+              run: npm run build
+
+            - name: Publish to npm
+              run: npm publish -w packages/${{ inputs.package }} --provenance
+              env:
+                  NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+
+            - name: Publish to JSR
+              if: ${{ inputs.package != 'migrate-config' }}
+              run: npx jsr publish
+              working-directory: packages/${{ inputs.package }}
+
+            - name: Post Release Announcement
+              run: npx @humanwhocodes/crosspost -t -b -m "eslint/${{ inputs.package }} v${{ steps.get-version.outputs.version }} has been released!\n\nhttps://github.com/eslint/rewrite/releases/tag/${{ steps.get-latest-release.outputs.latest_tag }}"
+              env:
+                  TWITTER_API_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
+                  TWITTER_API_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
+                  TWITTER_ACCESS_TOKEN_KEY: ${{ secrets.TWITTER_ACCESS_TOKEN_KEY }}
+                  TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+                  MASTODON_ACCESS_TOKEN: ${{ secrets.MASTODON_ACCESS_TOKEN }}
+                  MASTODON_HOST: ${{ secrets.MASTODON_HOST }}
+                  BLUESKY_IDENTIFIER: ${{ vars.BLUESKY_IDENTIFIER }}
+                  BLUESKY_PASSWORD: ${{ secrets.BLUESKY_PASSWORD }}
+                  BLUESKY_HOST: ${{ vars.BLUESKY_HOST }}
