@@ -90,13 +90,7 @@ function mapDependenciesToPaths(dependencies) {
 	for (const [, { dir: packageDir, dependencies: deps }] of dependencies) {
 		const pathDeps = [...deps]
 			.filter(dep => dependencies.has(dep))
-			.map(dep => {
-				const depDir = dependencies.get(dep);
-				if (depDir) {
-					return depDir.dir;
-				}
-				return dep;
-			});
+			.map(dep => dependencies.get(dep).dir);
 		mappedDependencies.set(packageDir, new Set(pathDeps));
 	}
 
@@ -120,8 +114,13 @@ function publishPackagesToNpm(packageDirs, dependencies) {
 	for (const packageDir of packageDirs) {
 		// check if any dependencies previously failed
 		const deps = dependencies.get(packageDir);
+		const hasNotOkDeps =
+			deps &&
+			[...deps].some(
+				dep => results.has(dep) && results.get(dep) !== "ok",
+			);
 
-		if (deps && [...deps].some(dep => results.get(dep) !== "ok")) {
+		if (hasNotOkDeps) {
 			console.log(`Skipping ${packageDir} (missing dependencies)`);
 			results.set(packageDir, "Skipped (missing dependencies)");
 			continue;
