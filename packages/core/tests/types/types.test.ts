@@ -257,6 +257,7 @@ const testRule: RuleDefinition<{
 									: "👎",
 							);
 						},
+						suggest: undefined,
 					});
 				}
 			},
@@ -270,6 +271,15 @@ const testRule: RuleDefinition<{
 							messageId: "Bar",
 						},
 					],
+				});
+			},
+			Baz(node: TestNode) {
+				// node.type === "Baz"
+				context.report({
+					message: "This baz is foobar",
+					loc: { line: node.start, column: 1 },
+					fix: null,
+					suggest: null,
 				});
 			},
 		};
