@@ -482,8 +482,6 @@ interface ViolationReportBase {
 
 	/**
 	 * The fix to be applied for the violation.
-	 * @param fixer The text editor to apply the fix.
-	 * @returns The fix(es) for the violation.
 	 */
 	fix?: RuleFixer | null | undefined;
 
