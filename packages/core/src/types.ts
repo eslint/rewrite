@@ -516,10 +516,8 @@ interface SuggestedEditBase {
 
 	/**
 	 * The fix to be applied for the suggestion.
-	 * @param fixer The text editor to apply the fix.
-	 * @returns The fix for the suggestion.
 	 */
-	fix?(fixer: RuleTextEditor): RuleTextEdit | Iterable<RuleTextEdit> | null;
+	fix?: RuleFixer | null | undefined;
 }
 
 type SuggestionMessage = { desc: string } | { messageId: string };

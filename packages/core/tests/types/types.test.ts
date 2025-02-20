@@ -269,6 +269,7 @@ const testRule: RuleDefinition<{
 					suggest: [
 						{
 							messageId: "Bar",
+							fix: null,
 						},
 					],
 				});
