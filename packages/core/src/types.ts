@@ -186,6 +186,16 @@ export interface RulesMeta<
 	 * Indicates if the rule may provide suggestions.
 	 */
 	hasSuggestions?: boolean | undefined;
+
+	/**
+	 * The language the rule is intended to lint.
+	 */
+	language?: string;
+
+	/**
+	 * The dialects of `language` that the rule is intended to lint.
+	 */
+	dialects?: string[];
 }
 
 /**

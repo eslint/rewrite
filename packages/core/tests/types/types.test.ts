@@ -236,6 +236,8 @@ const testRule: RuleDefinition<{
 			badFoo: "change this foo",
 			wrongBar: "fix this bar",
 		},
+		language: "javascript",
+		dialects: ["javascript", "typescript"],
 	},
 
 	create(context: TestRuleContext): TestRuleVisitor {
