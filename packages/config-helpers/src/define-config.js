@@ -88,7 +88,7 @@ function isLegacyConfig(config) {
  * @return {boolean} `true` if the config object is a global ignores config.
  */
 function isGlobalIgnores(config) {
-	return !Object.keys(config).some(key => !allowedGlobalIgnoreKeys.has(key));
+	return Object.keys(config).every(key => allowedGlobalIgnoreKeys.has(key));
 }
 
 /**
