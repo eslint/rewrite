@@ -459,6 +459,15 @@ export interface RuleTextEdit {
 
 // #endregion
 
+/**
+ * Fixes a violation.
+ * @param fixer The text editor to apply the fix.
+ * @returns The fix(es) for the violation.
+ */
+type RuleFixer = (
+	fixer: RuleTextEditor,
+) => RuleTextEdit | Iterable<RuleTextEdit> | null;
+
 interface ViolationReportBase {
 	/**
 	 * The type of node that the violation is for.
@@ -473,22 +482,22 @@ interface ViolationReportBase {
 
 	/**
 	 * The fix to be applied for the violation.
-	 * @param fixer The text editor to apply the fix.
-	 * @returns The fix(es) for the violation.
 	 */
-	fix?(fixer: RuleTextEditor): RuleTextEdit | Iterable<RuleTextEdit> | null;
+	fix?: RuleFixer | null | undefined;
 
 	/**
 	 * An array of suggested fixes for the problem. These fixes may change the
 	 * behavior of the code, so they are not applied automatically.
 	 */
-	suggest?: SuggestedEdit[];
+	suggest?: SuggestedEdit[] | null | undefined;
 }
 
 type ViolationMessage<MessageIds = string> =
 	| { message: string }
 	| { messageId: MessageIds };
-type ViolationLocation<Node> = { loc: SourceLocation } | { node: Node };
+type ViolationLocation<Node> =
+	| { loc: SourceLocation | Position }
+	| { node: Node };
 
 export type ViolationReport<
 	Node = unknown,
@@ -507,10 +516,8 @@ interface SuggestedEditBase {
 
 	/**
 	 * The fix to be applied for the suggestion.
-	 * @param fixer The text editor to apply the fix.
-	 * @returns The fix for the suggestion.
 	 */
-	fix?(fixer: RuleTextEditor): RuleTextEdit | Iterable<RuleTextEdit> | null;
+	fix?: RuleFixer | null | undefined;
 }
 
 type SuggestionMessage = { desc: string } | { messageId: string };
