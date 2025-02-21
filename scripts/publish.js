@@ -32,27 +32,19 @@ const dryRun = process.argv.includes("--dry-run");
 const exec = dryRun ? text => console.log(text) : execSync;
 
 //-----------------------------------------------------------------------------
-// Helpers
+// Read Step Output
 //-----------------------------------------------------------------------------
 
-/**
- * Converts a GitHub Actions step output name to its corresponding environment variable name
- * @param {string} stepId The ID of the step
- * @param {string} outputName The name of the output
- * @returns {string} The environment variable name
- */
-function convertOutputToEnvVar(stepId, outputName) {
-	// Convert step ID to uppercase and replace hyphens with underscores
-	const normalizedStepId = stepId.toUpperCase().replace(/-/gu, "_");
-
-	// Convert output name to uppercase and replace slashes with double underscores
-	const normalizedOutputName = outputName
-		.toUpperCase()
-		.replace(/\//gu, "__")
-		.replace(/-/gu, "_");
-
-	return `STEPS_${normalizedStepId}_OUTPUTS_${normalizedOutputName}`;
+if (!process.env.STEPS_RELEASE_OUTPUTS) {
+	console.error("No release outputs found.");
+	process.exit(1);
 }
+
+const releaseOutputs = JSON.parse(process.env.STEPS_RELEASE_OUTPUTS);
+
+//-----------------------------------------------------------------------------
+// Helpers
+//-----------------------------------------------------------------------------
 
 /**
  * Gets the output of a GitHub Actions step from the environment variables.
@@ -61,9 +53,7 @@ function convertOutputToEnvVar(stepId, outputName) {
  * @return {string} The output value.
  */
 function getReleaseOutput(packageDir, name) {
-	return process.env[
-		convertOutputToEnvVar("release", `${packageDir}--${name}`)
-	];
+	return releaseOutputs[`${packageDir}--${name}`];
 }
 
 /**
