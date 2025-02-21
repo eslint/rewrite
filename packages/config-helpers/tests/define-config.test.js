@@ -336,6 +336,29 @@ describe("defineConfig()", () => {
 				]);
 			});
 
+			it("should not create a global ignores when an extended config doesn't have `ignores`", () => {
+				const config = defineConfig({
+					name: "Base",
+					ignores: ["foo.js"],
+					extends: [
+						{ name: "Ext1", rules: { "no-console": "error" } },
+						{},
+					],
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "Base > Ext1",
+						ignores: ["foo.js"],
+						rules: { "no-console": "error" },
+					},
+					// should not create a global ignores
+					{
+						name: "Base > ExtendedConfig[1]",
+					},
+				]);
+			});
+
 			it("should omit base config when it only has ignores", () => {
 				const config = defineConfig({
 					ignores: ["test/*.js"],
