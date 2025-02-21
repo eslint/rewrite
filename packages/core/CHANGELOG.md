@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.12.0](https://github.com/eslint/rewrite/compare/core-v0.11.0...core-v0.12.0) (2025-02-21)
+
+
+### Features
+
+* Add meta.language and meta.dialects to RuleDefinition ([#156](https://github.com/eslint/rewrite/issues/156)) ([dac0387](https://github.com/eslint/rewrite/commit/dac0387fc3dd7e74811ae045ab782c70366bb14c))
+
+
+### Bug Fixes
+
+* Types to align with older ESLint types ([#155](https://github.com/eslint/rewrite/issues/155)) ([664740a](https://github.com/eslint/rewrite/commit/664740a8d4a93bee896cec3a661bf2072e893e24))
+
 ## [0.11.0](https://github.com/eslint/rewrite/compare/core-v0.10.0...core-v0.11.0) (2025-01-31)
 
 
