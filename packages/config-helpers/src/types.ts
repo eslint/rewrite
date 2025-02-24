@@ -24,6 +24,6 @@ export interface ConfigWithExtends extends Linter.Config {
 /**
  * Infinite array type.
  */
-type InfiniteArray<T> = InfiniteArray<T>[];
+type InfiniteArray<T> = T | InfiniteArray<T>[];
 
-export type ConfigWithExtendsArray = InfiniteArray<ConfigWithExtends>;
+export type ConfigWithExtendsArray = InfiniteArray<ConfigWithExtends>[];
