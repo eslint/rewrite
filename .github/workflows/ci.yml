@@ -70,12 +70,12 @@ jobs:
                   npm install
                   npm run build
 
-            - name: npm install and test types (core)
+            - name: Test types (core)
               working-directory: packages/core
               run: |
                   npm run test:types
 
-            - name: npm install and test types (plugin-kit)
+            - name: Test types (plugin-kit)
               working-directory: packages/plugin-kit
               run: |
                   npm run test:types
