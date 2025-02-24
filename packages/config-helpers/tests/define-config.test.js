@@ -667,7 +667,7 @@ describe("defineConfig()", () => {
 							"no-debugger": "error",
 						},
 					});
-				}, /Plugin config "test\/config2" not found\./u);
+				}, /Plugin config "config2" not found in plugin "test"\./u);
 			});
 
 			it("should throw an error when a plugin config is in eslintrc format", () => {
@@ -1087,6 +1087,68 @@ describe("defineConfig()", () => {
 					},
 					{
 						plugins: { test1: testPlugin },
+						rules: { "no-debugger": "error" },
+					},
+				]);
+			});
+
+			it("should properly find a config with @ in the name", () => {
+				const testPlugin = {
+					configs: {
+						config1: {
+							rules: { "no-console": "error" },
+						},
+					},
+				};
+
+				const config = defineConfig({
+					plugins: {
+						"@test1/plugin": testPlugin,
+					},
+					extends: ["@test1/plugin/config1"],
+					rules: {
+						"no-debugger": "error",
+					},
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "UserConfig[0] > @test1/plugin/config1",
+						rules: { "no-console": "error" },
+					},
+					{
+						plugins: { "@test1/plugin": testPlugin },
+						rules: { "no-debugger": "error" },
+					},
+				]);
+			});
+
+			it("should properly find a config with @ and two slashes in the name", () => {
+				const testPlugin = {
+					configs: {
+						"config1/example": {
+							rules: { "no-console": "error" },
+						},
+					},
+				};
+
+				const config = defineConfig({
+					plugins: {
+						"@test1/plugin": testPlugin,
+					},
+					extends: ["@test1/plugin/config1/example"],
+					rules: {
+						"no-debugger": "error",
+					},
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "UserConfig[0] > @test1/plugin/config1/example",
+						rules: { "no-console": "error" },
+					},
+					{
+						plugins: { "@test1/plugin": testPlugin },
 						rules: { "no-debugger": "error" },
 					},
 				]);

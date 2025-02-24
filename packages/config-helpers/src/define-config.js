@@ -116,11 +116,10 @@ function getPluginMember(id) {
 	 */
 	if (namespace[0] === "@" && namespace !== "@") {
 		const secondSlashIndex = id.indexOf("/", firstSlashIndex + 1);
-		if (secondSlashIndex === -1) {
-			return { namespace, name: id };
+		if (secondSlashIndex !== -1) {
+			namespace = id.slice(0, secondSlashIndex);
+			return { namespace, name: id.slice(secondSlashIndex + 1) };
 		}
-		namespace = id.slice(0, secondSlashIndex);
-		return { namespace, name: id.slice(secondSlashIndex + 1) };
 	}
 
 	const name = id.slice(firstSlashIndex + 1);
@@ -216,7 +215,9 @@ function findPluginConfig(config, pluginConfigName) {
 	const pluginConfig = plugin.configs?.[configName];
 
 	if (!pluginConfig) {
-		throw new TypeError(`Plugin config "${pluginConfigName}" not found.`);
+		throw new TypeError(
+			`Plugin config "${configName}" not found in plugin "${userPluginNamespace}".`,
+		);
 	}
 
 	// if it's an array then it's definitely a new config
