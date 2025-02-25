@@ -387,6 +387,11 @@ function processExtends(config, configNames) {
 		objectExtends,
 	)) {
 		const extension = /** @type {Config} */ (extendsElement);
+
+		if ("extends" in extension) {
+			throw new TypeError("Nested 'extends' is not allowed.");
+		}
+
 		const baseConfigName = /** @type {string} */ (configNames.get(config));
 		const extensionName =
 			extensionNames.get(extendsElement) ??

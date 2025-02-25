@@ -1261,6 +1261,22 @@ describe("defineConfig()", () => {
 					defineConfig();
 				}, /Expected one or more arguments\./u);
 			});
+
+			it("should throw an error when an extends element has an extends key", () => {
+				assert.throws(() => {
+					defineConfig({
+						extends: [
+							{
+								extends: ["test/recommended"],
+								rules: { "no-console": "error" },
+							},
+						],
+						rules: {
+							"no-debugger": "error",
+						},
+					});
+				}, /Nested 'extends' is not allowed/u);
+			});
 		});
 	});
 });
