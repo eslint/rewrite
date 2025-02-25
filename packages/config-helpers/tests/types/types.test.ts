@@ -50,3 +50,16 @@ defineConfig({
 		},
 	},
 });
+
+defineConfig({
+	extends: [
+		[
+			[{ rules: { "no-alert": "warn" } }],
+			{ rules: { "no-debugger": "error" } },
+		],
+		[
+			{ rules: { "no-eval": "error" } },
+			{ rules: { "no-implied-eval": "error" } },
+		],
+	],
+});

@@ -14,6 +14,7 @@
 /** @typedef {import("./types.ts").ExtendsElement} ExtendsElement */
 /** @typedef {import("./types.ts").SimpleExtendsElement} SimpleExtendsElement */
 /** @typedef {import("./types.ts").ConfigWithExtends} ConfigWithExtends */
+/** @typedef {import("./types.ts").InfiniteArray<Config>} InfiniteConfigArray */
 /** @typedef {import("./types.ts").ConfigWithExtendsArray} ConfigWithExtendsArray */
 
 //-----------------------------------------------------------------------------
@@ -201,7 +202,7 @@ function normalizePluginConfig(userNamespace, plugin, config) {
  * Finds a plugin config by name in the given config.
  * @param {Config} config The config object.
  * @param {string} pluginConfigName The name of the plugin config.
- * @return {Config|Config[]} The plugin config.
+ * @return {InfiniteConfigArray} The plugin config.
  */
 function findPluginConfig(config, pluginConfigName) {
 	const { namespace: userPluginNamespace, name: configName } =
@@ -222,9 +223,23 @@ function findPluginConfig(config, pluginConfigName) {
 
 	// if it's an array then it's definitely a new config
 	if (Array.isArray(pluginConfig)) {
-		return pluginConfig.map(pluginSubConfig =>
-			normalizePluginConfig(userPluginNamespace, plugin, pluginSubConfig),
-		);
+		return pluginConfig.map(pluginSubConfig => {
+			if (Array.isArray(pluginSubConfig)) {
+				return pluginSubConfig.map(pluginSubSubConfig =>
+					normalizePluginConfig(
+						userPluginNamespace,
+						plugin,
+						pluginSubSubConfig,
+					),
+				);
+			}
+
+			return normalizePluginConfig(
+				userPluginNamespace,
+				plugin,
+				pluginSubConfig,
+			);
+		});
 	}
 
 	// if it's a legacy config, throw an error

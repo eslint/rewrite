@@ -5,14 +5,21 @@
 import type { Linter } from "eslint";
 
 /**
- * The type of array element in the `extends` property after flattened.
+ * Infinite array type.
+ */
+export type InfiniteArray<T> = T | InfiniteArray<T>[];
+
+/**
+ * The type of array element in the `extends` property after flattening.
  */
 export type SimpleExtendsElement = string | Linter.Config;
 
 /**
  * The type of array element in the `extends` property before flattening.
  */
-export type ExtendsElement = SimpleExtendsElement | Linter.Config[];
+export type ExtendsElement =
+	| SimpleExtendsElement
+	| InfiniteArray<Linter.Config>;
 
 /**
  * Config with extends. Valid only inside of `defineConfig()`.
@@ -20,10 +27,5 @@ export type ExtendsElement = SimpleExtendsElement | Linter.Config[];
 export interface ConfigWithExtends extends Linter.Config {
 	extends?: ExtendsElement[];
 }
-
-/**
- * Infinite array type.
- */
-type InfiniteArray<T> = T | InfiniteArray<T>[];
 
 export type ConfigWithExtendsArray = InfiniteArray<ConfigWithExtends>[];
