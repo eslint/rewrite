@@ -199,6 +199,42 @@ function normalizePluginConfig(userNamespace, plugin, config) {
 }
 
 /**
+ * Deeply normalizes a plugin config, traversing recursively into an arrays.
+ * @param {string} userPluginNamespace The namespace of the plugin.
+ * @param {Plugin} plugin The plugin object.
+ * @param {Config|LegacyConfig|(Config|LegacyConfig)[]} pluginConfig The plugin config to normalize.
+ * @param {string} pluginConfigName The name of the plugin config.
+ * @return {InfiniteConfigArray} The normalized plugin config.
+ */
+function deepNormalizePluginConfig(
+	userPluginNamespace,
+	plugin,
+	pluginConfig,
+	pluginConfigName,
+) {
+	// if it's an array then it's definitely a new config
+	if (Array.isArray(pluginConfig)) {
+		return pluginConfig.map(pluginSubConfig =>
+			deepNormalizePluginConfig(
+				userPluginNamespace,
+				plugin,
+				pluginSubConfig,
+				pluginConfigName,
+			),
+		);
+	}
+
+	// if it's a legacy config, throw an error
+	if (isLegacyConfig(pluginConfig)) {
+		throw new TypeError(
+			`Plugin config "${pluginConfigName}" is an eslintrc config and cannot be used in this context.`,
+		);
+	}
+
+	return normalizePluginConfig(userPluginNamespace, plugin, pluginConfig);
+}
+
+/**
  * Finds a plugin config by name in the given config.
  * @param {Config} config The config object.
  * @param {string} pluginConfigName The name of the plugin config.
@@ -221,35 +257,12 @@ function findPluginConfig(config, pluginConfigName) {
 		);
 	}
 
-	// if it's an array then it's definitely a new config
-	if (Array.isArray(pluginConfig)) {
-		return pluginConfig.map(pluginSubConfig => {
-			if (Array.isArray(pluginSubConfig)) {
-				return pluginSubConfig.map(pluginSubSubConfig =>
-					normalizePluginConfig(
-						userPluginNamespace,
-						plugin,
-						pluginSubSubConfig,
-					),
-				);
-			}
-
-			return normalizePluginConfig(
-				userPluginNamespace,
-				plugin,
-				pluginSubConfig,
-			);
-		});
-	}
-
-	// if it's a legacy config, throw an error
-	if (isLegacyConfig(pluginConfig)) {
-		throw new TypeError(
-			`Plugin config "${pluginConfigName}" is an eslintrc config and cannot be used in this context.`,
-		);
-	}
-
-	return normalizePluginConfig(userPluginNamespace, plugin, pluginConfig);
+	return deepNormalizePluginConfig(
+		userPluginNamespace,
+		plugin,
+		pluginConfig,
+		pluginConfigName,
+	);
 }
 
 /**

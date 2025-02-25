@@ -1321,6 +1321,54 @@ describe("defineConfig()", () => {
 					},
 				]);
 			});
+
+			it("should extend a multi-dimensional array of configs by string names with plugin namespace replacement", () => {
+				const testPlugin = {
+					meta: {
+						namespace: "test",
+					},
+					configs: {
+						config1: [
+							[{ rules: { "test/no-console": "error" } }],
+							[
+								{ rules: { "test/no-debugger": "error" } },
+								[{ rules: { "test/no-alert": "error" } }],
+							],
+						],
+					},
+				};
+
+				const config = defineConfig({
+					plugins: {
+						test1: testPlugin,
+					},
+					extends: ["test1/config1"],
+					rules: {
+						"no-unreachable": "error",
+					},
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "UserConfig[0] > ExtendedConfig[0][0][0]",
+						rules: { "test1/no-console": "error" },
+					},
+					{
+						name: "UserConfig[0] > ExtendedConfig[0][1][0]",
+						rules: { "test1/no-debugger": "error" },
+					},
+					{
+						name: "UserConfig[0] > ExtendedConfig[0][1][1][0]",
+						rules: { "test1/no-alert": "error" },
+					},
+					{
+						plugins: {
+							test1: testPlugin,
+						},
+						rules: { "no-unreachable": "error" },
+					},
+				]);
+			});
 		});
 
 		describe("Errors", () => {
