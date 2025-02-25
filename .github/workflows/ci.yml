@@ -75,6 +75,11 @@ jobs:
               run: |
                   npm run test:types
 
+            - name: Test types (config-helpers)
+              working-directory: packages/config-helpers
+              run: |
+                  npm run test:types
+
             - name: Test types (plugin-kit)
               working-directory: packages/plugin-kit
               run: |
