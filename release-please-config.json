@@ -23,7 +23,7 @@
         }
       ]
     },
-    "packages/core": {
+    "packages/config-helpers": {
       "release-type": "node",
       "extra-files": [
         {
@@ -33,7 +33,7 @@
         }
       ]
     },
-    "packages/object-schema": {
+    "packages/core": {
       "release-type": "node",
       "extra-files": [
         {
@@ -45,6 +45,16 @@
     },
     "packages/migrate-config": {
       "release-type": "node"
+    },
+    "packages/object-schema": {
+      "release-type": "node",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "jsr.json",
+          "jsonpath": "$.version"
+        }
+      ]
     },
     "packages/plugin-kit": {
       "release-type": "node",
