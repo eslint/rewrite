@@ -7,7 +7,7 @@
 // Imports
 //-----------------------------------------------------------------------------
 
-import { defineConfig } from "@eslint/config-helpers";
+import { defineConfig, globalIgnores } from "@eslint/config-helpers";
 
 //-----------------------------------------------------------------------------
 // Type Checking
@@ -17,7 +17,7 @@ defineConfig({});
 defineConfig({}, {});
 defineConfig([]);
 defineConfig([], {});
-defineConfig([], []);
+defineConfig([globalIgnores(["node_modules"])], []);
 defineConfig([{}]);
 defineConfig({
 	extends: [],
@@ -43,23 +43,31 @@ defineConfig({
 	],
 });
 
-defineConfig({
-	settings: {
-		react: {
-			version: "detect",
+defineConfig([
+	{
+		settings: {
+			react: {
+				version: "detect",
+			},
 		},
 	},
-});
+]);
 
-defineConfig({
-	extends: [
-		[
-			[{ rules: { "no-alert": "warn" } }],
-			{ rules: { "no-debugger": "error" } },
+defineConfig(
+	{
+		extends: [
+			[
+				[{ rules: { "no-alert": "warn" } }],
+				{ rules: { "no-debugger": "error" } },
+			],
+			[
+				{ rules: { "no-eval": "error" } },
+				{ rules: { "no-implied-eval": "error" } },
+			],
 		],
-		[
-			{ rules: { "no-eval": "error" } },
-			{ rules: { "no-implied-eval": "error" } },
-		],
-	],
-});
+	},
+	globalIgnores(["node_modules"]),
+);
+
+globalIgnores(["node_modules"]);
+globalIgnores(["dist", "build"], "my name");

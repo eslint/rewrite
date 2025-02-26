@@ -54,6 +54,30 @@ export default defineConfig([
 ]);
 ```
 
+### `globalIgnores()`
+
+The `globalIgnores()` function allows you to specify patterns for files and directories that should be globally ignored by ESLint. This is useful for excluding files that you don't want to lint, such as build directories or third-party libraries. Here's an example:
+
+```js
+// eslint.config.js
+import { defineConfig, globalIgnores } from "@eslint/config-helpers";
+
+export default defineConfig([
+	{
+		files: ["src/**/*.js"],
+		rules: {
+			semi: "error",
+			"prefer-const": "error",
+		},
+	},
+	globalIgnores([
+		"node_modules/",
+		"dist/",
+		"coverage/",
+	]);
+]);
+```
+
 ## License
 
 Apache 2.0
