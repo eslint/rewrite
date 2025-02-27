@@ -25,7 +25,7 @@ describe("globalIgnores", () => {
 
 	it("should create config with auto-generated name", () => {
 		const result = globalIgnores(["*.test.js"]);
-		assert.strictEqual(result.name.startsWith("global-ignores-"), true);
+		assert.strictEqual(result.name.startsWith("globalIgnores "), true);
 		assert.deepStrictEqual(result.ignores, ["*.test.js"]);
 	});
 
