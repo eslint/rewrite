@@ -70,11 +70,7 @@ export default defineConfig([
 			"prefer-const": "error",
 		},
 	},
-	globalIgnores([
-		"node_modules/",
-		"dist/",
-		"coverage/",
-	])
+	globalIgnores(["node_modules/", "dist/", "coverage/"]),
 ]);
 ```
 
