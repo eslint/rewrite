@@ -17,4 +17,8 @@ describe("index", () => {
 	it("should export defineConfig()", () => {
 		assert.strictEqual(typeof api.defineConfig, "function");
 	});
+
+	it("should export globalIgnores()", () => {
+		assert.strictEqual(typeof api.globalIgnores, "function");
+	});
 });
