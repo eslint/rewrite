@@ -1,3 +1,4 @@
+import { defineConfig } from "eslint/config";
 import { fixupConfigRules, fixupPluginRules } from "@eslint/compat";
 import prettier from "eslint-plugin-prettier";
 import _import from "eslint-plugin-import";
@@ -15,37 +16,36 @@ const compat = new FlatCompat({
     allConfig: js.configs.all
 });
 
-export default [
-    ...fixupConfigRules(compat.extends("eslint:recommended", "plugin:ava/recommended", "prettier")),
-    {
-        plugins: {
-            prettier,
-            import: fixupPluginRules(_import),
-        },
+export default defineConfig([{
+    extends: fixupConfigRules(compat.extends("eslint:recommended", "plugin:ava/recommended", "prettier")),
 
-        languageOptions: {
-            globals: {
-                ...globals.node,
-            },
-
-            ecmaVersion: 2020,
-            sourceType: "module",
-        },
-
-        rules: {
-            "prettier/prettier": 2,
-            "ava/no-ignored-test-files": 0,
-            "ava/no-import-test-files": 0,
-
-            "import/no-unresolved": [2, {
-                ignore: ["ava", "got"],
-            }],
-
-            "import/no-unused-modules": 2,
-
-            "import/order": [2, {
-                "newlines-between": "never",
-            }],
-        },
+    plugins: {
+        prettier,
+        import: fixupPluginRules(_import),
     },
-];
+
+    languageOptions: {
+        globals: {
+            ...globals.node,
+        },
+
+        ecmaVersion: 2020,
+        sourceType: "module",
+    },
+
+    rules: {
+        "prettier/prettier": 2,
+        "ava/no-ignored-test-files": 0,
+        "ava/no-import-test-files": 0,
+
+        "import/no-unresolved": [2, {
+            ignore: ["ava", "got"],
+        }],
+
+        "import/no-unused-modules": 2,
+
+        "import/order": [2, {
+            "newlines-between": "never",
+        }],
+    },
+}]);

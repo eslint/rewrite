@@ -1,3 +1,4 @@
+import { defineConfig, globalIgnores } from "eslint/config";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import js from "@eslint/js";
@@ -13,10 +14,10 @@ const compat = new FlatCompat({
 });
 const gitignorePath = path.resolve(__dirname, ".gitignore");
 
-export default [{
-    ignores: ["**/baz"],
-}, includeIgnoreFile(gitignorePath), ...compat.extends("eslint:recommended"), {
+export default defineConfig([globalIgnores(["**/baz"]), includeIgnoreFile(gitignorePath), {
+    extends: compat.extends("eslint:recommended"),
+
     rules: {
         "no-console": "off",
     },
-}];
+}]);

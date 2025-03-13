@@ -1,3 +1,4 @@
+import { defineConfig } from "eslint/config";
 import { fixupConfigRules, fixupPluginRules } from "@eslint/compat";
 import jsxA11Y from "eslint-plugin-jsx-a11y";
 import tanstackQuery from "@tanstack/eslint-plugin-query";
@@ -14,14 +15,16 @@ const compat = new FlatCompat({
     allConfig: js.configs.all
 });
 
-export default [...fixupConfigRules(compat.extends(
-    "react-app",
-    "prettier",
-    "plugin:jsx-a11y/recommended",
-    "plugin:@tanstack/eslint-plugin-query/recommended",
-)), {
+export default defineConfig([{
+    extends: fixupConfigRules(compat.extends(
+        "react-app",
+        "prettier",
+        "plugin:jsx-a11y/recommended",
+        "plugin:@tanstack/eslint-plugin-query/recommended",
+    )),
+
     plugins: {
         "jsx-a11y": fixupPluginRules(jsxA11Y),
         "@tanstack/query": fixupPluginRules(tanstackQuery),
     },
-}];
+}]);

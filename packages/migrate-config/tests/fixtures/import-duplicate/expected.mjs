@@ -1,8 +1,9 @@
+import { defineConfig } from "eslint/config";
 import _import from "eslint-plugin-import";
 import { fixupPluginRules } from "@eslint/compat";
 import reactHooks from "eslint-plugin-react-hooks";
 
-export default [{
+export default defineConfig([{
     plugins: {
         import: fixupPluginRules(_import),
     },
@@ -10,4 +11,4 @@ export default [{
     plugins: {
         "react-hooks": fixupPluginRules(reactHooks),
     },
-}];
+}]);

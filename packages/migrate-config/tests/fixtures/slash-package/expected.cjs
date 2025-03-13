@@ -1,4 +1,8 @@
 const {
+    defineConfig,
+} = require("eslint/config");
+
+const {
     fixupConfigRules,
     fixupPluginRules,
 } = require("@eslint/compat");
@@ -17,14 +21,16 @@ const compat = new FlatCompat({
     allConfig: js.configs.all
 });
 
-module.exports = [...fixupConfigRules(compat.extends(
-    "react-app",
-    "prettier",
-    "plugin:jsx-a11y/recommended",
-    "plugin:@tanstack/eslint-plugin-query/recommended",
-)), {
+module.exports = defineConfig([{
+    extends: fixupConfigRules(compat.extends(
+        "react-app",
+        "prettier",
+        "plugin:jsx-a11y/recommended",
+        "plugin:@tanstack/eslint-plugin-query/recommended",
+    )),
+
     plugins: {
         "jsx-a11y": fixupPluginRules(jsxA11Y),
         "@tanstack/query": fixupPluginRules(tanstackQuery),
     },
-}];
+}]);
