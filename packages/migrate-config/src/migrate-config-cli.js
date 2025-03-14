@@ -114,12 +114,14 @@ if (result.imports.size) {
 		.filter(([key, imp]) => imp.added && !key.startsWith("node:"))
 		.map(([key]) => key);
 
-	console.log(
-		"\nYou will need to install the following packages to use the new config:",
-	);
-	console.log(`${addedImports.map(imp => `- ${imp}`).join("\n")}\n`);
-	console.log("You can install them using the following command:\n");
-	console.log(`npm install ${addedImports.join(" ")} -D\n`);
+	if (addedImports.length) {
+		console.log(
+			"\nYou will need to install the following packages to use the new config:",
+		);
+		console.log(`${addedImports.map(imp => `- ${imp}`).join("\n")}\n`);
+		console.log("You can install them using the following command:\n");
+		console.log(`npm install ${addedImports.join(" ")} -D\n`);
+	}
 }
 
 if (result.messages.length) {
