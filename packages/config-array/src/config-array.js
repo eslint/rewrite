@@ -245,6 +245,44 @@ function doMatch(filepath, pattern, options = {}) {
 }
 
 /**
+ * Normalizes a pattern by removing the leading "./" if present.
+ * @param {string} pattern The pattern to normalize.
+ * @returns {string} The normalized pattern.
+ */
+function normalizePattern(pattern) {
+	if (isString(pattern)) {
+		if (pattern.startsWith("./")) {
+			return pattern.slice(2);
+		}
+
+		if (pattern.startsWith("!./")) {
+			return `!${pattern.slice(3)}`;
+		}
+	}
+
+	return pattern;
+}
+
+/**
+ * Normalizes `files` and `ignores` patterns in a config by removing "./" prefixes.
+ * @param {Object} config The config object to normalize patterns in.
+ */
+function normalizeConfigPatterns(config) {
+	if (Array.isArray(config.files)) {
+		config.files = config.files.map(pattern => {
+			if (Array.isArray(pattern)) {
+				return pattern.map(normalizePattern);
+			}
+			return normalizePattern(pattern);
+		});
+	}
+
+	if (Array.isArray(config.ignores)) {
+		config.ignores = config.ignores.map(normalizePattern);
+	}
+}
+
+/**
  * Normalizes a `ConfigArray` by flattening it and executing any functions
  * that are found inside.
  * @param {Array} items The items in a `ConfigArray`.
@@ -294,6 +332,7 @@ async function normalize(items, context, extraConfigTypes) {
 	const configs = [];
 
 	for await (const config of asyncIterable) {
+		normalizeConfigPatterns(config);
 		configs.push(config);
 	}
 
@@ -345,7 +384,13 @@ function normalizeSync(items, context, extraConfigTypes) {
 		}
 	}
 
-	return [...flatTraverse(items)];
+	const configs = [...flatTraverse(items)];
+
+	for (const config of configs) {
+		normalizeConfigPatterns(config);
+	}
+
+	return configs;
 }
 
 /**

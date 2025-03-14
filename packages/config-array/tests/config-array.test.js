@@ -1229,6 +1229,149 @@ describe("ConfigArray", () => {
 					assert.strictEqual(config2.defs.severity, "error");
 				});
 			});
+
+			// https://github.com/eslint/eslint/issues/18757
+			describe("patterns with './' prefix", () => {
+				it("should match patterns with './' prefix in `files` patterns", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["./src/*.js"],
+								defs: { severity: "error" },
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig("src/foo.js").defs.severity,
+						"error",
+					);
+				});
+
+				it("should match patterns with './' prefix in `ignores` patterns", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+								ignores: ["./src/*.js"],
+								defs: { severity: "error" },
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig("src/foo.js"),
+						undefined,
+					);
+				});
+
+				it("should match patterns with './' prefix in global `ignores` patterns", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+								defs: { severity: "error" },
+							},
+							{
+								ignores: ["./src/*.js"],
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig("src/foo.js"),
+						undefined,
+					);
+				});
+
+				it("should match negated `files` patterns with './' prefix", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["!./src/*.js"],
+								defs: { severity: "error" },
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig("src/foo.js"),
+						undefined,
+					);
+				});
+
+				it("should match negated `ignores` patterns with './' prefix", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+								ignores: ["**/*.js", "!./src/foo.js"],
+								defs: { severity: "error" },
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig("src/foo.js").defs.severity,
+						"error",
+					);
+				});
+
+				it("should match negated global `ignores` patterns with './' prefix", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+								defs: { severity: "error" },
+							},
+							{
+								ignores: ["**/*.js", "!./src/*.js"],
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig("src/foo.js").defs.severity,
+						"error",
+					);
+				});
+			});
 		});
 
 		describe("getConfigStatus()", () => {
