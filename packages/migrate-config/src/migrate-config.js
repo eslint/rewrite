@@ -645,7 +645,7 @@ function createPlugins(plugins, migration) {
 /**
  * Creates an object expression for the `ignorePatterns` property.
  * @param {LegacyConfig} config The config to create the object expression for.
- * @returns {ObjectExpression} The AST for the object expression.
+ * @returns {CallExpression} The AST for the object expression.
  */
 function createGlobalIgnores(config) {
 	const ignorePatterns = Array.isArray(config.ignorePatterns)
@@ -656,8 +656,9 @@ function createGlobalIgnores(config) {
 			b.literal(convertIgnorePatternToMinimatch(pattern)),
 		),
 	);
-	return b.objectExpression([
-		b.property("init", b.identifier("ignores"), ignorePatternsArray),
+
+	return b.callExpression(b.identifier("globalIgnores"), [
+		ignorePatternsArray,
 	]);
 }
 
@@ -755,40 +756,9 @@ function migrateConfigObject(migration, config) {
 			);
 		}
 
-		// if there are either files or ignores, map so the resulting object has files and ignores
-		if (files || ignores) {
-			extendsCallExpression = b.callExpression(
-				b.memberExpression(extendsCallExpression, b.identifier("map")),
-				[
-					b.arrowFunctionExpression(
-						[b.identifier("config")],
-						b.objectExpression([
-							b.spreadElement(b.identifier("config")),
-							...(files
-								? [
-										b.property(
-											"init",
-											b.identifier("files"),
-											files,
-										),
-									]
-								: []),
-							...(ignores
-								? [
-										b.property(
-											"init",
-											b.identifier("ignores"),
-											ignores,
-										),
-									]
-								: []),
-						]),
-					),
-				],
-			);
-		}
-
-		configArrayElements.push(b.spreadElement(extendsCallExpression));
+		properties.push(
+			b.property("init", b.identifier("extends"), extendsCallExpression),
+		);
 	}
 
 	/*
@@ -878,6 +848,11 @@ export function migrateConfig(
 	const migration = new Migration(config);
 	const body = [];
 
+	// always use defineConfig
+	migration.imports.set("eslint/config", {
+		bindings: ["defineConfig"],
+	});
+
 	/** @type {Array<CallExpression|ObjectExpression|SpreadElement>} */
 	const configArrayElements = [
 		...migrateConfigObject(
@@ -945,6 +920,7 @@ export function migrateConfig(
 	}
 
 	if (config.ignorePatterns) {
+		migration.imports.get("eslint/config").bindings.push("globalIgnores");
 		configArrayElements.unshift(createGlobalIgnores(config));
 	}
 
@@ -1007,6 +983,11 @@ export function migrateConfig(
 	// output any inits
 	body.push(...migration.inits);
 
+	// the defineConfig() call
+	const defineConfigNode = b.callExpression(b.identifier("defineConfig"), [
+		b.arrayExpression(configArrayElements),
+	]);
+
 	// output the actual config array to the program
 	if (!isModule) {
 		body.push(
@@ -1017,14 +998,12 @@ export function migrateConfig(
 						b.identifier("module"),
 						b.identifier("exports"),
 					),
-					b.arrayExpression(configArrayElements),
+					defineConfigNode,
 				),
 			),
 		);
 	} else {
-		body.push(
-			b.exportDefaultDeclaration(b.arrayExpression(configArrayElements)),
-		);
+		body.push(b.exportDefaultDeclaration(defineConfigNode));
 	}
 
 	return {

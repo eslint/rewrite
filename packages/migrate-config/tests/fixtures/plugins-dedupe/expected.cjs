@@ -1,4 +1,8 @@
 const {
+    defineConfig,
+} = require("eslint/config");
+
+const {
     fixupConfigRules,
     fixupPluginRules,
 } = require("@eslint/compat");
@@ -17,12 +21,11 @@ const compat = new FlatCompat({
     allConfig: js.configs.all
 });
 
-module.exports = [
-    ...fixupConfigRules(compat.extends("plugin:import/errors", "plugin:n/recommended")),
-    {
-        plugins: {
-            import: fixupPluginRules(_import),
-            n: fixupPluginRules(n),
-        },
+module.exports = defineConfig([{
+    extends: fixupConfigRules(compat.extends("plugin:import/errors", "plugin:n/recommended")),
+
+    plugins: {
+        import: fixupPluginRules(_import),
+        n: fixupPluginRules(n),
     },
-];
+}]);
