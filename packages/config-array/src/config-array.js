@@ -264,12 +264,47 @@ function normalizePattern(pattern) {
 }
 
 /**
+ * Checks if a given pattern requires normalization.
+ *
+ * @param {any} pattern The pattern to check.
+ * @returns {boolean} True if the pattern needs normalization, false otherwise.
+ *
+ */
+function needsPatternNormalization(pattern) {
+	return (
+		isString(pattern) &&
+		(pattern.startsWith("./") || pattern.startsWith("!./"))
+	);
+}
+
+/**
  * Normalizes `files` and `ignores` patterns in a config by removing "./" prefixes.
  * @param {Object} config The config object to normalize patterns in.
  */
 function normalizeConfigPatterns(config) {
+	let needsNormalization = false;
+
 	if (Array.isArray(config.files)) {
-		config.files = config.files.map(pattern => {
+		needsNormalization = config.files.some(pattern => {
+			if (Array.isArray(pattern)) {
+				return pattern.some(needsPatternNormalization);
+			}
+			return needsPatternNormalization(pattern);
+		});
+	}
+
+	if (!needsNormalization && Array.isArray(config.ignores)) {
+		needsNormalization = config.ignores.some(needsPatternNormalization);
+	}
+
+	if (!needsNormalization) {
+		return config;
+	}
+
+	const newConfig = { ...config };
+
+	if (Array.isArray(newConfig.files)) {
+		newConfig.files = newConfig.files.map(pattern => {
 			if (Array.isArray(pattern)) {
 				return pattern.map(normalizePattern);
 			}
@@ -277,9 +312,11 @@ function normalizeConfigPatterns(config) {
 		});
 	}
 
-	if (Array.isArray(config.ignores)) {
-		config.ignores = config.ignores.map(normalizePattern);
+	if (Array.isArray(newConfig.ignores)) {
+		newConfig.ignores = newConfig.ignores.map(normalizePattern);
 	}
+
+	return newConfig;
 }
 
 /**
@@ -332,8 +369,7 @@ async function normalize(items, context, extraConfigTypes) {
 	const configs = [];
 
 	for await (const config of asyncIterable) {
-		normalizeConfigPatterns(config);
-		configs.push(config);
+		configs.push(normalizeConfigPatterns(config));
 	}
 
 	return configs;
@@ -384,10 +420,10 @@ function normalizeSync(items, context, extraConfigTypes) {
 		}
 	}
 
-	const configs = [...flatTraverse(items)];
+	const configs = [];
 
-	for (const config of configs) {
-		normalizeConfigPatterns(config);
+	for (const config of flatTraverse(items)) {
+		configs.push(normalizeConfigPatterns(config));
 	}
 
 	return configs;
