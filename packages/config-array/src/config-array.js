@@ -265,7 +265,6 @@ function normalizePattern(pattern) {
 
 /**
  * Checks if a given pattern requires normalization.
- *
  * @param {any} pattern The pattern to check.
  * @returns {boolean} True if the pattern needs normalization, false otherwise.
  *
