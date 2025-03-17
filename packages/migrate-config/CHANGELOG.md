@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/eslint/rewrite/compare/migrate-config-v1.3.8...migrate-config-v1.4.0) (2025-03-14)
+
+
+### Features
+
+* Use defineConfig() and globalIgnores() helpers ([#164](https://github.com/eslint/rewrite/issues/164)) ([727ec5d](https://github.com/eslint/rewrite/commit/727ec5dfd6870062696ea746b6e9d2a63dc8e34a))
+
 ## [1.3.8](https://github.com/eslint/rewrite/compare/migrate-config-v1.3.7...migrate-config-v1.3.8) (2025-02-21)
 
 

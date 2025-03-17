@@ -1,3 +1,4 @@
+import { defineConfig } from "eslint/config";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import js from "@eslint/js";
@@ -11,14 +12,14 @@ const compat = new FlatCompat({
     allConfig: js.configs.all
 });
 
-export default [...compat.extends("airbnb").map(config => ({
-    ...config,
+export default defineConfig([{
     files: ["src/app/**"],
     ignores: ["**/*.test.js"],
-})), ...compat.extends("airbnb-base").map(config => ({
-    ...config,
+    extends: compat.extends("airbnb"),
+}, {
     files: ["src/app/**/*.test.js"],
-})), ...compat.extends("airbnb-base").map(config => ({
-    ...config,
+    extends: compat.extends("airbnb-base"),
+}, {
     ignores: ["src/app/**/*.spec.js"],
-}))];
+    extends: compat.extends("airbnb-base"),
+}]);

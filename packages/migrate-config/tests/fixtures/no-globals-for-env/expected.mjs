@@ -1,3 +1,4 @@
+import { defineConfig } from "eslint/config";
 import { fixupConfigRules, fixupPluginRules } from "@eslint/compat";
 import prettier from "eslint-plugin-prettier";
 import _import from "eslint-plugin-import";
@@ -19,53 +20,47 @@ const compat = new FlatCompat({
     allConfig: js.configs.all
 });
 
-export default [
-    ...fixupConfigRules(compat.extends("eslint:recommended", "plugin:import/errors")),
-    {
-        plugins: {
-            prettier,
-            import: fixupPluginRules(_import),
-            node,
-            promise,
-            standard,
-            "@typescript-eslint": typescriptEslint,
-        },
+export default defineConfig([{
+    extends: fixupConfigRules(compat.extends("eslint:recommended", "plugin:import/errors")),
 
-        languageOptions: {
-            globals: {
-                ...node.environments.base.globals,
-            },
-
-            ecmaVersion: 2018,
-            sourceType: "script",
-        },
-
-        rules: {
-            semi: ["error"],
-            quotes: ["error"],
-            "no-console": ["warn"],
-        },
+    plugins: {
+        prettier,
+        import: fixupPluginRules(_import),
+        node,
+        promise,
+        standard,
+        "@typescript-eslint": typescriptEslint,
     },
-    ...compat.extends("plugin:@typescript-eslint/recommended").map(config => ({
-        ...config,
-        files: ["**/*.ts"],
-        ignores: ["**/*.d.ts"],
-    })),
-    {
-        files: ["**/*.ts"],
-        ignores: ["**/*.d.ts"],
 
-        plugins: {
-            "@typescript-eslint": typescriptEslint,
+    languageOptions: {
+        globals: {
+            ...node.environments.base.globals,
         },
 
-        languageOptions: {
-            parser: tsParser,
-        },
-
-        rules: {
-            "@typescript-eslint/no-explicit-any": ["error"],
-            "@typescript-eslint/no-unused-vars": ["error"],
-        },
+        ecmaVersion: 2018,
+        sourceType: "script",
     },
-];
+
+    rules: {
+        semi: ["error"],
+        quotes: ["error"],
+        "no-console": ["warn"],
+    },
+}, {
+    files: ["**/*.ts"],
+    ignores: ["**/*.d.ts"],
+    extends: compat.extends("plugin:@typescript-eslint/recommended"),
+
+    plugins: {
+        "@typescript-eslint": typescriptEslint,
+    },
+
+    languageOptions: {
+        parser: tsParser,
+    },
+
+    rules: {
+        "@typescript-eslint/no-explicit-any": ["error"],
+        "@typescript-eslint/no-unused-vars": ["error"],
+    },
+}]);

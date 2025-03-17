@@ -1,3 +1,4 @@
+import { defineConfig, globalIgnores } from "eslint/config";
 import typescriptEslint from "@typescript-eslint/eslint-plugin";
 import jest from "eslint-plugin-jest";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
@@ -19,37 +20,37 @@ const compat = new FlatCompat({
     allConfig: js.configs.all
 });
 
-export default [{
-    ignores: [
-        ".github/renovate.json",
-        "**/dist/",
-        "**/esm/",
-        "**/build/",
-        "**/fixtures/",
-        "**/byline.ts",
-        "**/prism.ts",
-        "**/charm.ts",
-        "**/pnpm-lock.yaml",
-        "**/generated-dmmf.ts",
-        "packages/client/generator-build/",
-        "packages/client/declaration/",
-        "packages/client/runtime/",
-        "packages/client/src/__tests__/types/",
-        "packages/client/scripts/default-index.js",
-        "packages/cli/prisma-client/",
-        "packages/cli/install/",
-        "packages/cli/preinstall/",
-        "packages/cli/**/tmp-*",
-        "**/sandbox/",
-    ],
-}, ...compat.extends(
-    "eslint:recommended",
-    "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:@typescript-eslint/recommended-requiring-type-checking",
-    "plugin:prettier/recommended",
-    "plugin:jest/recommended",
-), {
+export default defineConfig([globalIgnores([
+    ".github/renovate.json",
+    "**/dist/",
+    "**/esm/",
+    "**/build/",
+    "**/fixtures/",
+    "**/byline.ts",
+    "**/prism.ts",
+    "**/charm.ts",
+    "**/pnpm-lock.yaml",
+    "**/generated-dmmf.ts",
+    "packages/client/generator-build/",
+    "packages/client/declaration/",
+    "packages/client/runtime/",
+    "packages/client/src/__tests__/types/",
+    "packages/client/scripts/default-index.js",
+    "packages/cli/prisma-client/",
+    "packages/cli/install/",
+    "packages/cli/preinstall/",
+    "packages/cli/**/tmp-*",
+    "**/sandbox/",
+]), {
+    extends: compat.extends(
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@typescript-eslint/recommended-requiring-type-checking",
+        "plugin:prettier/recommended",
+        "plugin:jest/recommended",
+    ),
+
     plugins: {
         "@typescript-eslint": typescriptEslint,
         jest,
@@ -144,4 +145,4 @@ export default [{
     rules: {
         "local-rules/valid-exported-types-index": "error",
     },
-}];
+}]);

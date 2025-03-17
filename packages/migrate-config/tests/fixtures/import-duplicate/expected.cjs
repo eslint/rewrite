@@ -1,3 +1,7 @@
+const {
+    defineConfig,
+} = require("eslint/config");
+
 const _import = require("eslint-plugin-import");
 
 const {
@@ -6,7 +10,7 @@ const {
 
 const reactHooks = require("eslint-plugin-react-hooks");
 
-module.exports = [{
+module.exports = defineConfig([{
     plugins: {
         import: fixupPluginRules(_import),
     },
@@ -14,4 +18,4 @@ module.exports = [{
     plugins: {
         "react-hooks": fixupPluginRules(reactHooks),
     },
-}];
+}]);
