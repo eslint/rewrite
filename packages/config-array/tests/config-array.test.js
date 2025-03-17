@@ -1371,6 +1371,50 @@ describe("ConfigArray", () => {
 						"error",
 					);
 				});
+
+				it("should match nested `files` patterns with './' prefix", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: [["./src/*.js"]],
+								defs: { severity: "error" },
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig("src/foo.js").defs.severity,
+						"error",
+					);
+				});
+
+				it("should match patterns with './' prefix in `files` patterns using normalize()", async () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["./src/*.js"],
+								defs: { severity: "error" },
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					await configs.normalize();
+
+					assert.strictEqual(
+						configs.getConfig("src/foo.js").defs.severity,
+						"error",
+					);
+				});
 			});
 		});
 
