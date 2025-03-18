@@ -526,6 +526,36 @@ describe("ConfigArray", () => {
 		});
 	});
 
+	describe("Config Pattern Normalization", () => {
+		it("should create a new object when normalizing config patterns with ./", () => {
+			const config = {
+				files: ["./foo.js"],
+			};
+
+			configs = new ConfigArray([config], {
+				basePath,
+			});
+
+			configs.normalizeSync();
+
+			assert.notStrictEqual(configs[0], config);
+		});
+
+		it("should create a new object when normalizing config patterns with !./", async () => {
+			const config = {
+				ignores: ["!./foo.js"],
+			};
+
+			configs = new ConfigArray([config], {
+				basePath,
+			});
+
+			await configs.normalize();
+
+			assert.notStrictEqual(configs[0], config);
+		});
+	});
+
 	describe("ConfigArray members", () => {
 		beforeEach(() => {
 			configs = createConfigArray();
