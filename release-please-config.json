@@ -25,7 +25,6 @@
     },
     "packages/config-helpers": {
       "release-type": "node",
-      "release-as": "0.1.0",
       "extra-files": [
         {
           "type": "json",
