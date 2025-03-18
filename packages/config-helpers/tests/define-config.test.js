@@ -788,7 +788,69 @@ describe("defineConfig()", () => {
 							"no-debugger": "error",
 						},
 					});
-				}, /Plugin config "test\/config1" is an eslintrc config and cannot be used in this context\./u);
+				}, /Plugin config "config1" in plugin "test" is an eslintrc config and cannot be used in this context\./u);
+			});
+
+			it("should use flat config when base config is legacy", () => {
+				const testPlugin = {
+					configs: {
+						recommended: {
+							env: { browser: true }, // legacy config
+							rules: { "no-console": "error" },
+						},
+						"flat/recommended": {
+							rules: { "no-console": "error" },
+						},
+					},
+				};
+
+				const config = defineConfig({
+					plugins: {
+						test: testPlugin,
+					},
+					extends: ["test/recommended"],
+					rules: {
+						"no-debugger": "error",
+					},
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "UserConfig[0] > test/recommended",
+						rules: { "no-console": "error" },
+					},
+					{
+						plugins: { test: testPlugin },
+						rules: { "no-debugger": "error" },
+					},
+				]);
+			});
+
+			it("should throw error when both base and flat configs are legacy", () => {
+				const testPlugin = {
+					configs: {
+						recommended: {
+							env: { browser: true },
+							rules: { "no-console": "error" },
+						},
+						"flat/recommended": {
+							env: { browser: true },
+							rules: { "no-console": "error" },
+						},
+					},
+				};
+
+				assert.throws(() => {
+					defineConfig({
+						plugins: {
+							test: testPlugin,
+						},
+						extends: ["test/recommended"],
+						rules: {
+							"no-debugger": "error",
+						},
+					});
+				}, /Plugin config "recommended" in plugin "test" is an eslintrc config and cannot be used in this context\./u);
 			});
 		});
 

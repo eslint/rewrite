@@ -249,19 +249,40 @@ function findPluginConfig(config, pluginConfigName) {
 		throw new TypeError(`Plugin "${userPluginNamespace}" not found.`);
 	}
 
-	const pluginConfig = plugin.configs?.[configName];
+	const directConfig = plugin.configs?.[configName];
+	if (directConfig) {
+		// Arrays are always flat configs, and non-legacy configs can be used directly
+		if (Array.isArray(directConfig) || !isLegacyConfig(directConfig)) {
+			return deepNormalizePluginConfig(
+				userPluginNamespace,
+				plugin,
+				directConfig,
+				pluginConfigName,
+			);
+		}
 
-	if (!pluginConfig) {
+		// If it's a legacy config, look for the flat version
+		const flatConfig = plugin.configs?.[`flat/${configName}`];
+
+		if (
+			flatConfig &&
+			(Array.isArray(flatConfig) || !isLegacyConfig(flatConfig))
+		) {
+			return deepNormalizePluginConfig(
+				userPluginNamespace,
+				plugin,
+				flatConfig,
+				pluginConfigName,
+			);
+		}
+
 		throw new TypeError(
-			`Plugin config "${configName}" not found in plugin "${userPluginNamespace}".`,
+			`Plugin config "${configName}" in plugin "${userPluginNamespace}" is an eslintrc config and cannot be used in this context.`,
 		);
 	}
 
-	return deepNormalizePluginConfig(
-		userPluginNamespace,
-		plugin,
-		pluginConfig,
-		pluginConfigName,
+	throw new TypeError(
+		`Plugin config "${configName}" not found in plugin "${userPluginNamespace}".`,
 	);
 }
 
