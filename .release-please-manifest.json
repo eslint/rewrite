@@ -3,7 +3,7 @@
   "packages/config-array": "0.19.2",
   "packages/core": "0.12.0",
   "packages/migrate-config": "1.4.0",
-  "packages/config-helpers": "0.1.0",
+  "packages/config-helpers": "0.2.0",
   "packages/object-schema": "2.1.6",
   "packages/plugin-kit": "0.2.7"
 }

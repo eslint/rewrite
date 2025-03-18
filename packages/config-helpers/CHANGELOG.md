@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/eslint/rewrite/compare/config-helpers-v0.1.0...config-helpers-v0.2.0) (2025-03-18)
+
+
+### Features
+
+* Look up flat/ config alternatives in defineConfig ([#167](https://github.com/eslint/rewrite/issues/167)) ([0e1a2e0](https://github.com/eslint/rewrite/commit/0e1a2e0f04f72fed0fd5645c1355d90335664a7a))
+
 ## 0.1.0 (2025-03-06)
 
 
