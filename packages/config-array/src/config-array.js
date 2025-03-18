@@ -281,6 +281,10 @@ function needsPatternNormalization(pattern) {
  * @param {Object} config The config object to normalize patterns in.
  */
 function normalizeConfigPatterns(config) {
+	if (!config) {
+		return config;
+	}
+
 	let needsNormalization = false;
 
 	if (Array.isArray(config.files)) {
