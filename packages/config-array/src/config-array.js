@@ -279,6 +279,7 @@ function needsPatternNormalization(pattern) {
 /**
  * Normalizes `files` and `ignores` patterns in a config by removing "./" prefixes.
  * @param {Object} config The config object to normalize patterns in.
+ * @returns {Object} The normalized config object.
  */
 function normalizeConfigPatterns(config) {
 	if (!config) {

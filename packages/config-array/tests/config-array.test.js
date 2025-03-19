@@ -426,7 +426,7 @@ describe("ConfigArray", () => {
 
 			assert.throws(() => {
 				configs.normalizeSync();
-			}, "Config Error: Config (unnamed): Unexpected non-object config.");
+			}, /ConfigError: Config \(unnamed\): Unexpected non-object config./u);
 		});
 
 		it("should throw an error when base config name is not a string", async () => {
@@ -444,7 +444,7 @@ describe("ConfigArray", () => {
 
 			assert.throws(() => {
 				configs.getConfig("foo.js");
-			}, 'Config Error: Config (unnamed): Key "name": Property must be a string.');
+			}, /ConfigError: Config \(unnamed\): Key "name": Property must be a string./u);
 		});
 
 		it("should throw an error when additional config name is not a string", async () => {
@@ -458,7 +458,7 @@ describe("ConfigArray", () => {
 
 			assert.throws(() => {
 				configs.getConfig("foo.js");
-			}, 'Config Error: Config (unnamed): Key "name": Property must be a string.');
+			}, /ConfigError: Config \(unnamed\): Key "name": Property must be a string./u);
 		});
 
 		it("should throw an error when base config is undefined", () => {
@@ -466,7 +466,7 @@ describe("ConfigArray", () => {
 
 			assert.throws(() => {
 				configs.normalizeSync();
-			}, "ConfigError: Config (unnamed): Unexpected undefined config.");
+			}, /ConfigError: Config \(unnamed\): Unexpected undefined config./u);
 		});
 
 		it("should throw an error when base config is null", () => {
@@ -474,7 +474,7 @@ describe("ConfigArray", () => {
 
 			assert.throws(() => {
 				configs.normalizeSync();
-			}, "Config Error: Config (unnamed): Unexpected null config.");
+			}, /ConfigError: Config \(unnamed\): Unexpected null config./u);
 		});
 
 		it("should throw an error when additional config is undefined", () => {
@@ -483,7 +483,7 @@ describe("ConfigArray", () => {
 
 			assert.throws(() => {
 				configs.normalizeSync();
-			}, "Config Error: Config (unnamed): Unexpected undefined config.");
+			}, /ConfigError: Config \(unnamed\): Unexpected undefined config./u);
 		});
 
 		it("should throw an error when additional config is null", () => {
@@ -492,7 +492,7 @@ describe("ConfigArray", () => {
 
 			assert.throws(() => {
 				configs.normalizeSync();
-			}, "Config Error: Config (unnamed): Unexpected null config.");
+			}, /ConfigError: Config \(unnamed\): Unexpected null config./u);
 		});
 
 		it("should throw an error when basePath is a relative path", () => {
