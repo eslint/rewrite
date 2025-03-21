@@ -22,7 +22,7 @@
 
 import fsp from "node:fs/promises";
 import path from "node:path";
-import { migrateConfig } from "./migrate-config.js";
+import { migrateConfig, migrateJSConfig } from "./migrate-config.js";
 import { Legacy } from "@eslint/eslintrc";
 
 //-----------------------------------------------------------------------------
@@ -64,7 +64,6 @@ if (!configFilePath) {
 	process.exit(1);
 }
 
-const config = loadConfigFile(path.resolve(configFilePath));
 const ignorePatterns = await loadIgnoreFile(
 	path.resolve(configFilePath, "../", ".eslintignore"),
 );
@@ -74,37 +73,38 @@ const configFileBasename = path.basename(configFilePath, configFileExtname);
 const resultFileBasename = configFileBasename.startsWith(".eslintrc")
 	? "eslint.config"
 	: configFileBasename;
-const resultFilePath = `${path.dirname(configFilePath)}/${resultFileBasename}.${resultExtname}`;
 
 console.log("\nMigrating", configFilePath);
 
-if (configFileExtname.endsWith("js")) {
-	console.error(
-		"\nWARNING: This tool does not yet work great for .eslintrc.(js|cjs|mjs) files.",
-	);
-	console.error(
-		"It will convert the evaluated output of our config file, not the source code.",
-	);
-	console.error(
-		"Please review the output carefully to ensure it is correct.\n",
-	);
-}
-
 if (ignorePatterns) {
 	console.log("Also importing your .eslintignore file");
-
-	if (!config.ignorePatterns) {
-		config.ignorePatterns = [];
-	}
-
-	// put the .eslintignore patterns last so they can override config ignores
-	config.ignorePatterns = [...config.ignorePatterns, ...ignorePatterns];
 }
 
-const result = migrateConfig(config, {
-	sourceType: commonjs ? "commonjs" : "module",
-	gitignore,
-});
+const isJS = configFileExtname.endsWith("js");
+const resultFilePath = `${path.dirname(configFilePath)}/${resultFileBasename}${isJS ? configFileExtname : `.${resultExtname}`}`;
+
+let result;
+
+if (isJS) {
+	console.error(
+		"\nIMPORTANT: Migration of JavaScript configuration files results in removal of comments.",
+	);
+	console.error("Please review the output carefully.\n");
+
+	const code = await fsp.readFile(configFilePath, "utf8");
+	result = migrateJSConfig(code, {
+		ignorePatterns,
+		gitignore,
+	});
+} else {
+	const config = loadConfigFile(path.resolve(configFilePath));
+	result = migrateConfig(config, {
+		sourceType: commonjs ? "commonjs" : "module",
+		ignorePatterns,
+		gitignore,
+	});
+}
+
 await fsp.writeFile(resultFilePath, result.code);
 
 console.log("\nWrote new config to", resultFilePath);

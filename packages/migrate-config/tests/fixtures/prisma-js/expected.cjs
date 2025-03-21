@@ -1,26 +1,29 @@
-import { defineConfig, globalIgnores } from "eslint/config";
-import typescriptEslint from "@typescript-eslint/eslint-plugin";
-import jest from "eslint-plugin-jest";
-import simpleImportSort from "eslint-plugin-simple-import-sort";
-import _import from "eslint-plugin-import";
-import localRules from "eslint-plugin-local-rules";
-import { fixupPluginRules } from "@eslint/compat";
-import globals from "globals";
-import tsParser from "@typescript-eslint/parser";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import js from "@eslint/js";
-import { FlatCompat } from "@eslint/eslintrc";
+const {
+    defineConfig,
+    globalIgnores,
+} = require("eslint/config");
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-    baseDirectory: __dirname,
-    recommendedConfig: js.configs.recommended,
-    allConfig: js.configs.all
-});
+const tsParser = require("@typescript-eslint/parser");
+const typescriptEslint = require("@typescript-eslint/eslint-plugin");
+const jest = require("eslint-plugin-jest");
+const simpleImportSort = require("eslint-plugin-simple-import-sort");
+const _import = require("eslint-plugin-import");
+const localRules = require("eslint-plugin-local-rules");
 
-export default defineConfig([globalIgnores([
+const {
+    fixupPluginRules,
+} = require("@eslint/compat");
+
+const globals = require("globals");
+const path = require("path");
+const project = "tsconfig.json";
+
+const myGlobals = {
+    custom1: "readonly",
+    custom2: "writable",
+};
+
+module.exports = defineConfig([globalIgnores([
     ".github/renovate.json",
     "**/dist/",
     "**/esm/",
@@ -42,14 +45,27 @@ export default defineConfig([globalIgnores([
     "packages/cli/**/tmp-*",
     "**/sandbox/",
 ]), {
-    extends: compat.extends(
-        "eslint:recommended",
-        "plugin:@typescript-eslint/eslint-recommended",
-        "plugin:@typescript-eslint/recommended",
-        "plugin:@typescript-eslint/recommended-requiring-type-checking",
-        "plugin:prettier/recommended",
-        "plugin:jest/recommended",
-    ),
+    languageOptions: {
+        parser: tsParser,
+
+        globals: {
+            ...globals.node,
+            custom: true,
+            ...myGlobals,
+        },
+
+        ecmaVersion: 2020,
+        sourceType: "module",
+
+        parserOptions: {
+            project,
+        },
+    },
+
+    linterOptions: {
+        reportUnusedDisableDirectives: true,
+        noInlineConfig: true,
+    },
 
     plugins: {
         "@typescript-eslint": typescriptEslint,
@@ -59,29 +75,14 @@ export default defineConfig([globalIgnores([
         "local-rules": localRules,
     },
 
-    languageOptions: {
-        globals: {
-            ...globals.node,
-        },
-
-        parser: tsParser,
-        ecmaVersion: 2020,
-        sourceType: "module",
-
-        parserOptions: {
-            project: "tsconfig.json",
-        },
-    },
-
-    settings: {
-        jest: {
-            version: 27,
-
-            globalAliases: {
-                describe: "describeIf",
-            },
-        },
-    },
+    extends: compat.extends(
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@typescript-eslint/recommended-requiring-type-checking",
+        "plugin:prettier/recommended",
+        "plugin:jest/recommended",
+    ),
 
     rules: {
         "prettier/prettier": "warn",
@@ -130,6 +131,16 @@ export default defineConfig([globalIgnores([
         "import/first": "error",
         "import/newline-after-import": "error",
         "import/no-duplicates": "error",
+    },
+
+    settings: {
+        jest: {
+            version: 27,
+
+            globalAliases: {
+                describe: "describeIf",
+            },
+        },
     },
 }, {
     files: ["./packages/client/src/runtime/core/types/exported/*.ts"],
