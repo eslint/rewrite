@@ -426,7 +426,7 @@ describe("ConfigArray", () => {
 
 			assert.throws(() => {
 				configs.normalizeSync();
-			}, "Config Error: Config (unnamed): Unexpected non-object config.");
+			}, /ConfigError: Config \(unnamed\): Unexpected non-object config./u);
 		});
 
 		it("should throw an error when base config name is not a string", async () => {
@@ -444,7 +444,7 @@ describe("ConfigArray", () => {
 
 			assert.throws(() => {
 				configs.getConfig("foo.js");
-			}, 'Config Error: Config (unnamed): Key "name": Property must be a string.');
+			}, /ConfigError: Config \(unnamed\): Key "name": Property must be a string./u);
 		});
 
 		it("should throw an error when additional config name is not a string", async () => {
@@ -458,7 +458,7 @@ describe("ConfigArray", () => {
 
 			assert.throws(() => {
 				configs.getConfig("foo.js");
-			}, 'Config Error: Config (unnamed): Key "name": Property must be a string.');
+			}, /ConfigError: Config \(unnamed\): Key "name": Property must be a string./u);
 		});
 
 		it("should throw an error when base config is undefined", () => {
@@ -466,7 +466,7 @@ describe("ConfigArray", () => {
 
 			assert.throws(() => {
 				configs.normalizeSync();
-			}, "ConfigError: Config (unnamed): Unexpected undefined config.");
+			}, /ConfigError: Config \(unnamed\): Unexpected undefined config./u);
 		});
 
 		it("should throw an error when base config is null", () => {
@@ -474,7 +474,7 @@ describe("ConfigArray", () => {
 
 			assert.throws(() => {
 				configs.normalizeSync();
-			}, "Config Error: Config (unnamed): Unexpected null config.");
+			}, /ConfigError: Config \(unnamed\): Unexpected null config./u);
 		});
 
 		it("should throw an error when additional config is undefined", () => {
@@ -483,7 +483,7 @@ describe("ConfigArray", () => {
 
 			assert.throws(() => {
 				configs.normalizeSync();
-			}, "Config Error: Config (unnamed): Unexpected undefined config.");
+			}, /ConfigError: Config \(unnamed\): Unexpected undefined config./u);
 		});
 
 		it("should throw an error when additional config is null", () => {
@@ -492,7 +492,7 @@ describe("ConfigArray", () => {
 
 			assert.throws(() => {
 				configs.normalizeSync();
-			}, "Config Error: Config (unnamed): Unexpected null config.");
+			}, /ConfigError: Config \(unnamed\): Unexpected null config./u);
 		});
 
 		it("should throw an error when basePath is a relative path", () => {
@@ -523,6 +523,36 @@ describe("ConfigArray", () => {
 					message: "basePath must be a non-empty string",
 				},
 			);
+		});
+	});
+
+	describe("Config Pattern Normalization", () => {
+		it("should create a new object when normalizing config patterns with ./", () => {
+			const config = {
+				files: ["./foo.js"],
+			};
+
+			configs = new ConfigArray([config], {
+				basePath,
+			});
+
+			configs.normalizeSync();
+
+			assert.notStrictEqual(configs[0], config);
+		});
+
+		it("should create a new object when normalizing config patterns with !./", async () => {
+			const config = {
+				ignores: ["!./foo.js"],
+			};
+
+			configs = new ConfigArray([config], {
+				basePath,
+			});
+
+			await configs.normalize();
+
+			assert.notStrictEqual(configs[0], config);
 		});
 	});
 
@@ -1227,6 +1257,193 @@ describe("ConfigArray", () => {
 					const config2 = configs.getConfig(ignoredFilename);
 					assert.strictEqual(typeof config2, "object");
 					assert.strictEqual(config2.defs.severity, "error");
+				});
+			});
+
+			// https://github.com/eslint/eslint/issues/18757
+			describe("patterns with './' prefix", () => {
+				it("should match patterns with './' prefix in `files` patterns", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["./src/*.js"],
+								defs: { severity: "error" },
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig("src/foo.js").defs.severity,
+						"error",
+					);
+				});
+
+				it("should match patterns with './' prefix in `ignores` patterns", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+								ignores: ["./src/*.js"],
+								defs: { severity: "error" },
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig("src/foo.js"),
+						undefined,
+					);
+				});
+
+				it("should match patterns with './' prefix in global `ignores` patterns", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+								defs: { severity: "error" },
+							},
+							{
+								ignores: ["./src/*.js"],
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig("src/foo.js"),
+						undefined,
+					);
+				});
+
+				it("should match negated `files` patterns with './' prefix", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["!./src/*.js"],
+								defs: { severity: "error" },
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig("src/foo.js"),
+						undefined,
+					);
+				});
+
+				it("should match negated `ignores` patterns with './' prefix", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+								ignores: ["**/*.js", "!./src/foo.js"],
+								defs: { severity: "error" },
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig("src/foo.js").defs.severity,
+						"error",
+					);
+				});
+
+				it("should match negated global `ignores` patterns with './' prefix", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+								defs: { severity: "error" },
+							},
+							{
+								ignores: ["**/*.js", "!./src/*.js"],
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig("src/foo.js").defs.severity,
+						"error",
+					);
+				});
+
+				it("should match nested `files` patterns with './' prefix", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: [["./src/*.js"]],
+								defs: { severity: "error" },
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig("src/foo.js").defs.severity,
+						"error",
+					);
+				});
+
+				it("should match patterns with './' prefix in `files` patterns using normalize()", async () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["./src/*.js"],
+								defs: { severity: "error" },
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					await configs.normalize();
+
+					assert.strictEqual(
+						configs.getConfig("src/foo.js").defs.severity,
+						"error",
+					);
 				});
 			});
 		});
