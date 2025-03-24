@@ -310,17 +310,7 @@ describe("ConfigArray", () => {
 					basePath,
 				});
 
-				let actualError;
-				try {
-					await configArray.normalize();
-				} catch (error) {
-					actualError = error;
-				}
-				assert.throws(() => {
-					if (actualError) {
-						throw actualError;
-					}
-				}, expectedError.message);
+				await assert.rejects(configArray.normalize(), expectedError);
 			});
 
 			localIt(`${title} when calling normalizeSync()`, () => {
@@ -328,10 +318,7 @@ describe("ConfigArray", () => {
 					basePath,
 				});
 
-				assert.throws(
-					() => configArray.normalizeSync(),
-					expectedError.message,
-				);
+				assert.throws(() => configArray.normalizeSync(), expectedError);
 			});
 		}
 
@@ -374,7 +361,7 @@ describe("ConfigArray", () => {
 				},
 			],
 			expectedError:
-				'Config Error: Config (unnamed): Key "files": Items must be a string, a function, or an array of strings and functions.',
+				/ConfigError: Config \(unnamed\): Key "files": Items must be a string, a function, or an array of strings and functions\./u,
 		});
 
 		testValidationError({
@@ -385,7 +372,7 @@ describe("ConfigArray", () => {
 				},
 			],
 			expectedError:
-				'Config Error: Config (unnamed): Key "ignores": Expected value to be an array.',
+				/ConfigError: Config \(unnamed\): Key "ignores": Expected value to be an array\./u,
 		});
 
 		testValidationError({
@@ -397,7 +384,7 @@ describe("ConfigArray", () => {
 				},
 			],
 			expectedError:
-				'Config "foo": Key "ignores": Expected array to only contain strings and functions.',
+				/Config "foo": Key "ignores": Expected array to only contain strings and functions\./u,
 		});
 
 		testValidationError({
@@ -410,7 +397,7 @@ describe("ConfigArray", () => {
 				},
 			],
 			expectedError:
-				'Config "foo": Key "ignores": Expected array to only contain strings and functions.',
+				/Config "foo": Key "ignores": Expected array to only contain strings and functions\./u,
 		});
 
 		it("should throw an error when a config is not an object", () => {
