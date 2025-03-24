@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.20.0](https://github.com/eslint/rewrite/compare/config-array-v0.19.2...config-array-v0.20.0) (2025-03-24)
+
+
+### Features
+
+* normalize patterns to handle "./" prefix in files and ignores ([#162](https://github.com/eslint/rewrite/issues/162)) ([bbbe909](https://github.com/eslint/rewrite/commit/bbbe9098fe112ca646947b83f71fbf5639f932e6))
+
 ## [0.19.2](https://github.com/eslint/rewrite/compare/config-array-v0.19.1...config-array-v0.19.2) (2025-01-31)
 
 
