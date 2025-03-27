@@ -124,9 +124,10 @@ class Migration {
 			added: true,
 		});
 		this.needsDirname ||= isModule;
-		this.inits.push(
-			...getFlatCompatInit(),
-		); /* eslint-disable-line no-use-before-define -- too hard to rearrange */
+
+		/* eslint-disable no-use-before-define -- too hard to rearrange */
+		this.inits.push(...getFlatCompatInit());
+		/* eslint-enable no-use-before-define -- too hard to rearrange */
 	}
 }
 
