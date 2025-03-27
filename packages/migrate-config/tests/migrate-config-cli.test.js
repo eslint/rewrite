@@ -17,15 +17,18 @@ import { execSync } from "node:child_process";
 
 const filePaths = [
 	"basic-eslintrc/basic-eslintrc.yml",
-	"prisma/.eslintrc.cjs",
+	"prisma-js/.eslintrc.cjs",
 	"reveal-md/.eslintrc",
 	"release-it/.eslintrc.json",
+	"formidable-js/.eslintrc.cjs",
+	"backend-nx-skeleton-js/.eslintrc.cjs",
+	"backend-nx-skeleton-esm-js/.eslintrc.mjs",
 	"no-globals-for-env/.eslintrc.yml",
 	"overrides-extends/.eslintrc.json",
 	"plugins-dedupe/.eslintrc.yml",
 	"gitignore-simple/.eslintrc.json",
 	"gitignore-complex/.eslintrc.json",
-	"import-duplicate/.eslintrc.cjs",
+	"import-duplicate-js/.eslintrc.cjs",
 	"slash-package/.eslintrc.json",
 ].map(file => `tests/fixtures/${file}`);
 
@@ -81,19 +84,34 @@ describe("@eslint/migrate-config", async () => {
 				? "--gitignore"
 				: "";
 
+			// JS files must always use the format that matches the original file
+			if (fixturePath.endsWith("-js")) {
+				const resultPath = `${fixturePath}/eslint.config${path.extname(filePath)}`;
+				const expectedPath = `${fixturePath}/expected${path.extname(filePath)}`;
+
+				execSync(
+					`node src/migrate-config-cli.js ${filePath} ${gitignoreFlag}`,
+					{ stdio: "inherit" },
+				);
+
+				// check the cjs file
+				await assertFilesEqual(resultPath, expectedPath);
+				return;
+			}
+
 			// run the migration for mjs
 			execSync(
 				`node src/migrate-config-cli.js ${filePath} ${gitignoreFlag}`,
 				{ stdio: "inherit" },
 			);
 
+			// check the mjs file
+			await assertFilesEqual(resultMjsPath, expectedMjsPath);
+
 			// run the migration for cjs
 			execSync(
 				`node src/migrate-config-cli.js ${filePath} --commonjs  ${gitignoreFlag}`,
 			);
-
-			// check the mjs file
-			await assertFilesEqual(resultMjsPath, expectedMjsPath);
 
 			// check the cjs file
 			await assertFilesEqual(resultCjsPath, expectedCjsPath);
