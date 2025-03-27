@@ -3,8 +3,6 @@
  * @author Nicholas C. Zakas
  */
 
-/* eslint no-console: off -- Need to emit warnings */
-
 //-----------------------------------------------------------------------------
 // Imports
 //-----------------------------------------------------------------------------
@@ -99,6 +97,36 @@ class Migration {
 				added: true,
 			});
 		}
+	}
+
+	/**
+	 * Adds the necessary imports for the migration to use FlatCompat.
+	 * @param {boolean} isModule Whether or not the migration is for an ES module.
+	 * @returns {void}
+	 */
+	addFlatCompat(isModule) {
+		if (isModule) {
+			this.imports.set("node:path", {
+				name: "path",
+				added: true,
+			});
+			this.imports.set("node:url", {
+				bindings: ["fileURLToPath"],
+				added: true,
+			});
+		}
+		this.imports.set("@eslint/js", {
+			name: "js",
+			added: true,
+		});
+		this.imports.set("@eslint/eslintrc", {
+			bindings: ["FlatCompat"],
+			added: true,
+		});
+		this.needsDirname ||= isModule;
+		this.inits.push(
+			...getFlatCompatInit(),
+		); /* eslint-disable-line no-use-before-define -- too hard to rearrange */
 	}
 }
 
@@ -1274,6 +1302,7 @@ function convertLegacyConfigExpression(config, migration) {
 						),
 					),
 				);
+
 				break;
 			}
 
@@ -1298,7 +1327,7 @@ function convertLegacyConfigExpression(config, migration) {
 			case "ignorePatterns":
 				// if the value is not an array expression then just ignore it
 				if (value.type !== "ArrayExpression") {
-					console.warn(
+					migration.messages.push(
 						`Unexpected type for ${name}: ${value.type}. Ignoring...`,
 					);
 					break;
@@ -1310,7 +1339,7 @@ function convertLegacyConfigExpression(config, migration) {
 			case "overrides":
 				// if the value is not an array expression then just ignore it
 				if (value.type !== "ArrayExpression") {
-					console.warn(
+					migration.messages.push(
 						`Unexpected type for ${name}: ${value.type}. Ignoring...`,
 					);
 					break;
@@ -1333,7 +1362,7 @@ function convertLegacyConfigExpression(config, migration) {
 					value.type !== "ArrayExpression" &&
 					value.type !== "Literal"
 				) {
-					console.warn(
+					migration.messages.push(
 						`Unexpected type for ${name}: ${value.type}. Ignoring...`,
 					);
 					break;
@@ -1429,26 +1458,7 @@ export function migrateConfig(
 		config.extends ||
 		config.overrides?.some(override => override.extends)
 	) {
-		if (isModule) {
-			migration.imports.set("node:path", {
-				name: "path",
-				added: true,
-			});
-			migration.imports.set("node:url", {
-				bindings: ["fileURLToPath"],
-				added: true,
-			});
-		}
-		migration.imports.set("@eslint/js", {
-			name: "js",
-			added: true,
-		});
-		migration.imports.set("@eslint/eslintrc", {
-			bindings: ["FlatCompat"],
-			added: true,
-		});
-		migration.needsDirname ||= isModule;
-		migration.inits.push(...getFlatCompatInit());
+		migration.addFlatCompat(isModule);
 	}
 
 	// add .gitignore if necessary
@@ -1517,7 +1527,19 @@ export function migrateConfig(
 	};
 }
 
-export function migrateJSConfig(code, { ignorePatterns, gitignore = false }) {
+/**
+ * Migrates a JS config file to the flat config format.
+ * @param {string} code The JS config file to migrate.
+ * @param {Object} [options] Options for the migration.
+ * @param {string[]} [options.ignorePatterns] An array of glob patterns to ignore.
+ * @param {boolean} [options.gitignore] `true` to include contents of a .gitignore file.
+ * @returns {{code:string,messages:Array<string>,imports:Map<string,MigrationImport>}} The migrated config and
+ * any messages to display to the user.
+ */
+export function migrateJSConfig(
+	code,
+	{ ignorePatterns, gitignore = false } = {},
+) {
 	// first parse the code
 	const ast = recast.parse(code, {
 		parser: {
@@ -1574,6 +1596,19 @@ export function migrateJSConfig(code, { ignorePatterns, gitignore = false }) {
 		...convertLegacyConfigExpression(oldConfig, migration),
 	);
 
+	// if any config has extends then we need to add imports
+	if (
+		configArrayElements.some(
+			element =>
+				element.type === "ObjectExpression" &&
+				element.properties.some(
+					property => property.key.name === "extends",
+				),
+		)
+	) {
+		migration.addFlatCompat(isModule);
+	}
+
 	const defineConfigNode = b.callExpression(b.identifier("defineConfig"), [
 		b.arrayExpression(configArrayElements),
 	]);
@@ -1584,12 +1619,19 @@ export function migrateJSConfig(code, { ignorePatterns, gitignore = false }) {
 		cjsExports.right = defineConfigNode;
 	}
 
-	// outside of ESM we need to be careful of "use strict" directives
-	if (!isModule && body[0].directive === "use strict") {
-		body.splice(1, 0, ...addImports(migration, isModule));
-	} else {
-		body.unshift(...addImports(migration, isModule));
+	const bodyAdditions = [...addImports(migration, isModule)];
+
+	// add calculation of `__dirname` if needed
+	if (migration.needsDirname) {
+		bodyAdditions.push(...getDirnameInit());
 	}
+
+	// output any inits
+	bodyAdditions.push(...migration.inits);
+
+	// outside of ESM we need to be careful of "use strict" directives
+	const startIndex = !isModule && body[0].directive === "use strict" ? 1 : 0;
+	body.splice(startIndex, 0, ...bodyAdditions);
 
 	return {
 		// Recast doesn't export the `StatementKind` type so we need to cast the body to `Array<any>`

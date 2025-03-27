@@ -6,6 +6,17 @@ const {
 
 const globals = require("globals");
 const prettier = require("eslint-plugin-prettier");
+const js = require("@eslint/js");
+
+const {
+    FlatCompat,
+} = require("@eslint/eslintrc");
+
+const compat = new FlatCompat({
+    baseDirectory: __dirname,
+    recommendedConfig: js.configs.recommended,
+    allConfig: js.configs.all
+});
 const airbnbBase = require("eslint-config-airbnb-base");
 const bestPractices = require(airbnbBase.extends[0]);
 const ignoredProps = bestPractices.rules["no-param-reassign"][1].ignorePropertyModificationsFor.concat("err", "x", "_", "opts", "options", "settings", "config", "cfg");
