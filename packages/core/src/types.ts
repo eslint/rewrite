@@ -141,6 +141,7 @@ export interface RulesMetaDocs {
  */
 export interface RulesMeta<
 	MessageIds extends string = string,
+	RuleOptions = unknown[],
 	ExtRuleDocs = unknown,
 > {
 	/**
@@ -158,8 +159,10 @@ export interface RulesMeta<
 	 */
 	schema?: JSONSchema4 | JSONSchema4[] | false | undefined;
 
-	/** Any default options to be recursively merged on top of any user-provided options. */
-	defaultOptions?: unknown[];
+	/**
+	 * Any default options to be recursively merged on top of any user-provided options.
+	 **/
+	defaultOptions?: RuleOptions;
 
 	/**
 	 * The messages that the rule can report.
@@ -561,7 +564,11 @@ export interface RuleDefinition<
 	/**
 	 * The meta information for the rule.
 	 */
-	meta?: RulesMeta<Options["MessageIds"], Options["ExtRuleDocs"]>;
+	meta?: RulesMeta<
+		Options["MessageIds"],
+		Options["RuleOptions"],
+		Options["ExtRuleDocs"]
+	>;
 
 	/**
 	 * Creates the visitor that ESLint uses to apply the rule during traversal.
