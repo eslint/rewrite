@@ -290,3 +290,40 @@ const testRule: RuleDefinition<{
 };
 
 testRule.meta satisfies RulesMeta | undefined;
+
+const testRuleWithInvalidDefaultOptions: RuleDefinition<{
+	LangOptions: TestLanguageOptions;
+	Code: TestSourceCode;
+	RuleOptions: [{ foo: string; bar: number }];
+	Visitor: TestRuleVisitor;
+	Node: TestNode;
+	MessageIds: "badFoo" | "wrongBar";
+	ExtRuleDocs: never;
+}> = {
+	meta: {
+		type: "problem",
+		schema: [
+			{
+				type: "object",
+				properties: {
+					foo: {
+						type: "string",
+					},
+					bar: {
+						type: "integer",
+					},
+				},
+				additionalProperties: false,
+			},
+		],
+
+		// @ts-expect-error invalid default option "baz"
+		defaultOptions: [{ foo: "always", bar: 5, baz: "invalid" }],
+	},
+
+	create(): TestRuleVisitor {
+		return {};
+	},
+};
+
+testRuleWithInvalidDefaultOptions.meta satisfies RulesMeta | undefined;
