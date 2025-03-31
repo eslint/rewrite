@@ -317,8 +317,14 @@ const testRuleWithInvalidDefaultOptions: RuleDefinition<{
 			},
 		],
 
-		// @ts-expect-error invalid default option "baz"
-		defaultOptions: [{ foo: "always", bar: 5, baz: "invalid" }],
+		defaultOptions: [
+			{
+				foo: "always",
+				bar: 5,
+				// @ts-expect-error invalid default option "baz"
+				baz: "invalid",
+			},
+		],
 	},
 
 	create(): TestRuleVisitor {
