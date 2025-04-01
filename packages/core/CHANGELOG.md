@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.13.0](https://github.com/eslint/rewrite/compare/core-v0.12.0...core-v0.13.0) (2025-04-01)
+
+
+### Features
+
+* Set type for RuleDefinition.defaultOptions ([#173](https://github.com/eslint/rewrite/issues/173)) ([d5806df](https://github.com/eslint/rewrite/commit/d5806dfe5c2af849b84f39e3eb0300aaa7c29092))
+
 ## [0.12.0](https://github.com/eslint/rewrite/compare/core-v0.11.0...core-v0.12.0) (2025-02-21)
 
 
