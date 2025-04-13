@@ -1,9 +1,11 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "exactOptionalPropertyTypes": true,
     "noEmit": true,
     "rootDir": "../..",
-    "strict": true
+    "strict": true,
+    "verbatimModuleSyntax": true
   },
   "include": [".", "../../dist"]
 }

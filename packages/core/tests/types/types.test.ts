@@ -8,6 +8,8 @@
 //-----------------------------------------------------------------------------
 
 import type {
+	CustomRuleDefinitionType,
+	CustomRuleTypeDefinitions,
 	File,
 	FileProblem,
 	Language,
@@ -64,7 +66,7 @@ class TestSourceCode
 	text: string;
 	ast: TestRootNode;
 	notMuch: "no" | false;
-	visitorKeys?: Record<string, string[]> | undefined;
+	visitorKeys?: Record<string, string[]>;
 
 	constructor(text: string, ast: TestRootNode) {
 		this.text = text;
@@ -194,7 +196,7 @@ const testRule: RuleDefinition<{
 	Visitor: TestRuleVisitor;
 	Node: TestNode;
 	MessageIds: "badFoo" | "wrongBar";
-	ExtRuleDocs: never;
+	ExtRuleDocs: { baz?: boolean };
 }> = {
 	meta: {
 		type: "problem",
@@ -333,3 +335,42 @@ const testRuleWithInvalidDefaultOptions: RuleDefinition<{
 };
 
 testRuleWithInvalidDefaultOptions.meta satisfies RulesMeta | undefined;
+
+type TestRuleDefinition<
+	Options extends
+		Partial<CustomRuleTypeDefinitions> = CustomRuleTypeDefinitions,
+> = CustomRuleDefinitionType<
+	{
+		LangOptions: TestLanguageOptions;
+		Code: TestSourceCode;
+		Visitor: TestRuleVisitor;
+		Node: TestNode;
+	},
+	Options
+>;
+
+testRule satisfies TestRuleDefinition<{
+	RuleOptions: [{ foo: string; bar: number }];
+	MessageIds: "badFoo" | "wrongBar";
+	ExtRuleDocs: { baz?: boolean };
+}>;
+
+export type Rule1 = TestRuleDefinition;
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- empty object allowed
+export type Rule2 = TestRuleDefinition<{}>;
+
+export type Rule3 = TestRuleDefinition<{
+	RuleOptions: [number, string];
+	MessageIds: "foo" | "bar";
+	ExtRuleDocs: { baz: number; qux: string };
+}>;
+
+// @ts-expect-error -- non-object not allowed
+export type Rule4 = TestRuleDefinition<null>;
+
+// @ts-expect-error -- non-customizable properties not allowed
+export type Rule5 = TestRuleDefinition<{ Code: TestSourceCode }>;
+
+// @ts-expect-error -- undefined value not allow for optional property (assumes `exactOptionalPropertyTypes` tsc compiler option)
+export type Rule6 = TestRuleDefinition<{ RuleOptions: undefined }>;
