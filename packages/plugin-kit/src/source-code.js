@@ -11,13 +11,17 @@
 
 /** @typedef {import("@eslint/core").VisitTraversalStep} VisitTraversalStep */
 /** @typedef {import("@eslint/core").CallTraversalStep} CallTraversalStep */
-/** @typedef {import("@eslint/core").TextSourceCode} TextSourceCode */
 /** @typedef {import("@eslint/core").TraversalStep} TraversalStep */
 /** @typedef {import("@eslint/core").SourceLocation} SourceLocation */
 /** @typedef {import("@eslint/core").SourceLocationWithOffset} SourceLocationWithOffset */
 /** @typedef {import("@eslint/core").SourceRange} SourceRange */
 /** @typedef {import("@eslint/core").Directive} IDirective */
 /** @typedef {import("@eslint/core").DirectiveType} DirectiveType */
+/**
+ * @typedef {import("@eslint/core").TextSourceCode<Options>} TextSourceCode<Options>
+ * @template {SourceCodeBaseTypeOptions} [Options=SourceCodeBaseTypeOptions]
+ */
+/** @typedef {import("./types.ts").SourceCodeBaseTypeOptions} SourceCodeBaseTypeOptions */
 
 //-----------------------------------------------------------------------------
 // Helpers
@@ -212,7 +216,8 @@ export class Directive {
 
 /**
  * Source Code Base Object
- * @implements {TextSourceCode}
+ * @template {SourceCodeBaseTypeOptions} [Options=SourceCodeBaseTypeOptions]
+ * @implements {TextSourceCode<Options>}
  */
 export class TextSourceCodeBase {
 	/**
@@ -223,7 +228,7 @@ export class TextSourceCodeBase {
 
 	/**
 	 * The AST of the source code.
-	 * @type {object}
+	 * @type {Options["RootNode"]}
 	 */
 	ast;
 
@@ -237,7 +242,7 @@ export class TextSourceCodeBase {
 	 * Creates a new instance.
 	 * @param {Object} options The options for the instance.
 	 * @param {string} options.text The source code text.
-	 * @param {object} options.ast The root AST node.
+	 * @param {Options["RootNode"]} options.ast The root AST node.
 	 * @param {RegExp} [options.lineEndingPattern] The pattern to match lineEndings in the source code.
 	 */
 	constructor({ text, ast, lineEndingPattern = /\r?\n/u }) {
@@ -248,7 +253,7 @@ export class TextSourceCodeBase {
 
 	/**
 	 * Returns the loc information for the given node or token.
-	 * @param {object} nodeOrToken The node or token to get the loc information for.
+	 * @param {Options["SyntaxElementWithLoc"]} nodeOrToken The node or token to get the loc information for.
 	 * @returns {SourceLocation} The loc information for the node or token.
 	 */
 	getLoc(nodeOrToken) {
@@ -267,7 +272,7 @@ export class TextSourceCodeBase {
 
 	/**
 	 * Returns the range information for the given node or token.
-	 * @param {object} nodeOrToken The node or token to get the range information for.
+	 * @param {Options["SyntaxElementWithLoc"]} nodeOrToken The node or token to get the range information for.
 	 * @returns {SourceRange} The range information for the node or token.
 	 */
 	getRange(nodeOrToken) {
@@ -290,8 +295,8 @@ export class TextSourceCodeBase {
 	/* eslint-disable no-unused-vars -- Required to complete interface. */
 	/**
 	 * Returns the parent of the given node.
-	 * @param {object} node The node to get the parent of.
-	 * @returns {object|undefined} The parent of the node.
+	 * @param {Options["SyntaxElementWithLoc"]} node The node to get the parent of.
+	 * @returns {Options["SyntaxElementWithLoc"]|undefined} The parent of the node.
 	 */
 	getParent(node) {
 		throw new Error("Not implemented.");
@@ -300,8 +305,8 @@ export class TextSourceCodeBase {
 
 	/**
 	 * Gets all the ancestors of a given node
-	 * @param {object} node The node
-	 * @returns {Array<object>} All the ancestor nodes in the AST, not including the provided node, starting
+	 * @param {Options["SyntaxElementWithLoc"]} node The node
+	 * @returns {Array<Options["SyntaxElementWithLoc"]>} All the ancestor nodes in the AST, not including the provided node, starting
 	 * from the root node at index 0 and going inwards to the parent node.
 	 * @throws {TypeError} When `node` is missing.
 	 */
@@ -325,7 +330,7 @@ export class TextSourceCodeBase {
 
 	/**
 	 * Gets the source code for the given node.
-	 * @param {object} [node] The AST node to get the text for.
+	 * @param {Options["SyntaxElementWithLoc"]} [node] The AST node to get the text for.
 	 * @param {number} [beforeCount] The number of characters before the node to retrieve.
 	 * @param {number} [afterCount] The number of characters after the node to retrieve.
 	 * @returns {string} The text representing the AST node.
