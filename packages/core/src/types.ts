@@ -895,7 +895,7 @@ interface InlineConfigElement {
 /**
  * Generic options for the `SourceCodeBase` type.
  */
-interface SourceCodeBaseTypeOptions {
+export interface SourceCodeBaseTypeOptions {
 	LangOptions: LanguageOptions;
 	RootNode: unknown;
 	SyntaxElementWithLoc: unknown;
