@@ -83,12 +83,81 @@ const sourceCode = new TestTextSourceCode({
 	ast: { foo: "ABC", bar: 123 },
 });
 sourceCode.ast satisfies { foo: string; bar: number };
+sourceCode.text satisfies string;
+sourceCode.lines satisfies string[];
 sourceCode.getAncestors({}) satisfies object[];
 sourceCode.getLoc({}) satisfies SourceLocation;
 sourceCode.getParent({}) satisfies object | undefined;
 sourceCode.getRange({}) satisfies SourceRange;
 sourceCode.getText() satisfies string;
 sourceCode.getText({}, 0, 1) satisfies string;
+
+// TextSourceCodeBase (with options)
+interface CustomOptions {
+	LangOptions: { option1: string; option2: boolean };
+	RootNode: { type: string };
+	SyntaxElementWithLoc: { value: string };
+	ConfigNode: { config: string };
+}
+class TestTextSourceCodeWithOptions extends TextSourceCodeBase<CustomOptions> {
+	declare ast: CustomOptions["RootNode"];
+
+	constructor({
+		text,
+		ast,
+	}: {
+		text: string;
+		ast: CustomOptions["RootNode"];
+	}) {
+		super({ text, ast });
+	}
+}
+
+/* eslint-disable no-new -- Needed to test the constructor. */
+new TestTextSourceCodeWithOptions({
+	// @ts-expect-error Wrong type should be caught
+	text: 1,
+	// @ts-expect-error Wrong type should be caught
+	ast: { type: true },
+});
+new TestTextSourceCodeWithOptions({
+	// @ts-expect-error Wrong type should be caught
+	text: true,
+	// @ts-expect-error Wrong type should be caught
+	ast: { unknown: true },
+});
+/* eslint-enable no-new -- Constructor test ends here. */
+
+const sourceCodeWithOptions = new TestTextSourceCodeWithOptions({
+	text: "text",
+	ast: { type: "customRootNode" },
+});
+sourceCodeWithOptions.ast satisfies {
+	type: string;
+} satisfies CustomOptions["RootNode"];
+sourceCodeWithOptions.text satisfies string;
+sourceCodeWithOptions.lines satisfies string[];
+sourceCodeWithOptions.getAncestors({ value: "" }) satisfies {
+	value: string;
+}[] satisfies CustomOptions["SyntaxElementWithLoc"][];
+sourceCodeWithOptions.getLoc({ value: "" }) satisfies SourceLocation;
+sourceCodeWithOptions.getParent({ value: "" }) satisfies
+	| { value: string }
+	| undefined satisfies CustomOptions["SyntaxElementWithLoc"] | undefined;
+sourceCodeWithOptions.getRange({ value: "" }) satisfies SourceRange;
+sourceCodeWithOptions.getText() satisfies string;
+sourceCodeWithOptions.getText({ value: "" }, 0, 1) satisfies string;
+
+// @ts-expect-error Wrong type should be caught
+sourceCodeWithOptions.getAncestors({});
+// @ts-expect-error Wrong type should be caught
+sourceCodeWithOptions.getLoc({});
+// @ts-expect-error Wrong type should be caught
+sourceCodeWithOptions.getParent({});
+// @ts-expect-error Wrong type should be caught
+sourceCodeWithOptions.getRange({});
+// @ts-expect-error Wrong type should be caught
+sourceCodeWithOptions.getText({}, 0, 1);
 
 // VisitNodeStep
 class TestVisitNodeStep extends VisitNodeStep {
