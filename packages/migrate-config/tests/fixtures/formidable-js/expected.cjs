@@ -2,6 +2,7 @@
 
 const {
     defineConfig,
+    globalIgnores,
 } = require("eslint/config");
 
 const globals = require("globals");
@@ -128,4 +129,4 @@ module.exports = defineConfig([{
         ...additionalChanges,
         ...importRules,
     },
-}]);
+}, globalIgnores(["**/dist"])]);

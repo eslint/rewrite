@@ -165,6 +165,7 @@ module.exports = {
         node: true,
         commonjs: true,
     },
+    ignorePatterns: ["dist"],
     extends: ['eslint:recommended', 'airbnb-base', 'plugin:prettier/recommended'],
     plugins: ['prettier'],
     rules: {

@@ -1334,6 +1334,16 @@ function convertLegacyConfigExpression(config, migration) {
 					break;
 				}
 
+				if (
+					!migration.imports
+						.get("eslint/config")
+						.bindings.includes("globalIgnores")
+				) {
+					migration.imports
+						.get("eslint/config")
+						.bindings.push("globalIgnores");
+				}
+
 				configArray.push(createGlobalIgnoresFromNode(value));
 				break;
 
@@ -1587,15 +1597,23 @@ export function migrateJSConfig(
 		}
 	}
 
-	// add ignore patterns from .eslintignore
-	if (ignorePatterns) {
-		migration.imports.get("eslint/config").bindings.push("globalIgnores");
-		configArrayElements.push(createGlobalIgnores(ignorePatterns));
-	}
-
 	configArrayElements.push(
 		...convertLegacyConfigExpression(oldConfig, migration),
 	);
+
+	// add ignore patterns from .eslintignore
+	if (ignorePatterns) {
+		if (
+			!migration.imports
+				.get("eslint/config")
+				.bindings.includes("globalIgnores")
+		) {
+			migration.imports
+				.get("eslint/config")
+				.bindings.push("globalIgnores");
+		}
+		configArrayElements.push(createGlobalIgnores(ignorePatterns));
+	}
 
 	// if any config has extends then we need to add imports
 	if (

@@ -34,28 +34,7 @@ const myGlobals = {
     custom2: "writable",
 };
 
-module.exports = defineConfig([globalIgnores([
-    ".github/renovate.json",
-    "**/dist/",
-    "**/esm/",
-    "**/build/",
-    "**/fixtures/",
-    "**/byline.ts",
-    "**/prism.ts",
-    "**/charm.ts",
-    "**/pnpm-lock.yaml",
-    "**/generated-dmmf.ts",
-    "packages/client/generator-build/",
-    "packages/client/declaration/",
-    "packages/client/runtime/",
-    "packages/client/src/__tests__/types/",
-    "packages/client/scripts/default-index.js",
-    "packages/cli/prisma-client/",
-    "packages/cli/install/",
-    "packages/cli/preinstall/",
-    "packages/cli/**/tmp-*",
-    "**/sandbox/",
-]), {
+module.exports = defineConfig([{
     languageOptions: {
         parser: tsParser,
 
@@ -153,7 +132,7 @@ module.exports = defineConfig([globalIgnores([
             },
         },
     },
-}, {
+}, globalIgnores(["**/tmp"]), {
     files: ["./packages/client/src/runtime/core/types/exported/*.ts"],
     ignores: ["**/index.ts"],
 
@@ -167,4 +146,25 @@ module.exports = defineConfig([globalIgnores([
     rules: {
         "local-rules/valid-exported-types-index": "error",
     },
-}]);
+}, globalIgnores([
+    ".github/renovate.json",
+    "**/dist/",
+    "**/esm/",
+    "**/build/",
+    "**/fixtures/",
+    "**/byline.ts",
+    "**/prism.ts",
+    "**/charm.ts",
+    "**/pnpm-lock.yaml",
+    "**/generated-dmmf.ts",
+    "packages/client/generator-build/",
+    "packages/client/declaration/",
+    "packages/client/runtime/",
+    "packages/client/src/__tests__/types/",
+    "packages/client/scripts/default-index.js",
+    "packages/cli/prisma-client/",
+    "packages/cli/install/",
+    "packages/cli/preinstall/",
+    "packages/cli/**/tmp-*",
+    "**/sandbox/",
+])]);

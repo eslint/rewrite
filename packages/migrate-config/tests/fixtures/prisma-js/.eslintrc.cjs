@@ -11,6 +11,7 @@ module.exports = {
 	parser: "@typescript-eslint/parser",
 	reportUnusedDisableDirectives: true,
 	noInlineConfig: true,
+	ignorePatterns: ["tmp"],
 	plugins: [
 		"@typescript-eslint",
 		"jest",
