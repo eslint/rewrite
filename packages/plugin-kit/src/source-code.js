@@ -17,7 +17,6 @@
 /** @typedef {import("@eslint/core").SourceRange} SourceRange */
 /** @typedef {import("@eslint/core").Directive} IDirective */
 /** @typedef {import("@eslint/core").DirectiveType} DirectiveType */
-/** @typedef {import("@eslint/core").LanguageOptions} LanguageOptions */
 /** @typedef {import("@eslint/core").SourceCodeBaseTypeOptions} SourceCodeBaseTypeOptions */
 /**
  * @typedef {import("@eslint/core").TextSourceCode<Options>} TextSourceCode<Options>
