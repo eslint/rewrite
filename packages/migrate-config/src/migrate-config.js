@@ -13,6 +13,7 @@ import camelCase from "camelcase";
 import pluginsNeedingCompat from "./compat-plugins.js";
 import configsNeedingCompat from "./compat-configs.js";
 import { convertIgnorePatternToMinimatch } from "@eslint/compat";
+import * as espree from "espree";
 
 //-----------------------------------------------------------------------------
 // Types
@@ -30,6 +31,8 @@ import { convertIgnorePatternToMinimatch } from "@eslint/compat";
 /** @typedef {import("recast").types.namedTypes.Statement} Statement */
 /** @typedef {import("recast").types.namedTypes.Literal} Literal */
 /** @typedef {import("recast").types.namedTypes.SpreadElement} SpreadElement */
+/** @typedef {import("recast").types.namedTypes.ExportDefaultDeclaration} ExportDefaultDeclaration */
+/** @typedef {import("recast").types.namedTypes.AssignmentExpression} AssignmentExpression */
 /** @typedef {import("./types.js").MigrationImport} MigrationImport */
 
 //-----------------------------------------------------------------------------
@@ -50,12 +53,6 @@ const linterOptionsKeysToCopy = [
  * Represents a migration from one config to another.
  */
 class Migration {
-	/**
-	 * The config to migrate.
-	 * @type {LegacyConfig}
-	 */
-	config;
-
 	/**
 	 * Any imports required for the new config.
 	 * @type {Map<string,MigrationImport>}
@@ -81,11 +78,56 @@ class Migration {
 	inits = [];
 
 	/**
-	 * Creates a new Migration object.
-	 * @param {LegacyConfig} config The config to migrate.
+	 * For `env`, we need the `globals` package if there are any environments
+	 * that aren't ECMAScript environments and also aren't from plugins
+	 * (the name contains a slash).
+	 * @param {Object} [env] The environment object from the config.
+	 * @returns {void}
 	 */
-	constructor(config) {
-		this.config = config;
+	importGlobalsIfNeeded(env) {
+		const needsGlobals =
+			env &&
+			Object.keys(env).some(
+				envName => !envName.startsWith("es") && !envName.includes("/"),
+			);
+
+		if (needsGlobals && !this.imports.has("globals")) {
+			this.imports.set("globals", {
+				name: "globals",
+				added: true,
+			});
+		}
+	}
+
+	/**
+	 * Adds the necessary imports for the migration to use FlatCompat.
+	 * @param {boolean} isModule Whether or not the migration is for an ES module.
+	 * @returns {void}
+	 */
+	addFlatCompat(isModule) {
+		if (isModule) {
+			this.imports.set("node:path", {
+				name: "path",
+				added: true,
+			});
+			this.imports.set("node:url", {
+				bindings: ["fileURLToPath"],
+				added: true,
+			});
+		}
+		this.imports.set("@eslint/js", {
+			name: "js",
+			added: true,
+		});
+		this.imports.set("@eslint/eslintrc", {
+			bindings: ["FlatCompat"],
+			added: true,
+		});
+		this.needsDirname ||= isModule;
+
+		/* eslint-disable no-use-before-define -- too hard to rearrange */
+		this.inits.push(...getFlatCompatInit());
+		/* eslint-enable no-use-before-define -- too hard to rearrange */
 	}
 }
 
@@ -132,6 +174,96 @@ function getParserVariableName(parser) {
 
 // cache for plugins needing compat
 const pluginsNeedingCompatCache = new Set(pluginsNeedingCompat);
+
+/**
+ * Converts an array expression to an array.
+ * @param {ArrayExpression} arrayExpression The array expression to convert.
+ * @returns {Array<string>} The array.
+ * @throws {TypeError} If an element in the array expression is not a literal.
+ */
+function convertArrayExpressionToArray(arrayExpression) {
+	return arrayExpression.elements.map(element => {
+		if (element.type === "Literal" && typeof element.value === "string") {
+			return element.value;
+		}
+
+		throw new TypeError(`Cannot convert ${element.type} to array.`);
+	});
+}
+
+/**
+ * Converts an object expression to an object.
+ * @param {ObjectExpression} objectExpression The object expression to convert.
+ * @returns {Object} The object.
+ * @throws {TypeError} If a property value is not a literal or identifier.
+ */
+function convertObjectExpressionToObject(objectExpression) {
+	if (objectExpression.type !== "ObjectExpression") {
+		throw new TypeError(
+			`Cannot convert ${objectExpression.type} to object.`,
+		);
+	}
+
+	return objectExpression.properties.reduce((object, property) => {
+		if (property.type === "Property") {
+			const { key, value } = property;
+
+			if (value.type !== "Literal") {
+				return object;
+			}
+
+			if (key.type === "Literal") {
+				object[String(key.value)] = value.value;
+			} else if (key.type === "Identifier") {
+				object[key.name] = value.value;
+			}
+		}
+
+		return object;
+	}, {});
+}
+
+/**
+ * Finds the `module.exports` or `exports` assignment in a CommonJS module.
+ * @param {Program} ast The AST to search.
+ * @returns {AssignmentExpression|null} The node representing the exports or null if not found.
+ */
+function findCommonJSExports(ast) {
+	let exports = null;
+	recast.visit(ast, {
+		visitAssignmentExpression(path) {
+			if (
+				path.node.left.type === "MemberExpression" &&
+				path.node.left.object.type === "Identifier" &&
+				path.node.left.object.name === "module" &&
+				path.node.left.property.type === "Identifier" &&
+				path.node.left.property.name === "exports"
+			) {
+				exports = path.node;
+				return false;
+			}
+			this.traverse(path);
+			return true;
+		},
+	});
+	return exports;
+}
+
+/**
+ * Finds the default export in an ES module.
+ * @param {Program} ast The AST to search.
+ * @returns {ExportDefaultDeclaration|null} The node representing the default export or null if not found.
+ */
+function findDefaultExport(ast) {
+	let defaultExport = null;
+	recast.visit(ast, {
+		visitExportDefaultDeclaration(path) {
+			defaultExport = path.node;
+			return false;
+		},
+	});
+	return defaultExport;
+}
 
 /**
  * Determines if a plugin needs the compat utility.
@@ -437,9 +569,9 @@ function createExtendsArguments(extendedConfigs) {
 }
 
 /**
- * Creates a an object expression that duplicates an existing object.
+ * Creates a an object expression, array expression, or literal that duplicates an existing value.
  * @param {Object} value The object to create the AST for.
- * @returns {ObjectExpression|ArrayExpression|Literal} The AST for the object.
+ * @returns {ObjectExpression|ArrayExpression|Literal} The AST for the value.
  */
 function createAST(value) {
 	if (Array.isArray(value)) {
@@ -473,6 +605,34 @@ function createFilesArray(patterns) {
 }
 
 /**
+ * Creates an array expression from a node representing files.
+ * @param {ArrayExpression|Literal} files The node to convert.
+ * @returns {ArrayExpression} The AST for the array expression.
+ */
+function createFilesArrayFromNode(files) {
+	if (files.type === "ArrayExpression") {
+		return b.arrayExpression(
+			files.elements.map(element => {
+				if (
+					element.type === "Literal" &&
+					typeof element.value === "string"
+				) {
+					return b.literal(convertGlobPattern(element.value));
+				}
+
+				return element;
+			}),
+		);
+	}
+
+	if (files.type === "Literal" && typeof files.value === "string") {
+		return b.arrayExpression([b.literal(convertGlobPattern(files.value))]);
+	}
+
+	throw new TypeError(`Cannot convert ${files.type} to array.`);
+}
+
+/**
  * Creates an object expression for the language options.
  * @param {Migration} migration The migration object.
  * @param {LegacyConfig} config The config to create language options from.
@@ -488,23 +648,7 @@ function createLanguageOptions(migration, config) {
 		properties.push(b.property("init", b.identifier("globals"), globals));
 	}
 
-	/*
-	 * For `env`, we need the `globals` package if there are any environments
-	 * that aren't ECMAScript environments and also aren't from plugins
-	 * (the name contains a slash).
-	 */
-	const needsGlobals =
-		config.env &&
-		Object.keys(config.env).some(
-			envName => !envName.startsWith("es") && !envName.includes("/"),
-		);
-
-	if (needsGlobals && !imports.has("globals")) {
-		imports.set("globals", {
-			name: "globals",
-			added: true,
-		});
-	}
+	migration.importGlobalsIfNeeded(config.env);
 
 	// Copy over `parser`
 	const parserName = getParserVariableName(config.parser);
@@ -644,22 +788,124 @@ function createPlugins(plugins, migration) {
 
 /**
  * Creates an object expression for the `ignorePatterns` property.
- * @param {LegacyConfig} config The config to create the object expression for.
+ * @param {string|string[]} ignorePatterns The config to create the object expression for.
  * @returns {CallExpression} The AST for the object expression.
  */
-function createGlobalIgnores(config) {
-	const ignorePatterns = Array.isArray(config.ignorePatterns)
-		? config.ignorePatterns
-		: [config.ignorePatterns];
-	const ignorePatternsArray = b.arrayExpression(
-		ignorePatterns.map(pattern =>
+function createGlobalIgnores(ignorePatterns) {
+	const ignorePatternsArray = Array.isArray(ignorePatterns)
+		? ignorePatterns
+		: [ignorePatterns];
+	const ignorePatternsArrayExpression = b.arrayExpression(
+		ignorePatternsArray.map(pattern =>
 			b.literal(convertIgnorePatternToMinimatch(pattern)),
 		),
 	);
 
 	return b.callExpression(b.identifier("globalIgnores"), [
-		ignorePatternsArray,
+		ignorePatternsArrayExpression,
 	]);
+}
+
+/**
+ * Creates a call expression for the `globalIgnores` property when
+ * passed a node.
+ * @param {ArrayExpression|Literal} ignoresPatterns The node to create the call expression from.
+ * @returns {CallExpression} The AST for the call expression.
+ */
+function createGlobalIgnoresFromNode(ignoresPatterns) {
+	const arrayExpression =
+		ignoresPatterns.type === "ArrayExpression"
+			? ignoresPatterns
+			: b.arrayExpression([ignoresPatterns]);
+
+	const ignorePatternsArrayExpression = b.arrayExpression(
+		arrayExpression.elements.map(element =>
+			element.type === "Literal"
+				? b.literal(
+						typeof element.value === "string"
+							? convertIgnorePatternToMinimatch(element.value)
+							: element.value,
+					)
+				: element,
+		),
+	);
+
+	return b.callExpression(b.identifier("globalIgnores"), [
+		ignorePatternsArrayExpression,
+	]);
+}
+
+/**
+ * Creates a call expression for the `extends` property.
+ * @param {string|string[]} configExtends The array of extends to create the call expression for.
+ * @param {Migration} migration The migration object.
+ * @returns {CallExpression} The AST for the call expression.
+ */
+function createExtendsCallExpression(configExtends, migration) {
+	let extendsCallExpression = b.callExpression(
+		b.memberExpression(b.identifier("compat"), b.identifier("extends")),
+		createExtendsArguments(configExtends),
+	);
+
+	const extendsArray = Array.isArray(configExtends)
+		? configExtends
+		: [configExtends];
+
+	// Check if any of the extends are plugins that need the compat utility
+	const needsCompat = extendsArray.some(extend => {
+		if (
+			extend.startsWith("eslint:") ||
+			extend.startsWith(".") ||
+			extend.startsWith("/")
+		) {
+			return false;
+		}
+
+		if (extend.startsWith("plugin:")) {
+			return pluginNeedsCompat(extend.slice(7));
+		}
+
+		return configNeedsCompat(extend);
+	});
+
+	if (needsCompat) {
+		/*
+		 * When even one `extends` item needs compat, we need to mark every
+		 * plugin as needing compat. This is because the `fixupConfigRules`
+		 * function will be called on the entire object, and if any of those
+		 * plugins is also referenced in `plugins`, the user will get a
+		 * "can't redefine plugin" error.
+		 */
+		extendsArray.forEach(extend => {
+			if (extend.startsWith("plugin:")) {
+				const pluginName = extend.slice(7, extend.indexOf("/"));
+				const normalizedPluginName = naming.normalizePackageName(
+					pluginName,
+					"eslint-plugin",
+				);
+
+				pluginsNeedingCompatCache.add(normalizedPluginName);
+			}
+		});
+
+		if (!migration.imports.has("@eslint/compat")) {
+			migration.imports.set("@eslint/compat", {
+				bindings: ["fixupConfigRules"],
+				added: true,
+			});
+		} else {
+			migration.imports
+				.get("@eslint/compat")
+				.bindings.push("fixupConfigRules");
+		}
+
+		extendsCallExpression = b.callExpression(
+			b.identifier("fixupConfigRules"),
+			[extendsCallExpression],
+		);
+	}
+
+	return extendsCallExpression;
 }
 
 /**
@@ -693,71 +939,12 @@ function migrateConfigObject(migration, config) {
 
 	// Handle `extends`
 	if (config.extends) {
-		let extendsCallExpression = b.callExpression(
-			b.memberExpression(b.identifier("compat"), b.identifier("extends")),
-			createExtendsArguments(config.extends),
-		);
-
-		const extendsArray = Array.isArray(config.extends)
-			? config.extends
-			: [config.extends];
-
-		// Check if any of the extends are plugins that need the compat utility
-		const needsCompat = extendsArray.some(extend => {
-			if (
-				extend.startsWith("eslint:") ||
-				extend.startsWith(".") ||
-				extend.startsWith("/")
-			) {
-				return false;
-			}
-
-			if (extend.startsWith("plugin:")) {
-				return pluginNeedsCompat(extend.slice(7));
-			}
-
-			return configNeedsCompat(extend);
-		});
-
-		if (needsCompat) {
-			/*
-			 * When even one `extends` item needs compat, we need to mark every
-			 * plugin as needing compat. This is because the `fixupConfigRules`
-			 * function will be called on the entire object, and if any of those
-			 * plugins is also referenced in `plugins`, the user will get a
-			 * "can't redefine plugin" error.
-			 */
-			extendsArray.forEach(extend => {
-				if (extend.startsWith("plugin:")) {
-					const pluginName = extend.slice(7, extend.indexOf("/"));
-					const normalizedPluginName = naming.normalizePackageName(
-						pluginName,
-						"eslint-plugin",
-					);
-
-					pluginsNeedingCompatCache.add(normalizedPluginName);
-				}
-			});
-
-			if (!migration.imports.has("@eslint/compat")) {
-				migration.imports.set("@eslint/compat", {
-					bindings: ["fixupConfigRules"],
-					added: true,
-				});
-			} else {
-				migration.imports
-					.get("@eslint/compat")
-					.bindings.push("fixupConfigRules");
-			}
-
-			extendsCallExpression = b.callExpression(
-				b.identifier("fixupConfigRules"),
-				[extendsCallExpression],
-			);
-		}
-
 		properties.push(
-			b.property("init", b.identifier("extends"), extendsCallExpression),
+			b.property(
+				"init",
+				b.identifier("extends"),
+				createExtendsCallExpression(config.extends, migration),
+			),
 		);
 	}
 
@@ -833,20 +1020,418 @@ function migrateConfigObject(migration, config) {
 }
 
 /**
+ * Creates import/require statements from the migration imports map
+ * @param {Migration} migration The migration object
+ * @param {boolean} isModule Whether the output is a module or not
+ * @returns {Array<Statement>} Array of import/require statements
+ */
+function addImports(migration, isModule) {
+	const imports = [];
+
+	if (!isModule) {
+		migration.imports.forEach(({ name, bindings }, path) => {
+			const bindingProperties = bindings?.map(binding => {
+				const bindingProperty = b.property(
+					"init",
+					b.identifier(binding),
+					b.identifier(binding),
+				);
+				bindingProperty.shorthand = true;
+				return bindingProperty;
+			});
+
+			imports.push(
+				name
+					? b.variableDeclaration("const", [
+							b.variableDeclarator(
+								b.identifier(name),
+								b.callExpression(b.identifier("require"), [
+									b.literal(path),
+								]),
+							),
+						])
+					: b.variableDeclaration("const", [
+							b.variableDeclarator(
+								b.objectPattern(bindingProperties),
+								b.callExpression(b.identifier("require"), [
+									b.literal(path),
+								]),
+							),
+						]),
+			);
+		});
+	} else {
+		migration.imports.forEach(({ name, bindings }, path) => {
+			imports.push(
+				name
+					? b.importDeclaration(
+							[b.importDefaultSpecifier(b.identifier(name))],
+							b.literal(path),
+						)
+					: b.importDeclaration(
+							bindings.map(binding =>
+								b.importSpecifier(b.identifier(binding)),
+							),
+							b.literal(path),
+						),
+			);
+		});
+	}
+
+	return imports;
+}
+
+/**
+ * Converts an ObjectExpression eslintrc config to a flat config.
+ * @param {ObjectExpression} config The config object to convert.
+ * @param {Migration} migration The migration object.
+ * @returns {Array<any>} The converted config.
+ */
+function convertLegacyConfigExpression(config, migration) {
+	const newProperties = [];
+
+	/** @type {Array<any>} */
+	const configArray = [b.objectExpression(newProperties)];
+	const linterOptionsProperties = [];
+	const languageOptionsProperties = [];
+
+	/** @type {ObjectExpression} */
+	let globals;
+
+	function createLanguageOptionsNode() {
+		if (languageOptionsProperties.length === 0) {
+			newProperties.push(
+				b.property(
+					"init",
+					b.identifier("languageOptions"),
+					b.objectExpression(languageOptionsProperties),
+				),
+			);
+		}
+	}
+
+	function createGlobalsNode() {
+		if (globals) {
+			languageOptionsProperties.push(
+				b.property("init", b.identifier("globals"), globals),
+			);
+		}
+	}
+
+	for (const property of config.properties) {
+		// just copy over non-property nodes and pray it works
+		if (property.type !== "Property") {
+			newProperties.push(property);
+			continue;
+		}
+
+		const { key, value } = property;
+
+		// just copy over non-string keys
+		if (key.type !== "Identifier" && key.type !== "Literal") {
+			newProperties.push(property);
+			continue;
+		}
+
+		const name = key.type === "Identifier" ? key.name : key.value;
+
+		switch (name) {
+			// remove root
+			case "root":
+				// do not add root to the new properties
+				break;
+
+			// convert parser
+			case "parser": {
+				if (
+					value.type === "Literal" &&
+					typeof value.value === "string"
+				) {
+					const parserName = getParserVariableName(value.value);
+					if (parserName) {
+						if (languageOptionsProperties.length === 0) {
+							createLanguageOptionsNode();
+						}
+
+						languageOptionsProperties.push(
+							b.property(
+								"init",
+								b.identifier("parser"),
+								b.identifier(parserName),
+							),
+						);
+						migration.imports.set(value.value, {
+							name: parserName,
+						});
+					}
+				}
+				break;
+			}
+
+			case "parserOptions": {
+				if (languageOptionsProperties.length === 0) {
+					createLanguageOptionsNode();
+				}
+
+				// if the value is not an object expression, then just copy it over
+				if (value.type !== "ObjectExpression") {
+					languageOptionsProperties.push(property);
+					break;
+				}
+
+				// move ecmaVersion and sourceType properties up one level
+				if (value.properties) {
+					const indicesToRemove = [];
+					value.properties.forEach((prop, i) => {
+						if (prop.type !== "Property") {
+							return;
+						}
+
+						let parserOptionsKey;
+
+						if (prop.key.type === "Identifier") {
+							parserOptionsKey = prop.key.name;
+						} else if (prop.key.type === "Literal") {
+							parserOptionsKey = prop.key.value;
+						} else {
+							return;
+						}
+
+						if (
+							parserOptionsKey === "ecmaVersion" ||
+							parserOptionsKey === "sourceType"
+						) {
+							languageOptionsProperties.push(prop);
+							indicesToRemove.push(i);
+						}
+					});
+
+					// remove the properties we just moved
+					for (let i = indicesToRemove.length - 1; i >= 0; i--) {
+						value.properties.splice(indicesToRemove[i], 1);
+					}
+				}
+
+				languageOptionsProperties.push(
+					b.property("init", b.identifier("parserOptions"), value),
+				);
+				break;
+			}
+
+			// convert env
+			case "env": {
+				if (languageOptionsProperties.length === 0) {
+					createLanguageOptionsNode();
+				}
+
+				// if the value is not an object expression, then just copy it over
+				if (value.type !== "ObjectExpression") {
+					newProperties.push(property);
+					break;
+				}
+
+				const env = convertObjectExpressionToObject(value);
+				const envGlobals = createGlobals({ env });
+
+				migration.importGlobalsIfNeeded(env);
+
+				// if globals already exists, then prepend envGlobals to the same object
+				if (globals) {
+					globals.properties.unshift(...envGlobals.properties);
+				} else {
+					globals = envGlobals;
+					createGlobalsNode();
+				}
+
+				break;
+			}
+
+			// convert globals
+			case "globals": {
+				if (languageOptionsProperties.length === 0) {
+					createLanguageOptionsNode();
+				}
+
+				// if it's not an object expression then just copy it over
+				if (value.type !== "ObjectExpression") {
+					languageOptionsProperties.push(property);
+					break;
+				}
+
+				// if globals already exists then append properties to it
+				if (globals) {
+					globals.properties.push(...value.properties);
+				} else {
+					globals = value;
+					createGlobalsNode();
+				}
+
+				break;
+			}
+
+			// convert plugins
+			case "plugins": {
+				if (value.type === "ArrayExpression") {
+					const plugins = convertArrayExpressionToArray(value);
+
+					newProperties.push(
+						b.property(
+							"init",
+							b.identifier("plugins"),
+							createPlugins(plugins, migration),
+						),
+					);
+				}
+				break;
+			}
+
+			// convert extends
+			case "extends": {
+				// if it's not an array expression then just copy it over
+				if (value.type !== "ArrayExpression") {
+					newProperties.push(property);
+					break;
+				}
+
+				newProperties.push(
+					b.property(
+						"init",
+						b.identifier("extends"),
+						createExtendsCallExpression(
+							convertArrayExpressionToArray(value),
+							migration,
+						),
+					),
+				);
+
+				break;
+			}
+
+			// copy over linter options
+			case "noInlineConfig":
+			case "reportUnusedDisableDirectives": {
+				// if linterOptions doesn't exist yet, then create it
+				if (linterOptionsProperties.length === 0) {
+					newProperties.push(
+						b.property(
+							"init",
+							b.identifier("linterOptions"),
+							b.objectExpression(linterOptionsProperties),
+						),
+					);
+				}
+
+				linterOptionsProperties.push(property);
+				break;
+			}
+
+			case "ignorePatterns":
+				// if the value is not an array expression then just ignore it
+				if (value.type !== "ArrayExpression") {
+					migration.messages.push(
+						`Unexpected type for ${name}: ${value.type}. Ignoring...`,
+					);
+					break;
+				}
+
+				if (
+					!migration.imports
+						.get("eslint/config")
+						.bindings.includes("globalIgnores")
+				) {
+					migration.imports
+						.get("eslint/config")
+						.bindings.push("globalIgnores");
+				}
+
+				configArray.push(createGlobalIgnoresFromNode(value));
+				break;
+
+			case "overrides":
+				// if the value is not an array expression then just ignore it
+				if (value.type !== "ArrayExpression") {
+					migration.messages.push(
+						`Unexpected type for ${name}: ${value.type}. Ignoring...`,
+					);
+					break;
+				}
+
+				configArray.push(
+					...value.elements.flatMap(element =>
+						element.type === "ObjectExpression"
+							? convertLegacyConfigExpression(element, migration)
+							: element,
+					),
+				);
+
+				break;
+
+			case "files":
+			case "excludedFiles": {
+				// if the value is not an array expression or literal, then just ignore it
+				if (
+					value.type !== "ArrayExpression" &&
+					value.type !== "Literal"
+				) {
+					migration.messages.push(
+						`Unexpected type for ${name}: ${value.type}. Ignoring...`,
+					);
+					break;
+				}
+
+				const filesExpression = createFilesArrayFromNode(value);
+				newProperties.push(
+					b.property(
+						"init",
+						b.identifier(
+							name === "excludedFiles" ? "ignores" : "files",
+						),
+						filesExpression,
+					),
+				);
+
+				break;
+			}
+
+			// rules, settings, and processor are copied over as is
+			default:
+				newProperties.push(property);
+		}
+	}
+
+	return configArray;
+}
+
+//-----------------------------------------------------------------------------
+// Migration Methods
+//-----------------------------------------------------------------------------
+
+/**
  * Migrates an eslintrc config to flat config format.
  * @param {LegacyConfig} config The eslintrc config to migrate.
  * @param {Object} [options] Options for the migration.
- * @param {"module"|"commonjs"} [options.sourceType] The module type to use.
+ * @param {"module"|"commonjs"} [options.sourceType] The module type to output.
+ * @param {string[]} [options.ignorePatterns] An array of glob patterns to ignore.
  * @param {boolean} [options.gitignore] `true` to include contents of a .gitignore file.
  * @returns {{code:string,messages:Array<string>,imports:Map<string,MigrationImport>}} The migrated config and
  * any messages to display to the user.
  */
 export function migrateConfig(
 	config,
-	{ sourceType = "module", gitignore = false } = {},
+	{ sourceType = "module", ignorePatterns, gitignore = false } = {},
 ) {
-	const migration = new Migration(config);
+	const migration = new Migration();
 	const body = [];
+
+	// add ignore patterns from .eslintignore
+	if (ignorePatterns) {
+		if (!config.ignorePatterns) {
+			config.ignorePatterns = [];
+		}
+
+		// put the .eslintignore patterns last so they can override config ignores
+		config.ignorePatterns = [...config.ignorePatterns, ...ignorePatterns];
+	}
 
 	// always use defineConfig
 	migration.imports.set("eslint/config", {
@@ -884,26 +1469,7 @@ export function migrateConfig(
 		config.extends ||
 		config.overrides?.some(override => override.extends)
 	) {
-		if (isModule) {
-			migration.imports.set("node:path", {
-				name: "path",
-				added: true,
-			});
-			migration.imports.set("node:url", {
-				bindings: ["fileURLToPath"],
-				added: true,
-			});
-		}
-		migration.imports.set("@eslint/js", {
-			name: "js",
-			added: true,
-		});
-		migration.imports.set("@eslint/eslintrc", {
-			bindings: ["FlatCompat"],
-			added: true,
-		});
-		migration.needsDirname ||= isModule;
-		migration.inits.push(...getFlatCompatInit());
+		migration.addFlatCompat(isModule);
 	}
 
 	// add .gitignore if necessary
@@ -921,59 +1487,13 @@ export function migrateConfig(
 
 	if (config.ignorePatterns) {
 		migration.imports.get("eslint/config").bindings.push("globalIgnores");
-		configArrayElements.unshift(createGlobalIgnores(config));
+		configArrayElements.unshift(createGlobalIgnores(config.ignorePatterns));
 	}
 
 	// add imports to the top of the file
-	if (!isModule) {
-		migration.imports.forEach(({ name, bindings }, path) => {
-			const bindingProperties = bindings?.map(binding => {
-				const bindingProperty = b.property(
-					"init",
-					b.identifier(binding),
-					b.identifier(binding),
-				);
-				bindingProperty.shorthand = true;
-				return bindingProperty;
-			});
-
-			body.push(
-				name
-					? b.variableDeclaration("const", [
-							b.variableDeclarator(
-								b.identifier(name),
-								b.callExpression(b.identifier("require"), [
-									b.literal(path),
-								]),
-							),
-						])
-					: b.variableDeclaration("const", [
-							b.variableDeclarator(
-								b.objectPattern(bindingProperties),
-								b.callExpression(b.identifier("require"), [
-									b.literal(path),
-								]),
-							),
-						]),
-			);
-		});
-	} else {
-		migration.imports.forEach(({ name, bindings }, path) => {
-			body.push(
-				name
-					? b.importDeclaration(
-							[b.importDefaultSpecifier(b.identifier(name))],
-							b.literal(path),
-						)
-					: b.importDeclaration(
-							bindings.map(binding =>
-								b.importSpecifier(b.identifier(binding)),
-							),
-							b.literal(path),
-						),
-			);
-		});
-	}
+	// Add imports in either CJS or ESM format
+	const imports = addImports(migration, isModule);
+	body.push(...imports);
 
 	// add calculation of `__dirname` if needed
 	if (migration.needsDirname) {
@@ -1009,6 +1529,132 @@ export function migrateConfig(
 	return {
 		// Recast doesn't export the `StatementKind` type so we need to cast the body to `Array<any>`
 		code: recast.print(b.program(/** @type {Array<any>}*/ (body)), {
+			tabWidth: 4,
+			trailingComma: true,
+			lineTerminator: "\n",
+		}).code,
+		messages: migration.messages,
+		imports: migration.imports,
+	};
+}
+
+/**
+ * Migrates a JS config file to the flat config format.
+ * @param {string} code The JS config file to migrate.
+ * @param {Object} [options] Options for the migration.
+ * @param {string[]} [options.ignorePatterns] An array of glob patterns to ignore.
+ * @param {boolean} [options.gitignore] `true` to include contents of a .gitignore file.
+ * @returns {{code:string,messages:Array<string>,imports:Map<string,MigrationImport>}} The migrated config and
+ * any messages to display to the user.
+ */
+export function migrateJSConfig(
+	code,
+	{ ignorePatterns, gitignore = false } = {},
+) {
+	// first parse the code
+	const ast = recast.parse(code, {
+		parser: {
+			parse(source) {
+				return espree.parse(source, {
+					sourceType: "module",
+					ecmaVersion: 2024,
+				});
+			},
+		},
+	});
+
+	const cjsExports = findCommonJSExports(ast);
+	const isModule = !cjsExports;
+	const esmExport = isModule ? findDefaultExport(ast) : null;
+	const oldConfig = isModule ? esmExport.declaration : cjsExports.right;
+	const migration = new Migration();
+	const body = ast.program.body;
+
+	if (!oldConfig || oldConfig.type !== "ObjectExpression") {
+		throw new TypeError(
+			"Config object isn't an object expression. Aborting.",
+		);
+	}
+
+	/** @type {Array<any>} */
+	const configArrayElements = [];
+
+	// always use defineConfig
+	migration.imports.set("eslint/config", {
+		bindings: ["defineConfig"],
+	});
+
+	// add .gitignore if necessary
+	if (gitignore) {
+		migration.needsDirname ||= isModule;
+		configArrayElements.unshift(createGitignoreEntry(migration));
+
+		if (migration.needsDirname && !migration.imports.has("node:url")) {
+			migration.imports.set("node:url", {
+				bindings: ["fileURLToPath"],
+				added: true,
+			});
+		}
+	}
+
+	configArrayElements.push(
+		...convertLegacyConfigExpression(oldConfig, migration),
+	);
+
+	// add ignore patterns from .eslintignore
+	if (ignorePatterns) {
+		if (
+			!migration.imports
+				.get("eslint/config")
+				.bindings.includes("globalIgnores")
+		) {
+			migration.imports
+				.get("eslint/config")
+				.bindings.push("globalIgnores");
+		}
+		configArrayElements.push(createGlobalIgnores(ignorePatterns));
+	}
+
+	// if any config has extends then we need to add imports
+	if (
+		configArrayElements.some(
+			element =>
+				element.type === "ObjectExpression" &&
+				element.properties.some(
+					property => property.key.name === "extends",
+				),
+		)
+	) {
+		migration.addFlatCompat(isModule);
+	}
+
+	const defineConfigNode = b.callExpression(b.identifier("defineConfig"), [
+		b.arrayExpression(configArrayElements),
+	]);
+
+	if (isModule) {
+		esmExport.declaration = defineConfigNode;
+	} else {
+		cjsExports.right = defineConfigNode;
+	}
+
+	const bodyAdditions = [...addImports(migration, isModule)];
+
+	// add calculation of `__dirname` if needed
+	if (migration.needsDirname) {
+		bodyAdditions.push(...getDirnameInit());
+	}
+
+	// output any inits
+	bodyAdditions.push(...migration.inits);
+
+	// outside of ESM we need to be careful of "use strict" directives
+	const startIndex = !isModule && body[0].directive === "use strict" ? 1 : 0;
+	body.splice(startIndex, 0, ...bodyAdditions);
+
+	return {
+		// Recast doesn't export the `StatementKind` type so we need to cast the body to `Array<any>`
+		code: recast.print(ast, {
 			tabWidth: 4,
 			trailingComma: true,
 			lineTerminator: "\n",

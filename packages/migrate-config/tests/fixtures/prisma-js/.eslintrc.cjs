@@ -1,10 +1,17 @@
 const path = require("path");
 
 const project = "tsconfig.json";
+const myGlobals = {
+	custom1: "readonly",
+	custom2: "writable",
+};
 
 module.exports = {
 	root: true,
 	parser: "@typescript-eslint/parser",
+	reportUnusedDisableDirectives: true,
+	noInlineConfig: true,
+	ignorePatterns: ["tmp"],
 	plugins: [
 		"@typescript-eslint",
 		"jest",
@@ -12,6 +19,10 @@ module.exports = {
 		"import",
 		"local-rules",
 	],
+	globals: {
+		custom: true,
+		...myGlobals,
+	},
 	env: {
 		node: true,
 		es6: true,
