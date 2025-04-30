@@ -1,6 +1,6 @@
 {
   "name": "@eslint/migrate-config",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "Configuration migration for ESLint",
   "type": "module",
   "bin": {
