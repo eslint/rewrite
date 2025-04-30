@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.3.0](https://github.com/eslint/rewrite/compare/plugin-kit-v0.2.8...plugin-kit-v0.3.0) (2025-04-30)
+
+
+### Features
+
+* make `TextSourceCodeBase` a generic type ([#182](https://github.com/eslint/rewrite/issues/182)) ([484b6ca](https://github.com/eslint/rewrite/commit/484b6ca3149354736317fca09efd3156caa4f4f9))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^0.13.0 to ^0.14.0
+
 ## [0.2.8](https://github.com/eslint/rewrite/compare/plugin-kit-v0.2.7...plugin-kit-v0.2.8) (2025-04-01)
 
 
