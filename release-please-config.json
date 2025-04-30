@@ -3,6 +3,7 @@
   "plugins": ["node-workspace"],
   "bump-minor-pre-major": true,
   "separate-pull-requests": true,
+  "pull-request-title-pattern": "chore: release${component} ${version}",
   "packages": {
     "packages/compat": {
       "release-type": "node",
