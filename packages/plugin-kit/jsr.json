@@ -1,6 +1,6 @@
 {
   "name": "@eslint/plugin-kit",
-  "version": "0.2.8",
+  "version": "0.3.0",
   "exports": "./dist/esm/index.js",
   "publish": {
     "include": [

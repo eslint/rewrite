@@ -5,5 +5,5 @@
   "packages/migrate-config": "1.4.1",
   "packages/config-helpers": "0.2.1",
   "packages/object-schema": "2.1.6",
-  "packages/plugin-kit": "0.2.8"
+  "packages/plugin-kit": "0.3.0"
 }
