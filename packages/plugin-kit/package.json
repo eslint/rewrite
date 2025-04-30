@@ -47,7 +47,7 @@
   ],
   "license": "Apache-2.0",
   "dependencies": {
-    "@eslint/core": "^0.13.0",
+    "@eslint/core": "^0.14.0",
     "levn": "^0.4.1"
   },
   "devDependencies": {
