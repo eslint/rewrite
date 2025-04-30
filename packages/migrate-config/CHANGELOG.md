@@ -7,6 +7,13 @@
 
 * Better conversion of .eslintrc.js files in migrate-config ([#172](https://github.com/eslint/rewrite/issues/172)) ([63cb367](https://github.com/eslint/rewrite/commit/63cb3679a4ac931120e6fedfdcb3d934d8f5ed9b))
 
+## [1.5.0](https://github.com/eslint/rewrite/compare/migrate-config-v1.4.1...migrate-config-v1.5.0) (2025-04-30)
+
+
+### Features
+
+* Better conversion of .eslintrc.js files in migrate-config ([#172](https://github.com/eslint/rewrite/issues/172)) ([63cb367](https://github.com/eslint/rewrite/commit/63cb3679a4ac931120e6fedfdcb3d934d8f5ed9b))
+
 ## [1.4.1](https://github.com/eslint/rewrite/compare/migrate-config-v1.4.0...migrate-config-v1.4.1) (2025-04-01)
 
 
