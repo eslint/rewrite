@@ -1,6 +1,6 @@
 {
   "name": "@eslint/compat",
-  "version": "1.2.8",
+  "version": "1.2.9",
   "description": "Compatibility utilities for ESLint",
   "type": "module",
   "main": "dist/esm/index.js",
@@ -48,7 +48,7 @@
   },
   "homepage": "https://github.com/eslint/rewrite#readme",
   "devDependencies": {
-    "@eslint/core": "^0.13.0",
+    "@eslint/core": "^0.14.0",
     "c8": "^9.1.0",
     "eslint": "^9.11.0",
     "mocha": "^10.4.0",
