@@ -2,6 +2,7 @@
   "bootstrap-sha": "b489df4cf3eae08a25ed401db207a78100cf4fc9",
   "plugins": ["node-workspace"],
   "bump-minor-pre-major": true,
+  "separate-pull-requests": true,
   "packages": {
     "packages/compat": {
       "release-type": "node",
