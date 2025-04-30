@@ -1,6 +1,6 @@
 {
   "name": "@eslint/config-helpers",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Helper utilities for creating ESLint configuration",
   "type": "module",
   "main": "dist/esm/index.js",
@@ -46,7 +46,7 @@
   },
   "homepage": "https://github.com/eslint/rewrite/tree/main/packages/config-helpers#readme",
   "devDependencies": {
-    "@eslint/core": "^0.13.0",
+    "@eslint/core": "^0.14.0",
     "c8": "^9.1.0",
     "eslint": "^9.19.0",
     "mocha": "^10.4.0",
