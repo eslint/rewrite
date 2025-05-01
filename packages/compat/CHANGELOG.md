@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.9](https://github.com/eslint/rewrite/compare/compat-v1.2.8...compat-v1.2.9) (2025-05-01)
+
+
+### Bug Fixes
+
+* Upgrade @eslint/core ([#197](https://github.com/eslint/rewrite/issues/197)) ([a830283](https://github.com/eslint/rewrite/commit/a830283cd05a7a471aeec5f4589491f3c4092986))
+
 ## [1.2.8](https://github.com/eslint/rewrite/compare/compat-v1.2.7...compat-v1.2.8) (2025-04-01)
 
 
