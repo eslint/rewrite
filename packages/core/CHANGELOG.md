@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.14.0](https://github.com/eslint/rewrite/compare/core-v0.13.0...core-v0.14.0) (2025-04-30)
+
+
+### Features
+
+* add core types for language-specific rule definitions ([#178](https://github.com/eslint/rewrite/issues/178)) ([fd9b571](https://github.com/eslint/rewrite/commit/fd9b571554085cb5ea9f9831a38650a49dfebb32))
+* make `TextSourceCodeBase` a generic type ([#182](https://github.com/eslint/rewrite/issues/182)) ([484b6ca](https://github.com/eslint/rewrite/commit/484b6ca3149354736317fca09efd3156caa4f4f9))
+
 ## [0.13.0](https://github.com/eslint/rewrite/compare/core-v0.12.0...core-v0.13.0) (2025-04-01)
 
 
