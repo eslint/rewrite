@@ -2,7 +2,6 @@
   "bootstrap-sha": "b489df4cf3eae08a25ed401db207a78100cf4fc9",
   "plugins": ["node-workspace"],
   "bump-minor-pre-major": true,
-  "separate-pull-requests": true,
   "pull-request-title-pattern": "chore: release${component} ${version}",
   "packages": {
     "packages/compat": {
