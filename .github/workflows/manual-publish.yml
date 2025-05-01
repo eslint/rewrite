@@ -12,6 +12,7 @@ on:
                     # packages-start
                     - compat
                     - config-array
+                    - config-helpers
                     - core
                     - migrate-config
                     - object-schema
