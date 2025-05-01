@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/eslint/rewrite/compare/plugin-kit-v0.3.0...plugin-kit-v0.3.1) (2025-05-01)
+
+
+### Bug Fixes
+
+* Upgrade @eslint/core ([#197](https://github.com/eslint/rewrite/issues/197)) ([a830283](https://github.com/eslint/rewrite/commit/a830283cd05a7a471aeec5f4589491f3c4092986))
+
 ## [0.3.0](https://github.com/eslint/rewrite/compare/plugin-kit-v0.2.8...plugin-kit-v0.3.0) (2025-04-30)
 
 

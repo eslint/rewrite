@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.2](https://github.com/eslint/rewrite/compare/config-helpers-v0.2.1...config-helpers-v0.2.2) (2025-05-01)
+
+
+### Bug Fixes
+
+* Upgrade @eslint/core ([#197](https://github.com/eslint/rewrite/issues/197)) ([a830283](https://github.com/eslint/rewrite/commit/a830283cd05a7a471aeec5f4589491f3c4092986))
+
 ## [0.2.1](https://github.com/eslint/rewrite/compare/config-helpers-v0.2.0...config-helpers-v0.2.1) (2025-04-01)
 
 
