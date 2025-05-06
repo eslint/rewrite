@@ -12,7 +12,7 @@
  * be marked as changed in Git, even though it hasn't. This, in turn, causes
  * JSR to think the directory is dirty and fails the build. To prevent this,
  * we ran:
- * $ git update-index --chmod=+x packages/migrate-config/src/migrate-config-cli.js
+ * $ git update-index --chmod=+x packages/mcp/src/mcp-cli.js
  * This tells Git to ignore changes to the executable bit on this file.
  */
 
