@@ -14,6 +14,7 @@ This repository is the home of the following packages:
 - [`@eslint/config-array`](./packages/config-array)
 - [`@eslint/config-helpers`](./packages/config-helpers)
 - [`@eslint/core`](./packages/core)
+- [`@eslint/mcp`](./packages/mcp)
 - [`@eslint/migrate-config`](./packages/migrate-config)
 - [`@eslint/object-schema`](./packages/object-schema)
 - [`@eslint/plugin-kit`](./packages/plugin-kit)
