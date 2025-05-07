@@ -34,7 +34,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/eslint/rewrite.git"
+    "url": "git+https://github.com/eslint/rewrite.git",
+    "directory": "packages/<%= name %>"
   },
   "keywords": [
     "eslint"
