@@ -38,8 +38,8 @@ function runServer(options) {
 //-----------------------------------------------------------------------------
 
 describe("MCP server", () => {
-	it("should start the MCP server when the --mcp flag is used", done => {
-		const child = runServer(["--mcp"]);
+	it("should start the MCP server", done => {
+		const child = runServer();
 
 		// should not have anything on std out
 		child.stdout.on("data", data => {
