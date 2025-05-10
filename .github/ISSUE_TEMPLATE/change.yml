@@ -18,6 +18,8 @@ body:
                 required: false
               - label: "`@eslint/core`"
                 required: false
+              - label: "`@eslint/mcp`"
+                required: false
               - label: "`@eslint/migrate-config`"
                 required: false
               - label: "`@eslint/object-schema`"
