@@ -14,6 +14,7 @@ on:
                     - config-array
                     - config-helpers
                     - core
+                    - mcp
                     - migrate-config
                     - object-schema
                     - plugin-kit
@@ -64,8 +65,12 @@ jobs:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
             - name: Publish to JSR
-              if: ${{ inputs.package != 'migrate-config' }}
-              run: npx jsr publish
+              run: |
+                  if [ -f "jsr.json" ]; then
+                    npx jsr publish
+                  else
+                    echo "No jsr.json file found, skipping JSR publish."
+                  fi
               working-directory: packages/${{ inputs.package }}
 
             - name: Post Release Announcement

@@ -45,6 +45,11 @@
         }
       ]
     },
+    "packages/mcp": {
+      "release-type": "node",
+      "release-as": "0.1.0",
+      "extra-files": ["src/mcp-server.js"]
+    },
     "packages/migrate-config": {
       "release-type": "node"
     },
