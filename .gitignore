@@ -134,3 +134,6 @@ dist
 
 package-lock.json
 yarn.lock
+
+# VS Code configuration
+.vscode
