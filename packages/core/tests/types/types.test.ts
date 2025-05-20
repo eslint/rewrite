@@ -15,8 +15,10 @@ import type {
 	Language,
 	LanguageContext,
 	LanguageOptions,
+	LinterOptionsConfig,
 	OkParseResult,
 	ParseResult,
+	RuleConfig,
 	RuleContext,
 	RuleDefinition,
 	RulesConfig,
@@ -24,6 +26,7 @@ import type {
 	RuleTextEdit,
 	RuleTextEditor,
 	RuleVisitor,
+	SettingsConfig,
 	SourceLocation,
 	SourceRange,
 	TextSourceCode,
@@ -45,6 +48,41 @@ interface TestRootNode {
 	start: number;
 	length: number;
 }
+
+//-----------------------------------------------------------------------------
+// Tests for config types
+//-----------------------------------------------------------------------------
+
+const emptyRules: RulesConfig = {};
+
+const rules: RulesConfig = {
+	"no-console": "error",
+	"no-unused-vars": 0,
+	"json/no-duplicate-keys": ["warn"],
+	"css/use-baseline": [1, { available: "widely" }],
+};
+
+const emptySettings: SettingsConfig = {};
+
+const settings: SettingsConfig = {
+	foo: true,
+	bar: "baz",
+};
+
+const ruleConfig1: RuleConfig = "error";
+const ruleConfig2: RuleConfig = 1;
+const ruleConfig3: RuleConfig = ["error", { foo: "bar" }];
+const ruleConfig4: RuleConfig<string[]> = ["error", "foo", "bar"];
+const ruelConfig5: RuleConfig<[{ available: "widely" | "newly" }]> = [
+	"error",
+	{ available: "widely" },
+];
+
+const linterConfig: LinterOptionsConfig = {
+	noInlineConfig: true,
+	reportUnusedDisableDirectives: "error",
+	reportUnusedInlineConfigs: "warn",
+};
 
 //-----------------------------------------------------------------------------
 // Tests for shared types
