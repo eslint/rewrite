@@ -136,7 +136,6 @@ function getPluginMember(id) {
  * @return {Config} The normalized config object.
  */
 function normalizePluginConfig(userNamespace, plugin, config) {
-	// @ts-ignore -- ESLint types aren't updated yet
 	const pluginNamespace = plugin.meta?.namespace;
 
 	// don't do anything if the plugin doesn't have a namespace or rules
