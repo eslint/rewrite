@@ -73,7 +73,7 @@ const ruleConfig1: RuleConfig = "error";
 const ruleConfig2: RuleConfig = 1;
 const ruleConfig3: RuleConfig = ["error", { foo: "bar" }];
 const ruleConfig4: RuleConfig<string[]> = ["error", "foo", "bar"];
-const ruelConfig5: RuleConfig<[{ available: "widely" | "newly" }]> = [
+const ruleConfig5: RuleConfig<[{ available: "widely" | "newly" }]> = [
 	"error",
 	{ available: "widely" },
 ];
