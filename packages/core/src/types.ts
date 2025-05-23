@@ -666,22 +666,36 @@ export interface LinterOptionsConfig {
 	 * Indicates what to do when an unused disable directive is found.
 	 */
 	reportUnusedDisableDirectives?: boolean | Severity;
-}
 
-/**
- * Shared settings that are accessible from within plugins.
- */
-export type SettingsConfig = Record<string, unknown>;
+	/**
+	 * A severity value indicating if and how unused inline configs should be
+	 * tracked and reported.
+	 */
+	reportUnusedInlineConfigs?: Severity;
+}
 
 /**
  * The configuration for a rule.
  */
-export type RuleConfig = Severity | [Severity, ...unknown[]];
+export type RuleConfig<RuleOptions extends unknown[] = unknown[]> =
+	| Severity
+	| [Severity, ...RuleOptions];
 
+/* eslint-disable @typescript-eslint/consistent-indexed-object-style -- needed to allow extension */
 /**
  * A collection of rules and their configurations.
  */
-export type RulesConfig = Record<string, RuleConfig>;
+export interface RulesConfig {
+	[key: string]: RuleConfig;
+}
+
+/**
+ * A collection of settings.
+ */
+export interface SettingsConfig {
+	[key: string]: unknown;
+}
+/* eslint-enable @typescript-eslint/consistent-indexed-object-style -- needed to allow extension */
 
 //------------------------------------------------------------------------------
 // Languages
