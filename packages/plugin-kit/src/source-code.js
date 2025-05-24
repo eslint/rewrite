@@ -270,6 +270,14 @@ export class TextSourceCodeBase {
 		);
 	}
 
+	getLocFromIndex() {
+		// TODO
+	}
+
+	getIndexFromLoc() {
+		// TODO
+	}
+
 	/**
 	 * Returns the range information for the given node or token.
 	 * @param {Options['SyntaxElementWithLoc']} nodeOrToken The node or token to get the range information for.
