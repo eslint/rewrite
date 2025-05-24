@@ -88,5 +88,28 @@ describe("@eslint/compat", () => {
 				],
 			});
 		});
+
+		it("should return an object with a custom name", () => {
+			const ignoreFilePath = fileURLToPath(
+				new URL(
+					"../tests/fixtures/ignore-files/gitignore1.txt",
+					import.meta.url,
+				),
+			);
+			const result = includeIgnoreFile(ignoreFilePath, "Custom Name");
+			assert.deepStrictEqual(result, {
+				name: "Custom Name",
+				ignores: [
+					"**/node_modules",
+					"!fixtures/node_modules",
+					"dist",
+					"**/*.log",
+					"**/.cache/",
+					".vuepress/dist",
+					"*/foo.js",
+					"dir/**/*",
+				],
+			});
+		});
 	});
 });
