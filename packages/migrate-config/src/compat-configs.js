@@ -3,4 +3,8 @@
  * @author Nicholas C. Zakas
  */
 
-export default ["eslint-config-react-app"];
+export default [
+	"eslint-config-react-app",
+	"eslint-config-airbnb",
+	"eslint-config-airbnb-base",
+];
