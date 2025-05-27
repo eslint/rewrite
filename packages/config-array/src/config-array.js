@@ -555,7 +555,7 @@ function assertNormalized(configArray) {
  * Ensures that config types are valid.
  * @param {Array<string>} extraConfigTypes The config types to check.
  * @returns {void}
- * @throws {Error} When the config types array is invalid.
+ * @throws {TypeError} When the config types array is invalid.
  */
 function assertExtraConfigTypes(extraConfigTypes) {
 	if (extraConfigTypes.length > 2) {
@@ -577,7 +577,7 @@ function assertExtraConfigTypes(extraConfigTypes) {
  * Returns path-handling implementations for Unix or Windows, depending on a given absolute path.
  * @param {string} fileOrDirPath The absolute path to check.
  * @returns {PathImpl} Path-handling implementations for the specified path.
- * @throws An error is thrown if the specified argument is not an absolute path.
+ * @throws {Error} An error is thrown if the specified argument is not an absolute path.
  */
 function getPathImpl(fileOrDirPath) {
 	// Posix absolute paths always start with a slash.
@@ -655,6 +655,7 @@ export class ConfigArray extends Array {
 	 * @param {Object} [options.schema] The additional schema
 	 *      definitions to use for the ConfigArray schema.
 	 * @param {Array<string>} [options.extraConfigTypes] List of config types supported.
+	 * @throws {TypeError} When the `basePath` is not a non-empty string,
 	 */
 	constructor(
 		configs,
