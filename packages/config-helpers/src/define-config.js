@@ -204,6 +204,7 @@ function normalizePluginConfig(userNamespace, plugin, config) {
  * @param {Config|LegacyConfig|(Config|LegacyConfig)[]} pluginConfig The plugin config to normalize.
  * @param {string} pluginConfigName The name of the plugin config.
  * @return {InfiniteConfigArray} The normalized plugin config.
+ * @throws {TypeError} If the plugin config is a legacy config.
  */
 function deepNormalizePluginConfig(
 	userPluginNamespace,
@@ -238,6 +239,7 @@ function deepNormalizePluginConfig(
  * @param {Config} config The config object.
  * @param {string} pluginConfigName The name of the plugin config.
  * @return {InfiniteConfigArray} The plugin config.
+ * @throws {TypeError} If the plugin config is not found or is a legacy config.
  */
 function findPluginConfig(config, pluginConfigName) {
 	const { namespace: userPluginNamespace, name: configName } =
@@ -386,6 +388,7 @@ function extendConfig(baseConfig, baseConfigName, extension, extensionName) {
  * @param {ConfigWithExtends} config The config object.
  * @param {WeakMap<Config, string>} configNames The map of config objects to their names.
  * @return {Config[]} The flattened list of config objects.
+ * @throws {TypeError} If the `extends` property is not an array or if nested `extends` is found.
  */
 function processExtends(config, configNames) {
 	if (!config.extends) {
@@ -490,6 +493,7 @@ function processConfigList(configList, configNames) {
  * Helper function to define a config array.
  * @param {ConfigWithExtendsArray} args The arguments to the function.
  * @returns {Config[]} The config array.
+ * @throws {TypeError} If no arguments are provided or if an argument is not an object.
  */
 export function defineConfig(...args) {
 	const configNames = new WeakMap();

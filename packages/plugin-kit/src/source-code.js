@@ -255,6 +255,7 @@ export class TextSourceCodeBase {
 	 * Returns the loc information for the given node or token.
 	 * @param {Options['SyntaxElementWithLoc']} nodeOrToken The node or token to get the loc information for.
 	 * @returns {SourceLocation} The loc information for the node or token.
+	 * @throws {Error} If the node or token does not have loc information.
 	 */
 	getLoc(nodeOrToken) {
 		if (hasESTreeStyleLoc(nodeOrToken)) {
@@ -282,6 +283,7 @@ export class TextSourceCodeBase {
 	 * Returns the range information for the given node or token.
 	 * @param {Options['SyntaxElementWithLoc']} nodeOrToken The node or token to get the range information for.
 	 * @returns {SourceRange} The range information for the node or token.
+	 * @throws {Error} If the node or token does not have range information.
 	 */
 	getRange(nodeOrToken) {
 		if (hasESTreeStyleRange(nodeOrToken)) {
@@ -305,6 +307,7 @@ export class TextSourceCodeBase {
 	 * Returns the parent of the given node.
 	 * @param {Options['SyntaxElementWithLoc']} node The node to get the parent of.
 	 * @returns {Options['SyntaxElementWithLoc']|undefined} The parent of the node.
+	 * @throws {Error} If the method is not implemented in the subclass.
 	 */
 	getParent(node) {
 		throw new Error("Not implemented.");
