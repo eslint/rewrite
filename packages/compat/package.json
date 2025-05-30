@@ -56,7 +56,7 @@
     "typescript": "^5.4.5"
   },
   "peerDependencies": {
-    "eslint": "^9.10.0"
+    "eslint": "^8.40 || 9"
   },
   "peerDependenciesMeta": {
     "eslint": {
