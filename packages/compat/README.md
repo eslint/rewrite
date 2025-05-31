@@ -160,7 +160,7 @@ const __dirname = path.dirname(__filename);
 const gitignorePath = path.resolve(__dirname, ".gitignore");
 
 export default [
-	includeIgnoreFile(gitignorePath, "Imported .gitignore patterns"), // `name` is optional.
+	includeIgnoreFile(gitignorePath, "Imported .gitignore patterns"), // second argument is optional.
 	{
 		// your overrides
 	},
@@ -176,7 +176,7 @@ const path = require("node:path");
 const gitignorePath = path.resolve(__dirname, ".gitignore");
 
 module.exports = [
-	includeIgnoreFile(gitignorePath, "Imported .gitignore patterns"), // `name` is optional.
+	includeIgnoreFile(gitignorePath, "Imported .gitignore patterns"), // second argument is optional.
 	{
 		// your overrides
 	},
