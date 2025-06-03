@@ -145,7 +145,9 @@ module.exports = [
 
 ### Including Ignore Files
 
-If you were using an alternate ignore file in ESLint v8.x, such as using `--ignore-path .gitignore` on the command line, you can include those patterns programmatically in your config file using the `includeIgnoreFile()` function. For example:
+If you were using an alternate ignore file in ESLint v8.x, such as using `--ignore-path .gitignore` on the command line, you can include those patterns programmatically in your config file using the `includeIgnoreFile()` function.
+
+The `includeIgnoreFile()` function also accepts a second optional `name` parameter that allows you to set a custom name for this configuration object. If not specified, it defaults to `"Imported .gitignore patterns"`. For example:
 
 ```js
 // eslint.config.js - ESM example
@@ -158,7 +160,7 @@ const __dirname = path.dirname(__filename);
 const gitignorePath = path.resolve(__dirname, ".gitignore");
 
 export default [
-	includeIgnoreFile(gitignorePath),
+	includeIgnoreFile(gitignorePath, "Imported .gitignore patterns"), // second argument is optional.
 	{
 		// your overrides
 	},
@@ -174,7 +176,7 @@ const path = require("node:path");
 const gitignorePath = path.resolve(__dirname, ".gitignore");
 
 module.exports = [
-	includeIgnoreFile(gitignorePath),
+	includeIgnoreFile(gitignorePath, "Imported .gitignore patterns"), // second argument is optional.
 	{
 		// your overrides
 	},
