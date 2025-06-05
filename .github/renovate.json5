@@ -23,5 +23,12 @@
 			addLabels: ["deps:npm"],
 			matchManagers: ["npm"],
 		},
+		{
+			description: "Update ESLint packages together.",
+			groupName: "eslint",
+			matchPackagePrefixes: ["@eslint/"],
+			matchPackageNames: ["eslint"],
+			minimumReleaseAge: null, // Don't wait for these packages
+		},
 	],
 }
