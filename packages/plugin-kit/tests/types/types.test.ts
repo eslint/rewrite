@@ -87,6 +87,7 @@ sourceCode.text satisfies string;
 sourceCode.lines satisfies string[];
 sourceCode.getAncestors({}) satisfies object[];
 sourceCode.getLoc({}) satisfies SourceLocation;
+sourceCode.getLocFromIndex(0) satisfies { line: number; column: number };
 sourceCode.getParent({}) satisfies object | undefined;
 sourceCode.getRange({}) satisfies SourceRange;
 sourceCode.getText() satisfies string;
@@ -141,6 +142,10 @@ sourceCodeWithOptions.getAncestors({ value: "" }) satisfies {
 	value: string;
 }[] satisfies CustomOptions["SyntaxElementWithLoc"][];
 sourceCodeWithOptions.getLoc({ value: "" }) satisfies SourceLocation;
+sourceCodeWithOptions.getLocFromIndex(0) satisfies {
+	line: number;
+	column: number;
+};
 sourceCodeWithOptions.getParent({ value: "" }) satisfies
 	| { value: string }
 	| undefined satisfies CustomOptions["SyntaxElementWithLoc"] | undefined;
@@ -152,6 +157,8 @@ sourceCodeWithOptions.getText({ value: "" }, 0, 1) satisfies string;
 sourceCodeWithOptions.getAncestors({});
 // @ts-expect-error Wrong type should be caught
 sourceCodeWithOptions.getLoc({});
+// @ts-expect-error Wrong type should be caught
+sourceCodeWithOptions.getLocFromIndex("foo");
 // @ts-expect-error Wrong type should be caught
 sourceCodeWithOptions.getParent({});
 // @ts-expect-error Wrong type should be caught
