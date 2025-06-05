@@ -360,7 +360,7 @@ export class TextSourceCodeBase {
 		if (index === this.text.length) {
 			return {
 				line: this.#lines.length - 1 + this.#lineStart,
-				// @ts-expect-error `this.#lines` is always non-empty here. See constructor.
+				// @ts-ignore `this.#lines` is always non-empty here. See constructor. (Please avoid using `@ts-expect-error`, as it causes a build error.)
 				column: this.#lines.at(-1).length + this.#columnStart,
 			};
 		}
@@ -370,7 +370,7 @@ export class TextSourceCodeBase {
 		 * be inserted into `lineStartIndices` to keep the list sorted.
 		 */
 		const lineNumber =
-			// @ts-expect-error `this.#lineStartIndices` is always non-empty here. See constructor.
+			// @ts-ignore `this.#lineStartIndices` is always non-empty here. See constructor. (Please avoid using `@ts-expect-error`, as it causes a build error.)
 			(index >= this.#lineStartIndices.at(-1)
 				? this.#lineStartIndices.length
 				: findLineNumberBinarySearch(this.#lineStartIndices, index)) -
