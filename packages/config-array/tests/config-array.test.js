@@ -1833,6 +1833,39 @@ describe("ConfigArray", () => {
 				);
 			});
 
+			it('should return "matched" when there is at least one non-universal match, "unconfigured" otherwise', () => {
+				[
+					[["**/*.js", "foo/**"]],
+					[["foo/**", "**/*.js"]],
+					[["**/*.js", "foo/**"], "bar/**"],
+					[["foo/**", "**/*.js"], "bar/**"],
+					[["bar/**"], "foo/*.js"],
+				].forEach(files => {
+					configs = new ConfigArray(
+						[
+							{
+								files,
+							},
+						],
+						{
+							basePath,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus("foo/a.js"),
+						"matched",
+					);
+
+					assert.strictEqual(
+						configs.getConfigStatus("bar/a.js"),
+						"unconfigured",
+					);
+				});
+			});
+
 			it('should return "matched" when file has the same name as a directory that is ignored by a pattern that ends with `/`', () => {
 				configs = new ConfigArray(
 					[
