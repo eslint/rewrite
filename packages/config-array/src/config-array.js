@@ -1013,6 +1013,15 @@ export class ConfigArray extends Array {
 			const nonUniversalFiles = [];
 			const universalFiles = config.files.filter(element => {
 				if (Array.isArray(element)) {
+					/*
+					 * filePath matches an element that is an array only if it matches
+					 * all patterns in it (AND operation). Therefore, if there is at least
+					 * one non-universal pattern in the array, and filePath matches the array,
+					 * then we know for sure that filePath matches at least one non-universal
+					 * pattern, so we can consider the entire array to be non-universal.
+					 * In other words, all patterns in the array need to be universal
+					 * for it to be considered universal.
+					 */
 					if (
 						element.every(pattern => universalPattern.test(pattern))
 					) {
