@@ -63,6 +63,32 @@ function hasPosStyleRange(node) {
 	return "position" in node;
 }
 
+/**
+ * Performs binary search to find the line number containing a given character index.
+ * Returns the lower bound - the index of the first element greater than the target.
+ * **Please note that the `lineStartIndices` should be sorted in ascending order**.
+ * - Time Complexity: O(log n) - Significantly faster than linear search for large files.
+ * @param {number[]} lineStartIndices Sorted array of line start indices.
+ * @param {number} target The character index to find the line number for.
+ * @returns {number} The 1-based line number for the target index.
+ */
+function findLineNumberBinarySearch(lineStartIndices, target) {
+	let low = 0;
+	let high = lineStartIndices.length;
+
+	while (low < high) {
+		const mid = ((low + high) / 2) | 0; // Use bitwise OR to floor the division.
+
+		if (target < lineStartIndices[mid]) {
+			high = mid;
+		} else {
+			low = mid + 1;
+		}
+	}
+
+	return low;
+}
+
 //-----------------------------------------------------------------------------
 // Exports
 //-----------------------------------------------------------------------------
@@ -224,7 +250,25 @@ export class TextSourceCodeBase {
 	 * The lines of text in the source code.
 	 * @type {Array<string>}
 	 */
-	#lines;
+	#lines = [];
+
+	/**
+	 * The indices of the start of each line in the source code.
+	 * @type {Array<number>}
+	 */
+	#lineStartIndices = [0];
+
+	/**
+	 * The line number at which the parser starts counting.
+	 * @type {0|1}
+	 */
+	#lineStart;
+
+	/**
+	 * The column number at which the parser starts counting.
+	 * @type {0|1}
+	 */
+	#columnStart;
 
 	/**
 	 * The AST of the source code.
@@ -243,12 +287,30 @@ export class TextSourceCodeBase {
 	 * @param {Object} options The options for the instance.
 	 * @param {string} options.text The source code text.
 	 * @param {Options['RootNode']} options.ast The root AST node.
-	 * @param {RegExp} [options.lineEndingPattern] The pattern to match lineEndings in the source code.
+	 * @param {RegExp} [options.lineEndingPattern] The pattern to match lineEndings in the source code. Defaults to `/\r?\n/gu`.
+	 * @param {0|1} [options.lineStart] The line number at which the parser starts counting. Defaults to `1` for ESTree compatibility.
+	 * @param {0|1} [options.columnStart] The column number at which the parser starts counting. Defaults to `0` for ESTree compatibility.
 	 */
-	constructor({ text, ast, lineEndingPattern = /\r?\n/u }) {
+	constructor({
+		text,
+		ast,
+		lineEndingPattern = /\r?\n/gu,
+		lineStart = 1,
+		columnStart = 0,
+	}) {
 		this.ast = ast;
 		this.text = text;
-		this.#lines = text.split(lineEndingPattern);
+		this.#lineStart = lineStart;
+		this.#columnStart = columnStart;
+
+		let match;
+		while ((match = lineEndingPattern.exec(text))) {
+			this.#lines.push(
+				text.slice(this.#lineStartIndices.at(-1), match.index),
+			);
+			this.#lineStartIndices.push(match.index + match[0].length);
+		}
+		this.#lines.push(text.slice(this.#lineStartIndices.at(-1)));
 	}
 
 	/**
@@ -271,12 +333,72 @@ export class TextSourceCodeBase {
 		);
 	}
 
-	getLocFromIndex() {
-		// TODO
+	/**
+	 * Converts a source text index into a `{ line: number, column: number }` pair.
+	 * @param {number} index The index of a character in a file.
+	 * @throws {TypeError|RangeError} If non-numeric index or index out of range.
+	 * @returns {{line: number, column: number}} A `{ line: number, column: number }` location object with 0 or 1-indexed line and 0 or 1-indexed column based on language.
+	 */
+	getLocFromIndex(index) {
+		if (typeof index !== "number") {
+			throw new TypeError("Expected `index` to be a number.");
+		}
+
+		if (index < 0 || index > this.text.length) {
+			throw new RangeError(
+				`Index out of range (requested index ${index}, but source text has length ${this.text.length}).`,
+			);
+		}
+
+		/*
+		 * For an argument of `this.text.length`, return the location one "spot" past the last character
+		 * of the file. If the last character is a linebreak, the location will be column 0 of the next
+		 * line; otherwise, the location will be in the next column on the same line.
+		 *
+		 * See `getIndexFromLoc` for the motivation for this special case.
+		 */
+		if (index === this.text.length) {
+			return {
+				line: this.#lines.length - 1 + this.#lineStart,
+				// @ts-expect-error `this.#lines` is always non-empty here. See constructor.
+				column: this.#lines.at(-1).length + this.#columnStart,
+			};
+		}
+
+		/*
+		 * To figure out which line `index` is on, determine the last place at which index could
+		 * be inserted into `lineStartIndices` to keep the list sorted.
+		 */
+		const lineNumber =
+			// @ts-expect-error `this.#lineStartIndices` is always non-empty here. See constructor.
+			(index >= this.#lineStartIndices.at(-1)
+				? this.#lineStartIndices.length
+				: findLineNumberBinarySearch(this.#lineStartIndices, index)) -
+			1 +
+			this.#lineStart;
+
+		return {
+			line: lineNumber,
+			column:
+				index -
+				this.#lineStartIndices[lineNumber - 1] +
+				this.#columnStart,
+		};
 	}
 
-	getIndexFromLoc() {
+	/**
+	 * Converts a `{ line: number, column: number }` pair into a source text index.
+	 * @param {Object} loc A line/column location.
+	 * @param {number} loc.line The line number of the location. (0 or 1-indexed based on language.)
+	 * @param {number} loc.column The column number of the location. (0 or 1-indexed based on language.)
+	 * @throws {TypeError|RangeError} If `loc` is not an object with a numeric
+	 * `line` and `column`, if the `line` is less than or equal to zero or
+	 * the `line` or `column` is out of the expected range.
+	 * @returns {number} The index of the line/column location in a file.
+	 */
+	getIndexFromLoc(loc) {
 		// TODO
+		return loc.line;
 	}
 
 	/**
