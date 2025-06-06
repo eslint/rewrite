@@ -883,6 +883,34 @@ describe("ConfigArray", () => {
 				assert.strictEqual(config2, undefined);
 			});
 
+			it("should match any filename with a config object that has `[]` in files", () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: [[]],
+							defs: {
+								"test-def": "test-value",
+							},
+						},
+						{
+							files: ["**/*.js"], // `[]` is not an explicit match, so we need to add an explicit match
+						},
+					],
+					{
+						basePath,
+						schema,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.deepStrictEqual(configs.getConfig("foo/a.js"), {
+					defs: {
+						"test-def": "test-value",
+					},
+				});
+			});
+
 			it("should calculate correct config when passed JS filename that matches a async function config", () => {
 				const configsToTest = createConfigArray();
 				configsToTest.push(context =>
@@ -1840,6 +1868,7 @@ describe("ConfigArray", () => {
 					[["**/*.js", "foo/**"], "bar/**"],
 					[["foo/**", "**/*.js"], "bar/**"],
 					[["bar/**"], "foo/*.js"],
+					[[], "foo/*.js"],
 				].forEach(files => {
 					configs = new ConfigArray(
 						[
