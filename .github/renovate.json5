@@ -27,7 +27,7 @@
 			description: "Update ESLint packages together.",
 			groupName: "eslint",
 			matchPackagePrefixes: ["@eslint/"],
-			matchPackageNames: ["eslint"],
+			matchPackageNames: ["eslint", "eslint-config-eslint", "espree"],
 			minimumReleaseAge: null, // Don't wait for these packages
 		},
 	],
