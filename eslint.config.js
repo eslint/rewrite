@@ -59,6 +59,7 @@ export default defineConfig([
 	// TypeScript
 	...tseslint.config({
 		files: ["**/*.ts"],
+		ignores: ["**/tests/**/*.ts"],
 		extends: [...tseslint.configs.strict, ...tseslint.configs.stylistic],
 		rules: {
 			"no-use-before-define": "off",
