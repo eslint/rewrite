@@ -15,7 +15,7 @@ yarn add @eslint/object-schema
 # or
 pnpm install @eslint/object-schema
 # or
-bun install @eslint/object-schema
+bun add @eslint/object-schema
 ```
 
 For Deno:
