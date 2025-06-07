@@ -979,7 +979,7 @@ export class ConfigArray extends Array {
 
 		const matchingConfigIndices = [];
 		let matchFound = false;
-		const universalPattern = /^\*$|\/\*{1,2}$/u;
+		const universalPattern = /^\*$|^!|\/\*{1,2}$/u;
 
 		this.forEach((config, index) => {
 			if (!config.files) {

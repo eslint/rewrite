@@ -1525,12 +1525,12 @@ describe("ConfigArray", () => {
 				);
 			});
 
-			it('should return "matched" when passed docx filename', () => {
+			it('should return "unconfigured" when passed docx filename', () => {
 				const filename = "sss.docx";
 
 				assert.strictEqual(
 					configs.getConfigStatus(filename),
-					"matched",
+					"unconfigured",
 				);
 			});
 
@@ -1869,6 +1869,8 @@ describe("ConfigArray", () => {
 					[["foo/**", "**/*.js"], "bar/**"],
 					[["bar/**"], "foo/*.js"],
 					[[], "foo/*.js"],
+					[["bar/**", "!bar/b.js"], "foo/*.js"],
+					["!b.js", "foo/*.js"],
 				].forEach(files => {
 					configs = new ConfigArray(
 						[
