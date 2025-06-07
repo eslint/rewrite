@@ -155,6 +155,331 @@ describe("source-code", () => {
 			});
 		});
 
+		describe("getLocFromIndex()", () => {
+			it("should throw an error for non-numeric index", () => {
+				const ast = {};
+				const text = "foo\nbar";
+				const sourceCode = new TextSourceCodeBase({ ast, text });
+
+				assert.throws(
+					() => {
+						sourceCode.getLocFromIndex("5");
+					},
+					TypeError,
+					"Expected `index` to be a number.",
+				);
+
+				assert.throws(
+					() => {
+						sourceCode.getLocFromIndex(null);
+					},
+					TypeError,
+					"Expected `index` to be a number.",
+				);
+			});
+
+			it("should throw an error for negative index", () => {
+				const ast = {};
+				const text = "foo\nbar";
+				const sourceCode = new TextSourceCodeBase({ ast, text });
+
+				assert.throws(
+					() => {
+						sourceCode.getLocFromIndex(-1);
+					},
+					RangeError,
+					/Index out of range/u,
+				);
+			});
+
+			it("should throw an error for index beyond text length", () => {
+				const ast = {};
+				const text = "foo\nbar";
+				const sourceCode = new TextSourceCodeBase({ ast, text });
+
+				assert.throws(
+					() => {
+						sourceCode.getLocFromIndex(text.length + 1);
+					},
+					RangeError,
+					/Index out of range/u,
+				);
+			});
+
+			it("should handle the special case of `text.length`", () => {
+				const ast = {};
+				const text = "foo\nbar";
+				const sourceCode = new TextSourceCodeBase({ ast, text });
+
+				assert.deepStrictEqual(
+					sourceCode.getLocFromIndex(text.length),
+					{
+						line: 2,
+						column: 3,
+					},
+				);
+			});
+
+			it("should handle the special case of `text.length` when lineStart is 0 and columnStart is 0", () => {
+				const ast = {};
+				const text = "foo\nbar";
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineStart: 0,
+					columnStart: 0,
+				});
+
+				assert.deepStrictEqual(
+					sourceCode.getLocFromIndex(text.length),
+					{
+						line: 1,
+						column: 3,
+					},
+				);
+			});
+
+			it("should handle the special case of `text.length` when lineStart is 1 and columnStart is 1", () => {
+				const ast = {};
+				const text = "foo\nbar";
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineStart: 1,
+					columnStart: 1,
+				});
+
+				assert.deepStrictEqual(
+					sourceCode.getLocFromIndex(text.length),
+					{
+						line: 2,
+						column: 4,
+					},
+				);
+			});
+
+			it("should convert index to location", () => {
+				const ast = {};
+				const text = "foo\nbar\r\nbaz";
+				const sourceCode = new TextSourceCodeBase({ ast, text });
+
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(0), {
+					line: 1,
+					column: 0,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(1), {
+					line: 1,
+					column: 1,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(2), {
+					line: 1,
+					column: 2,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(3), {
+					line: 1,
+					column: 3,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(4), {
+					line: 2,
+					column: 0,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(5), {
+					line: 2,
+					column: 1,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(6), {
+					line: 2,
+					column: 2,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(7), {
+					line: 2,
+					column: 3,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(8), {
+					line: 2,
+					column: 4,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(9), {
+					line: 3,
+					column: 0,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(10), {
+					line: 3,
+					column: 1,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(11), {
+					line: 3,
+					column: 2,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(12), {
+					line: 3,
+					column: 3,
+				});
+			});
+
+			it("should convert index to location when lineStart is 0 and columnStart is 0", () => {
+				const ast = {};
+				const text = "foo\nbar\r\nbaz";
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineStart: 0,
+					columnStart: 0,
+				});
+
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(0), {
+					line: 0,
+					column: 0,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(1), {
+					line: 0,
+					column: 1,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(2), {
+					line: 0,
+					column: 2,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(3), {
+					line: 0,
+					column: 3,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(4), {
+					line: 1,
+					column: 0,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(5), {
+					line: 1,
+					column: 1,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(6), {
+					line: 1,
+					column: 2,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(7), {
+					line: 1,
+					column: 3,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(8), {
+					line: 1,
+					column: 4,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(9), {
+					line: 2,
+					column: 0,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(10), {
+					line: 2,
+					column: 1,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(11), {
+					line: 2,
+					column: 2,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(12), {
+					line: 2,
+					column: 3,
+				});
+			});
+
+			it("should convert index to location when lineStart is 1 and columnStart is 1", () => {
+				const ast = {};
+				const text = "foo\nbar\r\nbaz";
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineStart: 1,
+					columnStart: 1,
+				});
+
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(0), {
+					line: 1,
+					column: 1,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(1), {
+					line: 1,
+					column: 2,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(2), {
+					line: 1,
+					column: 3,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(3), {
+					line: 1,
+					column: 4,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(4), {
+					line: 2,
+					column: 1,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(5), {
+					line: 2,
+					column: 2,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(6), {
+					line: 2,
+					column: 3,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(7), {
+					line: 2,
+					column: 4,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(8), {
+					line: 2,
+					column: 5,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(9), {
+					line: 3,
+					column: 1,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(10), {
+					line: 3,
+					column: 2,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(11), {
+					line: 3,
+					column: 3,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(12), {
+					line: 3,
+					column: 4,
+				});
+			});
+
+			it("should handle empty text", () => {
+				const ast = {};
+				const text = "";
+				const sourceCode = new TextSourceCodeBase({ ast, text });
+
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(0), {
+					line: 1,
+					column: 0,
+				});
+			});
+
+			it("should handle text with only line breaks", () => {
+				const ast = {};
+				const text = "\n\r\n";
+				const sourceCode = new TextSourceCodeBase({ ast, text });
+
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(0), {
+					line: 1,
+					column: 0,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(1), {
+					line: 2,
+					column: 0,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(2), {
+					line: 2,
+					column: 1,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(3), {
+					line: 3,
+					column: 0,
+				});
+			});
+		});
+
 		describe("getRange()", () => {
 			it("should return a range object when a range property is present", () => {
 				const ast = {

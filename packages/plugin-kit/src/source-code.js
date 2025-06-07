@@ -381,7 +381,7 @@ export class TextSourceCodeBase {
 			line: lineNumber,
 			column:
 				index -
-				this.#lineStartIndices[lineNumber - 1] +
+				this.#lineStartIndices[lineNumber - this.#lineStart] +
 				this.#columnStart,
 		};
 	}
