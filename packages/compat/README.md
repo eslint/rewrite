@@ -17,7 +17,7 @@ yarn add @eslint/compat -D
 # or
 pnpm install @eslint/compat -D
 # or
-bun install @eslint/compat -D
+bun add @eslint/compat -D
 ```
 
 For Deno:

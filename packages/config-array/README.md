@@ -17,7 +17,7 @@ yarn add @eslint/config-array
 # or
 pnpm install @eslint/config-array
 # or
-bun install @eslint/config-array
+bun add @eslint/config-array
 ```
 
 For Deno:
