@@ -338,6 +338,7 @@ export class TextSourceCodeBase {
 	 * @param {number} index The index of a character in a file.
 	 * @throws {TypeError|RangeError} If non-numeric index or index out of range.
 	 * @returns {{line: number, column: number}} A `{ line: number, column: number }` location object with 0 or 1-indexed line and 0 or 1-indexed column based on language.
+	 * @public
 	 */
 	getLocFromIndex(index) {
 		if (typeof index !== "number") {
@@ -395,6 +396,7 @@ export class TextSourceCodeBase {
 	 * `line` and `column`, if the `line` is less than or equal to zero or
 	 * the `line` or `column` is out of the expected range.
 	 * @returns {number} The index of the line/column location in a file.
+	 * @public
 	 */
 	getIndexFromLoc(loc) {
 		// TODO
