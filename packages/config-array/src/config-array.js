@@ -1010,17 +1010,41 @@ export class ConfigArray extends Array {
 			 * a file with a specific extensions such as *.js.
 			 */
 
-			const universalFiles = config.files.filter(pattern =>
-				universalPattern.test(pattern),
-			);
+			const nonUniversalFiles = [];
+			const universalFiles = config.files.filter(element => {
+				if (Array.isArray(element)) {
+					/*
+					 * filePath matches an element that is an array only if it matches
+					 * all patterns in it (AND operation). Therefore, if there is at least
+					 * one non-universal pattern in the array, and filePath matches the array,
+					 * then we know for sure that filePath matches at least one non-universal
+					 * pattern, so we can consider the entire array to be non-universal.
+					 * In other words, all patterns in the array need to be universal
+					 * for it to be considered universal.
+					 */
+					if (
+						element.every(pattern => universalPattern.test(pattern))
+					) {
+						return true;
+					}
+
+					nonUniversalFiles.push(element);
+					return false;
+				}
+
+				// element is a string
+
+				if (universalPattern.test(element)) {
+					return true;
+				}
+
+				nonUniversalFiles.push(element);
+				return false;
+			});
 
 			// universal patterns were found so we need to check the config twice
 			if (universalFiles.length) {
 				debug("Universal files patterns found. Checking carefully.");
-
-				const nonUniversalFiles = config.files.filter(
-					pattern => !universalPattern.test(pattern),
-				);
 
 				// check that the config matches without the non-universal files first
 				if (
