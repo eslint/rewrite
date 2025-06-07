@@ -498,6 +498,21 @@ describe("source-code", () => {
 					column: 0,
 				});
 			});
+
+			it("should symmetric with getIndexFromLoc()", () => {
+				const ast = {};
+				const text = "foo\nbar\r\nbaz";
+				const sourceCode = new TextSourceCodeBase({ ast, text });
+
+				for (let index = 0; index <= text.length; index++) {
+					assert.strictEqual(
+						index,
+						sourceCode.getIndexFromLoc(
+							sourceCode.getLocFromIndex(index),
+						),
+					);
+				}
+			});
 		});
 
 		describe("getRange()", () => {

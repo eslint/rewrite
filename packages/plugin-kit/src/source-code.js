@@ -399,8 +399,37 @@ export class TextSourceCodeBase {
 	 * @public
 	 */
 	getIndexFromLoc(loc) {
-		// TODO
-		return loc.line;
+		if (
+			typeof loc !== "object" ||
+			typeof loc.line !== "number" ||
+			typeof loc.column !== "number"
+		) {
+			throw new TypeError(
+				"Expected `loc` to be an object with numeric `line` and `column` properties.",
+			);
+		}
+
+		if (
+			loc.line < this.#lineStart ||
+			this.#lineStartIndices.length - 1 + this.#lineStart < loc.line
+		) {
+			throw new RangeError(
+				`Line number out of range (line ${loc.line} requested). Line numbers should be more than or equal to ${this.#lineStart} and less than or equal to ${this.#lineStartIndices.length - 1 + this.#lineStart}.`,
+			);
+		}
+
+		const lineStartIndex =
+			this.#lineStartIndices[loc.line - this.#lineStart];
+		/*
+		const lineEndIndex = loc.line - this.#lineStart === this.#lineStartIndices.length - 1
+			? this.text.length
+			: this.#lineStartIndices[loc.line - this.#lineStart + 1];
+		*/
+		const positionIndex = lineStartIndex + loc.column - this.#columnStart;
+
+		// TODO: RangeError
+
+		return positionIndex;
 	}
 
 	/**
