@@ -168,10 +168,30 @@ describe("source-code", () => {
 					TypeError,
 					"Expected `index` to be a number.",
 				);
-
 				assert.throws(
 					() => {
 						sourceCode.getLocFromIndex(null);
+					},
+					TypeError,
+					"Expected `index` to be a number.",
+				);
+				assert.throws(
+					() => {
+						sourceCode.getLocFromIndex(undefined);
+					},
+					TypeError,
+					"Expected `index` to be a number.",
+				);
+				assert.throws(
+					() => {
+						sourceCode.getLocFromIndex(true);
+					},
+					TypeError,
+					"Expected `index` to be a number.",
+				);
+				assert.throws(
+					() => {
+						sourceCode.getLocFromIndex(false);
 					},
 					TypeError,
 					"Expected `index` to be a number.",
