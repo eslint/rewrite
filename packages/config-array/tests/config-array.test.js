@@ -10,6 +10,7 @@
 import { ConfigArray, ConfigArraySymbol } from "../src/config-array.js";
 import assert from "node:assert";
 import { fileURLToPath } from "node:url";
+import path from "node:path";
 
 //-----------------------------------------------------------------------------
 // Helpers
@@ -400,6 +401,29 @@ describe("ConfigArray", () => {
 				/Config "foo": Key "ignores": Expected array to only contain strings and functions\./u,
 		});
 
+		testValidationError({
+			title: "should throw an error when basePath is undefined",
+			configs: [
+				{
+					name: "foo",
+					basePath: undefined,
+				},
+			],
+			expectedError:
+				/Config "foo": Key "basePath": Expected value to be a string\./u,
+		});
+
+		testValidationError({
+			title: "should throw an error when basePath is not a string",
+			configs: [
+				{
+					basePath: 5,
+				},
+			],
+			expectedError:
+				/Config \(unnamed\): Key "basePath": Expected value to be a string\./u,
+		});
+
 		it("should throw an error when a config is not an object", () => {
 			configs = new ConfigArray(
 				[
@@ -540,6 +564,200 @@ describe("ConfigArray", () => {
 			await configs.normalize();
 
 			assert.notStrictEqual(configs[0], config);
+		});
+	});
+
+	describe("Config objects `basePath` normalization", () => {
+		it("should create a new object with absolute `basePath` when normalizing relative `basePath` on posix (async)", async () => {
+			const config = {
+				basePath: "baz/qux",
+				defs: {
+					"test-def": "test-value",
+				},
+			};
+
+			configs = new ConfigArray([config], {
+				basePath: "/foo/bar",
+				schema,
+			});
+
+			await configs.normalize();
+
+			assert.notStrictEqual(configs[0], config);
+			assert.deepStrictEqual(configs[0], {
+				basePath: "/foo/bar/baz/qux",
+				defs: {
+					"test-def": "test-value",
+				},
+			});
+		});
+
+		it("should create a new object with absolute `basePath` when normalizing relative `basePath` on posix (sync)", () => {
+			const config = {
+				basePath: "baz/qux",
+				defs: {
+					"test-def": "test-value",
+				},
+			};
+
+			configs = new ConfigArray([config], {
+				basePath: "/foo/bar",
+				schema,
+			});
+
+			configs.normalizeSync();
+
+			assert.notStrictEqual(configs[0], config);
+			assert.deepStrictEqual(configs[0], {
+				basePath: "/foo/bar/baz/qux",
+				defs: {
+					"test-def": "test-value",
+				},
+			});
+		});
+
+		it("should create a new object with UNC `basePath` when normalizing relative `basePath` on windows (async)", async () => {
+			const config = {
+				basePath: "baz/qux",
+				defs: {
+					"test-def": "test-value",
+				},
+			};
+
+			configs = new ConfigArray([config], {
+				basePath: "C:\\foo\\bar",
+				schema,
+			});
+
+			await configs.normalize();
+
+			assert.notStrictEqual(configs[0], config);
+			assert.deepStrictEqual(configs[0], {
+				basePath: "\\\\?\\C:\\foo\\bar\\baz\\qux",
+				defs: {
+					"test-def": "test-value",
+				},
+			});
+		});
+
+		it("should create a new object with UNC `basePath` when normalizing relative `basePath` on windows (sync)", () => {
+			const config = {
+				basePath: "baz/qux",
+				defs: {
+					"test-def": "test-value",
+				},
+			};
+
+			configs = new ConfigArray([config], {
+				basePath: "C:\\foo\\bar",
+				schema,
+			});
+
+			configs.normalizeSync();
+
+			assert.notStrictEqual(configs[0], config);
+			assert.deepStrictEqual(configs[0], {
+				basePath: "\\\\?\\C:\\foo\\bar\\baz\\qux",
+				defs: {
+					"test-def": "test-value",
+				},
+			});
+		});
+
+		it("should create a new object with absolute `basePath` when normalizing absolute `basePath` on posix (async)", async () => {
+			const config = {
+				basePath: "/foo",
+				defs: {
+					"test-def": "test-value",
+				},
+			};
+
+			configs = new ConfigArray([config], {
+				basePath: "/foo/bar",
+				schema,
+			});
+
+			await configs.normalize();
+
+			assert.notStrictEqual(configs[0], config);
+			assert.deepStrictEqual(configs[0], {
+				basePath: "/foo",
+				defs: {
+					"test-def": "test-value",
+				},
+			});
+		});
+
+		it("should create a new object with absolute `basePath` when normalizing absolute `basePath` on posix (sync)", () => {
+			const config = {
+				basePath: "/foo",
+				defs: {
+					"test-def": "test-value",
+				},
+			};
+
+			configs = new ConfigArray([config], {
+				basePath: "/foo/bar",
+				schema,
+			});
+
+			configs.normalizeSync();
+
+			assert.notStrictEqual(configs[0], config);
+			assert.deepStrictEqual(configs[0], {
+				basePath: "/foo",
+				defs: {
+					"test-def": "test-value",
+				},
+			});
+		});
+
+		it("should create a new object with UNC `basePath` when normalizing absolute `basePath` on windows (async)", async () => {
+			const config = {
+				basePath: "C:\\foo",
+				defs: {
+					"test-def": "test-value",
+				},
+			};
+
+			configs = new ConfigArray([config], {
+				basePath: "C:\\foo\\bar",
+				schema,
+			});
+
+			await configs.normalize();
+
+			assert.notStrictEqual(configs[0], config);
+			assert.deepStrictEqual(configs[0], {
+				basePath: "\\\\?\\C:\\foo",
+				defs: {
+					"test-def": "test-value",
+				},
+			});
+		});
+
+		it("should create a new object with UNC `basePath` when normalizing absolute `basePath` on windows (sync)", () => {
+			const config = {
+				basePath: "C:\\foo",
+				defs: {
+					"test-def": "test-value",
+				},
+			};
+
+			configs = new ConfigArray([config], {
+				basePath: "C:\\foo\\bar",
+				schema,
+			});
+
+			configs.normalizeSync();
+
+			assert.notStrictEqual(configs[0], config);
+			assert.deepStrictEqual(configs[0], {
+				basePath: "\\\\?\\C:\\foo",
+				defs: {
+					"test-def": "test-value",
+				},
+			});
 		});
 	});
 
@@ -694,6 +912,37 @@ describe("ConfigArray", () => {
 				assert.throws(() => {
 					unnormalizedConfigs.getConfigWithStatus(filename);
 				}, /normalized/u);
+			});
+
+			it("should return config without meta fields `name`, `basePath`, `files`, and `ignores`", () => {
+				configs = new ConfigArray(
+					[
+						{
+							name: "test config",
+							basePath,
+							ignores: ["b.js"],
+							files: ["*.js"],
+							defs: {
+								"test-def": "test-value",
+							},
+						},
+					],
+					{
+						basePath,
+						schema,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.deepStrictEqual(configs.getConfigWithStatus("a.js"), {
+					status: "matched",
+					config: {
+						defs: {
+							"test-def": "test-value",
+						},
+					},
+				});
 			});
 
 			describe("should return expected results", () => {
@@ -1457,6 +1706,397 @@ describe("ConfigArray", () => {
 
 					assert.strictEqual(
 						configs.getConfig("src/foo.js").defs.severity,
+						"error",
+					);
+				});
+			});
+
+			describe("config objects with `basePath` property", () => {
+				it("should apply config object without `files` or `ignores` to the `basePath` directory and its subdirectories only (relative paths)", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+								defs: { severity: "warning" },
+							},
+							{
+								basePath: "src",
+								defs: { severity: "error" },
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig("foo.js").defs.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig("src/foo.js").defs.severity,
+						"error",
+					);
+					assert.strictEqual(
+						configs.getConfig("src/subdir/foo.js").defs.severity,
+						"error",
+					);
+				});
+
+				it("should apply config object without `files` or `ignores` to the `basePath` directory and its subdirectories only (absolute paths)", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+								defs: { severity: "warning" },
+							},
+							{
+								basePath: "src",
+								defs: { severity: "error" },
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "foo.js")).defs
+							.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "src/foo.js"))
+							.defs.severity,
+						"error",
+					);
+					assert.strictEqual(
+						configs.getConfig(
+							path.resolve(basePath, "src/subdir/foo.js"),
+						).defs.severity,
+						"error",
+					);
+				});
+
+				it("should intepret `files` and `ignores` as relative to the config's `basePath` (relative paths)", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+								defs: { severity: "warning" },
+							},
+							{
+								basePath: "src",
+								files: ["**/*.js"],
+								defs: { severity: "error" },
+							},
+							{
+								basePath: "src",
+								ignores: ["foo.js"],
+								defs: { severity: "fatal" },
+							},
+							{
+								basePath: "src",
+								files: ["**/*.js"],
+								ignores: ["foo.js", "bar.js"],
+								defs: { severity: "info" },
+							},
+							{
+								basePath: "src",
+								files: ["*.js"],
+								ignores: ["{foo,bar,baz}.js"],
+								defs: { severity: "log" },
+							},
+							{
+								basePath: "src",
+								files: ["quux.js"],
+								defs: { severity: "catastrophic" },
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig("foo.js").defs.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig("bar.js").defs.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig("baz.js").defs.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig("qux.js").defs.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig("quux.js").defs.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig("subdir/quux.js").defs.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig("src/foo.js").defs.severity,
+						"error",
+					);
+					assert.strictEqual(
+						configs.getConfig("src/bar.js").defs.severity,
+						"fatal",
+					);
+					assert.strictEqual(
+						configs.getConfig("src/baz.js").defs.severity,
+						"info",
+					);
+					assert.strictEqual(
+						configs.getConfig("src/qux.js").defs.severity,
+						"log",
+					);
+					assert.strictEqual(
+						configs.getConfig("src/quux.js").defs.severity,
+						"catastrophic",
+					);
+					assert.strictEqual(
+						configs.getConfig("src/subdir/quux.js").defs.severity,
+						"info",
+					);
+				});
+
+				it("should intepret `files` and `ignores` as relative to the config's `basePath` (absolute paths)", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+								defs: { severity: "warning" },
+							},
+							{
+								basePath: "src",
+								files: ["**/*.js"],
+								defs: { severity: "error" },
+							},
+							{
+								basePath: "src",
+								ignores: ["foo.js"],
+								defs: { severity: "fatal" },
+							},
+							{
+								basePath: "src",
+								files: ["**/*.js"],
+								ignores: ["foo.js", "bar.js"],
+								defs: { severity: "info" },
+							},
+							{
+								basePath: "src",
+								files: ["*.js"],
+								ignores: ["{foo,bar,baz}.js"],
+								defs: { severity: "log" },
+							},
+							{
+								basePath: "src",
+								files: ["quux.js"],
+								defs: { severity: "catastrophic" },
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "foo.js")).defs
+							.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "bar.js")).defs
+							.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "baz.js")).defs
+							.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "qux.js")).defs
+							.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "quux.js"))
+							.defs.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig(
+							path.resolve(basePath, "subdir/quux.js"),
+						).defs.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "src/foo.js"))
+							.defs.severity,
+						"error",
+					);
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "src/bar.js"))
+							.defs.severity,
+						"fatal",
+					);
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "src/baz.js"))
+							.defs.severity,
+						"info",
+					);
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "src/qux.js"))
+							.defs.severity,
+						"log",
+					);
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "src/quux.js"))
+							.defs.severity,
+						"catastrophic",
+					);
+					assert.strictEqual(
+						configs.getConfig(
+							path.resolve(basePath, "src/subdir/quux.js"),
+						).defs.severity,
+						"info",
+					);
+				});
+
+				it("should work correctly with both universal and non-universal `files` patterns (relative paths)", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+								defs: { severity: "warning" },
+							},
+							{
+								basePath: "src",
+								files: ["code/**", "docs/**/*.md"],
+								defs: { severity: "error" },
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig("foo.js").defs.severity,
+						"warning",
+					);
+					assert.strictEqual(configs.getConfig("foo.md"), undefined);
+					assert.strictEqual(
+						configs.getConfig("src/foo.js").defs.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig("src/foo.md"),
+						undefined,
+					);
+					assert.strictEqual(
+						configs.getConfig("src/code/foo.js").defs.severity,
+						"error",
+					);
+					assert.strictEqual(
+						configs.getConfig("src/code/foo.md"),
+						undefined,
+					);
+					assert.strictEqual(
+						configs.getConfig("src/docs/foo.js").defs.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig("src/docs/foo.md").defs.severity,
+						"error",
+					);
+				});
+
+				it("should work correctly with both universal and non-universal `files` patterns (absolute paths)", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+								defs: { severity: "warning" },
+							},
+							{
+								basePath: "src",
+								files: ["code/**", "docs/**/*.md"],
+								defs: { severity: "error" },
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "foo.js")).defs
+							.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "foo.md")),
+						undefined,
+					);
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "src/foo.js"))
+							.defs.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "src/foo.md")),
+						undefined,
+					);
+					assert.strictEqual(
+						configs.getConfig(
+							path.resolve(basePath, "src/code/foo.js"),
+						).defs.severity,
+						"error",
+					);
+					assert.strictEqual(
+						configs.getConfig(
+							path.resolve(basePath, "src/code/foo.md"),
+						),
+						undefined,
+					);
+					assert.strictEqual(
+						configs.getConfig(
+							path.resolve(basePath, "src/docs/foo.js"),
+						).defs.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig(
+							path.resolve(basePath, "src/docs/foo.md"),
+						).defs.severity,
 						"error",
 					);
 				});
@@ -3554,7 +4194,7 @@ describe("ConfigArray", () => {
 			it("should return all ignores from all configs without files when called", () => {
 				const expectedIgnores = configs.reduce((list, config) => {
 					if (config.ignores && Object.keys(config).length === 1) {
-						list.push(...config.ignores);
+						list.push(config);
 					}
 
 					return list;
@@ -3582,7 +4222,12 @@ describe("ConfigArray", () => {
 					configs.isFileIgnored("ignoreme/foo.js"),
 					true,
 				);
-				assert.deepStrictEqual(configs.ignores, ["ignoreme"]);
+				assert.deepStrictEqual(configs.ignores, [
+					{
+						name: "foo",
+						ignores: ["ignoreme"],
+					},
+				]);
 			});
 		});
 
