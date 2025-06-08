@@ -713,6 +713,316 @@ describe("source-code", () => {
 			});
 		});
 
+		describe("getIndexFromLoc()", () => {
+			it("should throw an error for non-object loc", () => {
+				const ast = {};
+				const text = "foo\nbar";
+				const sourceCode = new TextSourceCodeBase({ ast, text });
+
+				assert.throws(
+					() => {
+						sourceCode.getIndexFromLoc("invalid");
+					},
+					TypeError,
+					"Expected `loc` to be an object with numeric `line` and `column` properties.",
+				);
+
+				assert.throws(
+					() => {
+						sourceCode.getIndexFromLoc(null);
+					},
+					TypeError,
+					"Expected `loc` to be an object with numeric `line` and `column` properties.",
+				);
+
+				assert.throws(
+					() => {
+						sourceCode.getIndexFromLoc(undefined);
+					},
+					TypeError,
+					"Expected `loc` to be an object with numeric `line` and `column` properties.",
+				);
+			});
+
+			it("should throw an error for missing or non-numeric line/column properties", () => {
+				const ast = {};
+				const text = "foo\nbar";
+				const sourceCode = new TextSourceCodeBase({ ast, text });
+
+				assert.throws(
+					() => {
+						sourceCode.getIndexFromLoc({});
+					},
+					TypeError,
+					"Expected `loc` to be an object with numeric `line` and `column` properties.",
+				);
+
+				assert.throws(
+					() => {
+						sourceCode.getIndexFromLoc({ line: "1", column: 0 });
+					},
+					TypeError,
+					"Expected `loc` to be an object with numeric `line` and `column` properties.",
+				);
+
+				assert.throws(
+					() => {
+						sourceCode.getIndexFromLoc({ line: 1, column: "0" });
+					},
+					TypeError,
+					"Expected `loc` to be an object with numeric `line` and `column` properties.",
+				);
+			});
+
+			it("should throw an error for line number out of range when lineStart is 1 and columnStart is 0", () => {
+				const ast = {};
+				const text = "foo\nbar";
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineStart: 1,
+					columnStart: 0,
+				});
+
+				assert.throws(
+					() => {
+						sourceCode.getIndexFromLoc({ line: 0, column: 0 });
+					},
+					RangeError,
+					/Line number out of range/u,
+				);
+
+				assert.throws(
+					() => {
+						sourceCode.getIndexFromLoc({ line: 3, column: 0 });
+					},
+					RangeError,
+					/Line number out of range/u,
+				);
+			});
+
+			it("should throw an error for line number out of range when lineStart is 0 and columnStart is 1", () => {
+				const ast = {};
+				const text = "foo\nbar";
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineStart: 0,
+					columnStart: 1,
+				});
+
+				assert.throws(
+					() => {
+						sourceCode.getIndexFromLoc({ line: -1, column: 1 });
+					},
+					RangeError,
+					/Line number out of range/u,
+				);
+
+				assert.throws(
+					() => {
+						sourceCode.getIndexFromLoc({ line: 2, column: 1 });
+					},
+					RangeError,
+					/Line number out of range/u,
+				);
+			});
+
+			it("should throw an error for line number out of range when lineStart is 0 and columnStart is 0", () => {
+				const ast = {};
+				const text = "foo\nbar";
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineStart: 0,
+					columnStart: 0,
+				});
+
+				assert.throws(
+					() => {
+						sourceCode.getIndexFromLoc({ line: -1, column: 0 });
+					},
+					RangeError,
+					/Line number out of range/u,
+				);
+
+				assert.throws(
+					() => {
+						sourceCode.getIndexFromLoc({ line: 2, column: 0 });
+					},
+					RangeError,
+					/Line number out of range/u,
+				);
+			});
+
+			it("should throw an error for line number out of range when lineStart is 1 and columnStart is 1", () => {
+				const ast = {};
+				const text = "foo\nbar";
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineStart: 1,
+					columnStart: 1,
+				});
+
+				assert.throws(
+					() => {
+						sourceCode.getIndexFromLoc({ line: 0, column: 1 });
+					},
+					RangeError,
+					/Line number out of range/u,
+				);
+
+				assert.throws(
+					() => {
+						sourceCode.getIndexFromLoc({ line: 3, column: 1 });
+					},
+					RangeError,
+					/Line number out of range/u,
+				);
+			});
+
+			it("should throw an error for column number out of range when lineStart is 1 and columnStart is 0", () => {
+				const ast = {};
+				const text = "foo\nbar";
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineStart: 1,
+					columnStart: 0,
+				});
+
+				assert.throws(
+					() => {
+						sourceCode.getIndexFromLoc({ line: 1, column: -1 });
+					},
+					RangeError,
+					/Column number out of range/u,
+				);
+
+				assert.throws(
+					() => {
+						sourceCode.getIndexFromLoc({ line: 1, column: 4 });
+					},
+					RangeError,
+					/Column number out of range/u,
+				);
+
+				assert.throws(
+					() => {
+						sourceCode.getIndexFromLoc({ line: 2, column: 4 });
+					},
+					RangeError,
+					/Column number out of range/u,
+				);
+			});
+
+			it("should throw an error for column number out of range when lineStart is 0 and columnStart is 1", () => {
+				const ast = {};
+				const text = "foo\nbar";
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineStart: 0,
+					columnStart: 1,
+				});
+
+				assert.throws(
+					() => {
+						sourceCode.getIndexFromLoc({ line: 0, column: 0 });
+					},
+					RangeError,
+					/Column number out of range/u,
+				);
+
+				assert.throws(
+					() => {
+						sourceCode.getIndexFromLoc({ line: 0, column: 5 });
+					},
+					RangeError,
+					/Column number out of range/u,
+				);
+
+				assert.throws(
+					() => {
+						sourceCode.getIndexFromLoc({ line: 1, column: 5 });
+					},
+					RangeError,
+					/Column number out of range/u,
+				);
+			});
+
+			it("should throw an error for column number out of range when lineStart is 0 and columnStart is 0", () => {
+				const ast = {};
+				const text = "foo\nbar";
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineStart: 0,
+					columnStart: 0,
+				});
+
+				assert.throws(
+					() => {
+						sourceCode.getIndexFromLoc({ line: 0, column: -1 });
+					},
+					RangeError,
+					/Column number out of range/u,
+				);
+
+				assert.throws(
+					() => {
+						sourceCode.getIndexFromLoc({ line: 0, column: 4 });
+					},
+					RangeError,
+					/Column number out of range/u,
+				);
+
+				assert.throws(
+					() => {
+						sourceCode.getIndexFromLoc({ line: 1, column: 4 });
+					},
+					RangeError,
+					/Column number out of range/u,
+				);
+			});
+
+			it("should throw an error for column number out of range when lineStart is 1 and columnStart is 1", () => {
+				const ast = {};
+				const text = "foo\nbar";
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineStart: 1,
+					columnStart: 1,
+				});
+
+				assert.throws(
+					() => {
+						sourceCode.getIndexFromLoc({ line: 1, column: 0 });
+					},
+					RangeError,
+					/Column number out of range/u,
+				);
+
+				assert.throws(
+					() => {
+						sourceCode.getIndexFromLoc({ line: 1, column: 5 });
+					},
+					RangeError,
+					/Column number out of range/u,
+				);
+
+				assert.throws(
+					() => {
+						sourceCode.getIndexFromLoc({ line: 2, column: 5 });
+					},
+					RangeError,
+					/Column number out of range/u,
+				);
+			});
+		});
+
 		describe("getRange()", () => {
 			it("should return a range object when a range property is present", () => {
 				const ast = {

@@ -427,13 +427,14 @@ export class TextSourceCodeBase {
 		const positionIndex = lineStartIndex + loc.column - this.#columnStart;
 
 		if (
+			loc.column < this.#columnStart ||
 			(loc.line - this.#lineStart === this.#lineStartIndices.length - 1 &&
 				positionIndex > lineEndIndex) ||
 			(loc.line - this.#lineStart < this.#lineStartIndices.length - 1 &&
 				positionIndex >= lineEndIndex)
 		) {
 			throw new RangeError(
-				`Column number out of range (column ${loc.column} requested, but the length of line ${loc.line} is ${lineEndIndex - lineStartIndex}).`,
+				`Column number out of range (column ${loc.column} requested). Column number for line ${loc.line} should be more than or equal to ${this.#columnStart} and less than or equal to ${lineEndIndex - lineStartIndex}.`,
 			);
 		}
 
