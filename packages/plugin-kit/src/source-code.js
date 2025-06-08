@@ -420,14 +420,22 @@ export class TextSourceCodeBase {
 
 		const lineStartIndex =
 			this.#lineStartIndices[loc.line - this.#lineStart];
-		/*
-		const lineEndIndex = loc.line - this.#lineStart === this.#lineStartIndices.length - 1
-			? this.text.length
-			: this.#lineStartIndices[loc.line - this.#lineStart + 1];
-		*/
+		const lineEndIndex =
+			loc.line - this.#lineStart === this.#lineStartIndices.length - 1
+				? this.text.length
+				: this.#lineStartIndices[loc.line - this.#lineStart + 1];
 		const positionIndex = lineStartIndex + loc.column - this.#columnStart;
 
-		// TODO: RangeError
+		if (
+			(loc.line - this.#lineStart === this.#lineStartIndices.length - 1 &&
+				positionIndex > lineEndIndex) ||
+			(loc.line - this.#lineStart < this.#lineStartIndices.length - 1 &&
+				positionIndex >= lineEndIndex)
+		) {
+			throw new RangeError(
+				`Column number out of range (column ${loc.column} requested, but the length of line ${loc.line} is ${lineEndIndex - lineStartIndex}).`,
+			);
+		}
 
 		return positionIndex;
 	}
