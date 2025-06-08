@@ -3032,6 +3032,308 @@ describe("ConfigArray", () => {
 					);
 				});
 			});
+
+			describe("config objects with `basePath` property", () => {
+				it(`should return "matched" for a file that is matched by a non-universal pattern (relative paths)`, () => {
+					configs = new ConfigArray(
+						[
+							{
+								basePath: "src",
+								files: ["code/*.js"],
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus("code/foo.js"),
+						"unconfigured",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus("src/foo.js"),
+						"unconfigured",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus("src/code/foo.js"),
+						"matched",
+					);
+				});
+
+				it(`should return "matched" for a file that is matched by a non-universal pattern (absolute paths)`, () => {
+					configs = new ConfigArray(
+						[
+							{
+								basePath: "src",
+								files: ["code/*.js"],
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus(
+							path.resolve(basePath, "code/foo.js"),
+						),
+						"unconfigured",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus(
+							path.resolve(basePath, "src/foo.js"),
+						),
+						"unconfigured",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus(
+							path.resolve(basePath, "src/code/foo.js"),
+						),
+						"matched",
+					);
+				});
+
+				it(`should return "unconfigured" for a file under the config's base path if it isn't matched by a non-universal pattern (relative paths)`, () => {
+					configs = new ConfigArray(
+						[
+							{
+								basePath: "src",
+							},
+							{
+								basePath: "src",
+								files: ["*"],
+							},
+							{
+								basePath: "src",
+								files: ["!bar.js"],
+							},
+							{
+								basePath: "src",
+								files: ["code/*"],
+							},
+							{
+								basePath: "src",
+								files: ["code/**"],
+							},
+							{
+								basePath: "src",
+								files: ["!code/bar.js"],
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus("src/foo.js"),
+						"unconfigured",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus("src/code/foo.js"),
+						"unconfigured",
+					);
+				});
+
+				it(`should return "unconfigured" for a file under the config's base path if it isn't matched by a non-universal pattern (absolute paths)`, () => {
+					configs = new ConfigArray(
+						[
+							{
+								basePath: "src",
+							},
+							{
+								basePath: "src",
+								files: ["*"],
+							},
+							{
+								basePath: "src",
+								files: ["!bar.js"],
+							},
+							{
+								basePath: "src",
+								files: ["code/*"],
+							},
+							{
+								basePath: "src",
+								files: ["code/**"],
+							},
+							{
+								basePath: "src",
+								files: ["!code/bar.js"],
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus(
+							path.resolve(basePath, "src/foo.js"),
+						),
+						"unconfigured",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus(
+							path.resolve(basePath, "src/code/foo.js"),
+						),
+						"unconfigured",
+					);
+				});
+
+				it(`should return "external" for a file that is outside config array's base path even though it is inside config's base path`, () => {
+					configs = new ConfigArray(
+						[
+							{
+								basePath: "..",
+								files: ["**/*.js"],
+							},
+							{
+								basePath: "../",
+								files: ["**/*.js"],
+							},
+							{
+								basePath: "/",
+								files: ["**/*.js"],
+							},
+							{
+								basePath: "/project",
+								files: ["**/*.js"],
+							},
+							{
+								basePath: "/project/",
+								files: ["**/*.js"],
+							},
+						],
+						{
+							basePath: "/project/my",
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus("/project/foo.js"),
+						"external",
+					);
+
+					assert.strictEqual(
+						configs.getConfigStatus("/project/notmy/foo.js"),
+						"external",
+					);
+
+					assert.strictEqual(
+						configs.getConfigStatus("/project/my/foo.js"),
+						"matched",
+					);
+				});
+
+				it(`should return "ignored" for a file that is ignored or in an ignored directory (relative paths)`, () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+							},
+							{
+								basePath: "src",
+								ignores: [
+									"a.js",
+									"tools/*.js",
+									"code/b.js",
+									"docs",
+								],
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus("src/a.js"),
+						"ignored",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus("src/tools/foo.js"),
+						"ignored",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus("src/code/b.js"),
+						"ignored",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus("src/docs/foo.js"),
+						"ignored",
+					);
+				});
+
+				it(`should return "ignored" for a file that is ignored or in an ignored directory (absolute paths)`, () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+							},
+							{
+								basePath: "src",
+								ignores: [
+									"a.js",
+									"tools/*.js",
+									"code/b.js",
+									"docs",
+								],
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus(
+							path.resolve(basePath, "src/a.js"),
+						),
+						"ignored",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus(
+							path.resolve(basePath, "src/tools/foo.js"),
+						),
+						"ignored",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus(
+							path.resolve(basePath, "src/code/b.js"),
+						),
+						"ignored",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus(
+							path.resolve(basePath, "src/docs/foo.js"),
+						),
+						"ignored",
+					);
+				});
+			});
 		});
 
 		describe("isIgnored()", () => {
