@@ -226,16 +226,40 @@ describe("source-code", () => {
 				);
 			});
 
-			it("should handle the special case of `text.length`", () => {
+			it("should handle the special case of `text.length` when lineStart is 1 and columnStart is 0", () => {
 				const ast = {};
 				const text = "foo\nbar";
-				const sourceCode = new TextSourceCodeBase({ ast, text });
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineStart: 1,
+					columnStart: 0,
+				});
 
 				assert.deepStrictEqual(
 					sourceCode.getLocFromIndex(text.length),
 					{
 						line: 2,
 						column: 3,
+					},
+				);
+			});
+
+			it("should handle the special case of `text.length` when lineStart is 0 and columnStart is 1", () => {
+				const ast = {};
+				const text = "foo\nbar";
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineStart: 0,
+					columnStart: 1,
+				});
+
+				assert.deepStrictEqual(
+					sourceCode.getLocFromIndex(text.length),
+					{
+						line: 1,
+						column: 4,
 					},
 				);
 			});
@@ -278,10 +302,15 @@ describe("source-code", () => {
 				);
 			});
 
-			it("should convert index to location", () => {
+			it("should convert index to location when lineStart is 1 and columnStart is 0", () => {
 				const ast = {};
 				const text = "foo\nbar\r\nbaz";
-				const sourceCode = new TextSourceCodeBase({ ast, text });
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineStart: 1,
+					columnStart: 0,
+				});
 
 				assert.deepStrictEqual(sourceCode.getLocFromIndex(0), {
 					line: 1,
@@ -334,6 +363,70 @@ describe("source-code", () => {
 				assert.deepStrictEqual(sourceCode.getLocFromIndex(12), {
 					line: 3,
 					column: 3,
+				});
+			});
+
+			it("should convert index to location when lineStart is 0 and columnStart is 1", () => {
+				const ast = {};
+				const text = "foo\nbar\r\nbaz";
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineStart: 0,
+					columnStart: 1,
+				});
+
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(0), {
+					line: 0,
+					column: 1,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(1), {
+					line: 0,
+					column: 2,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(2), {
+					line: 0,
+					column: 3,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(3), {
+					line: 0,
+					column: 4,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(4), {
+					line: 1,
+					column: 1,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(5), {
+					line: 1,
+					column: 2,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(6), {
+					line: 1,
+					column: 3,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(7), {
+					line: 1,
+					column: 4,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(8), {
+					line: 1,
+					column: 5,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(9), {
+					line: 2,
+					column: 1,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(10), {
+					line: 2,
+					column: 2,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(11), {
+					line: 2,
+					column: 3,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(12), {
+					line: 2,
+					column: 4,
 				});
 			});
 
@@ -466,14 +559,54 @@ describe("source-code", () => {
 			});
 
 			it("should handle empty text", () => {
-				const ast = {};
-				const text = "";
-				const sourceCode = new TextSourceCodeBase({ ast, text });
-
-				assert.deepStrictEqual(sourceCode.getLocFromIndex(0), {
-					line: 1,
-					column: 0,
-				});
+				assert.deepStrictEqual(
+					new TextSourceCodeBase({
+						ast: {},
+						text: "",
+						lineStart: 1,
+						columnStart: 0,
+					}).getLocFromIndex(0),
+					{
+						line: 1,
+						column: 0,
+					},
+				);
+				assert.deepStrictEqual(
+					new TextSourceCodeBase({
+						ast: {},
+						text: "",
+						lineStart: 0,
+						columnStart: 1,
+					}).getLocFromIndex(0),
+					{
+						line: 0,
+						column: 1,
+					},
+				);
+				assert.deepStrictEqual(
+					new TextSourceCodeBase({
+						ast: {},
+						text: "",
+						lineStart: 0,
+						columnStart: 0,
+					}).getLocFromIndex(0),
+					{
+						line: 0,
+						column: 0,
+					},
+				);
+				assert.deepStrictEqual(
+					new TextSourceCodeBase({
+						ast: {},
+						text: "",
+						lineStart: 1,
+						columnStart: 1,
+					}).getLocFromIndex(0),
+					{
+						line: 1,
+						column: 1,
+					},
+				);
 			});
 
 			it("should handle text with only line breaks", () => {
@@ -499,10 +632,75 @@ describe("source-code", () => {
 				});
 			});
 
-			it("should symmetric with getIndexFromLoc()", () => {
+			it("should symmetric with getIndexFromLoc() when lineStart is 1 and columnStart is 0", () => {
 				const ast = {};
 				const text = "foo\nbar\r\nbaz";
-				const sourceCode = new TextSourceCodeBase({ ast, text });
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineStart: 1,
+					columnStart: 0,
+				});
+
+				for (let index = 0; index <= text.length; index++) {
+					assert.strictEqual(
+						index,
+						sourceCode.getIndexFromLoc(
+							sourceCode.getLocFromIndex(index),
+						),
+					);
+				}
+			});
+
+			it("should symmetric with getIndexFromLoc() when lineStart is 0 and columnStart is 1", () => {
+				const ast = {};
+				const text = "foo\nbar\r\nbaz";
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineStart: 0,
+					columnStart: 1,
+				});
+
+				for (let index = 0; index <= text.length; index++) {
+					assert.strictEqual(
+						index,
+						sourceCode.getIndexFromLoc(
+							sourceCode.getLocFromIndex(index),
+						),
+					);
+				}
+			});
+
+			it("should symmetric with getIndexFromLoc() when lineStart is 0 and columnStart is 0", () => {
+				const ast = {};
+				const text = "foo\nbar\r\nbaz";
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineStart: 0,
+					columnStart: 0,
+				});
+
+				for (let index = 0; index <= text.length; index++) {
+					assert.strictEqual(
+						index,
+						sourceCode.getIndexFromLoc(
+							sourceCode.getLocFromIndex(index),
+						),
+					);
+				}
+			});
+
+			it("should symmetric with getIndexFromLoc() when lineStart is 1 and columnStart is 1", () => {
+				const ast = {};
+				const text = "foo\nbar\r\nbaz";
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineStart: 1,
+					columnStart: 1,
+				});
 
 				for (let index = 0; index <= text.length; index++) {
 					assert.strictEqual(
