@@ -528,27 +528,6 @@ function shouldIgnorePath(configs, filePath, relativeFilePath, path) {
 }
 
 /**
- * Determines if a given file path is matched by a config based on
- * `ignores` only.
- * @param {string} filePath The unprocessed file path to check.
- * @param {string} relativeFilePath The path of the file to check relative to the base path,
- * 		using forward slash (`"/"`) as a separator.
- * @param {Object} config The config object to check.
- * @returns {boolean} True if the file path is matched by the config,
- *      false if not.
- */
-function pathMatchesIgnores(filePath, relativeFilePath, config) {
-	return (
-		Object.keys(config).filter(key => !META_FIELDS.has(key)).length > 1 &&
-		!shouldIgnorePath(
-			[{ ignores: config.ignores }],
-			filePath,
-			relativeFilePath,
-		)
-	);
-}
-
-/**
  * Determines if a given file path is matched by a config. If the config
  * has no `files` field, then it matches; otherwise, if a `files` field
  * is present then we match the globs in `files` and exclude any globs in
@@ -1063,17 +1042,37 @@ export class ConfigArray extends Array {
 					return;
 				}
 
-				if (pathMatchesIgnores(filePath, relativeFilePath, config)) {
+				if (
+					Object.keys(config).filter(key => !META_FIELDS.has(key))
+						.length === 1
+				) {
 					debug(
-						`Matching config found for ${filePath} (based on ignores: ${config.ignores})`,
+						`Skipped config found for ${filePath} (global ignores)`,
 					);
-					matchingConfigIndices.push(index);
+					return;
+				}
+
+				/*
+				 * Pass config object without `basePath`, because `relativeFilePath` is already
+				 * calculated as relative to it.
+				 */
+				if (
+					shouldIgnorePath(
+						[{ ignores: config.ignores }],
+						filePath,
+						relativeFilePath,
+					)
+				) {
+					debug(
+						`Skipped config found for ${filePath} (based on ignores: ${config.ignores})`,
+					);
 					return;
 				}
 
 				debug(
-					`Skipped config found for ${filePath} (based on ignores: ${config.ignores})`,
+					`Matching config found for ${filePath} (based on ignores: ${config.ignores})`,
 				);
+				matchingConfigIndices.push(index);
 				return;
 			}
 
