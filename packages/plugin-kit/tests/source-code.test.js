@@ -1021,6 +1021,324 @@ describe("source-code", () => {
 					/Column number out of range/u,
 				);
 			});
+
+			it("should convert loc to index when lineStart is 1 and columnStart is 0", () => {
+				const ast = {};
+				const text = "foo\nbar\r\nbaz";
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineStart: 1,
+					columnStart: 0,
+				});
+
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 1, column: 0 }),
+					0,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 1, column: 1 }),
+					1,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 1, column: 2 }),
+					2,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 1, column: 3 }),
+					3,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 2, column: 0 }),
+					4,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 2, column: 1 }),
+					5,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 2, column: 2 }),
+					6,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 2, column: 3 }),
+					7,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 2, column: 4 }),
+					8,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 3, column: 0 }),
+					9,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 3, column: 1 }),
+					10,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 3, column: 2 }),
+					11,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 3, column: 3 }),
+					12,
+				);
+			});
+
+			it("should convert loc to index when lineStart is 0 and columnStart is 1", () => {
+				const ast = {};
+				const text = "foo\nbar\r\nbaz";
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineStart: 0,
+					columnStart: 1,
+				});
+
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 0, column: 1 }),
+					0,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 0, column: 2 }),
+					1,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 0, column: 3 }),
+					2,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 0, column: 4 }),
+					3,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 1, column: 1 }),
+					4,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 1, column: 2 }),
+					5,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 1, column: 3 }),
+					6,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 1, column: 4 }),
+					7,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 1, column: 5 }),
+					8,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 2, column: 1 }),
+					9,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 2, column: 2 }),
+					10,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 2, column: 3 }),
+					11,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 2, column: 4 }),
+					12,
+				);
+			});
+
+			it("should convert loc to index when lineStart is 0 and columnStart is 0", () => {
+				const ast = {};
+				const text = "foo\nbar\r\nbaz";
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineStart: 0,
+					columnStart: 0,
+				});
+
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 0, column: 0 }),
+					0,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 0, column: 1 }),
+					1,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 0, column: 2 }),
+					2,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 0, column: 3 }),
+					3,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 1, column: 0 }),
+					4,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 1, column: 1 }),
+					5,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 1, column: 2 }),
+					6,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 1, column: 3 }),
+					7,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 1, column: 4 }),
+					8,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 2, column: 0 }),
+					9,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 2, column: 1 }),
+					10,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 2, column: 2 }),
+					11,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 2, column: 3 }),
+					12,
+				);
+			});
+
+			it("should convert loc to index when lineStart is 1 and columnStart is 1", () => {
+				const ast = {};
+				const text = "foo\nbar\r\nbaz";
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineStart: 1,
+					columnStart: 1,
+				});
+
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 1, column: 1 }),
+					0,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 1, column: 2 }),
+					1,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 1, column: 3 }),
+					2,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 1, column: 4 }),
+					3,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 2, column: 1 }),
+					4,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 2, column: 2 }),
+					5,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 2, column: 3 }),
+					6,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 2, column: 4 }),
+					7,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 2, column: 5 }),
+					8,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 3, column: 1 }),
+					9,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 3, column: 2 }),
+					10,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 3, column: 3 }),
+					11,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 3, column: 4 }),
+					12,
+				);
+			});
+
+			it("should handle empty text", () => {
+				assert.deepStrictEqual(
+					new TextSourceCodeBase({
+						ast: {},
+						text: "",
+						lineStart: 1,
+						columnStart: 0,
+					}).getIndexFromLoc({ line: 1, column: 0 }),
+					0,
+				);
+				assert.deepStrictEqual(
+					new TextSourceCodeBase({
+						ast: {},
+						text: "",
+						lineStart: 0,
+						columnStart: 1,
+					}).getIndexFromLoc({ line: 0, column: 1 }),
+					0,
+				);
+				assert.deepStrictEqual(
+					new TextSourceCodeBase({
+						ast: {},
+						text: "",
+						lineStart: 0,
+						columnStart: 0,
+					}).getIndexFromLoc({ line: 0, column: 0 }),
+					0,
+				);
+				assert.deepStrictEqual(
+					new TextSourceCodeBase({
+						ast: {},
+						text: "",
+						lineStart: 1,
+						columnStart: 1,
+					}).getIndexFromLoc({ line: 1, column: 1 }),
+					0,
+				);
+			});
+
+			it("should handle text with only line breaks", () => {
+				const ast = {};
+				const text = "\n\r\n";
+				const sourceCode = new TextSourceCodeBase({ ast, text });
+
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 1, column: 0 }),
+					0,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 2, column: 0 }),
+					1,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 2, column: 1 }),
+					2,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 3, column: 0 }),
+					3,
+				);
+			});
 		});
 
 		describe("getRange()", () => {
