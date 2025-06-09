@@ -15,7 +15,7 @@ yarn add @eslint/plugin-kit
 # or
 pnpm install @eslint/plugin-kit
 # or
-bun install @eslint/plugin-kit
+bun add @eslint/plugin-kit
 ```
 
 For Deno:
@@ -28,10 +28,10 @@ deno add @eslint/plugin-kit
 
 This package exports the following utilities:
 
-- `ConfigCommentParser` - used to parse ESLint configuration comments (i.e., `/* eslint-disable rule */`)
-- `VisitNodeStep` and `CallMethodStep` - used to help implement `SourceCode#traverse()`
-- `Directive` - used to help implement `SourceCode#getDisableDirectives()`
-- `TextSourceCodeBase` - base class to help implement the `SourceCode` interface
+- [`ConfigCommentParser`](#configcommentparser) - used to parse ESLint configuration comments (i.e., `/* eslint-disable rule */`)
+- [`VisitNodeStep` and `CallMethodStep`](#visitnodestep-and-callmethodstep) - used to help implement `SourceCode#traverse()`
+- [`Directive`](#directive) - used to help implement `SourceCode#getDisableDirectives()`
+- [`TextSourceCodeBase`](#textsourcecodebase) - base class to help implement the `SourceCode` interface
 
 ### `ConfigCommentParser`
 
@@ -52,7 +52,7 @@ const directive = commentParser.parseDirective(
 if (directive) {
 	console.log(directive.label); // "eslint-disable"
 	console.log(directive.value); // "prefer-const, semi"
-	console.log(directive.justification); // "I don't want to use these"
+	console.log(directive.justification); // "I don't want to use these."
 }
 ```
 
@@ -124,9 +124,7 @@ For example:
 import { VisitNodeStep, CallMethodStep } from "@eslint/plugin-kit";
 
 class MySourceCode {
-
     traverse() {
-
         const steps = [];
 
         for (const { node, parent, phase } of iterator(this.ast)) {

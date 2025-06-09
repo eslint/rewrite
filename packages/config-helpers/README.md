@@ -15,7 +15,7 @@ yarn add @eslint/config-helpers
 # or
 pnpm install @eslint/config-helpers
 # or
-bun install @eslint/config-helpers
+bun add @eslint/config-helpers
 ```
 
 For Deno:
