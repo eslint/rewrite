@@ -38,8 +38,7 @@
   "homepage": "https://github.com/eslint/rewrite#readme",
   "devDependencies": {
     "@types/eslint": "^9.6.0",
-    "eslint": "^9.27.0",
-    "mocha": "^10.4.0"
+    "eslint": "^9.27.0"
   },
   "engines": {
     "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
