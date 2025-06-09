@@ -30,6 +30,7 @@ const validSeverities = new Set([0, 1, 2, "off", "warn", "error"]);
 /**
  * Determines if the severity in the rule configuration is valid.
  * @param {RuleConfig} ruleConfig A rule's configuration.
+ * @returns {boolean} `true` if the severity is valid, otherwise `false`.
  */
 function isSeverityValid(ruleConfig) {
 	const severity = Array.isArray(ruleConfig) ? ruleConfig[0] : ruleConfig;
