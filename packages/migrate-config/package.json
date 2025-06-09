@@ -16,11 +16,13 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "mocha tests/*.js"
+    "test": "mocha tests/*.js",
+    "test:coverage": "c8 npm test"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/eslint/rewrite.git"
+    "url": "git+https://github.com/eslint/rewrite.git",
+    "directory": "packages/migrate-config"
   },
   "keywords": [
     "eslint",
@@ -35,7 +37,7 @@
   "bugs": {
     "url": "https://github.com/eslint/rewrite/issues"
   },
-  "homepage": "https://github.com/eslint/rewrite#readme",
+  "homepage": "https://github.com/eslint/rewrite/tree/main/packages/migrate-config#readme",
   "devDependencies": {
     "@types/eslint": "^9.6.0",
     "eslint": "^9.27.0",
