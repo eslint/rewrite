@@ -48,7 +48,6 @@
   },
   "homepage": "https://github.com/eslint/rewrite#readme",
   "devDependencies": {
-    "rollup": "^4.16.2",
     "rollup-plugin-copy": "^3.5.0"
   },
   "engines": {

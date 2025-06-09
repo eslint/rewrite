@@ -49,8 +49,7 @@
   "homepage": "https://github.com/eslint/rewrite#readme",
   "devDependencies": {
     "@eslint/core": "^0.14.0",
-    "eslint": "^9.27.0",
-    "rollup": "^4.16.2"
+    "eslint": "^9.27.0"
   },
   "peerDependencies": {
     "eslint": "^9.10.0"
