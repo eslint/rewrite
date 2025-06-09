@@ -34,8 +34,7 @@
   "homepage": "https://github.com/eslint/rewrite/tree/main/packages/mcp#readme",
   "devDependencies": {
     "c8": "^9.1.0",
-    "mocha": "^10.4.0",
-    "typescript": "^5.4.5"
+    "mocha": "^10.4.0"
   },
   "engines": {
     "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
