@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.15.0](https://github.com/eslint/rewrite/compare/core-v0.14.0...core-v0.15.0) (2025-06-09)
+
+
+### Features
+
+* Add extendable config types ([#210](https://github.com/eslint/rewrite/issues/210)) ([3089754](https://github.com/eslint/rewrite/commit/3089754848c1acd30368424271810cc9703a6cd4))
+
 ## [0.14.0](https://github.com/eslint/rewrite/compare/core-v0.13.0...core-v0.14.0) (2025-04-30)
 
 
