@@ -616,7 +616,55 @@ describe("ConfigArray", () => {
 			});
 		});
 
-		it("should create a new object with UNC `basePath` when normalizing relative `basePath` on windows (async)", async () => {
+		it("should create a new object with absolute `basePath` without trailing slash when normalizing relative `basePath` with trailing slash on posix (async)", async () => {
+			const config = {
+				basePath: "baz/qux/",
+				defs: {
+					"test-def": "test-value",
+				},
+			};
+
+			configs = new ConfigArray([config], {
+				basePath: "/foo/bar",
+				schema,
+			});
+
+			await configs.normalize();
+
+			assert.notStrictEqual(configs[0], config);
+			assert.deepStrictEqual(configs[0], {
+				basePath: "/foo/bar/baz/qux",
+				defs: {
+					"test-def": "test-value",
+				},
+			});
+		});
+
+		it("should create a new object with absolute `basePath` without trailing slash when normalizing relative `basePath` with trailing slash on posix (sync)", () => {
+			const config = {
+				basePath: "baz/qux/",
+				defs: {
+					"test-def": "test-value",
+				},
+			};
+
+			configs = new ConfigArray([config], {
+				basePath: "/foo/bar",
+				schema,
+			});
+
+			configs.normalizeSync();
+
+			assert.notStrictEqual(configs[0], config);
+			assert.deepStrictEqual(configs[0], {
+				basePath: "/foo/bar/baz/qux",
+				defs: {
+					"test-def": "test-value",
+				},
+			});
+		});
+
+		it("should create a new object with namespaced `basePath` when normalizing relative `basePath` on windows (async)", async () => {
 			const config = {
 				basePath: "baz/qux",
 				defs: {
@@ -640,9 +688,57 @@ describe("ConfigArray", () => {
 			});
 		});
 
-		it("should create a new object with UNC `basePath` when normalizing relative `basePath` on windows (sync)", () => {
+		it("should create a new object with namespaced `basePath` when normalizing relative `basePath` on windows (sync)", () => {
 			const config = {
 				basePath: "baz/qux",
+				defs: {
+					"test-def": "test-value",
+				},
+			};
+
+			configs = new ConfigArray([config], {
+				basePath: "C:\\foo\\bar",
+				schema,
+			});
+
+			configs.normalizeSync();
+
+			assert.notStrictEqual(configs[0], config);
+			assert.deepStrictEqual(configs[0], {
+				basePath: "\\\\?\\C:\\foo\\bar\\baz\\qux",
+				defs: {
+					"test-def": "test-value",
+				},
+			});
+		});
+
+		it("should create a new object with namespaced `basePath` without trailing slash when normalizing relative `basePath` with trailing slash on windows (async)", async () => {
+			const config = {
+				basePath: "baz/qux/",
+				defs: {
+					"test-def": "test-value",
+				},
+			};
+
+			configs = new ConfigArray([config], {
+				basePath: "C:\\foo\\bar",
+				schema,
+			});
+
+			await configs.normalize();
+
+			assert.notStrictEqual(configs[0], config);
+			assert.deepStrictEqual(configs[0], {
+				basePath: "\\\\?\\C:\\foo\\bar\\baz\\qux",
+				defs: {
+					"test-def": "test-value",
+				},
+			});
+		});
+
+		it("should create a new object with namespaced `basePath` without trailing slash when normalizing relative `basePath` with trailing slash on windows (sync)", () => {
+			const config = {
+				basePath: "baz/qux/",
 				defs: {
 					"test-def": "test-value",
 				},
@@ -712,7 +808,7 @@ describe("ConfigArray", () => {
 			});
 		});
 
-		it("should create a new object with UNC `basePath` when normalizing absolute `basePath` on windows (async)", async () => {
+		it("should create a new object with namespaced `basePath` when normalizing absolute `basePath` on windows (async)", async () => {
 			const config = {
 				basePath: "C:\\foo",
 				defs: {
@@ -736,7 +832,7 @@ describe("ConfigArray", () => {
 			});
 		});
 
-		it("should create a new object with UNC `basePath` when normalizing absolute `basePath` on windows (sync)", () => {
+		it("should create a new object with namespaced `basePath` when normalizing absolute `basePath` on windows (sync)", () => {
 			const config = {
 				basePath: "C:\\foo",
 				defs: {

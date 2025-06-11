@@ -321,7 +321,10 @@ function normalizeConfigPatterns(config, namespacedBasePath, path) {
 		if (path.isAbsolute(config.basePath)) {
 			newConfig.basePath = path.toNamespacedPath(config.basePath);
 		} else {
-			newConfig.basePath = path.join(namespacedBasePath, config.basePath);
+			newConfig.basePath = path.resolve(
+				namespacedBasePath,
+				config.basePath,
+			);
 		}
 	}
 
