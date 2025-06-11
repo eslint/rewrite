@@ -488,16 +488,40 @@ function toRelativePath(fileOrDirPath, namespacedBasePath, path) {
  * @param {string} filePath The unprocessed file path to check.
  * @param {string} relativeFilePath The path of the file to check relative to the base path,
  * 		using forward slash (`"/"`) as a separator.
- * @param {PathImpl} [path] Path-handling implementations.
+ * @param {Object} [basePathData] Additional data needed to recalculate paths for configuration objects
+ *  	that have `basePath` property.
+ * @param {string} [basePathData.basePath] Namespaced path to witch `relativeFilePath` is relative.
+ * @param {PathImpl} [basePathData.path] Path-handling implementation.
  * @returns {boolean} True if the path should be ignored and false if not.
  */
-function shouldIgnorePath(configs, filePath, relativeFilePath, path) {
+function shouldIgnorePath(
+	configs,
+	filePath,
+	relativeFilePath,
+	{ basePath, path } = {},
+) {
 	let shouldIgnore = false;
 
 	for (const config of configs) {
-		const relativeFilePathToCheck = config.basePath
-			? `${toRelativePath(filePath, config.basePath, path)}${relativeFilePath.endsWith("/") ? "/" : ""}`
-			: relativeFilePath;
+		let relativeFilePathToCheck = relativeFilePath;
+		if (config.basePath) {
+			relativeFilePathToCheck = toRelativePath(
+				path.resolve(basePath, relativeFilePath),
+				config.basePath,
+				path,
+			);
+
+			if (
+				relativeFilePathToCheck === "" ||
+				EXTERNAL_PATH_REGEX.test(relativeFilePathToCheck)
+			) {
+				continue;
+			}
+
+			if (relativeFilePath.endsWith("/")) {
+				relativeFilePathToCheck += "/";
+			}
+		}
 		shouldIgnore = config.ignores.reduce((ignored, matcher) => {
 			if (!ignored) {
 				if (typeof matcher === "function") {
@@ -567,6 +591,10 @@ function pathMatches(filePath, relativeFilePath, config) {
 	 * if there are any files to ignore.
 	 */
 	if (filePathMatchesPattern && config.ignores) {
+		/*
+		 * Pass config object without `basePath`, because `relativeFilePath` is already
+		 * calculated as relative to it.
+		 */
 		filePathMatchesPattern = !shouldIgnorePath(
 			[{ ignores: config.ignores }],
 			filePath,
@@ -999,12 +1027,10 @@ export class ConfigArray extends Array {
 		}
 
 		if (
-			shouldIgnorePath(
-				this.ignores,
-				filePath,
-				relativeToBaseFilePath,
-				this.#path,
-			)
+			shouldIgnorePath(this.ignores, filePath, relativeToBaseFilePath, {
+				basePath: this.#namespacedBasePath,
+				path: this.#path,
+			})
 		) {
 			debug(`Ignoring ${filePath} based on file pattern`);
 
@@ -1301,7 +1327,10 @@ export class ConfigArray extends Array {
 				this.ignores,
 				this.#path.join(this.basePath, relativeDirectoryToCheck),
 				relativeDirectoryToCheck,
-				this.#path,
+				{
+					basePath: this.#namespacedBasePath,
+					path: this.#path,
+				},
 			);
 
 			cache.set(relativeDirectoryToCheck, result);
