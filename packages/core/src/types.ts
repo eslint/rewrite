@@ -679,6 +679,7 @@ export interface LinterOptionsConfig {
  */
 export type RuleConfig<RuleOptions extends unknown[] = unknown[]> =
 	| Severity
+	| [Severity]
 	| [Severity, ...RuleOptions];
 
 /* eslint-disable @typescript-eslint/consistent-indexed-object-style -- needed to allow extension */
