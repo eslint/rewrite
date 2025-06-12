@@ -46,7 +46,7 @@
   },
   "homepage": "https://github.com/eslint/rewrite/tree/main/packages/<%= name %>#readme",
   "devDependencies": {
-    "@eslint/core": "^0.14.0",
+    "@eslint/core": "^0.15.0",
     "eslint": "^9.27.0",
     "rollup-plugin-copy": "^3.5.0"
   },
