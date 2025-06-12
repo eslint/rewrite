@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.5.1](https://github.com/eslint/rewrite/compare/migrate-config-v1.5.0...migrate-config-v1.5.1) (2025-06-09)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/compat bumped from ^1.2.9 to ^1.3.0
+
 ## [1.5.0](https://github.com/eslint/rewrite/compare/migrate-config-v1.4.1...migrate-config-v1.5.0) (2025-05-01)
 
 

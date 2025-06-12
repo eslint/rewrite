@@ -1,6 +1,6 @@
 {
   "name": "@eslint/config-array",
-  "version": "0.20.0",
+  "version": "0.20.1",
   "description": "General purpose glob-based configuration matching.",
   "author": "Nicholas C. Zakas",
   "type": "module",
@@ -24,12 +24,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/eslint/rewrite.git"
+    "url": "git+https://github.com/eslint/rewrite.git",
+    "directory": "packages/config-array"
   },
   "bugs": {
     "url": "https://github.com/eslint/rewrite/issues"
   },
-  "homepage": "https://github.com/eslint/rewrite#readme",
+  "homepage": "https://github.com/eslint/rewrite/tree/main/packages/config-array#readme",
   "scripts": {
     "build:dedupe-types": "node ../../tools/dedupe-types.js dist/cjs/index.cjs dist/esm/index.js",
     "build:cts": "node ../../tools/build-cts.js dist/esm/index.d.ts dist/cjs/index.d.cts",

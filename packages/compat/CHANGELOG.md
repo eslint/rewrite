@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.3.0](https://github.com/eslint/rewrite/compare/compat-v1.2.9...compat-v1.3.0) (2025-06-09)
+
+
+### Features
+
+* add support for custom name parameter to `includeIgnoreFile` ([#211](https://github.com/eslint/rewrite/issues/211)) ([3e18175](https://github.com/eslint/rewrite/commit/3e1817535e75f6feca7aee6d9ec2afaa0f6ad859))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @eslint/core bumped from ^0.14.0 to ^0.15.0
+
 ## [1.2.9](https://github.com/eslint/rewrite/compare/compat-v1.2.8...compat-v1.2.9) (2025-05-01)
 
 
