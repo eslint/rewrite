@@ -55,11 +55,7 @@
   "devDependencies": {
     "@jsr/std__path": "^1.0.4",
     "@types/minimatch": "^3.0.5",
-    "c8": "^9.1.0",
-    "mocha": "^10.4.0",
-    "rollup": "^4.16.2",
-    "rollup-plugin-copy": "^3.5.0",
-    "typescript": "^5.4.5"
+    "rollup-plugin-copy": "^3.5.0"
   },
   "engines": {
     "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
