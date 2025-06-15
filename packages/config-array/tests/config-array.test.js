@@ -4627,6 +4627,43 @@ describe("ConfigArray", () => {
 					},
 				]);
 			});
+
+			it("should ignore basePath field when considering global ignores", () => {
+				configs = new ConfigArray(
+					[
+						{
+							basePath: "src",
+							ignores: ["ignoreme1"],
+						},
+						{
+							name: "foo",
+							basePath: "tools",
+							ignores: ["ignoreme2"],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.deepStrictEqual(configs.ignores, [
+					{
+						basePath: path.toNamespacedPath(
+							path.join(basePath, "src"),
+						),
+						ignores: ["ignoreme1"],
+					},
+					{
+						name: "foo",
+						basePath: path.toNamespacedPath(
+							path.join(basePath, "tools"),
+						),
+						ignores: ["ignoreme2"],
+					},
+				]);
+			});
 		});
 
 		describe("push()", () => {
