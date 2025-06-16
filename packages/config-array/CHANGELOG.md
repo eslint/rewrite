@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.20.1](https://github.com/eslint/rewrite/compare/config-array-v0.20.0...config-array-v0.20.1) (2025-06-09)
+
+
+### Bug Fixes
+
+* consider negated patterns universal ([#220](https://github.com/eslint/rewrite/issues/220)) ([2dbe2b9](https://github.com/eslint/rewrite/commit/2dbe2b9c9431997bb4a1ab0335d8101564b62a41))
+* explicit match in array elements of `files` ([#218](https://github.com/eslint/rewrite/issues/218)) ([e84cbd7](https://github.com/eslint/rewrite/commit/e84cbd7468765c25c01fc420b43d75a256533da2))
+
 ## [0.20.0](https://github.com/eslint/rewrite/compare/config-array-v0.19.2...config-array-v0.20.0) (2025-03-24)
 
 
