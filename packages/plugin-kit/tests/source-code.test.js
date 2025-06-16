@@ -954,24 +954,33 @@ describe("source-code", () => {
 					() => {
 						sourceCode.getIndexFromLoc({ line: 1, column: -1 });
 					},
-					RangeError,
-					/Column number out of range/u,
+					{
+						name: "RangeError",
+						message:
+							"Column number out of range (column -1 requested). Valid range for line 1: 0-3",
+					},
 				);
 
 				assert.throws(
 					() => {
 						sourceCode.getIndexFromLoc({ line: 1, column: 4 });
 					},
-					RangeError,
-					/Column number out of range/u,
+					{
+						name: "RangeError",
+						message:
+							"Column number out of range (column 4 requested). Valid range for line 1: 0-3",
+					},
 				);
 
 				assert.throws(
 					() => {
 						sourceCode.getIndexFromLoc({ line: 2, column: 4 });
 					},
-					RangeError,
-					/Column number out of range/u,
+					{
+						name: "RangeError",
+						message:
+							"Column number out of range (column 4 requested). Valid range for line 2: 0-2",
+					},
 				);
 			});
 
@@ -989,24 +998,33 @@ describe("source-code", () => {
 					() => {
 						sourceCode.getIndexFromLoc({ line: 0, column: 0 });
 					},
-					RangeError,
-					/Column number out of range/u,
+					{
+						name: "RangeError",
+						message:
+							"Column number out of range (column 0 requested). Valid range for line 0: 1-4",
+					},
 				);
 
 				assert.throws(
 					() => {
 						sourceCode.getIndexFromLoc({ line: 0, column: 5 });
 					},
-					RangeError,
-					/Column number out of range/u,
+					{
+						name: "RangeError",
+						message:
+							"Column number out of range (column 5 requested). Valid range for line 0: 1-4",
+					},
 				);
 
 				assert.throws(
 					() => {
 						sourceCode.getIndexFromLoc({ line: 1, column: 5 });
 					},
-					RangeError,
-					/Column number out of range/u,
+					{
+						name: "RangeError",
+						message:
+							"Column number out of range (column 5 requested). Valid range for line 1: 1-3",
+					},
 				);
 			});
 
@@ -1024,24 +1042,33 @@ describe("source-code", () => {
 					() => {
 						sourceCode.getIndexFromLoc({ line: 0, column: -1 });
 					},
-					RangeError,
-					/Column number out of range/u,
+					{
+						name: "RangeError",
+						message:
+							"Column number out of range (column -1 requested). Valid range for line 0: 0-3",
+					},
 				);
 
 				assert.throws(
 					() => {
 						sourceCode.getIndexFromLoc({ line: 0, column: 4 });
 					},
-					RangeError,
-					/Column number out of range/u,
+					{
+						name: "RangeError",
+						message:
+							"Column number out of range (column 4 requested). Valid range for line 0: 0-3",
+					},
 				);
 
 				assert.throws(
 					() => {
 						sourceCode.getIndexFromLoc({ line: 1, column: 4 });
 					},
-					RangeError,
-					/Column number out of range/u,
+					{
+						name: "RangeError",
+						message:
+							"Column number out of range (column 4 requested). Valid range for line 1: 0-2",
+					},
 				);
 			});
 
@@ -1059,24 +1086,33 @@ describe("source-code", () => {
 					() => {
 						sourceCode.getIndexFromLoc({ line: 1, column: 0 });
 					},
-					RangeError,
-					/Column number out of range/u,
+					{
+						name: "RangeError",
+						message:
+							"Column number out of range (column 0 requested). Valid range for line 1: 1-4",
+					},
 				);
 
 				assert.throws(
 					() => {
 						sourceCode.getIndexFromLoc({ line: 1, column: 5 });
 					},
-					RangeError,
-					/Column number out of range/u,
+					{
+						name: "RangeError",
+						message:
+							"Column number out of range (column 5 requested). Valid range for line 1: 1-4",
+					},
 				);
 
 				assert.throws(
 					() => {
 						sourceCode.getIndexFromLoc({ line: 2, column: 5 });
 					},
-					RangeError,
-					/Column number out of range/u,
+					{
+						name: "RangeError",
+						message:
+							"Column number out of range (column 5 requested). Valid range for line 2: 1-3",
+					},
 				);
 			});
 

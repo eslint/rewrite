@@ -435,7 +435,7 @@ export class TextSourceCodeBase {
 				positionIndex >= lineEndIndex)
 		) {
 			throw new RangeError(
-				`Column number out of range (column ${loc.column} requested). Valid range for line ${loc.line}: ${this.#columnStart}-${lineEndIndex - lineStartIndex}`,
+				`Column number out of range (column ${loc.column} requested). Valid range for line ${loc.line}: ${this.#columnStart}-${lineEndIndex - lineStartIndex - 1 + this.#columnStart}`,
 			);
 		}
 
