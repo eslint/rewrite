@@ -414,7 +414,7 @@ export class TextSourceCodeBase {
 			this.#lineStartIndices.length - 1 + this.#lineStart < loc.line
 		) {
 			throw new RangeError(
-				`Line number out of range (line ${loc.line} requested). Line numbers should be more than or equal to ${this.#lineStart} and less than or equal to ${this.#lineStartIndices.length - 1 + this.#lineStart}.`,
+				`Line number out of range (line ${loc.line} requested). Valid range: ${this.#lineStart}-${this.#lineStartIndices.length - 1 + this.#lineStart}`,
 			);
 		}
 
@@ -434,7 +434,7 @@ export class TextSourceCodeBase {
 				positionIndex >= lineEndIndex)
 		) {
 			throw new RangeError(
-				`Column number out of range (column ${loc.column} requested). Column number for line ${loc.line} should be more than or equal to ${this.#columnStart} and less than or equal to ${lineEndIndex - lineStartIndex}.`,
+				`Column number out of range (column ${loc.column} requested). Valid range for line ${loc.line}: ${this.#columnStart}-${lineEndIndex - lineStartIndex}`,
 			);
 		}
 
