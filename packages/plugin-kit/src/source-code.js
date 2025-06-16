@@ -400,6 +400,7 @@ export class TextSourceCodeBase {
 	 */
 	getIndexFromLoc(loc) {
 		if (
+			loc === null ||
 			typeof loc !== "object" ||
 			typeof loc.line !== "number" ||
 			typeof loc.column !== "number"

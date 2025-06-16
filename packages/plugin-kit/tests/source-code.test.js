@@ -165,36 +165,46 @@ describe("source-code", () => {
 					() => {
 						sourceCode.getLocFromIndex("5");
 					},
-					TypeError,
-					"Expected `index` to be a number.",
+					{
+						name: "TypeError",
+						message: "Expected `index` to be a number.",
+					},
 				);
 				assert.throws(
 					() => {
 						sourceCode.getLocFromIndex(null);
 					},
-					TypeError,
-					"Expected `index` to be a number.",
+					{
+						name: "TypeError",
+						message: "Expected `index` to be a number.",
+					},
 				);
 				assert.throws(
 					() => {
 						sourceCode.getLocFromIndex(undefined);
 					},
-					TypeError,
-					"Expected `index` to be a number.",
+					{
+						name: "TypeError",
+						message: "Expected `index` to be a number.",
+					},
 				);
 				assert.throws(
 					() => {
 						sourceCode.getLocFromIndex(true);
 					},
-					TypeError,
-					"Expected `index` to be a number.",
+					{
+						name: "TypeError",
+						message: "Expected `index` to be a number.",
+					},
 				);
 				assert.throws(
 					() => {
 						sourceCode.getLocFromIndex(false);
 					},
-					TypeError,
-					"Expected `index` to be a number.",
+					{
+						name: "TypeError",
+						message: "Expected `index` to be a number.",
+					},
 				);
 			});
 
@@ -207,8 +217,11 @@ describe("source-code", () => {
 					() => {
 						sourceCode.getLocFromIndex(-1);
 					},
-					RangeError,
-					/Index out of range/u,
+					{
+						name: "RangeError",
+						message:
+							"Index out of range (requested index -1, but source text has length 7).",
+					},
 				);
 			});
 
@@ -221,8 +234,11 @@ describe("source-code", () => {
 					() => {
 						sourceCode.getLocFromIndex(text.length + 1);
 					},
-					RangeError,
-					/Index out of range/u,
+					{
+						name: "RangeError",
+						message:
+							"Index out of range (requested index 8, but source text has length 7).",
+					},
 				);
 			});
 
@@ -723,24 +739,33 @@ describe("source-code", () => {
 					() => {
 						sourceCode.getIndexFromLoc("invalid");
 					},
-					TypeError,
-					"Expected `loc` to be an object with numeric `line` and `column` properties.",
+					{
+						name: "TypeError",
+						message:
+							"Expected `loc` to be an object with numeric `line` and `column` properties.",
+					},
 				);
 
 				assert.throws(
 					() => {
 						sourceCode.getIndexFromLoc(null);
 					},
-					TypeError,
-					"Expected `loc` to be an object with numeric `line` and `column` properties.",
+					{
+						name: "TypeError",
+						message:
+							"Expected `loc` to be an object with numeric `line` and `column` properties.",
+					},
 				);
 
 				assert.throws(
 					() => {
 						sourceCode.getIndexFromLoc(undefined);
 					},
-					TypeError,
-					"Expected `loc` to be an object with numeric `line` and `column` properties.",
+					{
+						name: "TypeError",
+						message:
+							"Expected `loc` to be an object with numeric `line` and `column` properties.",
+					},
 				);
 			});
 
@@ -753,24 +778,33 @@ describe("source-code", () => {
 					() => {
 						sourceCode.getIndexFromLoc({});
 					},
-					TypeError,
-					"Expected `loc` to be an object with numeric `line` and `column` properties.",
+					{
+						name: "TypeError",
+						message:
+							"Expected `loc` to be an object with numeric `line` and `column` properties.",
+					},
 				);
 
 				assert.throws(
 					() => {
 						sourceCode.getIndexFromLoc({ line: "1", column: 0 });
 					},
-					TypeError,
-					"Expected `loc` to be an object with numeric `line` and `column` properties.",
+					{
+						name: "TypeError",
+						message:
+							"Expected `loc` to be an object with numeric `line` and `column` properties.",
+					},
 				);
 
 				assert.throws(
 					() => {
 						sourceCode.getIndexFromLoc({ line: 1, column: "0" });
 					},
-					TypeError,
-					"Expected `loc` to be an object with numeric `line` and `column` properties.",
+					{
+						name: "TypeError",
+						message:
+							"Expected `loc` to be an object with numeric `line` and `column` properties.",
+					},
 				);
 			});
 
@@ -788,16 +822,22 @@ describe("source-code", () => {
 					() => {
 						sourceCode.getIndexFromLoc({ line: 0, column: 0 });
 					},
-					RangeError,
-					/Line number out of range/u,
+					{
+						name: "RangeError",
+						message:
+							"Line number out of range (line 0 requested). Valid range: 1-2",
+					},
 				);
 
 				assert.throws(
 					() => {
 						sourceCode.getIndexFromLoc({ line: 3, column: 0 });
 					},
-					RangeError,
-					/Line number out of range/u,
+					{
+						name: "RangeError",
+						message:
+							"Line number out of range (line 3 requested). Valid range: 1-2",
+					},
 				);
 			});
 
@@ -815,16 +855,22 @@ describe("source-code", () => {
 					() => {
 						sourceCode.getIndexFromLoc({ line: -1, column: 1 });
 					},
-					RangeError,
-					/Line number out of range/u,
+					{
+						name: "RangeError",
+						message:
+							"Line number out of range (line -1 requested). Valid range: 0-1",
+					},
 				);
 
 				assert.throws(
 					() => {
 						sourceCode.getIndexFromLoc({ line: 2, column: 1 });
 					},
-					RangeError,
-					/Line number out of range/u,
+					{
+						name: "RangeError",
+						message:
+							"Line number out of range (line 2 requested). Valid range: 0-1",
+					},
 				);
 			});
 
@@ -842,16 +888,22 @@ describe("source-code", () => {
 					() => {
 						sourceCode.getIndexFromLoc({ line: -1, column: 0 });
 					},
-					RangeError,
-					/Line number out of range/u,
+					{
+						name: "RangeError",
+						message:
+							"Line number out of range (line -1 requested). Valid range: 0-1",
+					},
 				);
 
 				assert.throws(
 					() => {
 						sourceCode.getIndexFromLoc({ line: 2, column: 0 });
 					},
-					RangeError,
-					/Line number out of range/u,
+					{
+						name: "RangeError",
+						message:
+							"Line number out of range (line 2 requested). Valid range: 0-1",
+					},
 				);
 			});
 
@@ -869,16 +921,22 @@ describe("source-code", () => {
 					() => {
 						sourceCode.getIndexFromLoc({ line: 0, column: 1 });
 					},
-					RangeError,
-					/Line number out of range/u,
+					{
+						name: "RangeError",
+						message:
+							"Line number out of range (line 0 requested). Valid range: 1-2",
+					},
 				);
 
 				assert.throws(
 					() => {
 						sourceCode.getIndexFromLoc({ line: 3, column: 1 });
 					},
-					RangeError,
-					/Line number out of range/u,
+					{
+						name: "RangeError",
+						message:
+							"Line number out of range (line 3 requested). Valid range: 1-2",
+					},
 				);
 			});
 
