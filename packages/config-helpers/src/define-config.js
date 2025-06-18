@@ -34,7 +34,7 @@ const eslintrcKeys = [
 	"root",
 ];
 
-const allowedGlobalIgnoreKeys = new Set(["ignores", "name"]);
+const allowedGlobalIgnoreKeys = new Set(["basePath", "ignores", "name"]);
 
 /**
  * Gets the name of a config object.

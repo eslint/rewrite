@@ -1568,6 +1568,23 @@ describe("defineConfig()", () => {
 			]);
 		});
 
+		it("should omit base config when it only has ignores", () => {
+			const config = defineConfig({
+				basePath: "my-base-path",
+				ignores: ["test/*.js"],
+				extends: [{ rules: { "no-console": "error" } }],
+			});
+
+			assert.deepStrictEqual(config, [
+				{
+					name: "UserConfig[0] > ExtendedConfig[0]",
+					basePath: "my-base-path",
+					ignores: ["test/*.js"],
+					rules: { "no-console": "error" },
+				},
+			]);
+		});
+
 		it("should throw an error when an extended config has `basePath`", () => {
 			assert.throws(() => {
 				defineConfig({
