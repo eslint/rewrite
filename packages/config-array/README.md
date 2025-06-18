@@ -76,7 +76,7 @@ const configs = new ConfigArray(rawConfigs, {
 });
 ```
 
-This example reads in an object or array from `my.config.js` and passes it into the `ConfigArray` constructor as the first argument. The second argument is an object specifying the `basePath` (the directory in which `my.config.js` is found) and a `schema` to define the additional properties of a config object beyond `files`, `ignores`, and `name`.
+This example reads in an object or array from `my.config.js` and passes it into the `ConfigArray` constructor as the first argument. The second argument is an object specifying the `basePath` (the directory in which `my.config.js` is found) and a `schema` to define the additional properties of a config object beyond `files`, `ignores`, `basePath`, and `name`.
 
 ### Specifying a Schema
 
@@ -163,6 +163,16 @@ export default [
 		files: ["!*.js"],
 		settings: {
 			js: false,
+		},
+	},
+
+	// specific settings for files inside `src` directory
+	{
+		name: "Source files",
+		basePath: "src",
+		files: ["**/*"],
+		settings: {
+			source: true,
 		},
 	},
 ];
