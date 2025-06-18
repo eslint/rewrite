@@ -4515,6 +4515,598 @@ describe("ConfigArray", () => {
 						true,
 					);
 				});
+
+				it("should intepret `ignores` as relative to the config's `basePath` when ignoring files (relative paths)", () => {
+					configs = new ConfigArray(
+						[
+							{
+								ignores: ["src/*"],
+							},
+							{
+								basePath: "src",
+								ignores: ["!a.js"],
+							},
+							{
+								basePath,
+								ignores: ["!projects/my/src/b.js"],
+							},
+							{
+								basePath: "tools",
+								ignores: ["*", "!a.js"],
+							},
+							{
+								ignores: ["!tools/b.js"],
+							},
+							{
+								basePath: "scripts",
+								ignores: ["a.js", "b.js"],
+							},
+							{
+								basePath: path.resolve(basePath, "projects"),
+								ignores: ["my/tests"],
+							},
+							{
+								basePath: path.resolve(basePath, "projects"),
+								ignores: ["**/.*/**/*.js"],
+							},
+							{
+								basePath: path.resolve(basePath, "projects/my"),
+								ignores: ["fixtures/*.js"],
+							},
+							{
+								basePath: path.resolve(
+									basePath,
+									"projects/my/misc",
+								),
+								ignores: ["**/tmp/*.js", "b.js"],
+							},
+						],
+						{
+							basePath: path.resolve(basePath, "projects/my"),
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(configs.isFileIgnored("a.js"), false);
+					assert.strictEqual(configs.isFileIgnored("b.js"), false);
+					assert.strictEqual(configs.isFileIgnored("c.js"), false);
+					assert.strictEqual(
+						configs.isFileIgnored("foo/a.js"),
+						false,
+					);
+					assert.strictEqual(
+						configs.isFileIgnored("foo/b.js"),
+						false,
+					);
+					assert.strictEqual(
+						configs.isFileIgnored("foo/c.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("src/a.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("src/b.js"),
+						false,
+					);
+
+					assert.strictEqual(configs.isFileIgnored("src/c.js"), true);
+
+					assert.strictEqual(
+						configs.isFileIgnored("tools/a.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("tools/b.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("tools/c.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("scripts/a.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("scripts/b.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("scripts/c.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("tests/a.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(".coverage/a.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("foo/.coverage/a.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("fixtures/a.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("tmp/a.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("tmp/b.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("foo/tmp/a.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("foo/tmp/b.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("misc/a.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("misc/b.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("misc/foo/a.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("misc/foo/b.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("misc/tmp/a.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("misc/foo/tmp/a.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("misc/foo/tmp/bar/a.js"),
+						false,
+					);
+				});
+
+				it("should intepret `ignores` as relative to the config's `basePath` when ignoring files (absolute paths)", () => {
+					configs = new ConfigArray(
+						[
+							{
+								ignores: ["src/*"],
+							},
+							{
+								basePath: "src",
+								ignores: ["!a.js"],
+							},
+							{
+								basePath,
+								ignores: ["!projects/my/src/b.js"],
+							},
+							{
+								basePath: "tools",
+								ignores: ["*", "!a.js"],
+							},
+							{
+								ignores: ["!tools/b.js"],
+							},
+							{
+								basePath: "scripts",
+								ignores: ["a.js", "b.js"],
+							},
+							{
+								basePath: path.resolve(basePath, "projects"),
+								ignores: ["my/tests"],
+							},
+							{
+								basePath: path.resolve(basePath, "projects"),
+								ignores: ["**/.*/**/*.js"],
+							},
+							{
+								basePath: path.resolve(basePath, "projects/my"),
+								ignores: ["fixtures/*.js"],
+							},
+							{
+								basePath: path.resolve(
+									basePath,
+									"projects/my/misc",
+								),
+								ignores: ["**/tmp/*.js", "b.js"],
+							},
+						],
+						{
+							basePath: path.resolve(basePath, "projects/my"),
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(basePath, "projects/my", "a.js"),
+						),
+						false,
+					);
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(basePath, "projects/my", "b.js"),
+						),
+						false,
+					);
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(basePath, "projects/my", "c.js"),
+						),
+						false,
+					);
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"foo",
+								"a.js",
+							),
+						),
+						false,
+					);
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"foo",
+								"b.js",
+							),
+						),
+						false,
+					);
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"foo",
+								"c.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"src",
+								"a.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"src",
+								"b.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"src",
+								"c.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"tools",
+								"a.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"tools",
+								"b.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"tools",
+								"c.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"scripts",
+								"a.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"scripts",
+								"b.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"scripts",
+								"c.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"tests",
+								"a.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								".coverage",
+								"a.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"foo",
+								".coverage",
+								"a.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"fixtures",
+								"a.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"tmp",
+								"a.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"tmp",
+								"b.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"foo",
+								"tmp",
+								"a.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"foo",
+								"tmp",
+								"b.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"misc",
+								"a.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"misc",
+								"b.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"misc",
+								"foo",
+								"a.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"misc",
+								"foo",
+								"b.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"misc",
+								"tmp",
+								"a.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"misc",
+								"foo",
+								"tmp",
+								"a.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"misc",
+								"foo",
+								"tmp",
+								"bar",
+								"a.js",
+							),
+						),
+						false,
+					);
+				});
 			});
 		});
 
