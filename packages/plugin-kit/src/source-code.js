@@ -242,7 +242,7 @@ export class Directive {
 
 /**
  * Source Code Base Object
- * @template {SourceCodeBaseTypeOptions & {SyntaxElementWithLoc: object}} [Options=SourceCodeBaseTypeOptions & {SyntaxElementWithLoc: object}]
+ * @template {SourceCodeBaseTypeOptions & {RootNode: object, SyntaxElementWithLoc: object}} [Options=SourceCodeBaseTypeOptions & {RootNode: object, SyntaxElementWithLoc: object}]
  * @implements {TextSourceCode<Options>}
  */
 export class TextSourceCodeBase {
@@ -259,16 +259,16 @@ export class TextSourceCodeBase {
 	#lineStartIndices = [0];
 
 	/**
-	 * The line number at which the parser starts counting.
+	 * The line number at which the parser starts counting. Defaults to `1` for ESTree compatibility.
 	 * @type {0|1}
 	 */
-	#lineStart;
+	#lineStart = 1;
 
 	/**
-	 * The column number at which the parser starts counting.
+	 * The column number at which the parser starts counting. Defaults to `0` for ESTree compatibility.
 	 * @type {0|1}
 	 */
-	#columnStart;
+	#columnStart = 0;
 
 	/**
 	 * The AST of the source code.
@@ -288,20 +288,34 @@ export class TextSourceCodeBase {
 	 * @param {string} options.text The source code text.
 	 * @param {Options['RootNode']} options.ast The root AST node.
 	 * @param {RegExp} [options.lineEndingPattern] The pattern to match lineEndings in the source code. Defaults to `/\r?\n/gu`.
-	 * @param {0|1} [options.lineStart] The line number at which the parser starts counting. Defaults to `1` for ESTree compatibility.
-	 * @param {0|1} [options.columnStart] The column number at which the parser starts counting. Defaults to `0` for ESTree compatibility.
 	 */
-	constructor({
-		text,
-		ast,
-		lineEndingPattern = /\r?\n/gu,
-		lineStart = 1,
-		columnStart = 0,
-	}) {
+	constructor({ text, ast, lineEndingPattern = /\r?\n/gu }) {
 		this.ast = ast;
 		this.text = text;
-		this.#lineStart = lineStart;
-		this.#columnStart = columnStart;
+
+		if (hasESTreeStyleLoc(ast)) {
+			if (ast.loc?.start?.line === 0 || ast.loc?.start?.line === 1) {
+				this.#lineStart = ast.loc.start.line;
+			}
+
+			if (ast.loc?.start?.column === 0 || ast.loc?.start?.column === 1) {
+				this.#columnStart = ast.loc.start.column;
+			}
+		} else if (hasPosStyleLoc(ast)) {
+			if (
+				ast.position?.start?.line === 0 ||
+				ast.position?.start?.line === 1
+			) {
+				this.#lineStart = ast.position.start.line;
+			}
+
+			if (
+				ast.position?.start?.column === 0 ||
+				ast.position?.start?.column === 1
+			) {
+				this.#columnStart = ast.position.start.column;
+			}
+		}
 
 		let match;
 		while ((match = lineEndingPattern.exec(text))) {
