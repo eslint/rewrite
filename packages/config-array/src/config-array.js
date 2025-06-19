@@ -292,9 +292,11 @@ function normalizeConfigPatterns(config, namespacedBasePath, path) {
 		return config;
 	}
 
+	const hasBasePath = typeof config.basePath === "string";
+
 	let needsNormalization = false;
 
-	if (typeof config.basePath === "string") {
+	if (hasBasePath) {
 		needsNormalization = true;
 	}
 
@@ -317,7 +319,7 @@ function normalizeConfigPatterns(config, namespacedBasePath, path) {
 
 	const newConfig = { ...config };
 
-	if (typeof config.basePath === "string") {
+	if (hasBasePath) {
 		if (path.isAbsolute(config.basePath)) {
 			newConfig.basePath = path.toNamespacedPath(config.basePath);
 		} else {
