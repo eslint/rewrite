@@ -1517,6 +1517,143 @@ describe("defineConfig()", () => {
 		});
 	});
 
+	describe("basePath", () => {
+		it("should apply `basePath` from the base config to all resulting configs", () => {
+			const config = defineConfig({
+				basePath: "my-base-path",
+				extends: [
+					{ rules: { "no-console": "error" } },
+					[{ rules: { "no-alert": "error" } }, { ignores: ["foo"] }],
+					{ ignores: ["bar"] },
+					{ files: ["src/**"], rules: { "no-console": "warn" } },
+				],
+				rules: {
+					"no-debugger": "error",
+				},
+			});
+
+			assert.deepStrictEqual(config, [
+				{
+					name: "UserConfig[0] > ExtendedConfig[0]",
+					basePath: "my-base-path",
+					rules: { "no-console": "error" },
+				},
+				{
+					name: "UserConfig[0] > ExtendedConfig[1][0]",
+					basePath: "my-base-path",
+					rules: { "no-alert": "error" },
+				},
+				{
+					name: "UserConfig[0] > ExtendedConfig[1][1]",
+					basePath: "my-base-path",
+					ignores: ["foo"],
+				},
+				{
+					name: "UserConfig[0] > ExtendedConfig[2]",
+					basePath: "my-base-path",
+					ignores: ["bar"],
+				},
+				{
+					name: "UserConfig[0] > ExtendedConfig[3]",
+					basePath: "my-base-path",
+					files: ["src/**"],
+					rules: { "no-console": "warn" },
+				},
+				{
+					basePath: "my-base-path",
+					rules: {
+						"no-debugger": "error",
+					},
+				},
+			]);
+		});
+
+		it("should omit base config when it only has ignores", () => {
+			const config = defineConfig({
+				basePath: "my-base-path",
+				ignores: ["test/*.js"],
+				extends: [{ rules: { "no-console": "error" } }],
+			});
+
+			assert.deepStrictEqual(config, [
+				{
+					name: "UserConfig[0] > ExtendedConfig[0]",
+					basePath: "my-base-path",
+					ignores: ["test/*.js"],
+					rules: { "no-console": "error" },
+				},
+			]);
+		});
+
+		it("should throw an error when an extended config has `basePath`", () => {
+			assert.throws(() => {
+				defineConfig({
+					extends: [
+						{
+							basePath: "my-base-path",
+							rules: { "no-console": "error" },
+						},
+					],
+					rules: {
+						"no-debugger": "error",
+					},
+				});
+			}, /'basePath' in `extends` is not allowed\./u);
+
+			assert.throws(() => {
+				defineConfig({
+					extends: [
+						{
+							rules: { "no-alert": "error" },
+						},
+						[
+							{
+								basePath: "my-base-path",
+								rules: { "no-console": "error" },
+							},
+						],
+					],
+					rules: {
+						"no-debugger": "error",
+					},
+				});
+			}, /'basePath' in `extends` is not allowed\./u);
+
+			assert.throws(() => {
+				defineConfig({
+					extends: [
+						{
+							basePath: "my-base-path",
+							ignores: ["foo"],
+						},
+					],
+					rules: {
+						"no-debugger": "error",
+					},
+				});
+			}, /'basePath' in `extends` is not allowed\./u);
+
+			assert.throws(() => {
+				defineConfig({
+					extends: [
+						{
+							rules: { "no-alert": "error" },
+						},
+						[
+							{
+								basePath: "my-base-path",
+								ignores: ["foo"],
+							},
+						],
+					],
+					rules: {
+						"no-debugger": "error",
+					},
+				});
+			}, /'basePath' in `extends` is not allowed\./u);
+		});
+	});
+
 	describe("Errors", () => {
 		it("should throw an error when null is passed to defineConfig", () => {
 			assert.throws(() => {
