@@ -77,6 +77,7 @@ const ruleConfig5: RuleConfig<[{ available: "widely" | "newly" }]> = [
 	"error",
 	{ available: "widely" },
 ];
+const ruleConfig6: RuleConfig<["always" | "never"]> = ["error"];
 
 const linterConfig: LinterOptionsConfig = {
 	noInlineConfig: true,
