@@ -51,6 +51,14 @@
     "eslint": "^9.27.0",
     "rollup-plugin-copy": "^3.5.0"
   },
+  "peerDependencies": {
+    "eslint": "^8.40 || 9"
+  },
+  "peerDependenciesMeta": {
+    "eslint": {
+      "optional": true
+    }
+  },
   "engines": {
     "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
   }
