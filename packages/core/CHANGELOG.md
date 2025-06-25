@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.15.1](https://github.com/eslint/rewrite/compare/core-v0.15.0...core-v0.15.1) (2025-06-25)
+
+
+### Bug Fixes
+
+* Allow RuleConfig to have array with just severity ([#228](https://github.com/eslint/rewrite/issues/228)) ([c5f92fa](https://github.com/eslint/rewrite/commit/c5f92fa147ecad74164266c374f47ee217c7ccb7))
+
 ## [0.15.0](https://github.com/eslint/rewrite/compare/core-v0.14.0...core-v0.15.0) (2025-06-09)
 
 

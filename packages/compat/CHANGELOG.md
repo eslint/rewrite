@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.3.1](https://github.com/eslint/rewrite/compare/compat-v1.3.0...compat-v1.3.1) (2025-06-25)
+
+
+### Bug Fixes
+
+* relax `@eslint/compat` eslint peerDependencies constraint ([#215](https://github.com/eslint/rewrite/issues/215)) ([b96ec0c](https://github.com/eslint/rewrite/commit/b96ec0c2ed6006add49c9c83a599a7d5a284348e))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @eslint/core bumped from ^0.15.0 to ^0.15.1
+
 ## [1.3.0](https://github.com/eslint/rewrite/compare/compat-v1.2.9...compat-v1.3.0) (2025-06-09)
 
 
