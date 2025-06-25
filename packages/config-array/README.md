@@ -76,7 +76,7 @@ const configs = new ConfigArray(rawConfigs, {
 });
 ```
 
-This example reads in an object or array from `my.config.js` and passes it into the `ConfigArray` constructor as the first argument. The second argument is an object specifying the `basePath` (the directory in which `my.config.js` is found) and a `schema` to define the additional properties of a config object beyond `files`, `ignores`, and `name`.
+This example reads in an object or array from `my.config.js` and passes it into the `ConfigArray` constructor as the first argument. The second argument is an object specifying the `basePath` (the directory in which `my.config.js` is found) and a `schema` to define the additional properties of a config object beyond `files`, `ignores`, `basePath`, and `name`.
 
 ### Specifying a Schema
 
@@ -163,6 +163,16 @@ export default [
 		files: ["!*.js"],
 		settings: {
 			js: false,
+		},
+	},
+
+	// specific settings for files inside `src` directory
+	{
+		name: "Source files",
+		basePath: "src",
+		files: ["**/*"],
+		settings: {
+			source: true,
 		},
 	},
 ];
@@ -284,7 +294,7 @@ The config array always returns an object, even if there are no configs matching
 A few things to keep in mind:
 
 - If a filename is not an absolute path, it will be resolved relative to the base path directory.
-- The returned config object never has `files`, `ignores`, or `name` properties; the only properties on the object will be the other configuration options specified.
+- The returned config object never has `files`, `ignores`, `basePath`, or `name` properties; the only properties on the object will be the other configuration options specified.
 - The config array caches configs, so subsequent calls to `getConfig()` with the same filename will return in a fast lookup rather than another calculation.
 - A config will only be generated if the filename matches an entry in a `files` key. A config will not be generated without matching a `files` key (configs without a `files` key are only applied when another config with a `files` key is applied; configs without `files` are never applied on their own). Any config with a `files` key entry that is `*` or ends with `/**` or `/*` will only be applied if another entry in the same `files` key matches or another config matches.
 
