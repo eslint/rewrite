@@ -71,3 +71,24 @@ defineConfig(
 
 globalIgnores(["node_modules"]);
 globalIgnores(["dist", "build"], "my name");
+
+defineConfig({
+	plugins: {
+	  'some-plugin': {
+		rules: {
+		  'some-rule': {
+			meta: {
+			  docs: {
+				recommended: 'not a boolean!' // <-- TS ERROR
+			  }
+			},
+  
+			create() {
+			  return {};
+			}
+		  }
+		}
+	  }
+	}  
+  }
+);
