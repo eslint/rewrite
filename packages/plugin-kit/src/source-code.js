@@ -271,6 +271,12 @@ export class TextSourceCodeBase {
 	#columnStart = 0;
 
 	/**
+	 * The pattern to match line endings in the source code.
+	 * @type {RegExp}
+	 */
+	#lineEndingPattern;
+
+	/**
 	 * The AST of the source code.
 	 * @type {Options['RootNode']}
 	 */
@@ -292,6 +298,8 @@ export class TextSourceCodeBase {
 	constructor({ text, ast, lineEndingPattern = /\r?\n/gu }) {
 		this.ast = ast;
 		this.text = text;
+		this.#lineEndingPattern = lineEndingPattern;
+		this.#lines = text.split(this.#lineEndingPattern);
 
 		if (hasESTreeStyleLoc(ast)) {
 			if (ast.loc?.start?.line === 0 || ast.loc?.start?.line === 1) {
@@ -316,15 +324,68 @@ export class TextSourceCodeBase {
 				this.#columnStart = ast.position.start.column;
 			}
 		}
+	}
+
+	/**
+	 * Ensures `#lineStartIndices` information is calculated up to the specified index.
+	 * @param {number} index The index of a character in a file.
+	 * @returns {void}
+	 */
+	#ensureLineStartIndicesFromIndex(index) {
+		const lastIndex = this.#lineStartIndices.at(-1) ?? 0;
+
+		// If we've already parsed up to or beyond this index, do nothing
+		if (index <= lastIndex) {
+			return;
+		}
+
+		// Create a new RegExp instance to avoid lastIndex issues
+		const lineEndingPattern = structuredClone(this.#lineEndingPattern);
+
+		// Start parsing from where we left off
+		const text = this.text.slice(lastIndex, index + 1);
 
 		let match;
 		while ((match = lineEndingPattern.exec(text))) {
-			this.#lines.push(
-				text.slice(this.#lineStartIndices.at(-1), match.index),
+			this.#lineStartIndices.push(
+				lastIndex + match.index + match[0].length,
 			);
-			this.#lineStartIndices.push(match.index + match[0].length);
 		}
-		this.#lines.push(text.slice(this.#lineStartIndices.at(-1)));
+	}
+
+	/**
+	 * Ensures `#lineStartIndices` information is calculated up to the specified loc.
+	 * @param {Object} loc A line/column location.
+	 * @param {number} loc.line The line number of the location. (0 or 1-indexed based on language.)
+	 * @param {number} loc.column The column number of the location. (0 or 1-indexed based on language.)
+	 * @returns {void}
+	 */
+	#ensureLineStartIndicesFromLoc(loc) {
+		// Calculate line indices up to `locLineIndex + 1` (current line + potentially next line)
+		const nextLocLineIndex = loc.line - this.#lineStart + 1;
+
+		if (nextLocLineIndex <= this.#lineStartIndices.length - 1) {
+			return;
+		}
+
+		const lastIndex = this.#lineStartIndices.at(-1) ?? 0;
+		const lineEndingPattern = structuredClone(this.#lineEndingPattern);
+		const text = this.text.slice(lastIndex);
+
+		let match;
+		let linesFound = 0;
+		const additionalLinesNeeded =
+			nextLocLineIndex - (this.#lineStartIndices.length - 1);
+
+		while (
+			linesFound < additionalLinesNeeded &&
+			(match = lineEndingPattern.exec(text))
+		) {
+			this.#lineStartIndices.push(
+				lastIndex + match.index + match[0].length,
+			);
+			linesFound++;
+		}
 	}
 
 	/**
@@ -364,6 +425,8 @@ export class TextSourceCodeBase {
 				`Index out of range (requested index ${index}, but source text has length ${this.text.length}).`,
 			);
 		}
+
+		this.#ensureLineStartIndicesFromIndex(index);
 
 		/*
 		 * For an argument of `this.text.length`, return the location one "spot" past the last character
@@ -424,17 +487,19 @@ export class TextSourceCodeBase {
 
 		if (
 			loc.line < this.#lineStart ||
-			this.#lineStartIndices.length - 1 + this.#lineStart < loc.line
+			this.#lines.length - 1 + this.#lineStart < loc.line
 		) {
 			throw new RangeError(
-				`Line number out of range (line ${loc.line} requested). Valid range: ${this.#lineStart}-${this.#lineStartIndices.length - 1 + this.#lineStart}`,
+				`Line number out of range (line ${loc.line} requested). Valid range: ${this.#lineStart}-${this.#lines.length - 1 + this.#lineStart}`,
 			);
 		}
+
+		this.#ensureLineStartIndicesFromLoc(loc);
 
 		const lineStartIndex =
 			this.#lineStartIndices[loc.line - this.#lineStart];
 		const lineEndIndex =
-			loc.line - this.#lineStart === this.#lineStartIndices.length - 1
+			loc.line - this.#lineStart === this.#lines.length - 1
 				? this.text.length
 				: this.#lineStartIndices[loc.line - this.#lineStart + 1];
 		const positionIndex = lineStartIndex + loc.column - this.#columnStart;
