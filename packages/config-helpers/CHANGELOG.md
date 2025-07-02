@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.3.0](https://github.com/eslint/rewrite/compare/config-helpers-v0.2.3...config-helpers-v0.3.0) (2025-06-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* Support `basePath` property in config objects ([#223](https://github.com/eslint/rewrite/issues/223))
+
+### Features
+
+* Support `basePath` property in config objects ([#223](https://github.com/eslint/rewrite/issues/223)) ([40d31ba](https://github.com/eslint/rewrite/commit/40d31ba42a9fe0da10b6ca5e1b10f1f2b10c5f90))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @eslint/core bumped from ^0.15.0 to ^0.15.1
+
 ## [0.2.3](https://github.com/eslint/rewrite/compare/config-helpers-v0.2.2...config-helpers-v0.2.3) (2025-06-09)
 
 

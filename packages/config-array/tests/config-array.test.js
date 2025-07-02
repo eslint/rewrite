@@ -10,6 +10,7 @@
 import { ConfigArray, ConfigArraySymbol } from "../src/config-array.js";
 import assert from "node:assert";
 import { fileURLToPath } from "node:url";
+import path from "node:path";
 
 //-----------------------------------------------------------------------------
 // Helpers
@@ -400,6 +401,29 @@ describe("ConfigArray", () => {
 				/Config "foo": Key "ignores": Expected array to only contain strings and functions\./u,
 		});
 
+		testValidationError({
+			title: "should throw an error when basePath is undefined",
+			configs: [
+				{
+					name: "foo",
+					basePath: undefined,
+				},
+			],
+			expectedError:
+				/Config "foo": Key "basePath": Expected value to be a string\./u,
+		});
+
+		testValidationError({
+			title: "should throw an error when basePath is not a string",
+			configs: [
+				{
+					basePath: 5,
+				},
+			],
+			expectedError:
+				/Config \(unnamed\): Key "basePath": Expected value to be a string\./u,
+		});
+
 		it("should throw an error when a config is not an object", () => {
 			configs = new ConfigArray(
 				[
@@ -540,6 +564,296 @@ describe("ConfigArray", () => {
 			await configs.normalize();
 
 			assert.notStrictEqual(configs[0], config);
+		});
+	});
+
+	describe("Config objects `basePath` normalization", () => {
+		it("should create a new object with absolute `basePath` when normalizing relative `basePath` on posix (async)", async () => {
+			const config = {
+				basePath: "baz/qux",
+				defs: {
+					"test-def": "test-value",
+				},
+			};
+
+			configs = new ConfigArray([config], {
+				basePath: "/foo/bar",
+				schema,
+			});
+
+			await configs.normalize();
+
+			assert.notStrictEqual(configs[0], config);
+			assert.deepStrictEqual(configs[0], {
+				basePath: "/foo/bar/baz/qux",
+				defs: {
+					"test-def": "test-value",
+				},
+			});
+		});
+
+		it("should create a new object with absolute `basePath` when normalizing relative `basePath` on posix (sync)", () => {
+			const config = {
+				basePath: "baz/qux",
+				defs: {
+					"test-def": "test-value",
+				},
+			};
+
+			configs = new ConfigArray([config], {
+				basePath: "/foo/bar",
+				schema,
+			});
+
+			configs.normalizeSync();
+
+			assert.notStrictEqual(configs[0], config);
+			assert.deepStrictEqual(configs[0], {
+				basePath: "/foo/bar/baz/qux",
+				defs: {
+					"test-def": "test-value",
+				},
+			});
+		});
+
+		it("should create a new object with absolute `basePath` without trailing slash when normalizing relative `basePath` with trailing slash on posix (async)", async () => {
+			const config = {
+				basePath: "baz/qux/",
+				defs: {
+					"test-def": "test-value",
+				},
+			};
+
+			configs = new ConfigArray([config], {
+				basePath: "/foo/bar",
+				schema,
+			});
+
+			await configs.normalize();
+
+			assert.notStrictEqual(configs[0], config);
+			assert.deepStrictEqual(configs[0], {
+				basePath: "/foo/bar/baz/qux",
+				defs: {
+					"test-def": "test-value",
+				},
+			});
+		});
+
+		it("should create a new object with absolute `basePath` without trailing slash when normalizing relative `basePath` with trailing slash on posix (sync)", () => {
+			const config = {
+				basePath: "baz/qux/",
+				defs: {
+					"test-def": "test-value",
+				},
+			};
+
+			configs = new ConfigArray([config], {
+				basePath: "/foo/bar",
+				schema,
+			});
+
+			configs.normalizeSync();
+
+			assert.notStrictEqual(configs[0], config);
+			assert.deepStrictEqual(configs[0], {
+				basePath: "/foo/bar/baz/qux",
+				defs: {
+					"test-def": "test-value",
+				},
+			});
+		});
+
+		it("should create a new object with namespaced `basePath` when normalizing relative `basePath` on windows (async)", async () => {
+			const config = {
+				basePath: "baz/qux",
+				defs: {
+					"test-def": "test-value",
+				},
+			};
+
+			configs = new ConfigArray([config], {
+				basePath: "C:\\foo\\bar",
+				schema,
+			});
+
+			await configs.normalize();
+
+			assert.notStrictEqual(configs[0], config);
+			assert.deepStrictEqual(configs[0], {
+				basePath: "\\\\?\\C:\\foo\\bar\\baz\\qux",
+				defs: {
+					"test-def": "test-value",
+				},
+			});
+		});
+
+		it("should create a new object with namespaced `basePath` when normalizing relative `basePath` on windows (sync)", () => {
+			const config = {
+				basePath: "baz/qux",
+				defs: {
+					"test-def": "test-value",
+				},
+			};
+
+			configs = new ConfigArray([config], {
+				basePath: "C:\\foo\\bar",
+				schema,
+			});
+
+			configs.normalizeSync();
+
+			assert.notStrictEqual(configs[0], config);
+			assert.deepStrictEqual(configs[0], {
+				basePath: "\\\\?\\C:\\foo\\bar\\baz\\qux",
+				defs: {
+					"test-def": "test-value",
+				},
+			});
+		});
+
+		it("should create a new object with namespaced `basePath` without trailing slash when normalizing relative `basePath` with trailing slash on windows (async)", async () => {
+			const config = {
+				basePath: "baz/qux/",
+				defs: {
+					"test-def": "test-value",
+				},
+			};
+
+			configs = new ConfigArray([config], {
+				basePath: "C:\\foo\\bar",
+				schema,
+			});
+
+			await configs.normalize();
+
+			assert.notStrictEqual(configs[0], config);
+			assert.deepStrictEqual(configs[0], {
+				basePath: "\\\\?\\C:\\foo\\bar\\baz\\qux",
+				defs: {
+					"test-def": "test-value",
+				},
+			});
+		});
+
+		it("should create a new object with namespaced `basePath` without trailing slash when normalizing relative `basePath` with trailing slash on windows (sync)", () => {
+			const config = {
+				basePath: "baz/qux/",
+				defs: {
+					"test-def": "test-value",
+				},
+			};
+
+			configs = new ConfigArray([config], {
+				basePath: "C:\\foo\\bar",
+				schema,
+			});
+
+			configs.normalizeSync();
+
+			assert.notStrictEqual(configs[0], config);
+			assert.deepStrictEqual(configs[0], {
+				basePath: "\\\\?\\C:\\foo\\bar\\baz\\qux",
+				defs: {
+					"test-def": "test-value",
+				},
+			});
+		});
+
+		it("should create a new object with absolute `basePath` when normalizing absolute `basePath` on posix (async)", async () => {
+			const config = {
+				basePath: "/foo",
+				defs: {
+					"test-def": "test-value",
+				},
+			};
+
+			configs = new ConfigArray([config], {
+				basePath: "/foo/bar",
+				schema,
+			});
+
+			await configs.normalize();
+
+			assert.notStrictEqual(configs[0], config);
+			assert.deepStrictEqual(configs[0], {
+				basePath: "/foo",
+				defs: {
+					"test-def": "test-value",
+				},
+			});
+		});
+
+		it("should create a new object with absolute `basePath` when normalizing absolute `basePath` on posix (sync)", () => {
+			const config = {
+				basePath: "/foo",
+				defs: {
+					"test-def": "test-value",
+				},
+			};
+
+			configs = new ConfigArray([config], {
+				basePath: "/foo/bar",
+				schema,
+			});
+
+			configs.normalizeSync();
+
+			assert.notStrictEqual(configs[0], config);
+			assert.deepStrictEqual(configs[0], {
+				basePath: "/foo",
+				defs: {
+					"test-def": "test-value",
+				},
+			});
+		});
+
+		it("should create a new object with namespaced `basePath` when normalizing absolute `basePath` on windows (async)", async () => {
+			const config = {
+				basePath: "C:\\foo",
+				defs: {
+					"test-def": "test-value",
+				},
+			};
+
+			configs = new ConfigArray([config], {
+				basePath: "C:\\foo\\bar",
+				schema,
+			});
+
+			await configs.normalize();
+
+			assert.notStrictEqual(configs[0], config);
+			assert.deepStrictEqual(configs[0], {
+				basePath: "\\\\?\\C:\\foo",
+				defs: {
+					"test-def": "test-value",
+				},
+			});
+		});
+
+		it("should create a new object with namespaced `basePath` when normalizing absolute `basePath` on windows (sync)", () => {
+			const config = {
+				basePath: "C:\\foo",
+				defs: {
+					"test-def": "test-value",
+				},
+			};
+
+			configs = new ConfigArray([config], {
+				basePath: "C:\\foo\\bar",
+				schema,
+			});
+
+			configs.normalizeSync();
+
+			assert.notStrictEqual(configs[0], config);
+			assert.deepStrictEqual(configs[0], {
+				basePath: "\\\\?\\C:\\foo",
+				defs: {
+					"test-def": "test-value",
+				},
+			});
 		});
 	});
 
@@ -694,6 +1008,37 @@ describe("ConfigArray", () => {
 				assert.throws(() => {
 					unnormalizedConfigs.getConfigWithStatus(filename);
 				}, /normalized/u);
+			});
+
+			it("should return config without meta fields `name`, `basePath`, `files`, and `ignores`", () => {
+				configs = new ConfigArray(
+					[
+						{
+							name: "test config",
+							basePath,
+							ignores: ["b.js"],
+							files: ["*.js"],
+							defs: {
+								"test-def": "test-value",
+							},
+						},
+					],
+					{
+						basePath,
+						schema,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.deepStrictEqual(configs.getConfigWithStatus("a.js"), {
+					status: "matched",
+					config: {
+						defs: {
+							"test-def": "test-value",
+						},
+					},
+				});
 			});
 
 			describe("should return expected results", () => {
@@ -1457,6 +1802,397 @@ describe("ConfigArray", () => {
 
 					assert.strictEqual(
 						configs.getConfig("src/foo.js").defs.severity,
+						"error",
+					);
+				});
+			});
+
+			describe("config objects with `basePath` property", () => {
+				it("should apply config object without `files` or `ignores` to the `basePath` directory and its subdirectories only (relative paths)", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+								defs: { severity: "warning" },
+							},
+							{
+								basePath: "src",
+								defs: { severity: "error" },
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig("foo.js").defs.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig("src/foo.js").defs.severity,
+						"error",
+					);
+					assert.strictEqual(
+						configs.getConfig("src/subdir/foo.js").defs.severity,
+						"error",
+					);
+				});
+
+				it("should apply config object without `files` or `ignores` to the `basePath` directory and its subdirectories only (absolute paths)", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+								defs: { severity: "warning" },
+							},
+							{
+								basePath: "src",
+								defs: { severity: "error" },
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "foo.js")).defs
+							.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "src/foo.js"))
+							.defs.severity,
+						"error",
+					);
+					assert.strictEqual(
+						configs.getConfig(
+							path.resolve(basePath, "src/subdir/foo.js"),
+						).defs.severity,
+						"error",
+					);
+				});
+
+				it("should intepret `files` and `ignores` as relative to the config's `basePath` (relative paths)", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+								defs: { severity: "warning" },
+							},
+							{
+								basePath: "src",
+								files: ["**/*.js"],
+								defs: { severity: "error" },
+							},
+							{
+								basePath: "src",
+								ignores: ["foo.js"],
+								defs: { severity: "fatal" },
+							},
+							{
+								basePath: "src",
+								files: ["**/*.js"],
+								ignores: ["foo.js", "bar.js"],
+								defs: { severity: "info" },
+							},
+							{
+								basePath: "src",
+								files: ["*.js"],
+								ignores: ["{foo,bar,baz}.js"],
+								defs: { severity: "log" },
+							},
+							{
+								basePath: "src",
+								files: ["quux.js"],
+								defs: { severity: "catastrophic" },
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig("foo.js").defs.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig("bar.js").defs.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig("baz.js").defs.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig("qux.js").defs.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig("quux.js").defs.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig("subdir/quux.js").defs.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig("src/foo.js").defs.severity,
+						"error",
+					);
+					assert.strictEqual(
+						configs.getConfig("src/bar.js").defs.severity,
+						"fatal",
+					);
+					assert.strictEqual(
+						configs.getConfig("src/baz.js").defs.severity,
+						"info",
+					);
+					assert.strictEqual(
+						configs.getConfig("src/qux.js").defs.severity,
+						"log",
+					);
+					assert.strictEqual(
+						configs.getConfig("src/quux.js").defs.severity,
+						"catastrophic",
+					);
+					assert.strictEqual(
+						configs.getConfig("src/subdir/quux.js").defs.severity,
+						"info",
+					);
+				});
+
+				it("should intepret `files` and `ignores` as relative to the config's `basePath` (absolute paths)", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+								defs: { severity: "warning" },
+							},
+							{
+								basePath: "src",
+								files: ["**/*.js"],
+								defs: { severity: "error" },
+							},
+							{
+								basePath: "src",
+								ignores: ["foo.js"],
+								defs: { severity: "fatal" },
+							},
+							{
+								basePath: "src",
+								files: ["**/*.js"],
+								ignores: ["foo.js", "bar.js"],
+								defs: { severity: "info" },
+							},
+							{
+								basePath: "src",
+								files: ["*.js"],
+								ignores: ["{foo,bar,baz}.js"],
+								defs: { severity: "log" },
+							},
+							{
+								basePath: "src",
+								files: ["quux.js"],
+								defs: { severity: "catastrophic" },
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "foo.js")).defs
+							.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "bar.js")).defs
+							.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "baz.js")).defs
+							.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "qux.js")).defs
+							.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "quux.js"))
+							.defs.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig(
+							path.resolve(basePath, "subdir/quux.js"),
+						).defs.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "src/foo.js"))
+							.defs.severity,
+						"error",
+					);
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "src/bar.js"))
+							.defs.severity,
+						"fatal",
+					);
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "src/baz.js"))
+							.defs.severity,
+						"info",
+					);
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "src/qux.js"))
+							.defs.severity,
+						"log",
+					);
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "src/quux.js"))
+							.defs.severity,
+						"catastrophic",
+					);
+					assert.strictEqual(
+						configs.getConfig(
+							path.resolve(basePath, "src/subdir/quux.js"),
+						).defs.severity,
+						"info",
+					);
+				});
+
+				it("should work correctly with both universal and non-universal `files` patterns (relative paths)", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+								defs: { severity: "warning" },
+							},
+							{
+								basePath: "src",
+								files: ["code/**", "docs/**/*.md"],
+								defs: { severity: "error" },
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig("foo.js").defs.severity,
+						"warning",
+					);
+					assert.strictEqual(configs.getConfig("foo.md"), undefined);
+					assert.strictEqual(
+						configs.getConfig("src/foo.js").defs.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig("src/foo.md"),
+						undefined,
+					);
+					assert.strictEqual(
+						configs.getConfig("src/code/foo.js").defs.severity,
+						"error",
+					);
+					assert.strictEqual(
+						configs.getConfig("src/code/foo.md"),
+						undefined,
+					);
+					assert.strictEqual(
+						configs.getConfig("src/docs/foo.js").defs.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig("src/docs/foo.md").defs.severity,
+						"error",
+					);
+				});
+
+				it("should work correctly with both universal and non-universal `files` patterns (absolute paths)", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+								defs: { severity: "warning" },
+							},
+							{
+								basePath: "src",
+								files: ["code/**", "docs/**/*.md"],
+								defs: { severity: "error" },
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "foo.js")).defs
+							.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "foo.md")),
+						undefined,
+					);
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "src/foo.js"))
+							.defs.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig(path.resolve(basePath, "src/foo.md")),
+						undefined,
+					);
+					assert.strictEqual(
+						configs.getConfig(
+							path.resolve(basePath, "src/code/foo.js"),
+						).defs.severity,
+						"error",
+					);
+					assert.strictEqual(
+						configs.getConfig(
+							path.resolve(basePath, "src/code/foo.md"),
+						),
+						undefined,
+					);
+					assert.strictEqual(
+						configs.getConfig(
+							path.resolve(basePath, "src/docs/foo.js"),
+						).defs.severity,
+						"warning",
+					);
+					assert.strictEqual(
+						configs.getConfig(
+							path.resolve(basePath, "src/docs/foo.md"),
+						).defs.severity,
 						"error",
 					);
 				});
@@ -2392,6 +3128,308 @@ describe("ConfigArray", () => {
 					);
 				});
 			});
+
+			describe("config objects with `basePath` property", () => {
+				it(`should return "matched" for a file that is matched by a non-universal pattern (relative paths)`, () => {
+					configs = new ConfigArray(
+						[
+							{
+								basePath: "src",
+								files: ["code/*.js"],
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus("code/foo.js"),
+						"unconfigured",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus("src/foo.js"),
+						"unconfigured",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus("src/code/foo.js"),
+						"matched",
+					);
+				});
+
+				it(`should return "matched" for a file that is matched by a non-universal pattern (absolute paths)`, () => {
+					configs = new ConfigArray(
+						[
+							{
+								basePath: "src",
+								files: ["code/*.js"],
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus(
+							path.resolve(basePath, "code/foo.js"),
+						),
+						"unconfigured",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus(
+							path.resolve(basePath, "src/foo.js"),
+						),
+						"unconfigured",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus(
+							path.resolve(basePath, "src/code/foo.js"),
+						),
+						"matched",
+					);
+				});
+
+				it(`should return "unconfigured" for a file under the config's base path if it isn't matched by a non-universal pattern (relative paths)`, () => {
+					configs = new ConfigArray(
+						[
+							{
+								basePath: "src",
+							},
+							{
+								basePath: "src",
+								files: ["*"],
+							},
+							{
+								basePath: "src",
+								files: ["!bar.js"],
+							},
+							{
+								basePath: "src",
+								files: ["code/*"],
+							},
+							{
+								basePath: "src",
+								files: ["code/**"],
+							},
+							{
+								basePath: "src",
+								files: ["!code/bar.js"],
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus("src/foo.js"),
+						"unconfigured",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus("src/code/foo.js"),
+						"unconfigured",
+					);
+				});
+
+				it(`should return "unconfigured" for a file under the config's base path if it isn't matched by a non-universal pattern (absolute paths)`, () => {
+					configs = new ConfigArray(
+						[
+							{
+								basePath: "src",
+							},
+							{
+								basePath: "src",
+								files: ["*"],
+							},
+							{
+								basePath: "src",
+								files: ["!bar.js"],
+							},
+							{
+								basePath: "src",
+								files: ["code/*"],
+							},
+							{
+								basePath: "src",
+								files: ["code/**"],
+							},
+							{
+								basePath: "src",
+								files: ["!code/bar.js"],
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus(
+							path.resolve(basePath, "src/foo.js"),
+						),
+						"unconfigured",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus(
+							path.resolve(basePath, "src/code/foo.js"),
+						),
+						"unconfigured",
+					);
+				});
+
+				it(`should return "external" for a file that is outside config array's base path even though it is inside config's base path`, () => {
+					configs = new ConfigArray(
+						[
+							{
+								basePath: "..",
+								files: ["**/*.js"],
+							},
+							{
+								basePath: "../",
+								files: ["**/*.js"],
+							},
+							{
+								basePath: "/",
+								files: ["**/*.js"],
+							},
+							{
+								basePath: "/project",
+								files: ["**/*.js"],
+							},
+							{
+								basePath: "/project/",
+								files: ["**/*.js"],
+							},
+						],
+						{
+							basePath: "/project/my",
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus("/project/foo.js"),
+						"external",
+					);
+
+					assert.strictEqual(
+						configs.getConfigStatus("/project/notmy/foo.js"),
+						"external",
+					);
+
+					assert.strictEqual(
+						configs.getConfigStatus("/project/my/foo.js"),
+						"matched",
+					);
+				});
+
+				it(`should return "ignored" for a file that is ignored or in an ignored directory (relative paths)`, () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+							},
+							{
+								basePath: "src",
+								ignores: [
+									"a.js",
+									"tools/*.js",
+									"code/b.js",
+									"docs",
+								],
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus("src/a.js"),
+						"ignored",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus("src/tools/foo.js"),
+						"ignored",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus("src/code/b.js"),
+						"ignored",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus("src/docs/foo.js"),
+						"ignored",
+					);
+				});
+
+				it(`should return "ignored" for a file that is ignored or in an ignored directory (absolute paths)`, () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+							},
+							{
+								basePath: "src",
+								ignores: [
+									"a.js",
+									"tools/*.js",
+									"code/b.js",
+									"docs",
+								],
+							},
+						],
+						{
+							basePath,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus(
+							path.resolve(basePath, "src/a.js"),
+						),
+						"ignored",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus(
+							path.resolve(basePath, "src/tools/foo.js"),
+						),
+						"ignored",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus(
+							path.resolve(basePath, "src/code/b.js"),
+						),
+						"ignored",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus(
+							path.resolve(basePath, "src/docs/foo.js"),
+						),
+						"ignored",
+					);
+				});
+			});
 		});
 
 		describe("isIgnored()", () => {
@@ -3003,6 +4041,1073 @@ describe("ConfigArray", () => {
 					assert.strictEqual(configs.isFileIgnored(filename), true);
 				});
 			});
+
+			describe("config objects with `basePath` property", () => {
+				it("should intepret `ignores` as relative to the config's `basePath` when ignoring directories (relative paths)", () => {
+					configs = new ConfigArray(
+						[
+							{
+								ignores: ["src/*"],
+							},
+							{
+								basePath: "src",
+								ignores: ["!bar"],
+							},
+							{
+								basePath,
+								ignores: ["!projects/my/src/baz/"],
+							},
+							{
+								basePath: "tools",
+								ignores: ["*", "!baz"],
+							},
+							{
+								ignores: ["!tools/qux"],
+							},
+							{
+								basePath: "scripts",
+								ignores: ["qux", "quux"],
+							},
+							{
+								basePath: path.resolve(basePath, "projects"),
+								ignores: ["my/tests"],
+							},
+							{
+								basePath: path.resolve(basePath, "projects"),
+								ignores: ["**/.*"],
+							},
+							{
+								basePath: path.resolve(basePath, "projects/my"),
+								ignores: ["fixtures"],
+							},
+							{
+								basePath: path.resolve(
+									basePath,
+									"projects/my/misc",
+								),
+								ignores: ["**/tmp", "bar"],
+							},
+						],
+						{
+							basePath: path.resolve(basePath, "projects/my"),
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(configs.isFileIgnored("a.js"), false);
+					assert.strictEqual(
+						configs.isFileIgnored("foo/a.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("src/foo/a.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("src/bar/a.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("src/baz/a.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("tools/foo/a.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("tools/baz/a.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("tools/qux/a.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("scripts/foo/a.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("scripts/qux/a.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("scripts/quux/a.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("tests/a.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(".coverage/a.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("foo/.coverage/a.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("fixtures/a.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("tmp/a.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("foo/tmp/a.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("misc/foo/a.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("misc/bar/a.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("misc/tmp/a.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("misc/foo/tmp/a.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("misc/foo/tmp/bar/a.js"),
+						true,
+					);
+				});
+
+				it("should intepret `ignores` as relative to the config's `basePath` when ignoring directories (absolute paths)", () => {
+					configs = new ConfigArray(
+						[
+							{
+								ignores: ["src/*"],
+							},
+							{
+								basePath: "src",
+								ignores: ["!bar"],
+							},
+							{
+								basePath,
+								ignores: ["!projects/my/src/baz/"],
+							},
+							{
+								basePath: "tools",
+								ignores: ["*", "!baz"],
+							},
+							{
+								ignores: ["!tools/qux"],
+							},
+							{
+								basePath: "scripts",
+								ignores: ["qux", "quux"],
+							},
+							{
+								basePath: path.resolve(basePath, "projects"),
+								ignores: ["my/tests"],
+							},
+							{
+								basePath: path.resolve(basePath, "projects"),
+								ignores: ["**/.*"],
+							},
+							{
+								basePath: path.resolve(basePath, "projects/my"),
+								ignores: ["fixtures"],
+							},
+							{
+								basePath: path.resolve(
+									basePath,
+									"projects/my/misc",
+								),
+								ignores: ["**/tmp", "bar"],
+							},
+						],
+						{
+							basePath: path.resolve(basePath, "projects/my"),
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(basePath, "projects/my", "a.js"),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"foo",
+								"a.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"src/foo",
+								"a.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"src/bar",
+								"a.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"src/baz",
+								"a.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"tools/foo",
+								"a.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"tools/baz",
+								"a.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"tools/qux",
+								"a.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"scripts/foo",
+								"a.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"scripts/qux",
+								"a.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"scripts/quux",
+								"a.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"tests",
+								"a.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								".coverage",
+								"a.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"foo/.coverage",
+								"a.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"fixtures",
+								"a.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"tmp",
+								"a.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"foo/tmp",
+								"a.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"misc/foo",
+								"a.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"misc/bar",
+								"a.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"misc/tmp",
+								"a.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"misc/foo/tmp",
+								"a.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"misc/foo/tmp/bar",
+								"a.js",
+							),
+						),
+						true,
+					);
+				});
+
+				it("should intepret `ignores` as relative to the config's `basePath` when ignoring files (relative paths)", () => {
+					configs = new ConfigArray(
+						[
+							{
+								ignores: ["src/*"],
+							},
+							{
+								basePath: "src",
+								ignores: ["!a.js"],
+							},
+							{
+								basePath,
+								ignores: ["!projects/my/src/b.js"],
+							},
+							{
+								basePath: "tools",
+								ignores: ["*", "!a.js"],
+							},
+							{
+								ignores: ["!tools/b.js"],
+							},
+							{
+								basePath: "scripts",
+								ignores: ["a.js", "b.js"],
+							},
+							{
+								basePath: path.resolve(basePath, "projects"),
+								ignores: ["my/tests"],
+							},
+							{
+								basePath: path.resolve(basePath, "projects"),
+								ignores: ["**/.*/**/*.js"],
+							},
+							{
+								basePath: path.resolve(basePath, "projects/my"),
+								ignores: ["fixtures/*.js"],
+							},
+							{
+								basePath: path.resolve(
+									basePath,
+									"projects/my/misc",
+								),
+								ignores: ["**/tmp/*.js", "b.js"],
+							},
+						],
+						{
+							basePath: path.resolve(basePath, "projects/my"),
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(configs.isFileIgnored("a.js"), false);
+					assert.strictEqual(configs.isFileIgnored("b.js"), false);
+					assert.strictEqual(configs.isFileIgnored("c.js"), false);
+					assert.strictEqual(
+						configs.isFileIgnored("foo/a.js"),
+						false,
+					);
+					assert.strictEqual(
+						configs.isFileIgnored("foo/b.js"),
+						false,
+					);
+					assert.strictEqual(
+						configs.isFileIgnored("foo/c.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("src/a.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("src/b.js"),
+						false,
+					);
+
+					assert.strictEqual(configs.isFileIgnored("src/c.js"), true);
+
+					assert.strictEqual(
+						configs.isFileIgnored("tools/a.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("tools/b.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("tools/c.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("scripts/a.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("scripts/b.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("scripts/c.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("tests/a.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(".coverage/a.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("foo/.coverage/a.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("fixtures/a.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("tmp/a.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("tmp/b.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("foo/tmp/a.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("foo/tmp/b.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("misc/a.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("misc/b.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("misc/foo/a.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("misc/foo/b.js"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("misc/tmp/a.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("misc/foo/tmp/a.js"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored("misc/foo/tmp/bar/a.js"),
+						false,
+					);
+				});
+
+				it("should intepret `ignores` as relative to the config's `basePath` when ignoring files (absolute paths)", () => {
+					configs = new ConfigArray(
+						[
+							{
+								ignores: ["src/*"],
+							},
+							{
+								basePath: "src",
+								ignores: ["!a.js"],
+							},
+							{
+								basePath,
+								ignores: ["!projects/my/src/b.js"],
+							},
+							{
+								basePath: "tools",
+								ignores: ["*", "!a.js"],
+							},
+							{
+								ignores: ["!tools/b.js"],
+							},
+							{
+								basePath: "scripts",
+								ignores: ["a.js", "b.js"],
+							},
+							{
+								basePath: path.resolve(basePath, "projects"),
+								ignores: ["my/tests"],
+							},
+							{
+								basePath: path.resolve(basePath, "projects"),
+								ignores: ["**/.*/**/*.js"],
+							},
+							{
+								basePath: path.resolve(basePath, "projects/my"),
+								ignores: ["fixtures/*.js"],
+							},
+							{
+								basePath: path.resolve(
+									basePath,
+									"projects/my/misc",
+								),
+								ignores: ["**/tmp/*.js", "b.js"],
+							},
+						],
+						{
+							basePath: path.resolve(basePath, "projects/my"),
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(basePath, "projects/my", "a.js"),
+						),
+						false,
+					);
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(basePath, "projects/my", "b.js"),
+						),
+						false,
+					);
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(basePath, "projects/my", "c.js"),
+						),
+						false,
+					);
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"foo",
+								"a.js",
+							),
+						),
+						false,
+					);
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"foo",
+								"b.js",
+							),
+						),
+						false,
+					);
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"foo",
+								"c.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"src",
+								"a.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"src",
+								"b.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"src",
+								"c.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"tools",
+								"a.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"tools",
+								"b.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"tools",
+								"c.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"scripts",
+								"a.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"scripts",
+								"b.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"scripts",
+								"c.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"tests",
+								"a.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								".coverage",
+								"a.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"foo",
+								".coverage",
+								"a.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"fixtures",
+								"a.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"tmp",
+								"a.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"tmp",
+								"b.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"foo",
+								"tmp",
+								"a.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"foo",
+								"tmp",
+								"b.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"misc",
+								"a.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"misc",
+								"b.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"misc",
+								"foo",
+								"a.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"misc",
+								"foo",
+								"b.js",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"misc",
+								"tmp",
+								"a.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"misc",
+								"foo",
+								"tmp",
+								"a.js",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isFileIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"misc",
+								"foo",
+								"tmp",
+								"bar",
+								"a.js",
+							),
+						),
+						false,
+					);
+				});
+			});
 		});
 
 		describe("isDirectoryIgnored()", () => {
@@ -3522,6 +5627,392 @@ describe("ConfigArray", () => {
 					);
 				});
 			});
+
+			describe("config objects with `basePath` property", () => {
+				it("should intepret `ignores` as relative to the config's `basePath` (relative paths)", () => {
+					configs = new ConfigArray(
+						[
+							{
+								ignores: ["src/*"],
+							},
+							{
+								basePath: "src",
+								ignores: ["!bar"],
+							},
+							{
+								basePath,
+								ignores: ["!projects/my/src/baz/"],
+							},
+							{
+								basePath: "tools",
+								ignores: ["*", "!baz"],
+							},
+							{
+								ignores: ["!tools/qux"],
+							},
+							{
+								basePath: "scripts",
+								ignores: ["qux", "quux"],
+							},
+							{
+								basePath: path.resolve(basePath, "projects"),
+								ignores: ["my/tests"],
+							},
+							{
+								basePath: path.resolve(basePath, "projects"),
+								ignores: ["**/.*"],
+							},
+							{
+								basePath: path.resolve(basePath, "projects/my"),
+								ignores: ["fixtures"],
+							},
+							{
+								basePath: path.resolve(
+									basePath,
+									"projects/my/misc",
+								),
+								ignores: ["**/tmp", "bar"],
+							},
+						],
+						{
+							basePath: path.resolve(basePath, "projects/my"),
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored("foo"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored("src/foo"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored("src/bar"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored("src/baz"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored("tools/foo"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored("tools/baz"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored("tools/qux"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored("scripts/foo"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored("scripts/qux"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored("scripts/quux"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored("tests"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored(".coverage"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored("foo/.coverage"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored("fixtures"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored("tmp"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored("foo/tmp"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored("misc/foo"),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored("misc/bar"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored("misc/tmp"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored("misc/foo/tmp"),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored("misc/foo/tmp/bar"),
+						true,
+					);
+				});
+
+				it("should intepret `ignores` as relative to the config's `basePath` (absolute paths)", () => {
+					configs = new ConfigArray(
+						[
+							{
+								ignores: ["src/*"],
+							},
+							{
+								basePath: "src",
+								ignores: ["!bar"],
+							},
+							{
+								basePath,
+								ignores: ["!projects/my/src/baz/"],
+							},
+							{
+								basePath: "tools",
+								ignores: ["*", "!baz"],
+							},
+							{
+								ignores: ["!tools/qux"],
+							},
+							{
+								basePath: "scripts",
+								ignores: ["qux", "quux"],
+							},
+							{
+								basePath: path.resolve(basePath, "projects"),
+								ignores: ["my/tests"],
+							},
+							{
+								basePath: path.resolve(basePath, "projects"),
+								ignores: ["**/.*"],
+							},
+							{
+								basePath: path.resolve(basePath, "projects/my"),
+								ignores: ["fixtures"],
+							},
+							{
+								basePath: path.resolve(
+									basePath,
+									"projects/my/misc",
+								),
+								ignores: ["**/tmp", "bar"],
+							},
+						],
+						{
+							basePath: path.resolve(basePath, "projects/my"),
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored(
+							path.resolve(basePath, "projects/my", "foo"),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored(
+							path.resolve(basePath, "projects/my", "src/foo"),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored(
+							path.resolve(basePath, "projects/my", "src/bar"),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored(
+							path.resolve(basePath, "projects/my", "src/baz"),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored(
+							path.resolve(basePath, "projects/my", "tools/foo"),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored(
+							path.resolve(basePath, "projects/my", "tools/baz"),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored(
+							path.resolve(basePath, "projects/my", "tools/qux"),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"scripts/foo",
+							),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"scripts/qux",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"scripts/quux",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored(
+							path.resolve(basePath, "projects/my", "tests"),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored(
+							path.resolve(basePath, "projects/my", ".coverage"),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"foo/.coverage",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored(
+							path.resolve(basePath, "projects/my", "fixtures"),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored(
+							path.resolve(basePath, "projects/my", "tmp"),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored(
+							path.resolve(basePath, "projects/my", "foo/tmp"),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored(
+							path.resolve(basePath, "projects/my", "misc/foo"),
+						),
+						false,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored(
+							path.resolve(basePath, "projects/my", "misc/bar"),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored(
+							path.resolve(basePath, "projects/my", "misc/tmp"),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"misc/foo/tmp",
+							),
+						),
+						true,
+					);
+
+					assert.strictEqual(
+						configs.isDirectoryIgnored(
+							path.resolve(
+								basePath,
+								"projects/my",
+								"misc/foo/tmp/bar",
+							),
+						),
+						true,
+					);
+				});
+			});
 		});
 
 		describe("files", () => {
@@ -3554,7 +6045,7 @@ describe("ConfigArray", () => {
 			it("should return all ignores from all configs without files when called", () => {
 				const expectedIgnores = configs.reduce((list, config) => {
 					if (config.ignores && Object.keys(config).length === 1) {
-						list.push(...config.ignores);
+						list.push(config);
 					}
 
 					return list;
@@ -3582,7 +6073,49 @@ describe("ConfigArray", () => {
 					configs.isFileIgnored("ignoreme/foo.js"),
 					true,
 				);
-				assert.deepStrictEqual(configs.ignores, ["ignoreme"]);
+				assert.deepStrictEqual(configs.ignores, [
+					{
+						name: "foo",
+						ignores: ["ignoreme"],
+					},
+				]);
+			});
+
+			it("should ignore basePath field when considering global ignores", () => {
+				configs = new ConfigArray(
+					[
+						{
+							basePath: "src",
+							ignores: ["ignoreme1"],
+						},
+						{
+							name: "foo",
+							basePath: "tools",
+							ignores: ["ignoreme2"],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.deepStrictEqual(configs.ignores, [
+					{
+						basePath: path.toNamespacedPath(
+							path.join(basePath, "src"),
+						),
+						ignores: ["ignoreme1"],
+					},
+					{
+						name: "foo",
+						basePath: path.toNamespacedPath(
+							path.join(basePath, "tools"),
+						),
+						ignores: ["ignoreme2"],
+					},
+				]);
 			});
 		});
 

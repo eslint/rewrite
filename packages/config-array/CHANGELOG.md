@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.21.0](https://github.com/eslint/rewrite/compare/config-array-v0.20.1...config-array-v0.21.0) (2025-06-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* Support `basePath` property in config objects ([#223](https://github.com/eslint/rewrite/issues/223))
+
+### Features
+
+* Support `basePath` property in config objects ([#223](https://github.com/eslint/rewrite/issues/223)) ([40d31ba](https://github.com/eslint/rewrite/commit/40d31ba42a9fe0da10b6ca5e1b10f1f2b10c5f90))
+
 ## [0.20.1](https://github.com/eslint/rewrite/compare/config-array-v0.20.0...config-array-v0.20.1) (2025-06-09)
 
 

@@ -75,7 +75,7 @@ const CONFIG_TYPES = new Set(["array", "function"]);
  * Fields that are considered metadata and not part of the config object.
  * @type {Set<string>}
  */
-const META_FIELDS = new Set(["name"]);
+const META_FIELDS = new Set(["name", "basePath"]);
 
 /**
  * A schema containing just files and ignores for early validation.
@@ -201,6 +201,10 @@ function assertValidBaseConfig(config, index) {
 
 	const validateConfig = {};
 
+	if ("basePath" in config) {
+		validateConfig.basePath = config.basePath;
+	}
+
 	if ("files" in config) {
 		validateConfig.files = config.files;
 	}
@@ -279,16 +283,24 @@ function needsPatternNormalization(pattern) {
 /**
  * Normalizes `files` and `ignores` patterns in a config by removing "./" prefixes.
  * @param {Object} config The config object to normalize patterns in.
+ * @param {string} namespacedBasePath The namespaced base path of the directory to which config base path is relative.
+ * @param {PathImpl} path Path-handling implementation.
  * @returns {Object} The normalized config object.
  */
-function normalizeConfigPatterns(config) {
+function normalizeConfigPatterns(config, namespacedBasePath, path) {
 	if (!config) {
 		return config;
 	}
 
+	const hasBasePath = typeof config.basePath === "string";
+
 	let needsNormalization = false;
 
-	if (Array.isArray(config.files)) {
+	if (hasBasePath) {
+		needsNormalization = true;
+	}
+
+	if (!needsNormalization && Array.isArray(config.files)) {
 		needsNormalization = config.files.some(pattern => {
 			if (Array.isArray(pattern)) {
 				return pattern.some(needsPatternNormalization);
@@ -306,6 +318,17 @@ function normalizeConfigPatterns(config) {
 	}
 
 	const newConfig = { ...config };
+
+	if (hasBasePath) {
+		if (path.isAbsolute(config.basePath)) {
+			newConfig.basePath = path.toNamespacedPath(config.basePath);
+		} else {
+			newConfig.basePath = path.resolve(
+				namespacedBasePath,
+				config.basePath,
+			);
+		}
+	}
 
 	if (Array.isArray(newConfig.files)) {
 		newConfig.files = newConfig.files.map(pattern => {
@@ -330,10 +353,18 @@ function normalizeConfigPatterns(config) {
  * @param {Object} context The context object to pass into any function
  *      found.
  * @param {Array<string>} extraConfigTypes The config types to check.
+ * @param {string} namespacedBasePath The namespaced base path of the directory to which config base paths are relative.
+ * @param {PathImpl} path Path-handling implementation.
  * @returns {Promise<Array>} A flattened array containing only config objects.
  * @throws {TypeError} When a config function returns a function.
  */
-async function normalize(items, context, extraConfigTypes) {
+async function normalize(
+	items,
+	context,
+	extraConfigTypes,
+	namespacedBasePath,
+	path,
+) {
 	const allowFunctions = extraConfigTypes.includes("function");
 	const allowArrays = extraConfigTypes.includes("array");
 
@@ -373,7 +404,7 @@ async function normalize(items, context, extraConfigTypes) {
 	const configs = [];
 
 	for await (const config of asyncIterable) {
-		configs.push(normalizeConfigPatterns(config));
+		configs.push(normalizeConfigPatterns(config, namespacedBasePath, path));
 	}
 
 	return configs;
@@ -386,10 +417,18 @@ async function normalize(items, context, extraConfigTypes) {
  * @param {Object} context The context object to pass into any function
  *      found.
  * @param {Array<string>} extraConfigTypes The config types to check.
+ * @param {string} namespacedBasePath The namespaced base path of the directory to which config base paths are relative.
+ * @param {PathImpl} path Path-handling implementation
  * @returns {Array} A flattened array containing only config objects.
  * @throws {TypeError} When a config function returns a function.
  */
-function normalizeSync(items, context, extraConfigTypes) {
+function normalizeSync(
+	items,
+	context,
+	extraConfigTypes,
+	namespacedBasePath,
+	path,
+) {
 	const allowFunctions = extraConfigTypes.includes("function");
 	const allowArrays = extraConfigTypes.includes("array");
 
@@ -427,63 +466,94 @@ function normalizeSync(items, context, extraConfigTypes) {
 	const configs = [];
 
 	for (const config of flatTraverse(items)) {
-		configs.push(normalizeConfigPatterns(config));
+		configs.push(normalizeConfigPatterns(config, namespacedBasePath, path));
 	}
 
 	return configs;
 }
 
 /**
- * Determines if a given file path should be ignored based on the given
- * matcher.
- * @param {Array<string|((string) => boolean)>} ignores The ignore patterns to check.
- * @param {string} filePath The unprocessed file path to check.
- * @param {string} relativeFilePath The path of the file to check relative to the base path,
- * 		using forward slash (`"/"`) as a separator.
- * @returns {boolean} True if the path should be ignored and false if not.
+ * Converts a given path to a relative path with all separator characters replaced by forward slashes (`"/"`).
+ * @param {string} fileOrDirPath The unprocessed path to convert.
+ * @param {string} namespacedBasePath The namespaced base path of the directory to which the calculated path shall be relative.
+ * @param {PathImpl} path Path-handling implementations.
+ * @returns {string} A relative path with all separator characters replaced by forward slashes.
  */
-function shouldIgnorePath(ignores, filePath, relativeFilePath) {
-	return ignores.reduce((ignored, matcher) => {
-		if (!ignored) {
-			if (typeof matcher === "function") {
-				return matcher(filePath);
-			}
-
-			// don't check negated patterns because we're not ignored yet
-			if (!matcher.startsWith("!")) {
-				return doMatch(relativeFilePath, matcher);
-			}
-
-			// otherwise we're still not ignored
-			return false;
-		}
-
-		// only need to check negated patterns because we're ignored
-		if (typeof matcher === "string" && matcher.startsWith("!")) {
-			return !doMatch(relativeFilePath, matcher, {
-				flipNegate: true,
-			});
-		}
-
-		return ignored;
-	}, false);
+function toRelativePath(fileOrDirPath, namespacedBasePath, path) {
+	const fullPath = path.resolve(namespacedBasePath, fileOrDirPath);
+	const namespacedFullPath = path.toNamespacedPath(fullPath);
+	const relativePath = path.relative(namespacedBasePath, namespacedFullPath);
+	return relativePath.replaceAll(path.SEPARATOR, "/");
 }
 
 /**
- * Determines if a given file path is matched by a config based on
- * `ignores` only.
+ * Determines if a given file path should be ignored based on the given
+ * matcher.
+ * @param {Array<{ basePath?: string, ignores: Array<string|((string) => boolean)>}>} configs Configuration objects containing `ignores`.
  * @param {string} filePath The unprocessed file path to check.
  * @param {string} relativeFilePath The path of the file to check relative to the base path,
  * 		using forward slash (`"/"`) as a separator.
- * @param {Object} config The config object to check.
- * @returns {boolean} True if the file path is matched by the config,
- *      false if not.
+ * @param {Object} [basePathData] Additional data needed to recalculate paths for configuration objects
+ *  	that have `basePath` property.
+ * @param {string} [basePathData.basePath] Namespaced path to witch `relativeFilePath` is relative.
+ * @param {PathImpl} [basePathData.path] Path-handling implementation.
+ * @returns {boolean} True if the path should be ignored and false if not.
  */
-function pathMatchesIgnores(filePath, relativeFilePath, config) {
-	return (
-		Object.keys(config).filter(key => !META_FIELDS.has(key)).length > 1 &&
-		!shouldIgnorePath(config.ignores, filePath, relativeFilePath)
-	);
+function shouldIgnorePath(
+	configs,
+	filePath,
+	relativeFilePath,
+	{ basePath, path } = {},
+) {
+	let shouldIgnore = false;
+
+	for (const config of configs) {
+		let relativeFilePathToCheck = relativeFilePath;
+		if (config.basePath) {
+			relativeFilePathToCheck = toRelativePath(
+				path.resolve(basePath, relativeFilePath),
+				config.basePath,
+				path,
+			);
+
+			if (
+				relativeFilePathToCheck === "" ||
+				EXTERNAL_PATH_REGEX.test(relativeFilePathToCheck)
+			) {
+				continue;
+			}
+
+			if (relativeFilePath.endsWith("/")) {
+				relativeFilePathToCheck += "/";
+			}
+		}
+		shouldIgnore = config.ignores.reduce((ignored, matcher) => {
+			if (!ignored) {
+				if (typeof matcher === "function") {
+					return matcher(filePath);
+				}
+
+				// don't check negated patterns because we're not ignored yet
+				if (!matcher.startsWith("!")) {
+					return doMatch(relativeFilePathToCheck, matcher);
+				}
+
+				// otherwise we're still not ignored
+				return false;
+			}
+
+			// only need to check negated patterns because we're ignored
+			if (typeof matcher === "string" && matcher.startsWith("!")) {
+				return !doMatch(relativeFilePathToCheck, matcher, {
+					flipNegate: true,
+				});
+			}
+
+			return ignored;
+		}, shouldIgnore);
+	}
+
+	return shouldIgnore;
 }
 
 /**
@@ -526,8 +596,12 @@ function pathMatches(filePath, relativeFilePath, config) {
 	 * if there are any files to ignore.
 	 */
 	if (filePathMatchesPattern && config.ignores) {
+		/*
+		 * Pass config object without `basePath`, because `relativeFilePath` is already
+		 * calculated as relative to it.
+		 */
 		filePathMatchesPattern = !shouldIgnorePath(
-			config.ignores,
+			[{ ignores: config.ignores }],
 			filePath,
 			relativeFilePath,
 		);
@@ -595,20 +669,6 @@ function getPathImpl(fileOrDirPath) {
 	throw new Error(
 		`Expected an absolute path but received "${fileOrDirPath}"`,
 	);
-}
-
-/**
- * Converts a given path to a relative path with all separator characters replaced by forward slashes (`"/"`).
- * @param {string} fileOrDirPath The unprocessed path to convert.
- * @param {string} namespacedBasePath The namespaced base path of the directory to which the calculated path shall be relative.
- * @param {PathImpl} path Path-handling implementations.
- * @returns {string} A relative path with all separator characters replaced by forward slashes.
- */
-function toRelativePath(fileOrDirPath, namespacedBasePath, path) {
-	const fullPath = path.resolve(namespacedBasePath, fileOrDirPath);
-	const namespacedFullPath = path.toNamespacedPath(fullPath);
-	const relativePath = path.relative(namespacedBasePath, namespacedFullPath);
-	return relativePath.replaceAll(path.SEPARATOR, "/");
 }
 
 //------------------------------------------------------------------------------
@@ -791,7 +851,7 @@ export class ConfigArray extends Array {
 	 * the matching `files` fields in any configs. This is necessary to mimic
 	 * the behavior of things like .gitignore and .eslintignore, allowing a
 	 * globbing operation to be faster.
-	 * @returns {string[]} An array of string patterns and functions to be ignored.
+	 * @returns {Object[]} An array of config objects representing global ignores.
 	 */
 	get ignores() {
 		assertNormalized(this);
@@ -818,7 +878,7 @@ export class ConfigArray extends Array {
 				Object.keys(config).filter(key => !META_FIELDS.has(key))
 					.length === 1
 			) {
-				result.push(...config.ignores);
+				result.push(config);
 			}
 		}
 
@@ -849,6 +909,8 @@ export class ConfigArray extends Array {
 				this,
 				context,
 				this.extraConfigTypes,
+				this.#namespacedBasePath,
+				this.#path,
 			);
 			this.length = 0;
 			this.push(
@@ -878,6 +940,8 @@ export class ConfigArray extends Array {
 				this,
 				context,
 				this.extraConfigTypes,
+				this.#namespacedBasePath,
+				this.#path,
 			);
 			this.length = 0;
 			this.push(
@@ -942,13 +1006,13 @@ export class ConfigArray extends Array {
 
 		// check to see if the file is outside the base path
 
-		const relativeFilePath = toRelativePath(
+		const relativeToBaseFilePath = toRelativePath(
 			filePath,
 			this.#namespacedBasePath,
 			this.#path,
 		);
 
-		if (EXTERNAL_PATH_REGEX.test(relativeFilePath)) {
+		if (EXTERNAL_PATH_REGEX.test(relativeToBaseFilePath)) {
 			debug(`No config for file ${filePath} outside of base path`);
 
 			// cache and return result
@@ -967,7 +1031,12 @@ export class ConfigArray extends Array {
 			return CONFIG_WITH_STATUS_IGNORED;
 		}
 
-		if (shouldIgnorePath(this.ignores, filePath, relativeFilePath)) {
+		if (
+			shouldIgnorePath(this.ignores, filePath, relativeToBaseFilePath, {
+				basePath: this.#namespacedBasePath,
+				path: this.#path,
+			})
+		) {
 			debug(`Ignoring ${filePath} based on file pattern`);
 
 			// cache and return result
@@ -982,6 +1051,21 @@ export class ConfigArray extends Array {
 		const universalPattern = /^\*$|^!|\/\*{1,2}$/u;
 
 		this.forEach((config, index) => {
+			const relativeFilePath = config.basePath
+				? toRelativePath(
+						this.#path.resolve(this.#namespacedBasePath, filePath),
+						config.basePath,
+						this.#path,
+					)
+				: relativeToBaseFilePath;
+
+			if (config.basePath && EXTERNAL_PATH_REGEX.test(relativeFilePath)) {
+				debug(
+					`Skipped config found for ${filePath} (based on config's base path: ${config.basePath}`,
+				);
+				return;
+			}
+
 			if (!config.files) {
 				if (!config.ignores) {
 					debug(`Universal config found for ${filePath}`);
@@ -989,17 +1073,37 @@ export class ConfigArray extends Array {
 					return;
 				}
 
-				if (pathMatchesIgnores(filePath, relativeFilePath, config)) {
+				if (
+					Object.keys(config).filter(key => !META_FIELDS.has(key))
+						.length === 1
+				) {
 					debug(
-						`Matching config found for ${filePath} (based on ignores: ${config.ignores})`,
+						`Skipped config found for ${filePath} (global ignores)`,
 					);
-					matchingConfigIndices.push(index);
+					return;
+				}
+
+				/*
+				 * Pass config object without `basePath`, because `relativeFilePath` is already
+				 * calculated as relative to it.
+				 */
+				if (
+					shouldIgnorePath(
+						[{ ignores: config.ignores }],
+						filePath,
+						relativeFilePath,
+					)
+				) {
+					debug(
+						`Skipped config found for ${filePath} (based on ignores: ${config.ignores})`,
+					);
 					return;
 				}
 
 				debug(
-					`Skipped config found for ${filePath} (based on ignores: ${config.ignores})`,
+					`Matching config found for ${filePath} (based on ignores: ${config.ignores})`,
 				);
+				matchingConfigIndices.push(index);
 				return;
 			}
 
@@ -1228,6 +1332,10 @@ export class ConfigArray extends Array {
 				this.ignores,
 				this.#path.join(this.basePath, relativeDirectoryToCheck),
 				relativeDirectoryToCheck,
+				{
+					basePath: this.#namespacedBasePath,
+					path: this.#path,
+				},
 			);
 
 			cache.set(relativeDirectoryToCheck, result);
