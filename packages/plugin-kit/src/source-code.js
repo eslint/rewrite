@@ -301,28 +301,25 @@ export class TextSourceCodeBase {
 		this.#lineEndingPattern = lineEndingPattern;
 		this.#lines = text.split(this.#lineEndingPattern);
 
-		if (hasESTreeStyleLoc(ast)) {
-			if (ast.loc?.start?.line === 0 || ast.loc?.start?.line === 1) {
-				this.#lineStart = ast.loc.start.line;
-			}
+		if (hasESTreeStyleLoc(this.ast)) {
+			this.#setLineColumnStart(this.ast.loc);
+		} else if (hasPosStyleLoc(this.ast)) {
+			this.#setLineColumnStart(this.ast.position);
+		}
+	}
 
-			if (ast.loc?.start?.column === 0 || ast.loc?.start?.column === 1) {
-				this.#columnStart = ast.loc.start.column;
-			}
-		} else if (hasPosStyleLoc(ast)) {
-			if (
-				ast.position?.start?.line === 0 ||
-				ast.position?.start?.line === 1
-			) {
-				this.#lineStart = ast.position.start.line;
-			}
+	/**
+	 * Sets the `#lineStart` and `#columnStart` based on a `loc` or `position` object.
+	 * @param {SourceLocation} loc The `loc` or `position` object to use.
+	 * @returns {void}
+	 */
+	#setLineColumnStart(loc) {
+		if (loc?.start?.line === 0 || loc?.start?.line === 1) {
+			this.#lineStart = loc.start.line;
+		}
 
-			if (
-				ast.position?.start?.column === 0 ||
-				ast.position?.start?.column === 1
-			) {
-				this.#columnStart = ast.position.start.column;
-			}
+		if (loc?.start?.column === 0 || loc?.start?.column === 1) {
+			this.#columnStart = loc.start.column;
 		}
 	}
 
