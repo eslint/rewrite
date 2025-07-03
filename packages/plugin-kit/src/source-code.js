@@ -250,7 +250,7 @@ export class TextSourceCodeBase {
 	 * The lines of text in the source code.
 	 * @type {Array<string>}
 	 */
-	#lines = [];
+	#lines;
 
 	/**
 	 * The indices of the start of each line in the source code.
