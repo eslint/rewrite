@@ -333,23 +333,23 @@ export class TextSourceCodeBase {
 	 * @returns {void}
 	 */
 	#ensureLineStartIndicesFromIndex(index) {
-		const lastIndex = this.#lineStartIndices.at(-1) ?? 0;
+		const lastCalculatedIndex = this.#lineStartIndices.at(-1) ?? 0;
 
-		// If we've already parsed up to or beyond this index, do nothing
-		if (index <= lastIndex) {
+		// If we've already parsed up to or beyond this index, do nothing.
+		if (index <= lastCalculatedIndex) {
 			return;
 		}
 
-		// Create a new RegExp instance to avoid lastIndex issues
+		// Create a new RegExp instance to avoid lastIndex issues.
 		const lineEndingPattern = structuredClone(this.#lineEndingPattern);
 
-		// Start parsing from where we left off
-		const text = this.text.slice(lastIndex, index + 1);
+		// Start parsing from where we left off.
+		const text = this.text.slice(lastCalculatedIndex, index + 1);
 
 		let match;
 		while ((match = lineEndingPattern.exec(text))) {
 			this.#lineStartIndices.push(
-				lastIndex + match.index + match[0].length,
+				lastCalculatedIndex + match.index + match[0].length,
 			);
 		}
 	}
@@ -362,30 +362,32 @@ export class TextSourceCodeBase {
 	 * @returns {void}
 	 */
 	#ensureLineStartIndicesFromLoc(loc) {
-		// Calculate line indices up to `locLineIndex + 1` (current line + potentially next line)
+		// Calculate line indices up to the potentially next line, as it is needed for the follow‑up calculation.
 		const nextLocLineIndex = loc.line - this.#lineStart + 1;
+		const lastCalculatedLineIndex = this.#lineStartIndices.length - 1;
+		let additionalLinesNeeded = nextLocLineIndex - lastCalculatedLineIndex;
 
-		if (nextLocLineIndex <= this.#lineStartIndices.length - 1) {
+		// If we've already parsed up to or beyond this line, do nothing.
+		if (additionalLinesNeeded <= 0) {
 			return;
 		}
 
-		const lastIndex = this.#lineStartIndices.at(-1) ?? 0;
+		const lastCalculatedIndex = this.#lineStartIndices.at(-1) ?? 0;
+
+		// Create a new RegExp instance to avoid lastIndex issues.
 		const lineEndingPattern = structuredClone(this.#lineEndingPattern);
-		const text = this.text.slice(lastIndex);
+
+		// Start parsing from where we left off.
+		const text = this.text.slice(lastCalculatedIndex);
 
 		let match;
-		let linesFound = 0;
-		const additionalLinesNeeded =
-			nextLocLineIndex - (this.#lineStartIndices.length - 1);
-
 		while (
-			linesFound < additionalLinesNeeded &&
+			Boolean(additionalLinesNeeded--) &&
 			(match = lineEndingPattern.exec(text))
 		) {
 			this.#lineStartIndices.push(
-				lastIndex + match.index + match[0].length,
+				lastCalculatedIndex + match.index + match[0].length,
 			);
-			linesFound++;
 		}
 	}
 
@@ -427,11 +429,9 @@ export class TextSourceCodeBase {
 			);
 		}
 
-		this.#ensureLineStartIndicesFromIndex(index);
-
 		/*
 		 * For an argument of `this.text.length`, return the location one "spot" past the last character
-		 * of the file. If the last character is a linebreak, the location will be column 0 of the next
+		 * of the file. If the last character is a linebreak, the location will be `#columnStart` of the next
 		 * line; otherwise, the location will be in the next column on the same line.
 		 *
 		 * See `getIndexFromLoc` for the motivation for this special case.
@@ -442,6 +442,9 @@ export class TextSourceCodeBase {
 				column: (this.#lines.at(-1)?.length ?? 0) + this.#columnStart,
 			};
 		}
+
+		// Ensure `#lineStartIndices` are lazily calculated.
+		this.#ensureLineStartIndicesFromIndex(index);
 
 		/*
 		 * To figure out which line `index` is on, determine the last place at which index could
@@ -495,6 +498,7 @@ export class TextSourceCodeBase {
 			);
 		}
 
+		// Ensure `#lineStartIndices` are lazily calculated.
 		this.#ensureLineStartIndicesFromLoc(loc);
 
 		const lineStartIndex =
