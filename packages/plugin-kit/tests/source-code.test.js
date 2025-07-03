@@ -1741,9 +1741,7 @@ describe("source-code", () => {
 						sourceCode.lines = ["bar"];
 					},
 					{
-						name: "TypeError",
-						message:
-							"Cannot set property lines of #<TextSourceCodeBase> which has only a getter",
+						name: "TypeError", // Cannot use `message` here because it behaves differently in other runtimes, such as Bun.
 					},
 				);
 
@@ -1752,9 +1750,7 @@ describe("source-code", () => {
 						sourceCode.lines.push("qux");
 					},
 					{
-						name: "TypeError",
-						message:
-							"Cannot add property 3, object is not extensible",
+						name: "TypeError", // Cannot use `message` here because it behaves differently in other runtimes, such as Bun.
 					},
 				);
 			});
