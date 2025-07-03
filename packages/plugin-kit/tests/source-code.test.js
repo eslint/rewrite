@@ -1689,5 +1689,75 @@ describe("source-code", () => {
 				]);
 			});
 		});
+
+		describe("lines", () => {
+			it("should return an array of lines", () => {
+				const ast = {};
+				const text = "foo\nbar\r\nbaz";
+				const sourceCode = new TextSourceCodeBase({ ast, text });
+
+				assert.deepStrictEqual(sourceCode.lines, ["foo", "bar", "baz"]);
+			});
+
+			it("should return an array of lines when line ending pattern is specified", () => {
+				const ast = {};
+				const text = "foo\nbar\r\nbaz";
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineEndingPattern: /\n/u,
+				});
+
+				assert.deepStrictEqual(sourceCode.lines, [
+					"foo",
+					"bar\r",
+					"baz",
+				]);
+			});
+
+			it("should return an array of lines when no line endings are present", () => {
+				const ast = {};
+				const text = "foo";
+				const sourceCode = new TextSourceCodeBase({ ast, text });
+
+				assert.deepStrictEqual(sourceCode.lines, ["foo"]);
+			});
+
+			it("should return an empty array when text is empty", () => {
+				const ast = {};
+				const text = "";
+				const sourceCode = new TextSourceCodeBase({ ast, text });
+
+				assert.deepStrictEqual(sourceCode.lines, [""]);
+			});
+
+			it("should throw an error when writing to lines", () => {
+				const ast = {};
+				const text = "foo\nbar\r\nbaz";
+				const sourceCode = new TextSourceCodeBase({ ast, text });
+
+				assert.throws(
+					() => {
+						sourceCode.lines = ["bar"];
+					},
+					{
+						name: "TypeError",
+						message:
+							"Cannot set property lines of #<TextSourceCodeBase> which has only a getter",
+					},
+				);
+
+				assert.throws(
+					() => {
+						sourceCode.lines.push("qux");
+					},
+					{
+						name: "TypeError",
+						message:
+							"Cannot add property 3, object is not extensible",
+					},
+				);
+			});
+		});
 	});
 });

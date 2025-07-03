@@ -306,6 +306,10 @@ export class TextSourceCodeBase {
 		} else if (hasPosStyleLoc(this.ast)) {
 			this.#setLineColumnStart(this.ast.position);
 		}
+
+		// don't allow further modification of this object
+		Object.freeze(this);
+		Object.freeze(this.lines);
 	}
 
 	/**
