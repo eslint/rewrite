@@ -69,17 +69,17 @@ function hasPosStyleRange(node) {
  * **Please note that the `lineStartIndices` should be sorted in ascending order**.
  * - Time Complexity: O(log n) - Significantly faster than linear search for large files.
  * @param {number[]} lineStartIndices Sorted array of line start indices.
- * @param {number} target The character index to find the line number for.
- * @returns {number} The 1-based line number for the target index.
+ * @param {number} targetIndex The target index to find the line number for.
+ * @returns {number} The line number for the target index.
  */
-function findLineNumberBinarySearch(lineStartIndices, target) {
+function findLineNumberBinarySearch(lineStartIndices, targetIndex) {
 	let low = 0;
-	let high = lineStartIndices.length;
+	let high = lineStartIndices.length - 1;
 
 	while (low < high) {
 		const mid = ((low + high) / 2) | 0; // Use bitwise OR to floor the division.
 
-		if (target < lineStartIndices[mid]) {
+		if (targetIndex < lineStartIndices[mid]) {
 			high = mid;
 		} else {
 			low = mid + 1;
