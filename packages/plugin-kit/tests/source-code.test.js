@@ -115,6 +115,44 @@ describe("source-code", () => {
 
 				assert.deepStrictEqual(sourceCode.lines, ["foo", "bar", "baz"]);
 			});
+
+			it("should handle loc (ESTree) style location", () => {
+				const ast = {
+					loc: {
+						start: { line: 1, column: 1 },
+					},
+				};
+				const text = "foo";
+				const sourceCode = new TextSourceCodeBase({ ast, text });
+
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(0), {
+					line: 1,
+					column: 1,
+				});
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 1, column: 1 }),
+					0,
+				);
+			});
+
+			it("should handle position style location", () => {
+				const ast = {
+					position: {
+						start: { line: 1, column: 1 },
+					},
+				};
+				const text = "foo";
+				const sourceCode = new TextSourceCodeBase({ ast, text });
+
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(0), {
+					line: 1,
+					column: 1,
+				});
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 1, column: 1 }),
+					0,
+				);
+			});
 		});
 
 		describe("getLoc()", () => {
