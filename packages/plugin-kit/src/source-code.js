@@ -259,12 +259,6 @@ export class TextSourceCodeBase {
 	#lineStartIndices = [0];
 
 	/**
-	 * The column number at which the parser starts counting. Defaults to `0` for ESTree compatibility.
-	 * @type {0|1}
-	 */
-	#columnStart = 0;
-
-	/**
 	 * The pattern to match line endings in the source code.
 	 * @type {RegExp}
 	 */
@@ -302,39 +296,10 @@ export class TextSourceCodeBase {
 		this.#lineEndingPattern = lineEndingPattern;
 
 		if (hasESTreeStyleLoc(this.ast)) {
-			this.#setRootNodeLoc(this.ast.loc);
+			this.#rootNodeLoc = this.ast.loc;
 		} else if (hasPosStyleLoc(this.ast)) {
-			this.#setRootNodeLoc(this.ast.position);
+			this.#rootNodeLoc = this.ast.position;
 		}
-	}
-
-	/**
-	 * Sets the root node loc based on a `loc` or `position` object.
-	 * @param {SourceLocation} rootNodeLoc The `loc` or `position` object to use.
-	 * @returns {void}
-	 */
-	#setRootNodeLoc(rootNodeLoc) {
-		// const zeroOrOne = new Set([0, 1]);
-
-		// if(rootNodeLoc === null || typeof rootNodeLoc !== "object" || !("start" in rootNodeLoc) || !("end" in rootNodeLoc)) {
-		// 	throw new TypeError("Expected root node `loc` or `position` to be an object with `start` and `end` properties.");
-		// }
-
-		// if (!zeroOrOne.has(rootNodeLoc.start.line) || !zeroOrOne.has(rootNodeLoc.start.column)) {
-		// 	throw new TypeError(
-		// 		"Expected root node `loc` or `position` to have `start.line` and `start.column` properties with values of 0 or 1.",
-		// 	);
-		// }
-
-		// if (typeof rootNodeLoc.end.line !== "number" || typeof rootNodeLoc.end.column !== "number") {
-		// 	throw new TypeError(
-		// 		"Expected root node `loc` or `position` to have `end.line` and `end.column` properties with numeric values.",
-		// 	);
-		// }
-
-		this.#rootNodeLoc = rootNodeLoc;
-		// @ts-expect-error TODO
-		this.#columnStart = this.#rootNodeLoc.start.column;
 	}
 
 	/**
@@ -463,7 +428,9 @@ export class TextSourceCodeBase {
 		if (index === this.text.length) {
 			return {
 				line: this.lines.length - 1 + this.#rootNodeLoc.start.line,
-				column: (this.lines.at(-1)?.length ?? 0) + this.#columnStart,
+				column:
+					(this.lines.at(-1)?.length ?? 0) +
+					this.#rootNodeLoc.start.column,
 			};
 		}
 
@@ -488,7 +455,7 @@ export class TextSourceCodeBase {
 				this.#lineStartIndices[
 					lineNumber - this.#rootNodeLoc.start.line
 				] +
-				this.#columnStart,
+				this.#rootNodeLoc.start.column,
 		};
 	}
 
@@ -536,15 +503,16 @@ export class TextSourceCodeBase {
 			: this.#lineStartIndices[
 					loc.line - this.#rootNodeLoc.start.line + 1
 				];
-		const positionIndex = lineStartIndex + loc.column - this.#columnStart;
+		const positionIndex =
+			lineStartIndex + loc.column - this.#rootNodeLoc.start.column;
 
 		if (
-			loc.column < this.#columnStart ||
+			loc.column < this.#rootNodeLoc.start.column ||
 			(isLastLine && positionIndex > lineEndIndex) ||
 			(!isLastLine && positionIndex >= lineEndIndex)
 		) {
 			throw new RangeError(
-				`Column number out of range (column ${loc.column} requested). Valid range for line ${loc.line}: ${this.#columnStart}-${lineEndIndex - lineStartIndex + this.#columnStart + (isLastLine ? 0 : -1)}`,
+				`Column number out of range (column ${loc.column} requested). Valid range for line ${loc.line}: ${this.#rootNodeLoc.start.column}-${lineEndIndex - lineStartIndex + this.#rootNodeLoc.start.column + (isLastLine ? 0 : -1)}`,
 			);
 		}
 
