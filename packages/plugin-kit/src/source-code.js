@@ -267,9 +267,14 @@ export class TextSourceCodeBase {
 	/**
 	 * The location of the root node in the source code.
 	 * Used to determine the starting and ending line/column numbers.
+	 * - `start.line`: Defaults to `1` for ESTree compatibility.
+	 * - `start.column`: Defaults to `0` for ESTree compatibility.
 	 * @type {SourceLocation}
-	 */ // @ts-expect-error TODO
-	#rootNodeLoc;
+	 */
+	#rootNodeLoc = {
+		start: { line: 1, column: 0 },
+		end: { line: Infinity, column: Infinity },
+	};
 
 	/**
 	 * The AST of the source code.
