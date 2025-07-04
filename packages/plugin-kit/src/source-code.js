@@ -302,13 +302,11 @@ export class TextSourceCodeBase {
 		this.#lines = text.split(this.#lineEndingPattern);
 
 		if (hasESTreeStyleLoc(this.ast)) {
-			this.#setLineColumnStart(this.ast.loc);
+			this.#setLineColumn(this.ast.loc);
 		} else if (hasPosStyleLoc(this.ast)) {
-			this.#setLineColumnStart(this.ast.position);
+			this.#setLineColumn(this.ast.position);
 		}
 
-		// don't allow further modification of this object
-		Object.freeze(this);
 		Object.freeze(this.lines);
 	}
 
@@ -317,7 +315,7 @@ export class TextSourceCodeBase {
 	 * @param {SourceLocation} loc The `loc` or `position` object to use.
 	 * @returns {void}
 	 */
-	#setLineColumnStart(loc) {
+	#setLineColumn(loc) {
 		if (loc?.start?.line === 0 || loc?.start?.line === 1) {
 			this.#lineStart = loc.start.line;
 		}
