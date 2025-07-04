@@ -277,6 +277,13 @@ export class TextSourceCodeBase {
 	#lineEndingPattern;
 
 	/**
+	 * The location of the root node in the source code.
+	 * Used to determine the starting and ending line/column numbers.
+	 * @type {SourceLocation}
+	 */ // @ts-expect-error TODO
+	#rootNodeLoc;
+
+	/**
 	 * The AST of the source code.
 	 * @type {Options['RootNode']}
 	 */
@@ -301,25 +308,41 @@ export class TextSourceCodeBase {
 		this.#lineEndingPattern = lineEndingPattern;
 
 		if (hasESTreeStyleLoc(this.ast)) {
-			this.#setLineColumn(this.ast.loc);
+			this.#setRootNodeLoc(this.ast.loc);
 		} else if (hasPosStyleLoc(this.ast)) {
-			this.#setLineColumn(this.ast.position);
+			this.#setRootNodeLoc(this.ast.position);
 		}
 	}
 
 	/**
-	 * Sets the `#lineStart` and `#columnStart` based on a `loc` or `position` object.
-	 * @param {SourceLocation} loc The `loc` or `position` object to use.
+	 * Sets the root node loc based on a `loc` or `position` object.
+	 * @param {SourceLocation} rootNodeLoc The `loc` or `position` object to use.
 	 * @returns {void}
 	 */
-	#setLineColumn(loc) {
-		if (loc?.start?.line === 0 || loc?.start?.line === 1) {
-			this.#lineStart = loc.start.line;
-		}
+	#setRootNodeLoc(rootNodeLoc) {
+		// const zeroOrOne = new Set([0, 1]);
 
-		if (loc?.start?.column === 0 || loc?.start?.column === 1) {
-			this.#columnStart = loc.start.column;
-		}
+		// if(rootNodeLoc === null || typeof rootNodeLoc !== "object" || !("start" in rootNodeLoc) || !("end" in rootNodeLoc)) {
+		// 	throw new TypeError("Expected root node `loc` or `position` to be an object with `start` and `end` properties.");
+		// }
+
+		// if (!zeroOrOne.has(rootNodeLoc.start.line) || !zeroOrOne.has(rootNodeLoc.start.column)) {
+		// 	throw new TypeError(
+		// 		"Expected root node `loc` or `position` to have `start.line` and `start.column` properties with values of 0 or 1.",
+		// 	);
+		// }
+
+		// if (typeof rootNodeLoc.end.line !== "number" || typeof rootNodeLoc.end.column !== "number") {
+		// 	throw new TypeError(
+		// 		"Expected root node `loc` or `position` to have `end.line` and `end.column` properties with numeric values.",
+		// 	);
+		// }
+
+		this.#rootNodeLoc = rootNodeLoc;
+		// @ts-expect-error TODO
+		this.#lineStart = this.#rootNodeLoc.start.line;
+		// @ts-expect-error TODO
+		this.#columnStart = this.#rootNodeLoc.start.column;
 	}
 
 	/**
