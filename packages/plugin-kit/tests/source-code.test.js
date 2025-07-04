@@ -1115,6 +1115,10 @@ describe("source-code", () => {
 					},
 				);
 
+				assert.doesNotThrow(() => {
+					sourceCode.getIndexFromLoc({ line: 2, column: 3 });
+				});
+
 				assert.throws(
 					() => {
 						sourceCode.getIndexFromLoc({ line: 2, column: 4 });
@@ -1163,6 +1167,10 @@ describe("source-code", () => {
 							"Column number out of range (column 5 requested). Valid range for line 0: 1-4",
 					},
 				);
+
+				assert.doesNotThrow(() => {
+					sourceCode.getIndexFromLoc({ line: 1, column: 4 });
+				});
 
 				assert.throws(
 					() => {
@@ -1213,6 +1221,10 @@ describe("source-code", () => {
 					},
 				);
 
+				assert.doesNotThrow(() => {
+					sourceCode.getIndexFromLoc({ line: 1, column: 3 });
+				});
+
 				assert.throws(
 					() => {
 						sourceCode.getIndexFromLoc({ line: 1, column: 4 });
@@ -1261,6 +1273,10 @@ describe("source-code", () => {
 							"Column number out of range (column 5 requested). Valid range for line 1: 1-4",
 					},
 				);
+
+				assert.doesNotThrow(() => {
+					sourceCode.getIndexFromLoc({ line: 2, column: 4 });
+				});
 
 				assert.throws(
 					() => {
