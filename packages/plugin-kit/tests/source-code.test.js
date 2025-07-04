@@ -1126,7 +1126,7 @@ describe("source-code", () => {
 					{
 						name: "RangeError",
 						message:
-							"Column number out of range (column 4 requested). Valid range for line 2: 0-2",
+							"Column number out of range (column 4 requested). Valid range for line 2: 0-3",
 					},
 				);
 			});
@@ -1179,7 +1179,7 @@ describe("source-code", () => {
 					{
 						name: "RangeError",
 						message:
-							"Column number out of range (column 5 requested). Valid range for line 1: 1-3",
+							"Column number out of range (column 5 requested). Valid range for line 1: 1-4",
 					},
 				);
 			});
@@ -1232,7 +1232,7 @@ describe("source-code", () => {
 					{
 						name: "RangeError",
 						message:
-							"Column number out of range (column 4 requested). Valid range for line 1: 0-2",
+							"Column number out of range (column 4 requested). Valid range for line 1: 0-3",
 					},
 				);
 			});
@@ -1285,7 +1285,7 @@ describe("source-code", () => {
 					{
 						name: "RangeError",
 						message:
-							"Column number out of range (column 5 requested). Valid range for line 2: 1-3",
+							"Column number out of range (column 5 requested). Valid range for line 2: 1-4",
 					},
 				);
 			});

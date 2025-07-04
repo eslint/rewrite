@@ -501,23 +501,22 @@ export class TextSourceCodeBase {
 		// Ensure `#lineStartIndices` are lazily calculated.
 		this.#ensureLineStartIndicesFromLoc(loc);
 
+		const isLastLine =
+			loc.line - this.#lineStart === this.#lines.length - 1;
 		const lineStartIndex =
 			this.#lineStartIndices[loc.line - this.#lineStart];
-		const lineEndIndex =
-			loc.line - this.#lineStart === this.#lines.length - 1
-				? this.text.length
-				: this.#lineStartIndices[loc.line - this.#lineStart + 1];
+		const lineEndIndex = isLastLine
+			? this.text.length
+			: this.#lineStartIndices[loc.line - this.#lineStart + 1];
 		const positionIndex = lineStartIndex + loc.column - this.#columnStart;
 
 		if (
 			loc.column < this.#columnStart ||
-			(loc.line - this.#lineStart === this.#lineStartIndices.length - 1 &&
-				positionIndex > lineEndIndex) ||
-			(loc.line - this.#lineStart < this.#lineStartIndices.length - 1 &&
-				positionIndex >= lineEndIndex)
+			(isLastLine && positionIndex > lineEndIndex) ||
+			(!isLastLine && positionIndex >= lineEndIndex)
 		) {
 			throw new RangeError(
-				`Column number out of range (column ${loc.column} requested). Valid range for line ${loc.line}: ${this.#columnStart}-${lineEndIndex - lineStartIndex - 1 + this.#columnStart}`,
+				`Column number out of range (column ${loc.column} requested). Valid range for line ${loc.line}: ${this.#columnStart}-${lineEndIndex - lineStartIndex + this.#columnStart + (isLastLine ? 0 : -1)}`,
 			);
 		}
 
