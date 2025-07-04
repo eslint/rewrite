@@ -250,7 +250,7 @@ export class TextSourceCodeBase {
 	 * The lines of text in the source code.
 	 * @type {Array<string>}
 	 */
-	#lines;
+	#lines = [];
 
 	/**
 	 * The indices of the start of each line in the source code.
@@ -299,15 +299,12 @@ export class TextSourceCodeBase {
 		this.ast = ast;
 		this.text = text;
 		this.#lineEndingPattern = lineEndingPattern;
-		this.#lines = text.split(this.#lineEndingPattern);
 
 		if (hasESTreeStyleLoc(this.ast)) {
 			this.#setLineColumn(this.ast.loc);
 		} else if (hasPosStyleLoc(this.ast)) {
 			this.#setLineColumn(this.ast.position);
 		}
-
-		Object.freeze(this.lines);
 	}
 
 	/**
@@ -323,6 +320,20 @@ export class TextSourceCodeBase {
 		if (loc?.start?.column === 0 || loc?.start?.column === 1) {
 			this.#columnStart = loc.start.column;
 		}
+	}
+
+	/**
+	 * Ensures that `#lines` is lazily calculated from the source text.
+	 * @returns {void}
+	 */
+	#ensureLines() {
+		// If `#lines` has already been calculated, do nothing.
+		if (this.#lines.length > 0) {
+			return;
+		}
+
+		this.#lines = this.text.split(this.#lineEndingPattern);
+		Object.freeze(this.#lines);
 	}
 
 	/**
@@ -436,8 +447,8 @@ export class TextSourceCodeBase {
 		 */
 		if (index === this.text.length) {
 			return {
-				line: this.#lines.length - 1 + this.#lineStart,
-				column: (this.#lines.at(-1)?.length ?? 0) + this.#columnStart,
+				line: this.lines.length - 1 + this.#lineStart,
+				column: (this.lines.at(-1)?.length ?? 0) + this.#columnStart,
 			};
 		}
 
@@ -489,18 +500,17 @@ export class TextSourceCodeBase {
 
 		if (
 			loc.line < this.#lineStart ||
-			this.#lines.length - 1 + this.#lineStart < loc.line
+			this.lines.length - 1 + this.#lineStart < loc.line
 		) {
 			throw new RangeError(
-				`Line number out of range (line ${loc.line} requested). Valid range: ${this.#lineStart}-${this.#lines.length - 1 + this.#lineStart}`,
+				`Line number out of range (line ${loc.line} requested). Valid range: ${this.#lineStart}-${this.lines.length - 1 + this.#lineStart}`,
 			);
 		}
 
 		// Ensure `#lineStartIndices` are lazily calculated.
 		this.#ensureLineStartIndicesFromLoc(loc);
 
-		const isLastLine =
-			loc.line - this.#lineStart === this.#lines.length - 1;
+		const isLastLine = loc.line - this.#lineStart === this.lines.length - 1;
 		const lineStartIndex =
 			this.#lineStartIndices[loc.line - this.#lineStart];
 		const lineEndIndex = isLastLine
@@ -606,6 +616,8 @@ export class TextSourceCodeBase {
 	 * @public
 	 */
 	get lines() {
+		this.#ensureLines(); // Ensure `#lines` is lazily calculated.
+
 		return this.#lines;
 	}
 
