@@ -475,18 +475,17 @@ export class TextSourceCodeBase {
 
 		if (
 			loc.line < rootNodeLoc.start.line ||
-			this.lines.length - 1 + rootNodeLoc.start.line < loc.line
+			rootNodeLoc.end.line < loc.line
 		) {
 			throw new RangeError(
-				`Line number out of range (line ${loc.line} requested). Valid range: ${rootNodeLoc.start.line}-${this.lines.length - 1 + rootNodeLoc.start.line}`,
+				`Line number out of range (line ${loc.line} requested). Valid range: ${rootNodeLoc.start.line}-${rootNodeLoc.end.line}`,
 			);
 		}
 
 		// Ensure `#lineStartIndices` are lazily calculated.
 		this.#ensureLineStartIndicesFromLoc(loc);
 
-		const isLastLine =
-			loc.line - rootNodeLoc.start.line === this.lines.length - 1;
+		const isLastLine = loc.line === rootNodeLoc.end.line;
 		const lineStartIndex =
 			this.#lineStartIndices[loc.line - rootNodeLoc.start.line];
 		const lineEndIndex = isLastLine
