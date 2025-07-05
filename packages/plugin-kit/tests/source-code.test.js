@@ -1075,6 +1075,10 @@ describe("source-code", () => {
 							line: 1,
 							column: 0,
 						},
+						end: {
+							line: 2,
+							column: 3,
+						},
 					},
 				};
 				const text = "foo\nbar";
@@ -1112,6 +1116,10 @@ describe("source-code", () => {
 						start: {
 							line: 0,
 							column: 1,
+						},
+						end: {
+							line: 1,
+							column: 4,
 						},
 					},
 				};
@@ -1151,6 +1159,10 @@ describe("source-code", () => {
 							line: 0,
 							column: 0,
 						},
+						end: {
+							line: 1,
+							column: 3,
+						},
 					},
 				};
 				const text = "foo\nbar";
@@ -1189,6 +1201,10 @@ describe("source-code", () => {
 							line: 1,
 							column: 1,
 						},
+						end: {
+							line: 2,
+							column: 4,
+						},
 					},
 				};
 				const text = "foo\nbar";
@@ -1226,6 +1242,10 @@ describe("source-code", () => {
 						start: {
 							line: 1,
 							column: 0,
+						},
+						end: {
+							line: 2,
+							column: 3,
 						},
 					},
 				};
@@ -1280,6 +1300,10 @@ describe("source-code", () => {
 							line: 0,
 							column: 1,
 						},
+						end: {
+							line: 1,
+							column: 4,
+						},
 					},
 				};
 				const text = "foo\nbar";
@@ -1332,6 +1356,10 @@ describe("source-code", () => {
 						start: {
 							line: 0,
 							column: 0,
+						},
+						end: {
+							line: 1,
+							column: 3,
 						},
 					},
 				};
@@ -1386,6 +1414,10 @@ describe("source-code", () => {
 							line: 1,
 							column: 1,
 						},
+						end: {
+							line: 2,
+							column: 4,
+						},
 					},
 				};
 				const text = "foo\nbar";
@@ -1439,6 +1471,10 @@ describe("source-code", () => {
 							line: 1,
 							column: 0,
 						},
+						end: {
+							line: 3,
+							column: 3,
+						},
 					},
 				};
 				const text = "foo\nbar\r\nbaz";
@@ -1467,6 +1503,10 @@ describe("source-code", () => {
 						start: {
 							line: 1,
 							column: 0,
+						},
+						end: {
+							line: 3,
+							column: 3,
 						},
 					},
 				};
@@ -1537,6 +1577,10 @@ describe("source-code", () => {
 							line: 0,
 							column: 1,
 						},
+						end: {
+							line: 2,
+							column: 4,
+						},
 					},
 				};
 				const text = "foo\nbar\r\nbaz";
@@ -1606,6 +1650,10 @@ describe("source-code", () => {
 							line: 0,
 							column: 0,
 						},
+						end: {
+							line: 2,
+							column: 3,
+						},
 					},
 				};
 				const text = "foo\nbar\r\nbaz";
@@ -1674,6 +1722,10 @@ describe("source-code", () => {
 						start: {
 							line: 1,
 							column: 1,
+						},
+						end: {
+							line: 3,
+							column: 4,
 						},
 					},
 				};
@@ -1746,6 +1798,10 @@ describe("source-code", () => {
 									line: 1,
 									column: 0,
 								},
+								end: {
+									line: 1,
+									column: 0,
+								},
 							},
 						},
 						text: "",
@@ -1757,6 +1813,10 @@ describe("source-code", () => {
 						ast: {
 							loc: {
 								start: {
+									line: 0,
+									column: 1,
+								},
+								end: {
 									line: 0,
 									column: 1,
 								},
@@ -1774,6 +1834,10 @@ describe("source-code", () => {
 									line: 0,
 									column: 0,
 								},
+								end: {
+									line: 0,
+									column: 0,
+								},
 							},
 						},
 						text: "",
@@ -1785,6 +1849,10 @@ describe("source-code", () => {
 						ast: {
 							loc: {
 								start: {
+									line: 1,
+									column: 1,
+								},
+								end: {
 									line: 1,
 									column: 1,
 								},
@@ -1801,6 +1869,10 @@ describe("source-code", () => {
 					loc: {
 						start: {
 							line: 1,
+							column: 0,
+						},
+						end: {
+							line: 3,
 							column: 0,
 						},
 					},
