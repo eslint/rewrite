@@ -64,13 +64,13 @@ function hasPosStyleRange(node) {
 }
 
 /**
- * Performs binary search to find the line number containing a given character index.
+ * Performs binary search to find the line number index containing a given target index.
  * Returns the lower bound - the index of the first element greater than the target.
  * **Please note that the `lineStartIndices` should be sorted in ascending order**.
  * - Time Complexity: O(log n) - Significantly faster than linear search for large files.
  * @param {number[]} lineStartIndices Sorted array of line start indices.
- * @param {number} targetIndex The target index to find the line number for.
- * @returns {number} The line number for the target index.
+ * @param {number} targetIndex The target index to find the line number index for.
+ * @returns {number} The line number index for the target index.
  */
 function findLineNumberBinarySearch(lineStartIndices, targetIndex) {
 	let low = 0;
@@ -259,22 +259,10 @@ export class TextSourceCodeBase {
 	#lineStartIndices = [0];
 
 	/**
-	 * The pattern to match line endings in the source code.
+	 * The pattern to match lineEndings in the source code.
 	 * @type {RegExp}
 	 */
 	#lineEndingPattern;
-
-	/**
-	 * The location of the root node in the source code.
-	 * Used to determine the starting and ending line/column numbers.
-	 * - `start.line`: Defaults to `1` for ESTree compatibility.
-	 * - `start.column`: Defaults to `0` for ESTree compatibility.
-	 * @type {SourceLocation}
-	 */
-	#rootNodeLoc = {
-		start: { line: 1, column: 0 },
-		end: { line: Infinity, column: Infinity },
-	};
 
 	/**
 	 * The AST of the source code.
@@ -299,12 +287,6 @@ export class TextSourceCodeBase {
 		this.ast = ast;
 		this.text = text;
 		this.#lineEndingPattern = lineEndingPattern;
-
-		if (hasESTreeStyleLoc(this.ast)) {
-			this.#rootNodeLoc = this.ast.loc;
-		} else if (hasPosStyleLoc(this.ast)) {
-			this.#rootNodeLoc = this.ast.position;
-		}
 	}
 
 	/**
@@ -356,8 +338,10 @@ export class TextSourceCodeBase {
 	 * @returns {void}
 	 */
 	#ensureLineStartIndicesFromLoc(loc) {
+		const rootNodeLoc = this.getLoc(this.ast);
+
 		// Calculate line indices up to the potentially next line, as it is needed for the follow‑up calculation.
-		const nextLocLineIndex = loc.line - this.#rootNodeLoc.start.line + 1;
+		const nextLocLineIndex = loc.line - rootNodeLoc.start.line + 1;
 		const lastCalculatedLineIndex = this.#lineStartIndices.length - 1;
 		let additionalLinesNeeded = nextLocLineIndex - lastCalculatedLineIndex;
 
@@ -423,6 +407,8 @@ export class TextSourceCodeBase {
 			);
 		}
 
+		const rootNodeLoc = this.getLoc(this.ast);
+
 		/*
 		 * For an argument of `this.text.length`, return the location one "spot" past the last character
 		 * of the file. If the last character is a linebreak, the location will be `#columnStart` of the next
@@ -432,10 +418,9 @@ export class TextSourceCodeBase {
 		 */
 		if (index === this.text.length) {
 			return {
-				line: this.lines.length - 1 + this.#rootNodeLoc.start.line,
+				line: this.lines.length - 1 + rootNodeLoc.start.line,
 				column:
-					(this.lines.at(-1)?.length ?? 0) +
-					this.#rootNodeLoc.start.column,
+					(this.lines.at(-1)?.length ?? 0) + rootNodeLoc.start.column,
 			};
 		}
 
@@ -451,16 +436,14 @@ export class TextSourceCodeBase {
 				? this.#lineStartIndices.length
 				: findLineNumberBinarySearch(this.#lineStartIndices, index)) -
 			1 +
-			this.#rootNodeLoc.start.line;
+			rootNodeLoc.start.line;
 
 		return {
 			line: lineNumber,
 			column:
 				index -
-				this.#lineStartIndices[
-					lineNumber - this.#rootNodeLoc.start.line
-				] +
-				this.#rootNodeLoc.start.column,
+				this.#lineStartIndices[lineNumber - rootNodeLoc.start.line] +
+				rootNodeLoc.start.column,
 		};
 	}
 
@@ -487,12 +470,14 @@ export class TextSourceCodeBase {
 			);
 		}
 
+		const rootNodeLoc = this.getLoc(this.ast);
+
 		if (
-			loc.line < this.#rootNodeLoc.start.line ||
-			this.lines.length - 1 + this.#rootNodeLoc.start.line < loc.line
+			loc.line < rootNodeLoc.start.line ||
+			this.lines.length - 1 + rootNodeLoc.start.line < loc.line
 		) {
 			throw new RangeError(
-				`Line number out of range (line ${loc.line} requested). Valid range: ${this.#rootNodeLoc.start.line}-${this.lines.length - 1 + this.#rootNodeLoc.start.line}`,
+				`Line number out of range (line ${loc.line} requested). Valid range: ${rootNodeLoc.start.line}-${this.lines.length - 1 + rootNodeLoc.start.line}`,
 			);
 		}
 
@@ -500,24 +485,22 @@ export class TextSourceCodeBase {
 		this.#ensureLineStartIndicesFromLoc(loc);
 
 		const isLastLine =
-			loc.line - this.#rootNodeLoc.start.line === this.lines.length - 1;
+			loc.line - rootNodeLoc.start.line === this.lines.length - 1;
 		const lineStartIndex =
-			this.#lineStartIndices[loc.line - this.#rootNodeLoc.start.line];
+			this.#lineStartIndices[loc.line - rootNodeLoc.start.line];
 		const lineEndIndex = isLastLine
 			? this.text.length
-			: this.#lineStartIndices[
-					loc.line - this.#rootNodeLoc.start.line + 1
-				];
+			: this.#lineStartIndices[loc.line - rootNodeLoc.start.line + 1];
 		const positionIndex =
-			lineStartIndex + loc.column - this.#rootNodeLoc.start.column;
+			lineStartIndex + loc.column - rootNodeLoc.start.column;
 
 		if (
-			loc.column < this.#rootNodeLoc.start.column ||
+			loc.column < rootNodeLoc.start.column ||
 			(isLastLine && positionIndex > lineEndIndex) ||
 			(!isLastLine && positionIndex >= lineEndIndex)
 		) {
 			throw new RangeError(
-				`Column number out of range (column ${loc.column} requested). Valid range for line ${loc.line}: ${this.#rootNodeLoc.start.column}-${lineEndIndex - lineStartIndex + this.#rootNodeLoc.start.column + (isLastLine ? 0 : -1)}`,
+				`Column number out of range (column ${loc.column} requested). Valid range for line ${loc.line}: ${rootNodeLoc.start.column}-${lineEndIndex - lineStartIndex + rootNodeLoc.start.column + (isLastLine ? 0 : -1)}`,
 			);
 		}
 

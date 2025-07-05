@@ -724,7 +724,14 @@ describe("source-code", () => {
 			});
 
 			it("should handle text with only line breaks", () => {
-				const ast = {};
+				const ast = {
+					loc: {
+						start: {
+							line: 1,
+							column: 0,
+						},
+					},
+				};
 				const text = "\n\r\n";
 				const sourceCode = new TextSourceCodeBase({ ast, text });
 
@@ -1626,7 +1633,14 @@ describe("source-code", () => {
 			});
 
 			it("should handle text with only line breaks", () => {
-				const ast = {};
+				const ast = {
+					loc: {
+						start: {
+							line: 1,
+							column: 0,
+						},
+					},
+				};
 				const text = "\n\r\n";
 				const sourceCode = new TextSourceCodeBase({ ast, text });
 
