@@ -64,13 +64,13 @@ function hasPosStyleRange(node) {
 }
 
 /**
- * Performs binary search to find the line number index containing a given target index.
+ * Performs binary search to find the line number containing a given target index.
  * Returns the lower bound - the index of the first element greater than the target.
  * **Please note that the `lineStartIndices` should be sorted in ascending order**.
  * - Time Complexity: O(log n) - Significantly faster than linear search for large files.
  * @param {number[]} lineStartIndices Sorted array of line start indices.
- * @param {number} targetIndex The target index to find the line number index for.
- * @returns {number} The line number index for the target index.
+ * @param {number} targetIndex The target index to find the line number for.
+ * @returns {number} The line number for the target index.
  */
 function findLineNumberBinarySearch(lineStartIndices, targetIndex) {
 	let low = 0;
@@ -430,7 +430,7 @@ export class TextSourceCodeBase {
 
 		/*
 		 * To figure out which line `index` is on, determine the last place at which index could
-		 * be inserted into `lineStartIndices` to keep the list sorted.
+		 * be inserted into `#lineStartIndices` to keep the list sorted.
 		 */
 		const lineNumber =
 			(index >= (this.#lineStartIndices.at(-1) ?? 0)
