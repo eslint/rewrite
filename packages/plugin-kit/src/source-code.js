@@ -290,7 +290,7 @@ export class TextSourceCodeBase {
 	}
 
 	/**
-	 * Ensures that `#lines` is lazily calculated from the source text.
+	 * Ensures `#lines` is lazily calculated from the source text.
 	 * @returns {void}
 	 */
 	#ensureLines() {
@@ -304,7 +304,7 @@ export class TextSourceCodeBase {
 	}
 
 	/**
-	 * Ensures `#lineStartIndices` information is calculated up to the specified index.
+	 * Ensures `#lineStartIndices` is lazily calculated up to the specified index.
 	 * @param {number} index The index of a character in a file.
 	 * @returns {void}
 	 */
@@ -331,7 +331,7 @@ export class TextSourceCodeBase {
 	}
 
 	/**
-	 * Ensures `#lineStartIndices` information is calculated up to the specified loc.
+	 * Ensures `#lineStartIndices` is lazily calculated up to the specified loc.
 	 * @param {Object} loc A line/column location.
 	 * @param {number} loc.line The line number of the location. (0 or 1-indexed based on language.)
 	 * @param {number} loc.column The column number of the location. (0 or 1-indexed based on language.)
