@@ -482,6 +482,22 @@ export class TextSourceCodeBase {
 			);
 		}
 
+		// If the loc is at the start, return the start index of the root node.
+		if (
+			loc.line === rootNodeLoc.start.line &&
+			loc.column === rootNodeLoc.start.column
+		) {
+			return 0;
+		}
+
+		// If the loc is at the end, return the index one "spot" past the last character of the file.
+		if (
+			loc.line === rootNodeLoc.end.line &&
+			loc.column === rootNodeLoc.end.column
+		) {
+			return this.text.length;
+		}
+
 		// Ensure `#lineStartIndices` are lazily calculated.
 		this.#ensureLineStartIndicesFromLoc(loc);
 
