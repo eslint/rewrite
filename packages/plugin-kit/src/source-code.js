@@ -334,14 +334,12 @@ export class TextSourceCodeBase {
 	 * Ensures `#lineStartIndices` is lazily calculated up to the specified loc.
 	 * @param {Object} loc A line/column location.
 	 * @param {number} loc.line The line number of the location. (0 or 1-indexed based on language.)
-	 * @param {number} loc.column The column number of the location. (0 or 1-indexed based on language.)
 	 * @returns {void}
 	 */
 	#ensureLineStartIndicesFromLoc(loc) {
-		const rootNodeLoc = this.getLoc(this.ast);
-
 		// Calculate line indices up to the potentially next line, as it is needed for the follow‑up calculation.
-		const nextLocLineIndex = loc.line - rootNodeLoc.start.line + 1;
+		const nextLocLineIndex =
+			loc.line - this.getLoc(this.ast).start.line + 1;
 		const lastCalculatedLineIndex = this.#lineStartIndices.length - 1;
 		let additionalLinesNeeded = nextLocLineIndex - lastCalculatedLineIndex;
 
