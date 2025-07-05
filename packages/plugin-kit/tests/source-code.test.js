@@ -280,12 +280,33 @@ describe("source-code", () => {
 				);
 			});
 
+			it("should throw an error when `ast.loc` or `ast.position` is not defined", () => {
+				const ast = {};
+				const text = "foo\nbar";
+				const sourceCode = new TextSourceCodeBase({ ast, text });
+
+				assert.throws(
+					() => {
+						sourceCode.getLocFromIndex(0);
+					},
+					{
+						name: "Error",
+						message:
+							"Custom getLoc() method must be implemented in the subclass.",
+					},
+				);
+			});
+
 			it("should handle the special case of `text.length` when lineStart is 1 and columnStart is 0", () => {
 				const ast = {
 					loc: {
 						start: {
 							line: 1,
 							column: 0,
+						},
+						end: {
+							line: 2,
+							column: 3,
 						},
 					},
 				};
@@ -311,6 +332,10 @@ describe("source-code", () => {
 							line: 0,
 							column: 1,
 						},
+						end: {
+							line: 1,
+							column: 4,
+						},
 					},
 				};
 				const text = "foo\nbar";
@@ -334,6 +359,10 @@ describe("source-code", () => {
 						start: {
 							line: 0,
 							column: 0,
+						},
+						end: {
+							line: 1,
+							column: 3,
 						},
 					},
 				};
@@ -359,6 +388,10 @@ describe("source-code", () => {
 							line: 1,
 							column: 1,
 						},
+						end: {
+							line: 2,
+							column: 4,
+						},
 					},
 				};
 				const text = "foo\nbar";
@@ -382,6 +415,10 @@ describe("source-code", () => {
 						start: {
 							line: 1,
 							column: 0,
+						},
+						end: {
+							line: 3,
+							column: 3,
 						},
 					},
 				};
@@ -452,6 +489,10 @@ describe("source-code", () => {
 							line: 0,
 							column: 1,
 						},
+						end: {
+							line: 2,
+							column: 4,
+						},
 					},
 				};
 				const text = "foo\nbar\r\nbaz";
@@ -521,6 +562,10 @@ describe("source-code", () => {
 							line: 0,
 							column: 0,
 						},
+						end: {
+							line: 2,
+							column: 3,
+						},
 					},
 				};
 				const text = "foo\nbar\r\nbaz";
@@ -589,6 +634,10 @@ describe("source-code", () => {
 						start: {
 							line: 1,
 							column: 1,
+						},
+						end: {
+							line: 3,
+							column: 4,
 						},
 					},
 				};
@@ -661,6 +710,10 @@ describe("source-code", () => {
 									line: 1,
 									column: 0,
 								},
+								end: {
+									line: 1,
+									column: 0,
+								},
 							},
 						},
 						text: "",
@@ -675,6 +728,10 @@ describe("source-code", () => {
 						ast: {
 							loc: {
 								start: {
+									line: 0,
+									column: 1,
+								},
+								end: {
 									line: 0,
 									column: 1,
 								},
@@ -695,6 +752,10 @@ describe("source-code", () => {
 									line: 0,
 									column: 0,
 								},
+								end: {
+									line: 0,
+									column: 0,
+								},
 							},
 						},
 						text: "",
@@ -709,6 +770,10 @@ describe("source-code", () => {
 						ast: {
 							loc: {
 								start: {
+									line: 1,
+									column: 1,
+								},
+								end: {
 									line: 1,
 									column: 1,
 								},
@@ -728,6 +793,10 @@ describe("source-code", () => {
 					loc: {
 						start: {
 							line: 1,
+							column: 0,
+						},
+						end: {
+							line: 3,
 							column: 0,
 						},
 					},
@@ -760,6 +829,10 @@ describe("source-code", () => {
 							line: 1,
 							column: 0,
 						},
+						end: {
+							line: 3,
+							column: 3,
+						},
 					},
 				};
 				const text = "foo\nbar\r\nbaz";
@@ -784,6 +857,10 @@ describe("source-code", () => {
 						start: {
 							line: 0,
 							column: 1,
+						},
+						end: {
+							line: 2,
+							column: 4,
 						},
 					},
 				};
@@ -810,6 +887,10 @@ describe("source-code", () => {
 							line: 0,
 							column: 0,
 						},
+						end: {
+							line: 2,
+							column: 3,
+						},
 					},
 				};
 				const text = "foo\nbar\r\nbaz";
@@ -834,6 +915,10 @@ describe("source-code", () => {
 						start: {
 							line: 1,
 							column: 1,
+						},
+						end: {
+							line: 3,
+							column: 4,
 						},
 					},
 				};
@@ -929,6 +1014,23 @@ describe("source-code", () => {
 						name: "TypeError",
 						message:
 							"Expected `loc` to be an object with numeric `line` and `column` properties.",
+					},
+				);
+			});
+
+			it("should throw an error when `ast.loc` or `ast.position` is not defined", () => {
+				const ast = {};
+				const text = "foo\nbar";
+				const sourceCode = new TextSourceCodeBase({ ast, text });
+
+				assert.throws(
+					() => {
+						sourceCode.getIndexFromLoc({ line: 1, column: 0 });
+					},
+					{
+						name: "Error",
+						message:
+							"Custom getLoc() method must be implemented in the subclass.",
 					},
 				);
 			});

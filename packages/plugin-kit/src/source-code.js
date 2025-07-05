@@ -409,18 +409,19 @@ export class TextSourceCodeBase {
 
 		const rootNodeLoc = this.getLoc(this.ast);
 
-		/*
-		 * For an argument of `this.text.length`, return the location one "spot" past the last character
-		 * of the file. If the last character is a linebreak, the location will be `#columnStart` of the next
-		 * line; otherwise, the location will be in the next column on the same line.
-		 *
-		 * See `getIndexFromLoc` for the motivation for this special case.
-		 */
+		// If the index is at the start, return the start location of the root node.
+		if (index === 0) {
+			return {
+				line: rootNodeLoc.start.line,
+				column: rootNodeLoc.start.column,
+			};
+		}
+
+		// If the index is `this.text.length`, return the location one "spot" past the last character of the file.
 		if (index === this.text.length) {
 			return {
-				line: this.lines.length - 1 + rootNodeLoc.start.line,
-				column:
-					(this.lines.at(-1)?.length ?? 0) + rootNodeLoc.start.column,
+				line: rootNodeLoc.end.line,
+				column: rootNodeLoc.end.column,
 			};
 		}
 
