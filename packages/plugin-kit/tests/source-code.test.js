@@ -409,6 +409,39 @@ describe("source-code", () => {
 				);
 			});
 
+			it("should convert index to location when random index is given", () => {
+				const ast = {
+					loc: {
+						start: {
+							line: 1,
+							column: 0,
+						},
+						end: {
+							line: 3,
+							column: 3,
+						},
+					},
+				};
+				const text = "foo\nbar\r\nbaz";
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+				});
+
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(3), {
+					line: 1,
+					column: 3,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(9), {
+					line: 3,
+					column: 0,
+				});
+				assert.deepStrictEqual(sourceCode.getLocFromIndex(1), {
+					line: 1,
+					column: 1,
+				}); // Please do not change the order of these tests. It's for checking lazy calculation.
+			});
+
 			it("should convert index to location when lineStart is 1 and columnStart is 0", () => {
 				const ast = {
 					loc: {
@@ -1397,6 +1430,35 @@ describe("source-code", () => {
 							"Column number out of range (column 5 requested). Valid range for line 2: 1-4",
 					},
 				);
+			});
+
+			it("should convert loc to index when random loc is given", () => {
+				const ast = {
+					loc: {
+						start: {
+							line: 1,
+							column: 0,
+						},
+					},
+				};
+				const text = "foo\nbar\r\nbaz";
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+				});
+
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 1, column: 3 }),
+					3,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 3, column: 0 }),
+					9,
+				);
+				assert.strictEqual(
+					sourceCode.getIndexFromLoc({ line: 1, column: 1 }),
+					1,
+				); // Please do not change the order of these tests. It's for checking lazy calculation.
 			});
 
 			it("should convert loc to index when lineStart is 1 and columnStart is 0", () => {
