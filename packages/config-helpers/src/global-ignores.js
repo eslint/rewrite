@@ -7,7 +7,7 @@
 // Type Definitions
 //-----------------------------------------------------------------------------
 
-/** @typedef {import("eslint").Linter.Config} Config */
+/** @typedef {import("@eslint/core").ConfigObject} Config */
 
 //-----------------------------------------------------------------------------
 // Helpers

@@ -100,7 +100,7 @@ export type RuleFixType = "code" | "whitespace";
  */
 export type RuleVisitor = Record<
 	string,
-	((...args: any[]) => void) | undefined
+	((...args: Array<any>) => void) | undefined
 >;
 
 /* eslint-enable @typescript-eslint/no-explicit-any -- Necessary to allow subclasses to work correctly */
@@ -143,7 +143,7 @@ export interface RulesMetaDocs {
  */
 export interface RulesMeta<
 	MessageIds extends string = string,
-	RuleOptions = unknown[],
+	RuleOptions = Array<unknown>,
 	ExtRuleDocs = unknown,
 > {
 	/**
@@ -159,7 +159,7 @@ export interface RulesMeta<
 	/**
 	 * The schema for the rule options. Required if the rule has options.
 	 */
-	schema?: JSONSchema4 | JSONSchema4[] | false | undefined;
+	schema?: JSONSchema4 | Array<JSONSchema4> | false | undefined;
 
 	/**
 	 * Any default options to be recursively merged on top of any user-provided options.
@@ -200,7 +200,7 @@ export interface RulesMeta<
 	/**
 	 * The dialects of `language` that the rule is intended to lint.
 	 */
-	dialects?: string[];
+	dialects?: Array<string>;
 }
 
 /**
@@ -221,7 +221,7 @@ export interface DeprecatedInfo {
 	/**
 	 * An empty array explicitly states that there is no replacement.
 	 */
-	replacedBy?: ReplacedByInfo[];
+	replacedBy?: Array<ReplacedByInfo>;
 
 	/**
 	 * The package version since when the rule is deprecated (should use full
@@ -285,7 +285,7 @@ export interface ExternalSpecifier {
 export interface RuleContextTypeOptions {
 	LangOptions: LanguageOptions;
 	Code: SourceCode;
-	RuleOptions: unknown[];
+	RuleOptions: Array<unknown>;
 	Node: unknown;
 	MessageIds: string;
 }
@@ -504,7 +504,7 @@ interface ViolationReportBase {
 	 * An array of suggested fixes for the problem. These fixes may change the
 	 * behavior of the code, so they are not applied automatically.
 	 */
-	suggest?: SuggestedEdit[] | null | undefined;
+	suggest?: Array<SuggestedEdit> | null | undefined;
 }
 
 type ViolationMessage<MessageIds = string> =
@@ -550,7 +550,7 @@ export type SuggestedEdit = SuggestedEditBase & SuggestionMessage;
 export interface RuleDefinitionTypeOptions {
 	LangOptions: LanguageOptions;
 	Code: SourceCode;
-	RuleOptions: unknown[];
+	RuleOptions: Array<unknown>;
 	Visitor: RuleVisitor;
 	Node: unknown;
 	MessageIds: string;
@@ -592,7 +592,7 @@ export interface RuleDefinition<
  * Defaults for non-language-related `RuleDefinition` options.
  */
 export interface CustomRuleTypeDefinitions {
-	RuleOptions: unknown[];
+	RuleOptions: Array<unknown>;
 	MessageIds: string;
 	ExtRuleDocs: Record<string, unknown>;
 }
@@ -636,6 +636,8 @@ export type CustomRuleDefinitionType<
 // Config
 //------------------------------------------------------------------------------
 
+// #region Severities
+
 /**
  * The human readable severity level used in a configuration.
  */
@@ -654,6 +656,24 @@ export type SeverityLevel = 0 | 1 | 2;
  * The severity of a rule in a configuration.
  */
 export type Severity = SeverityName | SeverityLevel;
+
+// #endregion
+
+/**
+ * Represents the metadata for an object, such as a plugin or processor.
+ */
+export interface ObjectMetaProperties {
+	/** @deprecated Use `meta.name` instead. */
+	name?: string | undefined;
+
+	/** @deprecated Use `meta.version` instead. */
+	version?: string | undefined;
+
+	meta?: {
+		name?: string | undefined;
+		version?: string | undefined;
+	};
+}
 
 /**
  * Represents the configuration options for the core linter.
@@ -679,7 +699,7 @@ export interface LinterOptionsConfig {
 /**
  * The configuration for a rule.
  */
-export type RuleConfig<RuleOptions extends unknown[] = unknown[]> =
+export type RuleConfig<RuleOptions extends Array<unknown> = Array<unknown>> =
 	| Severity
 	| [Severity, ...Partial<RuleOptions>];
 
@@ -698,6 +718,389 @@ export interface SettingsConfig {
 	[key: string]: unknown;
 }
 /* eslint-enable @typescript-eslint/consistent-indexed-object-style -- needed to allow extension */
+
+/**
+ * The configuration for a set of files.
+ */
+export interface ConfigObject<Rules extends RulesConfig = RulesConfig> {
+	/**
+	 * An string to identify the configuration object. Used in error messages and
+	 * inspection tools.
+	 */
+	name?: string;
+
+	/**
+	 * An array of glob patterns indicating the files that the configuration
+	 * object should apply to. If not specified, the configuration object applies
+	 * to all files
+	 */
+	files?: Array<string | Array<string>>;
+
+	/**
+	 * An array of glob patterns indicating the files that the configuration
+	 * object should not apply to. If not specified, the configuration object
+	 * applies to all files matched by files
+	 */
+	ignores?: Array<string>;
+
+	/**
+	 * The name of the language used for linting. This is used to determine the
+	 * parser and other language-specific settings.
+	 * @since 9.7.0
+	 */
+	language?: string;
+
+	/**
+	 * An object containing settings related to how JavaScript is configured for
+	 * linting.
+	 */
+	languageOptions?: LanguageOptions;
+
+	/**
+	 * An object containing settings related to the linting process
+	 */
+	linterOptions?: LinterOptionsConfig;
+
+	/**
+	 * Either an object containing preprocess() and postprocess() methods or a
+	 * string indicating the name of a processor inside of a plugin
+	 * (i.e., "pluginName/processorName").
+	 */
+	processor?: string | Processor;
+
+	/**
+	 * An object containing a name-value mapping of plugin names to plugin objects.
+	 * When files is specified, these plugins are only available to the matching files.
+	 */
+	plugins?: Record<string, Plugin>;
+
+	/**
+	 * An object containing the configured rules. When files or ignores are specified,
+	 * these rule configurations are only available to the matching files.
+	 */
+	rules?: Partial<Rules>;
+
+	/**
+	 * An object containing name-value pairs of information that should be
+	 * available to all rules.
+	 */
+	settings?: Record<string, unknown>;
+}
+
+//------------------------------------------------------------------------------
+// Legacy Config
+// https://eslint.org/docs/latest/use/configure/configuration-files#legacy-config
+//------------------------------------------------------------------------------
+
+/* eslint-disable @typescript-eslint/consistent-indexed-object-style, @typescript-eslint/no-explicit-any -- needed for backward compatibility */
+
+/** @deprecated Only supported in legacy eslintrc config format. */
+export type GlobalAccess =
+	| boolean
+	| "off"
+	| "readable"
+	| "readonly"
+	| "writable"
+	| "writeable";
+
+/** @deprecated Only supported in legacy eslintrc config format. */
+export interface GlobalsConfig {
+	[name: string]: GlobalAccess;
+}
+
+/**
+ * The ECMAScript version of the code being linted.
+ */
+export type EcmaVersion =
+	| 3
+	| 5
+	| 6
+	| 7
+	| 8
+	| 9
+	| 10
+	| 11
+	| 12
+	| 13
+	| 14
+	| 15
+	| 16
+	| 17
+	| 2015
+	| 2016
+	| 2017
+	| 2018
+	| 2019
+	| 2020
+	| 2021
+	| 2022
+	| 2023
+	| 2024
+	| 2025
+	| 2026
+	| "latest";
+
+/**
+ * The type of JavaScript source code.
+ */
+type SourceType = "script" | "module" | "commonjs";
+
+/**
+ * Parser options.
+ * @deprecated Only supported in legacy eslintrc config format.
+ * @see [Specifying Parser Options](https://eslint.org/docs/latest/use/configure/language-options#specifying-parser-options)
+ */
+export interface ParserOptionsConfig {
+	/**
+	 * Allow the use of reserved words as identifiers (if `ecmaVersion` is 3).
+	 *
+	 * @default false
+	 */
+	allowReserved?: boolean | undefined;
+
+	/**
+	 * Accepts any valid ECMAScript version number or `'latest'`:
+	 *
+	 * - A version: es3, es5, es6, es7, es8, es9, es10, es11, es12, es13, es14, ..., or
+	 * - A year: es2015, es2016, es2017, es2018, es2019, es2020, es2021, es2022, es2023, ..., or
+	 * - `'latest'`
+	 *
+	 * When it's a version or a year, the value must be a number - so do not include the `es` prefix.
+	 *
+	 * Specifies the version of ECMAScript syntax you want to use. This is used by the parser to determine how to perform scope analysis, and it affects the default
+	 *
+	 * @default 5
+	 */
+	ecmaVersion?: EcmaVersion | undefined;
+
+	/**
+	 * The type of JavaScript source code. Possible values are "script" for
+	 * traditional script files, "module" for ECMAScript modules (ESM), and
+	 * "commonjs" for CommonJS files.
+	 *
+	 * @default 'script'
+	 *
+	 * @see https://eslint.org/docs/latest/use/configure/language-options-deprecated#specifying-parser-options
+	 */
+	sourceType?: SourceType | undefined;
+
+	/**
+	 * An object indicating which additional language features you'd like to use.
+	 *
+	 * @see https://eslint.org/docs/latest/use/configure/language-options-deprecated#specifying-parser-options
+	 */
+	ecmaFeatures?:
+		| {
+				globalReturn?: boolean | undefined;
+				impliedStrict?: boolean | undefined;
+				jsx?: boolean | undefined;
+				experimentalObjectRestSpread?: boolean | undefined;
+				[key: string]: any;
+		  }
+		| undefined;
+	[key: string]: any;
+}
+
+/** @deprecated Only supported in legacy eslintrc config format. */
+export interface EnvironmentConfig {
+	/** The definition of global variables. */
+	globals?: GlobalsConfig | undefined;
+
+	/** The parser options that will be enabled under this environment. */
+	parserOptions?: ParserOptionsConfig | undefined;
+}
+
+/**
+ * A configuration object that may have a `rules` block.
+ */
+interface HasRules<Rules extends RulesConfig = RulesConfig> {
+	rules?: Partial<Rules> | undefined;
+}
+
+/**
+ * ESLint legacy configuration.
+ *
+ * @see [ESLint Legacy Configuration](https://eslint.org/docs/latest/use/configure/)
+ */
+interface BaseConfig<
+	Rules extends RulesConfig = RulesConfig,
+	OverrideRules extends RulesConfig = Rules,
+> extends HasRules<Rules> {
+	$schema?: string | undefined;
+
+	/**
+	 * An environment provides predefined global variables.
+	 *
+	 * @see [Environments](https://eslint.org/docs/latest/use/configure/language-options-deprecated#specifying-environments)
+	 */
+	env?: { [name: string]: boolean } | undefined;
+
+	/**
+	 * Extending configuration files.
+	 *
+	 * @see [Extends](https://eslint.org/docs/latest/use/configure/configuration-files-deprecated#extending-configuration-files)
+	 */
+	extends?: string | Array<string> | undefined;
+
+	/**
+	 * Specifying globals.
+	 *
+	 * @see [Globals](https://eslint.org/docs/latest/use/configure/language-options-deprecated#specifying-globals)
+	 */
+	globals?: GlobalsConfig | undefined;
+
+	/**
+	 * Disable processing of inline comments.
+	 *
+	 * @see [Disabling Inline Comments](https://eslint.org/docs/latest/use/configure/rules-deprecated#disabling-inline-comments)
+	 */
+	noInlineConfig?: boolean | undefined;
+
+	/**
+	 * Overrides can be used to use a differing configuration for matching sub-directories and files.
+	 *
+	 * @see [How do overrides work](https://eslint.org/docs/latest/use/configure/configuration-files-deprecated#how-do-overrides-work)
+	 */
+	overrides?: Array<ConfigOverride<OverrideRules>> | undefined;
+
+	/**
+	 * Parser.
+	 *
+	 * @see [Working with Custom Parsers](https://eslint.org/docs/latest/extend/custom-parsers)
+	 * @see [Specifying Parser](https://eslint.org/docs/latest/use/configure/parser-deprecated)
+	 */
+	parser?: string | undefined;
+
+	/**
+	 * Parser options.
+	 *
+	 * @see [Working with Custom Parsers](https://eslint.org/docs/latest/extend/custom-parsers)
+	 * @see [Specifying Parser Options](https://eslint.org/docs/latest/use/configure/language-options-deprecated#specifying-parser-options)
+	 */
+	parserOptions?: ParserOptionsConfig | undefined;
+
+	/**
+	 * Which third-party plugins define additional rules, environments, configs, etc. for ESLint to use.
+	 *
+	 * @see [Configuring Plugins](https://eslint.org/docs/latest/use/configure/plugins-deprecated#configure-plugins)
+	 */
+	plugins?: Array<string> | undefined;
+
+	/**
+	 * Specifying processor.
+	 *
+	 * @see [processor](https://eslint.org/docs/latest/use/configure/plugins-deprecated#specify-a-processor)
+	 */
+	processor?: string | undefined;
+
+	/**
+	 * Report unused eslint-disable comments as warning.
+	 *
+	 * @see [Report unused eslint-disable comments](https://eslint.org/docs/latest/use/configure/rules-deprecated#report-unused-eslint-disable-comments)
+	 */
+	reportUnusedDisableDirectives?: boolean | undefined;
+
+	/**
+	 * Settings.
+	 *
+	 * @see [Settings](https://eslint.org/docs/latest/use/configure/configuration-files-deprecated#adding-shared-settings)
+	 */
+	settings?: SettingsConfig | undefined;
+}
+
+/**
+ * The overwrites that apply more differing configuration to specific files or directories.
+ */
+export interface ConfigOverride<Rules extends RulesConfig = RulesConfig>
+	extends BaseConfig<Rules> {
+	/**
+	 * The glob patterns for excluded files.
+	 */
+	excludedFiles?: string | Array<string> | undefined;
+
+	/**
+	 * The glob patterns for target files.
+	 */
+	files: string | Array<string>;
+}
+
+/**
+ * ESLint legacy configuration.
+ *
+ * @see [ESLint Legacy Configuration](https://eslint.org/docs/latest/use/configure/)
+ */
+// https://github.com/eslint/eslint/blob/v8.57.0/conf/config-schema.js
+export interface LegacyConfigObject<
+	Rules extends RulesConfig = RulesConfig,
+	OverrideRules extends RulesConfig = Rules,
+> extends BaseConfig<Rules, OverrideRules> {
+	/**
+	 * Tell ESLint to ignore specific files and directories.
+	 *
+	 * @see [Ignore Patterns](https://eslint.org/docs/latest/use/configure/ignore-deprecated#ignorepatterns-in-config-files)
+	 */
+	ignorePatterns?: string | Array<string> | undefined;
+
+	/**
+	 * @see [Using Configuration Files](https://eslint.org/docs/latest/use/configure/configuration-files-deprecated#using-configuration-files)
+	 */
+	root?: boolean | undefined;
+}
+
+/* eslint-enable @typescript-eslint/consistent-indexed-object-style, @typescript-eslint/no-explicit-any -- needed for backward compatibility */
+
+//------------------------------------------------------------------------------
+// Processors
+// https://eslint.org/docs/latest/extend/plugins#processors-in-plugins
+//------------------------------------------------------------------------------
+
+/**
+ * File information passed to a processor.
+ */
+export interface ProcessorFile {
+	text: string;
+	filename: string;
+}
+
+/**
+ * A processor is an object that can preprocess and postprocess files.
+ */
+export interface Processor<
+	T extends string | ProcessorFile = string | ProcessorFile,
+> extends ObjectMetaProperties {
+	/** If `true` then it means the processor supports autofix. */
+	supportsAutofix?: boolean | undefined;
+
+	/** The function to extract code blocks. */
+	preprocess?(text: string, filename: string): Array<T>;
+
+	/** The function to merge messages. */
+	postprocess?(
+		messages: Array<Array<ViolationMessage>>,
+		filename: string,
+	): Array<ViolationMessage>;
+}
+
+//------------------------------------------------------------------------------
+// Plugins
+// https://eslint.org/docs/latest/extend/plugins
+//------------------------------------------------------------------------------
+
+export interface Plugin extends ObjectMetaProperties {
+	meta?: ObjectMetaProperties["meta"] & {
+		namespace?: string | undefined;
+	};
+	configs?:
+		| Record<
+				string,
+				LegacyConfigObject | ConfigObject | Array<ConfigObject>
+		  >
+		| undefined;
+	environments?: Record<string, EnvironmentConfig> | undefined;
+	languages?: Record<string, Language> | undefined;
+	processors?: Record<string, Processor> | undefined;
+	rules?: Record<string, RuleDefinition> | undefined;
+}
 
 //------------------------------------------------------------------------------
 // Languages
@@ -747,7 +1150,7 @@ export interface Language<
 	/**
 	 * The traversal path that tools should take when evaluating the AST
 	 */
-	visitorKeys?: Record<string, string[]>;
+	visitorKeys?: Record<string, Array<string>>;
 
 	/**
 	 * Default language options. User-defined options are merged with this object.
@@ -775,7 +1178,7 @@ export interface Language<
 	matchesSelectorClass?(
 		className: string,
 		node: Options["Node"],
-		ancestry: Options["Node"][],
+		ancestry: Array<Options["Node"]>,
 	): boolean;
 
 	/**
@@ -878,7 +1281,7 @@ export interface NotOkParseResult {
 	/**
 	 * Any parsing errors, whether fatal or not. (only when ok: false)
 	 */
-	errors: FileError[];
+	errors: Array<FileError>;
 
 	/**
 	 * Any additional data that the parser wants to provide.
@@ -939,7 +1342,7 @@ interface SourceCodeBase<
 	 * When present, this overrides the `visitorKeys` on the language for
 	 * just this source code object.
 	 */
-	visitorKeys?: Record<string, string[]>;
+	visitorKeys?: Record<string, Array<string>>;
 
 	/**
 	 * Retrieves the equivalent of `loc` for a given node or token.
@@ -970,23 +1373,23 @@ interface SourceCodeBase<
 	 * along with any problems found in evaluating the directives.
 	 */
 	getDisableDirectives?(): {
-		directives: Directive[];
-		problems: FileProblem[];
+		directives: Array<Directive>;
+		problems: Array<FileProblem>;
 	};
 
 	/**
 	 * Returns an array of all inline configuration nodes found in the
 	 * source code.
 	 */
-	getInlineConfigNodes?(): Options["ConfigNode"][];
+	getInlineConfigNodes?(): Array<Options["ConfigNode"]>;
 
 	/**
 	 * Applies configuration found inside of the source code. This method is only
 	 * called when ESLint is running with inline configuration allowed.
 	 */
 	applyInlineConfig?(): {
-		configs: InlineConfigElement[];
-		problems: FileProblem[];
+		configs: Array<InlineConfigElement>;
+		problems: Array<FileProblem>;
 	};
 
 	/**
@@ -1048,7 +1451,7 @@ export interface VisitTraversalStep {
 	kind: 1;
 	target: unknown;
 	phase: 1 /* enter */ | 2 /* exit */;
-	args: unknown[];
+	args: Array<unknown>;
 }
 
 /**
@@ -1058,7 +1461,7 @@ export interface CallTraversalStep {
 	kind: 2;
 	target: string;
 	phase?: string;
-	args: unknown[];
+	args: Array<unknown>;
 }
 
 export type TraversalStep = VisitTraversalStep | CallTraversalStep;
