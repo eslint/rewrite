@@ -295,11 +295,29 @@ export class TextSourceCodeBase {
 	 */
 	#ensureLines() {
 		// If `#lines` has already been calculated, do nothing.
-		if (this.#lines.length > 0) {
+		if (this.#lines.length === this.#lineStartIndices.length) {
 			return;
 		}
 
-		this.#lines = this.text.split(this.#lineEndingPattern);
+		const lastCalculatedIndex = this.#lineStartIndices.at(-1) ?? 0;
+
+		// Create a new RegExp instance to avoid lastIndex issues.
+		const lineEndingPattern = structuredClone(this.#lineEndingPattern);
+
+		// Start parsing from where we left off.
+		const text = this.text.slice(lastCalculatedIndex);
+
+		let lastSliceIndex = 0;
+		let match;
+		while ((match = lineEndingPattern.exec(text))) {
+			this.#lines.push(text.slice(lastSliceIndex, match.index));
+			this.#lineStartIndices.push(
+				lastCalculatedIndex + match.index + match[0].length,
+			);
+			lastSliceIndex = match.index + match[0].length;
+		}
+		this.#lines.push(text.slice(lastSliceIndex));
+
 		Object.freeze(this.#lines);
 	}
 
