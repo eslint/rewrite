@@ -31,7 +31,7 @@ export interface PropertyDefinition {
 	/**
 	 * The other properties that must be present when this property is used.
 	 */
-	requires?: string[];
+	requires?: Array<string>;
 
 	/**
 	 * The strategy to merge the property.
