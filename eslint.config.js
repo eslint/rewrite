@@ -62,6 +62,10 @@ export default defineConfig([
 		ignores: ["**/tests/**/*.ts"],
 		extends: [...tseslint.configs.strict, ...tseslint.configs.stylistic],
 		rules: {
+			"@typescript-eslint/array-type": [
+				"error",
+				{ default: "generic", readonly: "array" },
+			],
 			"no-use-before-define": "off",
 		},
 	}),
