@@ -322,11 +322,14 @@ export class TextSourceCodeBase {
 		// Start parsing from where we left off.
 		const text = this.text.slice(lastCalculatedIndex, index + 1);
 
+		let lastSliceIndex = 0;
 		let match;
 		while ((match = lineEndingPattern.exec(text))) {
+			this.#lines.push(text.slice(lastSliceIndex, match.index));
 			this.#lineStartIndices.push(
 				lastCalculatedIndex + match.index + match[0].length,
 			);
+			lastSliceIndex = match.index + match[0].length;
 		}
 	}
 
@@ -356,14 +359,17 @@ export class TextSourceCodeBase {
 		// Start parsing from where we left off.
 		const text = this.text.slice(lastCalculatedIndex);
 
+		let lastSliceIndex = 0;
 		let match;
 		while (
 			Boolean(additionalLinesNeeded--) &&
 			(match = lineEndingPattern.exec(text))
 		) {
+			this.#lines.push(text.slice(lastSliceIndex, match.index));
 			this.#lineStartIndices.push(
 				lastCalculatedIndex + match.index + match[0].length,
 			);
+			lastSliceIndex = match.index + match[0].length;
 		}
 	}
 
