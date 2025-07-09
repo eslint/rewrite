@@ -405,21 +405,24 @@ export class TextSourceCodeBase {
 			);
 		}
 
-		const rootNodeLoc = this.getLoc(this.ast);
+		const {
+			start: { line: startLine, column: startColumn },
+			end: { line: endLine, column: endColumn },
+		} = this.getLoc(this.ast);
 
 		// If the index is at the start, return the start location of the root node.
 		if (index === 0) {
 			return {
-				line: rootNodeLoc.start.line,
-				column: rootNodeLoc.start.column,
+				line: startLine,
+				column: startColumn,
 			};
 		}
 
 		// If the index is `this.text.length`, return the location one "spot" past the last character of the file.
 		if (index === this.text.length) {
 			return {
-				line: rootNodeLoc.end.line,
-				column: rootNodeLoc.end.column,
+				line: endLine,
+				column: endColumn,
 			};
 		}
 
@@ -435,14 +438,14 @@ export class TextSourceCodeBase {
 				? this.#lineStartIndices.length
 				: findLineNumberBinarySearch(this.#lineStartIndices, index)) -
 			1 +
-			rootNodeLoc.start.line;
+			startLine;
 
 		return {
 			line: lineNumber,
 			column:
 				index -
-				this.#lineStartIndices[lineNumber - rootNodeLoc.start.line] +
-				rootNodeLoc.start.column,
+				this.#lineStartIndices[lineNumber - startLine] +
+				startColumn,
 		};
 	}
 
@@ -469,52 +472,44 @@ export class TextSourceCodeBase {
 			);
 		}
 
-		const rootNodeLoc = this.getLoc(this.ast);
+		const {
+			start: { line: startLine, column: startColumn },
+			end: { line: endLine, column: endColumn },
+		} = this.getLoc(this.ast);
 
-		if (
-			loc.line < rootNodeLoc.start.line ||
-			rootNodeLoc.end.line < loc.line
-		) {
+		if (loc.line < startLine || endLine < loc.line) {
 			throw new RangeError(
-				`Line number out of range (line ${loc.line} requested). Valid range: ${rootNodeLoc.start.line}-${rootNodeLoc.end.line}`,
+				`Line number out of range (line ${loc.line} requested). Valid range: ${startLine}-${endLine}`,
 			);
 		}
 
 		// If the loc is at the start, return the start index of the root node.
-		if (
-			loc.line === rootNodeLoc.start.line &&
-			loc.column === rootNodeLoc.start.column
-		) {
+		if (loc.line === startLine && loc.column === startColumn) {
 			return 0;
 		}
 
 		// If the loc is at the end, return the index one "spot" past the last character of the file.
-		if (
-			loc.line === rootNodeLoc.end.line &&
-			loc.column === rootNodeLoc.end.column
-		) {
+		if (loc.line === endLine && loc.column === endColumn) {
 			return this.text.length;
 		}
 
 		// Ensure `#lineStartIndices` are lazily calculated.
 		this.#ensureLineStartIndicesFromLoc(loc);
 
-		const isLastLine = loc.line === rootNodeLoc.end.line;
-		const lineStartIndex =
-			this.#lineStartIndices[loc.line - rootNodeLoc.start.line];
+		const isLastLine = loc.line === endLine;
+		const lineStartIndex = this.#lineStartIndices[loc.line - startLine];
 		const lineEndIndex = isLastLine
 			? this.text.length
-			: this.#lineStartIndices[loc.line - rootNodeLoc.start.line + 1];
-		const positionIndex =
-			lineStartIndex + loc.column - rootNodeLoc.start.column;
+			: this.#lineStartIndices[loc.line - startLine + 1];
+		const positionIndex = lineStartIndex + loc.column - startColumn;
 
 		if (
-			loc.column < rootNodeLoc.start.column ||
+			loc.column < startColumn ||
 			(isLastLine && positionIndex > lineEndIndex) ||
 			(!isLastLine && positionIndex >= lineEndIndex)
 		) {
 			throw new RangeError(
-				`Column number out of range (column ${loc.column} requested). Valid range for line ${loc.line}: ${rootNodeLoc.start.column}-${lineEndIndex - lineStartIndex + rootNodeLoc.start.column + (isLastLine ? 0 : -1)}`,
+				`Column number out of range (column ${loc.column} requested). Valid range for line ${loc.line}: ${startColumn}-${lineEndIndex - lineStartIndex + startColumn + (isLastLine ? 0 : -1)}`,
 			);
 		}
 
