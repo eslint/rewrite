@@ -1971,7 +1971,7 @@ describe("source-code", () => {
 				const sourceCode = new TextSourceCodeBase({
 					ast,
 					text,
-					lineEndingPattern: /\n/gu,
+					lineEndingPattern: /\n/u, // Avoid using the `g` flag here, as this test is meant to run without it.
 				});
 
 				assert.deepStrictEqual(sourceCode.lines, [

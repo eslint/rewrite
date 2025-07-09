@@ -281,12 +281,35 @@ export class TextSourceCodeBase {
 	 * @param {Object} options The options for the instance.
 	 * @param {string} options.text The source code text.
 	 * @param {Options['RootNode']} options.ast The root AST node.
-	 * @param {RegExp} [options.lineEndingPattern] The pattern to match lineEndings in the source code. Defaults to `/\r?\n/gu`.
+	 * @param {RegExp} [options.lineEndingPattern] The pattern to match lineEndings in the source code. Defaults to `/\r?\n/u`.
 	 */
-	constructor({ text, ast, lineEndingPattern = /\r?\n/gu }) {
+	constructor({ text, ast, lineEndingPattern = /\r?\n/u }) {
 		this.ast = ast;
 		this.text = text;
 		this.#lineEndingPattern = lineEndingPattern;
+	}
+
+	/**
+	 * Parses the source text into lines and updates the `#lines` and `#lineStartIndices` properties.
+	 * @param {string} text The source text to parse into lines.
+	 * @returns {boolean} `true` if the text was successfully parsed into lines, `false` otherwise.
+	 */
+	#parseText(text) {
+		// Create a new RegExp instance to avoid lastIndex issues.
+		const match = structuredClone(this.#lineEndingPattern).exec(text);
+
+		if (!match) {
+			return false;
+		}
+
+		this.#lines.push(text.slice(0, match.index));
+		this.#lineStartIndices.push(
+			(this.#lineStartIndices.at(-1) ?? 0) +
+				match.index +
+				match[0].length,
+		);
+
+		return true;
 	}
 
 	/**
@@ -299,24 +322,13 @@ export class TextSourceCodeBase {
 			return;
 		}
 
-		const lastCalculatedIndex = this.#lineStartIndices.at(-1) ?? 0;
-
-		// Create a new RegExp instance to avoid lastIndex issues.
-		const lineEndingPattern = structuredClone(this.#lineEndingPattern);
-
-		// Start parsing from where we left off.
-		const text = this.text.slice(lastCalculatedIndex);
-
-		let lastSliceIndex = 0;
-		let match;
-		while ((match = lineEndingPattern.exec(text))) {
-			this.#lines.push(text.slice(lastSliceIndex, match.index));
-			this.#lineStartIndices.push(
-				lastCalculatedIndex + match.index + match[0].length,
-			);
-			lastSliceIndex = match.index + match[0].length;
+		while (
+			this.#parseText(this.text.slice(this.#lineStartIndices.at(-1)))
+		) {
+			// Continue parsing until no more matches are found.
 		}
-		this.#lines.push(text.slice(lastSliceIndex));
+
+		this.#lines.push(this.text.slice(this.#lineStartIndices.at(-1)));
 
 		Object.freeze(this.#lines);
 	}
@@ -327,27 +339,17 @@ export class TextSourceCodeBase {
 	 * @returns {void}
 	 */
 	#ensureLineStartIndicesFromIndex(index) {
-		const lastCalculatedIndex = this.#lineStartIndices.at(-1) ?? 0;
-
 		// If we've already parsed up to or beyond this index, do nothing.
-		if (index <= lastCalculatedIndex) {
+		if (index <= (this.#lineStartIndices.at(-1) ?? 0)) {
 			return;
 		}
 
-		// Create a new RegExp instance to avoid lastIndex issues.
-		const lineEndingPattern = structuredClone(this.#lineEndingPattern);
-
-		// Start parsing from where we left off.
-		const text = this.text.slice(lastCalculatedIndex, index + 1);
-
-		let lastSliceIndex = 0;
-		let match;
-		while ((match = lineEndingPattern.exec(text))) {
-			this.#lines.push(text.slice(lastSliceIndex, match.index));
-			this.#lineStartIndices.push(
-				lastCalculatedIndex + match.index + match[0].length,
-			);
-			lastSliceIndex = match.index + match[0].length;
+		while (
+			this.#parseText(
+				this.text.slice(this.#lineStartIndices.at(-1), index + 1),
+			)
+		) {
+			// Continue parsing until no more matches are found.
 		}
 	}
 
