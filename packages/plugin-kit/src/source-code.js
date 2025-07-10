@@ -371,25 +371,11 @@ export class TextSourceCodeBase {
 			return;
 		}
 
-		const lastCalculatedIndex = this.#lineStartIndices.at(-1) ?? 0;
-
-		// Create a new RegExp instance to avoid lastIndex issues.
-		const lineEndingPattern = structuredClone(this.#lineEndingPattern);
-
-		// Start parsing from where we left off.
-		const text = this.text.slice(lastCalculatedIndex);
-
-		let lastSliceIndex = 0;
-		let match;
 		while (
-			Boolean(additionalLinesNeeded--) &&
-			(match = lineEndingPattern.exec(text))
+			this.#parseText(this.text.slice(this.#lineStartIndices.at(-1))) &&
+			Boolean(additionalLinesNeeded--)
 		) {
-			this.#lines.push(text.slice(lastSliceIndex, match.index));
-			this.#lineStartIndices.push(
-				lastCalculatedIndex + match.index + match[0].length,
-			);
-			lastSliceIndex = match.index + match[0].length;
+			// Continue parsing until no more matches are found.
 		}
 	}
 
