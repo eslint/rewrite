@@ -375,9 +375,10 @@ export class TextSourceCodeBase {
 			this.#findNextLine(
 				this.text.slice(this.#lineStartIndices.at(-1)),
 			) &&
-			Boolean(additionalLinesNeeded--)
+			additionalLinesNeeded > 0
 		) {
-			// Continue parsing until no more matches are found.
+			// Continue parsing until no more matches are found or we have enough lines.
+			additionalLinesNeeded -= 1;
 		}
 	}
 
