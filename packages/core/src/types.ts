@@ -843,14 +843,14 @@ export type EcmaVersion =
 /**
  * The type of JavaScript source code.
  */
-type SourceType = "script" | "module" | "commonjs";
+type JavaScriptSourceType = "script" | "module" | "commonjs";
 
 /**
  * Parser options.
  * @deprecated Only supported in legacy eslintrc config format.
  * @see [Specifying Parser Options](https://eslint.org/docs/latest/use/configure/language-options#specifying-parser-options)
  */
-export interface ParserOptionsConfig {
+export interface JavaScriptParserOptionsConfig {
 	/**
 	 * Allow the use of reserved words as identifiers (if `ecmaVersion` is 3).
 	 *
@@ -882,7 +882,7 @@ export interface ParserOptionsConfig {
 	 *
 	 * @see https://eslint.org/docs/latest/use/configure/language-options-deprecated#specifying-parser-options
 	 */
-	sourceType?: SourceType | undefined;
+	sourceType?: JavaScriptSourceType | undefined;
 
 	/**
 	 * An object indicating which additional language features you'd like to use.
@@ -907,7 +907,7 @@ export interface EnvironmentConfig {
 	globals?: GlobalsConfig | undefined;
 
 	/** The parser options that will be enabled under this environment. */
-	parserOptions?: ParserOptionsConfig | undefined;
+	parserOptions?: JavaScriptParserOptionsConfig | undefined;
 }
 
 /**
@@ -977,7 +977,7 @@ interface BaseConfig<
 	 * @see [Working with Custom Parsers](https://eslint.org/docs/latest/extend/custom-parsers)
 	 * @see [Specifying Parser Options](https://eslint.org/docs/latest/use/configure/language-options-deprecated#specifying-parser-options)
 	 */
-	parserOptions?: ParserOptionsConfig | undefined;
+	parserOptions?: JavaScriptParserOptionsConfig | undefined;
 
 	/**
 	 * Which third-party plugins define additional rules, environments, configs, etc. for ESLint to use.
