@@ -11,7 +11,7 @@ export interface MigrationImport {
 	/**
 	 * The names to import from the module.
 	 */
-	bindings?: Array<string>;
+	bindings?: string[];
 
 	/**
 	 * Whether the import is added by the migration.

@@ -12,12 +12,12 @@ export interface ConfigObject {
 	/**
 	 * The files to include.
 	 */
-	files?: Array<string>;
+	files?: string[];
 
 	/**
 	 * The files to exclude.
 	 */
-	ignores?: Array<string>;
+	ignores?: string[];
 
 	/**
 	 * The name of the config object.

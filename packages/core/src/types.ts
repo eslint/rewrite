@@ -100,7 +100,7 @@ export type RuleFixType = "code" | "whitespace";
  */
 export type RuleVisitor = Record<
 	string,
-	((...args: Array<any>) => void) | undefined
+	((...args: any[]) => void) | undefined
 >;
 
 /* eslint-enable @typescript-eslint/no-explicit-any -- Necessary to allow subclasses to work correctly */
@@ -141,7 +141,7 @@ export interface RulesMetaDocs {
  */
 export interface RulesMeta<
 	MessageIds extends string = string,
-	RuleOptions = Array<unknown>,
+	RuleOptions = unknown[],
 	ExtRuleDocs = unknown,
 > {
 	/**
@@ -157,7 +157,7 @@ export interface RulesMeta<
 	/**
 	 * The schema for the rule options. Required if the rule has options.
 	 */
-	schema?: JSONSchema4 | Array<JSONSchema4> | false | undefined;
+	schema?: JSONSchema4 | JSONSchema4[] | false | undefined;
 
 	/**
 	 * Any default options to be recursively merged on top of any user-provided options.
@@ -198,7 +198,7 @@ export interface RulesMeta<
 	/**
 	 * The dialects of `language` that the rule is intended to lint.
 	 */
-	dialects?: Array<string>;
+	dialects?: string[];
 }
 
 /**
@@ -219,7 +219,7 @@ export interface DeprecatedInfo {
 	/**
 	 * An empty array explicitly states that there is no replacement.
 	 */
-	replacedBy?: Array<ReplacedByInfo>;
+	replacedBy?: ReplacedByInfo[];
 
 	/**
 	 * The package version since when the rule is deprecated (should use full
@@ -283,7 +283,7 @@ export interface ExternalSpecifier {
 export interface RuleContextTypeOptions {
 	LangOptions: LanguageOptions;
 	Code: SourceCode;
-	RuleOptions: Array<unknown>;
+	RuleOptions: unknown[];
 	Node: unknown;
 	MessageIds: string;
 }
@@ -502,7 +502,7 @@ interface ViolationReportBase {
 	 * An array of suggested fixes for the problem. These fixes may change the
 	 * behavior of the code, so they are not applied automatically.
 	 */
-	suggest?: Array<SuggestedEdit> | null | undefined;
+	suggest?: SuggestedEdit[] | null | undefined;
 }
 
 type ViolationMessage<MessageIds = string> =
@@ -548,7 +548,7 @@ export type SuggestedEdit = SuggestedEditBase & SuggestionMessage;
 export interface RuleDefinitionTypeOptions {
 	LangOptions: LanguageOptions;
 	Code: SourceCode;
-	RuleOptions: Array<unknown>;
+	RuleOptions: unknown[];
 	Visitor: RuleVisitor;
 	Node: unknown;
 	MessageIds: string;
@@ -590,7 +590,7 @@ export interface RuleDefinition<
  * Defaults for non-language-related `RuleDefinition` options.
  */
 export interface CustomRuleTypeDefinitions {
-	RuleOptions: Array<unknown>;
+	RuleOptions: unknown[];
 	MessageIds: string;
 	ExtRuleDocs: Record<string, unknown>;
 }
@@ -697,7 +697,7 @@ export interface LinterOptionsConfig {
 /**
  * The configuration for a rule.
  */
-export type RuleConfig<RuleOptions extends Array<unknown> = Array<unknown>> =
+export type RuleConfig<RuleOptions extends unknown[] = unknown[]> =
 	| Severity
 	| [Severity, ...Partial<RuleOptions>];
 
@@ -732,14 +732,14 @@ export interface ConfigObject<Rules extends RulesConfig = RulesConfig> {
 	 * object should apply to. If not specified, the configuration object applies
 	 * to all files
 	 */
-	files?: Array<string | Array<string>>;
+	files?: (string | string[])[];
 
 	/**
 	 * An array of glob patterns indicating the files that the configuration
 	 * object should not apply to. If not specified, the configuration object
 	 * applies to all files matched by files
 	 */
-	ignores?: Array<string>;
+	ignores?: string[];
 
 	/**
 	 * The name of the language used for linting. This is used to determine the
@@ -938,7 +938,7 @@ interface BaseConfig<
 	 *
 	 * @see [Extends](https://eslint.org/docs/latest/use/configure/configuration-files-deprecated#extending-configuration-files)
 	 */
-	extends?: string | Array<string> | undefined;
+	extends?: string | string[] | undefined;
 
 	/**
 	 * Specifying globals.
@@ -959,7 +959,7 @@ interface BaseConfig<
 	 *
 	 * @see [How do overrides work](https://eslint.org/docs/latest/use/configure/configuration-files-deprecated#how-do-overrides-work)
 	 */
-	overrides?: Array<ConfigOverride<OverrideRules>> | undefined;
+	overrides?: ConfigOverride<OverrideRules>[] | undefined;
 
 	/**
 	 * Parser.
@@ -982,7 +982,7 @@ interface BaseConfig<
 	 *
 	 * @see [Configuring Plugins](https://eslint.org/docs/latest/use/configure/plugins-deprecated#configure-plugins)
 	 */
-	plugins?: Array<string> | undefined;
+	plugins?: string[] | undefined;
 
 	/**
 	 * Specifying processor.
@@ -1014,12 +1014,12 @@ export interface ConfigOverride<Rules extends RulesConfig = RulesConfig>
 	/**
 	 * The glob patterns for excluded files.
 	 */
-	excludedFiles?: string | Array<string> | undefined;
+	excludedFiles?: string | string[] | undefined;
 
 	/**
 	 * The glob patterns for target files.
 	 */
-	files: string | Array<string>;
+	files: string | string[];
 }
 
 /**
@@ -1037,7 +1037,7 @@ export interface LegacyConfigObject<
 	 *
 	 * @see [Ignore Patterns](https://eslint.org/docs/latest/use/configure/ignore-deprecated#ignorepatterns-in-config-files)
 	 */
-	ignorePatterns?: string | Array<string> | undefined;
+	ignorePatterns?: string | string[] | undefined;
 
 	/**
 	 * @see [Using Configuration Files](https://eslint.org/docs/latest/use/configure/configuration-files-deprecated#using-configuration-files)
@@ -1070,13 +1070,13 @@ export interface Processor<
 	supportsAutofix?: boolean | undefined;
 
 	/** The function to extract code blocks. */
-	preprocess?(text: string, filename: string): Array<T>;
+	preprocess?(text: string, filename: string): T[];
 
 	/** The function to merge messages. */
 	postprocess?(
-		messages: Array<Array<ViolationMessage>>,
+		messages: ViolationMessage[][],
 		filename: string,
-	): Array<ViolationMessage>;
+	): ViolationMessage[];
 }
 
 //------------------------------------------------------------------------------
@@ -1089,10 +1089,7 @@ export interface Plugin extends ObjectMetaProperties {
 		namespace?: string | undefined;
 	};
 	configs?:
-		| Record<
-				string,
-				LegacyConfigObject | ConfigObject | Array<ConfigObject>
-		  >
+		| Record<string, LegacyConfigObject | ConfigObject | ConfigObject[]>
 		| undefined;
 	environments?: Record<string, EnvironmentConfig> | undefined;
 	languages?: Record<string, Language> | undefined;
@@ -1148,7 +1145,7 @@ export interface Language<
 	/**
 	 * The traversal path that tools should take when evaluating the AST
 	 */
-	visitorKeys?: Record<string, Array<string>>;
+	visitorKeys?: Record<string, string[]>;
 
 	/**
 	 * Default language options. User-defined options are merged with this object.
@@ -1176,7 +1173,7 @@ export interface Language<
 	matchesSelectorClass?(
 		className: string,
 		node: Options["Node"],
-		ancestry: Array<Options["Node"]>,
+		ancestry: Options["Node"][],
 	): boolean;
 
 	/**
@@ -1279,7 +1276,7 @@ export interface NotOkParseResult {
 	/**
 	 * Any parsing errors, whether fatal or not. (only when ok: false)
 	 */
-	errors: Array<FileError>;
+	errors: FileError[];
 
 	/**
 	 * Any additional data that the parser wants to provide.
@@ -1340,7 +1337,7 @@ interface SourceCodeBase<
 	 * When present, this overrides the `visitorKeys` on the language for
 	 * just this source code object.
 	 */
-	visitorKeys?: Record<string, Array<string>>;
+	visitorKeys?: Record<string, string[]>;
 
 	/**
 	 * Retrieves the equivalent of `loc` for a given node or token.
@@ -1371,23 +1368,23 @@ interface SourceCodeBase<
 	 * along with any problems found in evaluating the directives.
 	 */
 	getDisableDirectives?(): {
-		directives: Array<Directive>;
-		problems: Array<FileProblem>;
+		directives: Directive[];
+		problems: FileProblem[];
 	};
 
 	/**
 	 * Returns an array of all inline configuration nodes found in the
 	 * source code.
 	 */
-	getInlineConfigNodes?(): Array<Options["ConfigNode"]>;
+	getInlineConfigNodes?(): Options["ConfigNode"][];
 
 	/**
 	 * Applies configuration found inside of the source code. This method is only
 	 * called when ESLint is running with inline configuration allowed.
 	 */
 	applyInlineConfig?(): {
-		configs: Array<InlineConfigElement>;
-		problems: Array<FileProblem>;
+		configs: InlineConfigElement[];
+		problems: FileProblem[];
 	};
 
 	/**
@@ -1449,7 +1446,7 @@ export interface VisitTraversalStep {
 	kind: 1;
 	target: unknown;
 	phase: 1 /* enter */ | 2 /* exit */;
-	args: Array<unknown>;
+	args: unknown[];
 }
 
 /**
@@ -1459,7 +1456,7 @@ export interface CallTraversalStep {
 	kind: 2;
 	target: string;
 	phase?: string;
-	args: Array<unknown>;
+	args: unknown[];
 }
 
 export type TraversalStep = VisitTraversalStep | CallTraversalStep;
