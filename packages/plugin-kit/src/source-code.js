@@ -286,7 +286,11 @@ export class TextSourceCodeBase {
 	constructor({ text, ast, lineEndingPattern = /\r?\n/u }) {
 		this.ast = ast;
 		this.text = text;
-		this.#lineEndingPattern = lineEndingPattern;
+		// Remove the global(`g`) flag from the `lineEndingPattern` to avoid issues with lastIndex.
+		this.#lineEndingPattern = new RegExp(
+			lineEndingPattern.source,
+			lineEndingPattern.flags.replace("g", ""),
+		);
 	}
 
 	/**
@@ -295,8 +299,7 @@ export class TextSourceCodeBase {
 	 * @returns {boolean} `true` if a next line was found, `false` otherwise.
 	 */
 	#findNextLine(text) {
-		// Create a new RegExp instance to avoid lastIndex issues.
-		const match = structuredClone(this.#lineEndingPattern).exec(text);
+		const match = this.#lineEndingPattern.exec(text);
 
 		if (!match) {
 			return false;
