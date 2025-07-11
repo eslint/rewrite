@@ -290,11 +290,11 @@ export class TextSourceCodeBase {
 	}
 
 	/**
-	 * Parses the source text into lines and updates the `#lines` and `#lineStartIndices` properties.
-	 * @param {string} text The source text to parse into lines.
-	 * @returns {boolean} `true` if the text was successfully parsed into lines, `false` otherwise.
+	 * Finds the next line in the source text and updates `#lines` and `#lineStartIndices`.
+	 * @param {string} text The text to search for the next line.
+	 * @returns {boolean} `true` if a next line was found, `false` otherwise.
 	 */
-	#parseText(text) {
+	#findNextLine(text) {
 		// Create a new RegExp instance to avoid lastIndex issues.
 		const match = structuredClone(this.#lineEndingPattern).exec(text);
 
@@ -323,7 +323,7 @@ export class TextSourceCodeBase {
 		}
 
 		while (
-			this.#parseText(this.text.slice(this.#lineStartIndices.at(-1)))
+			this.#findNextLine(this.text.slice(this.#lineStartIndices.at(-1)))
 		) {
 			// Continue parsing until no more matches are found.
 		}
@@ -345,7 +345,7 @@ export class TextSourceCodeBase {
 		}
 
 		while (
-			this.#parseText(
+			this.#findNextLine(
 				this.text.slice(this.#lineStartIndices.at(-1), index + 1),
 			)
 		) {
@@ -372,7 +372,9 @@ export class TextSourceCodeBase {
 		}
 
 		while (
-			this.#parseText(this.text.slice(this.#lineStartIndices.at(-1))) &&
+			this.#findNextLine(
+				this.text.slice(this.#lineStartIndices.at(-1)),
+			) &&
 			Boolean(additionalLinesNeeded--)
 		) {
 			// Continue parsing until no more matches are found.
