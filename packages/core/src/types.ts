@@ -498,7 +498,7 @@ interface ViolationReportBase {
 	/**
 	 * The fix to be applied for the violation.
 	 */
-	fix?: RuleFixer | null | undefined;
+	fix?: RuleTextEdit | undefined;
 
 	/**
 	 * An array of suggested fixes for the problem. These fixes may change the
@@ -541,6 +541,65 @@ type SuggestionMessage = { desc: string } | { messageId: string };
  * A suggested edit for a rule violation.
  */
 export type SuggestedEdit = SuggestedEditBase & SuggestionMessage;
+
+/**
+ * The normalized version of a lint suggestion.
+ */
+interface LintSuggestion {
+	/** A short description. */
+
+	desc: string;
+
+	/** Fix result info. */
+	fix: RuleTextEdit;
+
+	/** Id referencing a message for the description. */
+	messageId?: string | undefined;
+}
+
+/**
+ * The normalized version of a lint violation message.
+ */
+export interface LintMessage {
+	/** The 1-based column number. */
+	column: number;
+
+	/** The 1-based line number. */
+	line: number;
+
+	/** The 1-based column number of the end location. */
+	endColumn?: number | undefined;
+
+	/** The 1-based line number of the end location. */
+	endLine?: number | undefined;
+
+	/** The ID of the rule which makes this message. */
+	ruleId: string | null;
+
+	/** The reported message. */
+	message: string;
+
+	/** The ID of the message in the rule's meta. */
+	messageId?: string | undefined;
+
+	/**
+	 * Type of node.
+	 * @deprecated `nodeType` is deprecated and will be removed in the next major version.
+	 */
+	nodeType?: string | undefined;
+
+	/** If `true` then this is a fatal error. */
+	fatal?: true | undefined;
+
+	/** The severity of this message. */
+	severity: Exclude<SeverityLevel, 0>;
+
+	/** Information for autofix. */
+	fix?: RuleTextEdit | undefined;
+
+	/** Information for suggestions. */
+	suggestions?: LintSuggestion[] | undefined;
+}
 
 // #endregion
 
@@ -1075,10 +1134,7 @@ export interface Processor<
 	preprocess?(text: string, filename: string): T[];
 
 	/** The function to merge messages. */
-	postprocess?(
-		messages: ViolationMessage[][],
-		filename: string,
-	): ViolationMessage[];
+	postprocess?(messages: LintMessage[][], filename: string): LintMessage[];
 }
 
 //------------------------------------------------------------------------------
