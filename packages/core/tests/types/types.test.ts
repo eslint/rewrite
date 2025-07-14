@@ -33,6 +33,8 @@ import type {
 	TraversalStep,
 } from "@eslint/core";
 
+import type { Linter } from "eslint";
+
 //-----------------------------------------------------------------------------
 // Helper types
 //-----------------------------------------------------------------------------
@@ -446,6 +448,9 @@ const configObjectExample: ConfigObject = {
 	},
 };
 
+// check back compat
+const oldConfigObjectExample: Linter.Config = configObjectExample;
+
 // Example LegacyConfigObject (eslintrc config)
 const legacyConfigObjectExample: LegacyConfigObject = {
 	$schema: "https://json.schemastore.org/eslintrc",
@@ -457,3 +462,7 @@ const legacyConfigObjectExample: LegacyConfigObject = {
 		eqeqeq: ["error", "always"],
 	},
 };
+
+// check back compat
+const oldLegacyConfigObjectExample: Linter.LegacyConfig =
+	legacyConfigObjectExample;
