@@ -34,7 +34,7 @@
     "build:dedupe-types": "node ../../tools/dedupe-types.js dist/cjs/index.cjs dist/esm/index.js",
     "build:cts": "node -e \"fs.copyFileSync('dist/esm/index.d.ts', 'dist/cjs/index.d.cts')\"",
     "build": "rollup -c && npm run build:dedupe-types && tsc -p tsconfig.esm.json && npm run build:cts",
-    "test:jsr": "npx jsr@latest publish --dry-run",
+    "test:jsr": "npx -y jsr@latest publish --dry-run",
     "pretest": "npm run build",
     "test": "mocha tests/",
     "test:coverage": "c8 npm test"
@@ -48,6 +48,7 @@
   "devDependencies": {
     "@eslint/core": "^0.9.0",
     "@types/levn": "^0.4.0",
+    "@types/mocha": "^10.0.7",
     "c8": "^9.1.0",
     "mocha": "^10.4.0",
     "rollup": "^4.16.2",

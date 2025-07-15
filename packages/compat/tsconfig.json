@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.base.json",
   "files": ["src/index.js"],
   "compilerOptions": {
-    "outDir": "dist/esm"
+    "outDir": "dist/esm",
+    "types": ["mocha", "@eslint/core"]
   }
 }

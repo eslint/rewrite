@@ -35,7 +35,7 @@
     "build:cts": "node -e \"fs.copyFileSync('dist/esm/index.d.ts', 'dist/cjs/index.d.cts')\"",
     "build:std__path": "rollup -c rollup.std__path-config.js && node fix-std__path-imports",
     "build": "rollup -c && npm run build:dedupe-types && tsc -p tsconfig.esm.json && npm run build:cts && npm run build:std__path",
-    "test:jsr": "npx jsr@latest publish --dry-run",
+    "test:jsr": "npx -y jsr@latest publish --dry-run",
     "pretest": "npm run build",
     "test": "mocha tests/",
     "test:coverage": "c8 npm test"
@@ -54,6 +54,7 @@
   "devDependencies": {
     "@jsr/std__path": "^1.0.4",
     "@types/minimatch": "^3.0.5",
+    "@types/mocha": "^10.0.7",
     "c8": "^9.1.0",
     "mocha": "^10.4.0",
     "rollup": "^4.16.2",

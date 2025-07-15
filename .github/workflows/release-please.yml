@@ -62,7 +62,7 @@ jobs:
             - name: Publish @eslint/compat package to JSR
               run: |
                   npm run build --if-present
-                  npx jsr publish
+                  npx -y jsr publish
               working-directory: packages/compat
               if: ${{ steps.release.outputs['packages/compat--release_created'] }}
 
@@ -95,7 +95,7 @@ jobs:
             - name: Publish @eslint/core package to JSR
               run: |
                   npm run build --if-present
-                  npx jsr publish
+                  npx -y jsr publish
               working-directory: packages/core
               if: ${{ steps.release.outputs['packages/core--release_created'] }}
 
@@ -154,7 +154,7 @@ jobs:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
             - name: Publish @eslint/object-schema package to JSR
-              run: npx jsr publish
+              run: npx -y jsr publish
               working-directory: packages/object-schema
               if: ${{ steps.release.outputs['packages/object-schema--release_created'] }}
 
@@ -185,7 +185,7 @@ jobs:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
             - name: Publish @eslint/config-array package to JSR
-              run: npx jsr publish
+              run: npx -y jsr publish
               working-directory: packages/config-array
               if: ${{ steps.release.outputs['packages/config-array--release_created'] }}
 
@@ -216,7 +216,7 @@ jobs:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
             - name: Publish @eslint/plugin-kit package to JSR
-              run: npx jsr publish
+              run: npx -y jsr publish
               working-directory: packages/plugin-kit
               if: ${{ steps.release.outputs['packages/plugin-kit--release_created'] }}
 

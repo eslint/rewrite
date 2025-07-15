@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.base.json",
   "files": ["src/migrate-config-cli.js"],
   "compilerOptions": {
-    "outDir": "dist/esm"
+    "outDir": "dist/esm",
+    "types": ["mocha", "@types/eslint"]
   }
 }

@@ -1,0 +1,30 @@
+{
+  "workspaces": {
+    ".": {
+      "entry": ["scripts/*.js", "tools/*.js", ".github/workflows/*.yml"]
+    },
+    "packages/migrate-config": {
+      "entry": ["src/migrate-config.js", "tests/**/*.{js,ts}"],
+      "project": ["src/**/*.{js,ts}", "tests/*.{js,ts}"]
+    },
+    "packages/config-array": {
+      "entry": ["tests/**/*.{js,ts}", "rollup.std__path-config.js"],
+      "project": ["src/**/*.{js,ts}", "tests/**/*.{js,ts}"]
+    },
+    "packages/plugin-kit": {
+      "entry": ["tests/**/*.{js,ts}"],
+      "project": ["src/**/*.{js,ts}", "tests/**/*.{js,ts}"]
+    },
+    "packages/compat": {
+      "entry": ["tests/**/*.{js,ts}"],
+      "project": ["src/**/*.{js,ts}", "tests/*.{js,ts}"]
+    },
+    "packages/object-schema": {
+      "entry": ["tests/**/*.{js,ts}", "src/types.ts"],
+      "project": ["src/**/*.{js,ts}", "tests/**/*.{js,ts}"]
+    },
+    "packages/core": {
+      "project": ["src/**/*.{js,ts}"]
+    }
+  }
+}
