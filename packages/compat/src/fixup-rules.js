@@ -7,10 +7,10 @@
 // Types
 //-----------------------------------------------------------------------------
 
-/** @typedef {import("eslint").ESLint.Plugin} FixupPluginDefinition */
-/** @typedef {import("eslint").Rule.RuleModule} FixupRuleDefinition */
+/** @typedef {import("@eslint/core").Plugin} FixupPluginDefinition */
+/** @typedef {import("@eslint/core").RuleDefinition} FixupRuleDefinition */
 /** @typedef {FixupRuleDefinition["create"]} FixupLegacyRuleDefinition */
-/** @typedef {import("eslint").Linter.Config} FixupConfig */
+/** @typedef {import("@eslint/core").ConfigObject} FixupConfig */
 /** @typedef {Array<FixupConfig>} FixupConfigArray */
 
 //-----------------------------------------------------------------------------

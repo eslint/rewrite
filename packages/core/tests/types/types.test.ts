@@ -33,6 +33,8 @@ import type {
 	TraversalStep,
 } from "@eslint/core";
 
+import type { Linter } from "eslint";
+
 //-----------------------------------------------------------------------------
 // Helper types
 //-----------------------------------------------------------------------------
@@ -413,3 +415,54 @@ export type Rule5 = TestRuleDefinition<{ Code: TestSourceCode }>;
 
 // @ts-expect-error -- undefined value not allow for optional property (assumes `exactOptionalPropertyTypes` tsc compiler option)
 export type Rule6 = TestRuleDefinition<{ RuleOptions: undefined }>;
+
+//------------------------------------------------------------------------------
+// Tests for config object types
+//------------------------------------------------------------------------------
+
+import type { ConfigObject, LegacyConfigObject } from "@eslint/core";
+
+// Example ConfigObject (flat config)
+const configObjectExample: ConfigObject = {
+	name: "example config",
+	files: ["**/*.js", ["**/*.ts", "**/src/*.*"]],
+	ignores: ["**/vendor/**"],
+	language: "js/js",
+	languageOptions: {
+		ecmaVersion: 2022,
+		sourceType: "module",
+	},
+	linterOptions: {
+		noInlineConfig: false,
+		reportUnusedDisableDirectives: true,
+	},
+	plugins: {
+		custom: { meta: { name: "custom-plugin", version: "1.0.0" } },
+	},
+	rules: {
+		"no-console": "warn",
+		eqeqeq: ["error", "always"],
+	},
+	settings: {
+		foo: "bar",
+	},
+};
+
+// check back compat
+const oldConfigObjectExample: Linter.Config = configObjectExample;
+
+// Example LegacyConfigObject (eslintrc config)
+const legacyConfigObjectExample: LegacyConfigObject = {
+	$schema: "https://json.schemastore.org/eslintrc",
+	env: { node: true, es2021: true },
+	extends: ["eslint:recommended", "plugin:custom/recommended"],
+	globals: { myGlobal: "readonly", foo: "writable", bar: "off" },
+	rules: {
+		"no-console": 2,
+		eqeqeq: ["error", "always"],
+	},
+};
+
+// check back compat
+const oldLegacyConfigObjectExample: Linter.LegacyConfig =
+	legacyConfigObjectExample;
