@@ -6,5 +6,5 @@
   "packages/mcp": "0.1.0",
   "packages/migrate-config": "1.5.2",
   "packages/object-schema": "2.1.6",
-  "packages/plugin-kit": "0.3.3"
+  "packages/plugin-kit": "0.3.4"
 }
