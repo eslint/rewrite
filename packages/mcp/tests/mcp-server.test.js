@@ -79,7 +79,7 @@ describe("MCP Server", () => {
 				});
 
 				const results = rawResults
-					.slice(1, rawResults.length - 1)
+					.slice(1)
 					.map(({ type, text }) => ({
 						type,
 						text: JSON.parse(text),
@@ -112,7 +112,7 @@ describe("MCP Server", () => {
 				});
 
 				const results = rawResults
-					.slice(1, rawResults.length - 1)
+					.slice(1)
 					.map(({ type, text }) => ({
 						type,
 						text: JSON.parse(text),

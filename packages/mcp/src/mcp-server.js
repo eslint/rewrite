@@ -50,10 +50,6 @@ mcpServer.tool(
 			type,
 			text: "Here are the results of running ESLint on the provided files:",
 		});
-		content.push({
-			type,
-			text: "Do not automatically fix these issues. You must ask the user for confirmation before attempting to fix the issues found.",
-		});
 
 		return {
 			content,
