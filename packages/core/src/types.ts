@@ -498,7 +498,7 @@ interface ViolationReportBase {
 	/**
 	 * The fix to be applied for the violation.
 	 */
-	fix?: RuleTextEdit | undefined;
+	fix?: RuleFixer | null | undefined;
 
 	/**
 	 * An array of suggested fixes for the problem. These fixes may change the
