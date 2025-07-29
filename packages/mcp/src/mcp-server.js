@@ -48,11 +48,11 @@ mcpServer.tool(
 
 		content.unshift({
 			type,
-			text: "Here are the results of running ESLint on the provided files:",
+			text: "Here are the results of running ESLint on the provided files. Before doing anything else, you must display the full list to the user:",
 		});
 		content.push({
 			type,
-			text: "Do not automatically fix these issues. You must ask the user for confirmation before attempting to fix the issues found.",
+			text: "If the user asked to fix any issues found, proceed in fixing them. If the user did not ask to fix issues found, you must ask the user for confirmation before attempting to fix the issues found.",
 		});
 
 		return {
