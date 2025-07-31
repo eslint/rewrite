@@ -8,6 +8,8 @@
 //-----------------------------------------------------------------------------
 
 import type {
+	ConfigObject,
+	LegacyConfigObject,
 	CustomRuleDefinitionType,
 	CustomRuleTypeDefinitions,
 	File,
@@ -420,12 +422,11 @@ export type Rule6 = TestRuleDefinition<{ RuleOptions: undefined }>;
 // Tests for config object types
 //------------------------------------------------------------------------------
 
-import type { ConfigObject, LegacyConfigObject } from "@eslint/core";
-
 // Example ConfigObject (flat config)
 const configObjectExample: ConfigObject = {
 	name: "example config",
 	files: ["**/*.js", ["**/*.ts", "**/src/*.*"]],
+	basePath: "/foo",
 	ignores: ["**/vendor/**"],
 	language: "js/js",
 	languageOptions: {
