@@ -810,7 +810,7 @@ export interface ConfigObject<Rules extends RulesConfig = RulesConfig> {
 	language?: string;
 
 	/**
-	 * An object containing settings related to how JavaScript is configured for
+	 * An object containing settings related to how the language is configured for
 	 * linting.
 	 */
 	languageOptions?: LanguageOptions;
