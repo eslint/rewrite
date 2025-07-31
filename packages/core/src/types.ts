@@ -852,7 +852,7 @@ export interface ConfigObject<Rules extends RulesConfig = RulesConfig> {
 /* eslint-disable @typescript-eslint/consistent-indexed-object-style, @typescript-eslint/no-explicit-any -- needed for backward compatibility */
 
 /** @deprecated Only supported in legacy eslintrc config format. */
-export type GlobalAccess =
+type GlobalAccess =
 	| boolean
 	| "off"
 	| "readable"
@@ -861,14 +861,14 @@ export type GlobalAccess =
 	| "writeable";
 
 /** @deprecated Only supported in legacy eslintrc config format. */
-export interface GlobalsConfig {
+interface GlobalsConfig {
 	[name: string]: GlobalAccess;
 }
 
 /**
  * The ECMAScript version of the code being linted.
  */
-export type EcmaVersion =
+type EcmaVersion =
 	| 3
 	| 5
 	| 6
@@ -907,7 +907,7 @@ type JavaScriptSourceType = "script" | "module" | "commonjs";
  * @deprecated Only supported in legacy eslintrc config format.
  * @see [Specifying Parser Options](https://eslint.org/docs/latest/use/configure/language-options#specifying-parser-options)
  */
-export interface JavaScriptParserOptionsConfig {
+interface JavaScriptParserOptionsConfig {
 	/**
 	 * Allow the use of reserved words as identifiers (if `ecmaVersion` is 3).
 	 *
@@ -959,7 +959,7 @@ export interface JavaScriptParserOptionsConfig {
 }
 
 /** @deprecated Only supported in legacy eslintrc config format. */
-export interface EnvironmentConfig {
+interface EnvironmentConfig {
 	/** The definition of global variables. */
 	globals?: GlobalsConfig | undefined;
 
@@ -1068,7 +1068,7 @@ interface BaseConfig<
 /**
  * The overwrites that apply more differing configuration to specific files or directories.
  */
-export interface ConfigOverride<Rules extends RulesConfig = RulesConfig>
+interface ConfigOverride<Rules extends RulesConfig = RulesConfig>
 	extends BaseConfig<Rules> {
 	/**
 	 * The glob patterns for excluded files.
