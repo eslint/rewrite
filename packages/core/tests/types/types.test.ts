@@ -420,13 +420,13 @@ export type Rule6 = TestRuleDefinition<{ RuleOptions: undefined }>;
 
 export const shouldAllowRecommendedBoolean: RulesMetaDocs = {
 	recommended: true,
-}
+};
 export const shouldAllowRecommendedString: RulesMetaDocs = {
 	recommended: "strict",
-}
+};
 
 export const shouldAllowRecommendedObject: RulesMetaDocs = {
 	recommended: {
-		someKey: 'some value',
-	}
-}
+		someKey: "some value",
+	},
+};

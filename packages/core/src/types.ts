@@ -127,7 +127,7 @@ export interface RulesMetaDocs {
 
 	/**
 	 * Indicates if the rule is generally recommended for all users.
-	 * 
+	 *
 	 * Note - this will always be a boolean for core rules, but may be used in any way by plugins.
 	 */
 	recommended?: unknown;
