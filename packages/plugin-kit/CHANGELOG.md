@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.4](https://github.com/eslint/rewrite/compare/plugin-kit-v0.3.3...plugin-kit-v0.3.4) (2025-07-21)
+
+
+### Bug Fixes
+
+* potential quadratic runtime in regular expression ([#240](https://github.com/eslint/rewrite/issues/240)) ([b283f64](https://github.com/eslint/rewrite/commit/b283f64099ad6c6b5043387c091691d21b387805))
+
 ## [0.3.3](https://github.com/eslint/rewrite/compare/plugin-kit-v0.3.2...plugin-kit-v0.3.3) (2025-06-25)
 
 
