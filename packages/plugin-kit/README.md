@@ -205,8 +205,8 @@ The `TextSourceCodeBase` class is intended to be a base class that has several o
 
 - `lines` - an array of text lines that is created automatically when the constructor is called.
 - `getLoc(node)` - gets the location of a node. Works for nodes that have the ESLint-style `loc` property and nodes that have the Unist-style [`position` property](https://github.com/syntax-tree/unist?tab=readme-ov-file#position). If you're using an AST with a different location format, you'll still need to implement this method yourself.
-- `getLocFromIndex(index)` - Converts a source text index into a `{ line: number, column: number }` pair.
-- `getIndexFromLoc(loc)` - Converts a `{ line: number, column: number }` pair into a source text index.
+- `getLocFromIndex(index)` - Converts a source text index into a `{ line: number, column: number }` pair. (For this method to work, the root node should always cover the entire source code text, and the `getLoc()` method needs to be implemented correctly.)
+- `getIndexFromLoc(loc)` - Converts a `{ line: number, column: number }` pair into a source text index. (For this method to work, the root node should always cover the entire source code text, and the `getLoc()` method needs to be implemented correctly.)
 - `getRange(node)` - gets the range of a node within the source text. Works for nodes that have the ESLint-style `range` property and nodes that have the Unist-style [`position` property](https://github.com/syntax-tree/unist?tab=readme-ov-file#position). If you're using an AST with a different range format, you'll still need to implement this method yourself.
 - `getText(nodeOrToken, charsBefore, charsAfter)` - gets the source text for the given node or token that has range information attached. Optionally, can return additional characters before and after the given node or token. As long as `getRange()` is properly implemented, this method will just work.
 - `getAncestors(node)` - returns the ancestry of the node. In order for this to work, you must implement the `getParent()` method yourself.
