@@ -23,6 +23,7 @@ import type {
 	RuleDefinition,
 	RulesConfig,
 	RulesMeta,
+	RulesMetaDocs,
 	RuleTextEdit,
 	RuleTextEditor,
 	RuleVisitor,
@@ -240,6 +241,9 @@ const testRule: RuleDefinition<{
 	meta: {
 		type: "problem",
 		fixable: "code",
+		docs: {
+			recommended: true,
+		},
 		deprecated: {
 			message: "use something else",
 			url: "https://example.com",
@@ -413,3 +417,16 @@ export type Rule5 = TestRuleDefinition<{ Code: TestSourceCode }>;
 
 // @ts-expect-error -- undefined value not allow for optional property (assumes `exactOptionalPropertyTypes` tsc compiler option)
 export type Rule6 = TestRuleDefinition<{ RuleOptions: undefined }>;
+
+export const shouldAllowRecommendedBoolean: RulesMetaDocs = {
+	recommended: true,
+};
+export const shouldAllowRecommendedString: RulesMetaDocs = {
+	recommended: "strict",
+};
+
+export const shouldAllowRecommendedObject: RulesMetaDocs = {
+	recommended: {
+		someKey: "some value",
+	},
+};
