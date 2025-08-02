@@ -1971,7 +1971,55 @@ describe("source-code", () => {
 				const sourceCode = new TextSourceCodeBase({
 					ast,
 					text,
-					lineEndingPattern: /\n/u, // Avoid using the `g` flag here, as this test is meant to run without it.
+					lineEndingPattern: /\n/u, // Avoid using the `g` or `y` flag here, as this test is meant to run without it.
+				});
+
+				assert.deepStrictEqual(sourceCode.lines, [
+					"foo",
+					"bar\r",
+					"baz",
+				]);
+			});
+
+			it("should return an array of lines when line ending pattern uses `g` flag", () => {
+				const ast = {};
+				const text = "foo\nbar\r\nbaz";
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineEndingPattern: /\n/gu,
+				});
+
+				assert.deepStrictEqual(sourceCode.lines, [
+					"foo",
+					"bar\r",
+					"baz",
+				]);
+			});
+
+			it("should return an array of lines when line ending pattern uses `y` flag", () => {
+				const ast = {};
+				const text = "foo\nbar\r\nbaz";
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineEndingPattern: /\n/uy,
+				});
+
+				assert.deepStrictEqual(sourceCode.lines, [
+					"foo",
+					"bar\r",
+					"baz",
+				]);
+			});
+
+			it("should return an array of lines when line ending pattern uses `g` and `y` flag", () => {
+				const ast = {};
+				const text = "foo\nbar\r\nbaz";
+				const sourceCode = new TextSourceCodeBase({
+					ast,
+					text,
+					lineEndingPattern: /\n/guy,
 				});
 
 				assert.deepStrictEqual(sourceCode.lines, [

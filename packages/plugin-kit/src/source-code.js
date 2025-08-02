@@ -286,10 +286,10 @@ export class TextSourceCodeBase {
 	constructor({ text, ast, lineEndingPattern = /\r?\n/u }) {
 		this.ast = ast;
 		this.text = text;
-		// Remove the global(`g`) flag from the `lineEndingPattern` to avoid issues with lastIndex.
+		// Remove the global(`g`) and sticky(`y`) flags from the `lineEndingPattern` to avoid issues with lastIndex.
 		this.#lineEndingPattern = new RegExp(
 			lineEndingPattern.source,
-			lineEndingPattern.flags.replace("g", ""),
+			lineEndingPattern.flags.replace(/[gy]/gu, ""),
 		);
 	}
 
