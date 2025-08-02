@@ -2045,6 +2045,48 @@ describe("source-code", () => {
 				assert.deepStrictEqual(sourceCode.lines, [""]);
 			});
 
+			it("should split lines correctly when the first character of a multi-character linebreak sequence is a valid linebreak", () => {
+				// Please refer to https://github.com/eslint/rewrite/pull/212#discussion_r2242088769 for the motivation behind this test.
+				const ast = {
+					loc: {
+						start: {
+							line: 1,
+							column: 0,
+						},
+						end: {
+							line: 2,
+							column: 14,
+						},
+					},
+				};
+				const text = ["// first line", "// second line"].join("\r\n");
+				const lineEndingPattern = /\r\n|[\r\n]/u; // <CR><LF>, or <CR>, or <LF>
+
+				const sourceCode1 = new TextSourceCodeBase({
+					ast,
+					text,
+					lineEndingPattern,
+				});
+
+				assert.deepStrictEqual(sourceCode1.lines, [
+					"// first line",
+					"// second line",
+				]);
+
+				const sourceCode2 = new TextSourceCodeBase({
+					ast,
+					text,
+					lineEndingPattern,
+				});
+
+				sourceCode2.getLocFromIndex(13); // linebreak sequence at the end of the first line
+
+				assert.deepStrictEqual(sourceCode2.lines, [
+					"// first line",
+					"// second line",
+				]);
+			});
+
 			it("should throw an error when writing to lines", () => {
 				const ast = {};
 				const text = "foo\nbar\r\nbaz";
