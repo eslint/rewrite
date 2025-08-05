@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.15.2](https://github.com/eslint/rewrite/compare/core-v0.15.1...core-v0.15.2) (2025-08-05)
+
+
+### Bug Fixes
+
+* relax type for rule.meta.docs.recommended ([#235](https://github.com/eslint/rewrite/issues/235)) ([9a4fe34](https://github.com/eslint/rewrite/commit/9a4fe343c309b7a000ffb5cd420b557809e4d58e))
+
 ## [0.15.1](https://github.com/eslint/rewrite/compare/core-v0.15.0...core-v0.15.1) (2025-06-25)
 
 
