@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.3.5](https://github.com/eslint/rewrite/compare/plugin-kit-v0.3.4...plugin-kit-v0.3.5) (2025-08-05)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^0.15.1 to ^0.15.2
+
 ## [0.3.4](https://github.com/eslint/rewrite/compare/plugin-kit-v0.3.3...plugin-kit-v0.3.4) (2025-07-21)
 
 
