@@ -3,6 +3,6 @@
   "files": ["src/index.js"],
   "compilerOptions": {
     "outDir": "dist/esm",
-    "types": ["mocha", "@eslint/core"]
+    "types": ["mocha", "@eslint/core", "node"]
   }
 }
