@@ -1,18 +1,18 @@
 import eslintConfigESLint from "eslint-config-eslint";
+import { defineConfig } from "@eslint/config-helpers";
 import tseslint from "typescript-eslint";
 
 const eslintPluginJSDoc = eslintConfigESLint.find(
 	config => config.plugins?.jsdoc,
 ).plugins.jsdoc;
 
-export default [
+export default defineConfig([
 	{
 		ignores: ["**/tests/fixtures/", "**/dist/", "**/coverage/"],
 	},
 
-	...eslintConfigESLint,
-
 	{
+		extends: [eslintConfigESLint],
 		rules: {
 			// disable rules we don't want to use from eslint-config-eslint
 			"no-undefined": "off",
@@ -31,6 +31,7 @@ export default [
 	{
 		files: [
 			"scripts/**",
+			"tools/**",
 			"packages/migrate-config/src/migrate-config-cli.js",
 		],
 		rules: {
@@ -58,9 +59,10 @@ export default [
 	// TypeScript
 	...tseslint.config({
 		files: ["**/*.ts"],
+		ignores: ["**/tests/**/*.ts"],
 		extends: [...tseslint.configs.strict, ...tseslint.configs.stylistic],
 		rules: {
 			"no-use-before-define": "off",
 		},
 	}),
-];
+]);

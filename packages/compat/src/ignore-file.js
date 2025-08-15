@@ -68,10 +68,11 @@ export function convertIgnorePatternToMinimatch(pattern) {
 /**
  * Reads an ignore file and returns an object with the ignore patterns.
  * @param {string} ignoreFilePath The absolute path to the ignore file.
+ * @param {string} [name] The name of the ignore file config.
  * @returns {FlatConfig} An object with an `ignores` property that is an array of ignore patterns.
  * @throws {Error} If the ignore file path is not an absolute path.
  */
-export function includeIgnoreFile(ignoreFilePath) {
+export function includeIgnoreFile(ignoreFilePath, name) {
 	if (!path.isAbsolute(ignoreFilePath)) {
 		throw new Error("The ignore file location must be an absolute path.");
 	}
@@ -80,7 +81,7 @@ export function includeIgnoreFile(ignoreFilePath) {
 	const lines = ignoreFile.split(/\r?\n/u);
 
 	return {
-		name: "Imported .gitignore patterns",
+		name: name || "Imported .gitignore patterns",
 		ignores: lines
 			.map(line => line.trim())
 			.filter(line => line && !line.startsWith("#"))

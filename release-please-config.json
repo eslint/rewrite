@@ -2,6 +2,8 @@
   "bootstrap-sha": "b489df4cf3eae08a25ed401db207a78100cf4fc9",
   "plugins": ["node-workspace"],
   "bump-minor-pre-major": true,
+  "extra-label": "triage:no",
+  "pull-request-title-pattern": "chore: release${component} ${version}",
   "packages": {
     "packages/compat": {
       "release-type": "node",
@@ -23,6 +25,16 @@
         }
       ]
     },
+    "packages/config-helpers": {
+      "release-type": "node",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "jsr.json",
+          "jsonpath": "$.version"
+        }
+      ]
+    },
     "packages/core": {
       "release-type": "node",
       "extra-files": [
@@ -33,6 +45,13 @@
         }
       ]
     },
+    "packages/mcp": {
+      "release-type": "node",
+      "extra-files": ["src/mcp-server.js"]
+    },
+    "packages/migrate-config": {
+      "release-type": "node"
+    },
     "packages/object-schema": {
       "release-type": "node",
       "extra-files": [
@@ -42,9 +61,6 @@
           "jsonpath": "$.version"
         }
       ]
-    },
-    "packages/migrate-config": {
-      "release-type": "node"
     },
     "packages/plugin-kit": {
       "release-type": "node",

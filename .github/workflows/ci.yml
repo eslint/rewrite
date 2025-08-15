@@ -39,7 +39,7 @@ jobs:
         strategy:
             matrix:
                 os: [windows-latest, macOS-latest, ubuntu-latest]
-                node-version: [18.x, 20.x, 22.x, 23.x]
+                node-version: [18.x, 20.x, 22.x, 24.x]
 
         steps:
             - uses: actions/checkout@v4
@@ -56,6 +56,37 @@ jobs:
                   npm test
               env:
                   CI: true
+
+    test_types:
+        name: Test Types
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "lts/*"
+
+            - name: Install Packages
+              run: |
+                  npm install
+                  npm run build
+
+            - name: Test types (core)
+              working-directory: packages/core
+              run: |
+                  npm run test:types
+
+            - name: Test types (config-helpers)
+              working-directory: packages/config-helpers
+              run: |
+                  npm run test:types
+
+            - name: Test types (plugin-kit)
+              working-directory: packages/plugin-kit
+              run: |
+                  npm run test:types
 
     jsr_test:
         name: Verify JSR Publish

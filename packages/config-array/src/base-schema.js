@@ -46,6 +46,7 @@ export const baseSchema = Object.freeze({
 			}
 		},
 	},
+	basePath: NOOP_STRATEGY,
 	files: NOOP_STRATEGY,
 	ignores: NOOP_STRATEGY,
 });

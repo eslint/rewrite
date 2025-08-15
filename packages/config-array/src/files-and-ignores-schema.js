@@ -67,6 +67,17 @@ function assertIsNonEmptyArray(value) {
  * @type {ObjectDefinition}
  */
 export const filesAndIgnoresSchema = Object.freeze({
+	basePath: {
+		required: false,
+		merge() {
+			return undefined;
+		},
+		validate(value) {
+			if (typeof value !== "string") {
+				throw new TypeError("Expected value to be a string.");
+			}
+		},
+	},
 	files: {
 		required: false,
 		merge() {

@@ -1,5 +1,104 @@
 # Changelog
 
+## [1.3.2](https://github.com/eslint/rewrite/compare/compat-v1.3.1...compat-v1.3.2) (2025-08-05)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @eslint/core bumped from ^0.15.1 to ^0.15.2
+
+## [1.3.1](https://github.com/eslint/rewrite/compare/compat-v1.3.0...compat-v1.3.1) (2025-06-25)
+
+
+### Bug Fixes
+
+* relax `@eslint/compat` eslint peerDependencies constraint ([#215](https://github.com/eslint/rewrite/issues/215)) ([b96ec0c](https://github.com/eslint/rewrite/commit/b96ec0c2ed6006add49c9c83a599a7d5a284348e))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @eslint/core bumped from ^0.15.0 to ^0.15.1
+
+## [1.3.0](https://github.com/eslint/rewrite/compare/compat-v1.2.9...compat-v1.3.0) (2025-06-09)
+
+
+### Features
+
+* add support for custom name parameter to `includeIgnoreFile` ([#211](https://github.com/eslint/rewrite/issues/211)) ([3e18175](https://github.com/eslint/rewrite/commit/3e1817535e75f6feca7aee6d9ec2afaa0f6ad859))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @eslint/core bumped from ^0.14.0 to ^0.15.0
+
+## [1.2.9](https://github.com/eslint/rewrite/compare/compat-v1.2.8...compat-v1.2.9) (2025-05-01)
+
+
+### Bug Fixes
+
+* Upgrade @eslint/core ([#197](https://github.com/eslint/rewrite/issues/197)) ([a830283](https://github.com/eslint/rewrite/commit/a830283cd05a7a471aeec5f4589491f3c4092986))
+
+## [1.2.8](https://github.com/eslint/rewrite/compare/compat-v1.2.7...compat-v1.2.8) (2025-04-01)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @eslint/core bumped from ^0.12.0 to ^0.13.0
+
+## [1.2.7](https://github.com/eslint/rewrite/compare/compat-v1.2.6...compat-v1.2.7) (2025-02-21)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @eslint/core bumped from ^0.11.0 to ^0.12.0
+
+## [1.2.6](https://github.com/eslint/rewrite/compare/compat-v1.2.5...compat-v1.2.6) (2025-01-31)
+
+
+### Bug Fixes
+
+* CommonJS types in all packages ([#148](https://github.com/eslint/rewrite/issues/148)) ([c91866c](https://github.com/eslint/rewrite/commit/c91866cc9fe16fb62bc48fc1cc7f9e18c6fea013))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @eslint/core bumped from ^0.10.0 to ^0.11.0
+
+## [1.2.5](https://github.com/eslint/rewrite/compare/compat-v1.2.4...compat-v1.2.5) (2025-01-09)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @eslint/core bumped from ^0.9.1 to ^0.10.0
+
+## [1.2.4](https://github.com/eslint/rewrite/compare/compat-v1.2.3...compat-v1.2.4) (2024-12-04)
+
+
+### Bug Fixes
+
+* Update RuleVisitor type ([#135](https://github.com/eslint/rewrite/issues/135)) ([156d601](https://github.com/eslint/rewrite/commit/156d601181deb362a2864c4d47d4e3da8609500b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @eslint/core bumped from ^0.9.0 to ^0.9.1
+
 ## [1.2.3](https://github.com/eslint/rewrite/compare/compat-v1.2.2...compat-v1.2.3) (2024-11-14)
 
 

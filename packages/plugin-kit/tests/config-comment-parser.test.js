@@ -254,6 +254,11 @@ describe("ConfigCommentParser", () => {
 				},
 			});
 		});
+
+		it("should not timeout for large inputs", () => {
+			const code = `${"A".repeat(100_000)}?: 1 B: 2`;
+			commentParser.parseJSONLikeConfig(code);
+		});
 	});
 
 	describe("parseDirective", () => {

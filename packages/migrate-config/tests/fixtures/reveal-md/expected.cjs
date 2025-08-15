@@ -1,3 +1,7 @@
+const {
+    defineConfig,
+} = require("eslint/config");
+
 const prettier = require("eslint-plugin-prettier");
 const _import = require("eslint-plugin-import");
 
@@ -18,7 +22,9 @@ const compat = new FlatCompat({
     allConfig: js.configs.all
 });
 
-module.exports = [...compat.extends("eslint:recommended", "prettier"), {
+module.exports = defineConfig([{
+    extends: compat.extends("eslint:recommended", "prettier"),
+
     plugins: {
         prettier,
         import: fixupPluginRules(_import),
@@ -41,4 +47,4 @@ module.exports = [...compat.extends("eslint:recommended", "prettier"), {
 
         "import/no-unresolved": 2,
     },
-}];
+}]);

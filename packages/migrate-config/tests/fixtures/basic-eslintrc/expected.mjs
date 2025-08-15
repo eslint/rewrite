@@ -1,3 +1,4 @@
+import { defineConfig, globalIgnores } from "eslint/config";
 import { fixupConfigRules, fixupPluginRules } from "@eslint/compat";
 import prettier from "eslint-plugin-prettier";
 import _import from "eslint-plugin-import";
@@ -20,9 +21,9 @@ const compat = new FlatCompat({
     allConfig: js.configs.all
 });
 
-export default [{
-    ignores: ["*/a.js", "dir/**/*", "**/dir/"],
-}, ...fixupConfigRules(compat.extends("eslint:recommended", "plugin:import/errors")), {
+export default defineConfig([globalIgnores(["*/a.js", "dir/**/*", "**/dir/"]), {
+    extends: fixupConfigRules(compat.extends("eslint:recommended", "plugin:import/errors")),
+
     plugins: {
         prettier,
         import: fixupPluginRules(_import),
@@ -48,13 +49,10 @@ export default [{
         quotes: ["error"],
         "no-console": ["warn"],
     },
-}, ...compat.extends("plugin:@typescript-eslint/recommended").map(config => ({
-    ...config,
+}, {
     files: ["**/*.ts"],
     ignores: ["**/*.d.ts"],
-})), {
-    files: ["**/*.ts"],
-    ignores: ["**/*.d.ts"],
+    extends: compat.extends("plugin:@typescript-eslint/recommended"),
 
     plugins: {
         "@typescript-eslint": typescriptEslint,
@@ -68,4 +66,4 @@ export default [{
         "@typescript-eslint/no-explicit-any": ["error"],
         "@typescript-eslint/no-unused-vars": ["error"],
     },
-}];
+}]);

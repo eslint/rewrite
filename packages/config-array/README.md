@@ -17,7 +17,7 @@ yarn add @eslint/config-array
 # or
 pnpm install @eslint/config-array
 # or
-bun install @eslint/config-array
+bun add @eslint/config-array
 ```
 
 For Deno:
@@ -76,7 +76,7 @@ const configs = new ConfigArray(rawConfigs, {
 });
 ```
 
-This example reads in an object or array from `my.config.js` and passes it into the `ConfigArray` constructor as the first argument. The second argument is an object specifying the `basePath` (the directory in which `my.config.js` is found) and a `schema` to define the additional properties of a config object beyond `files`, `ignores`, and `name`.
+This example reads in an object or array from `my.config.js` and passes it into the `ConfigArray` constructor as the first argument. The second argument is an object specifying the `basePath` (the directory in which `my.config.js` is found) and a `schema` to define the additional properties of a config object beyond `files`, `ignores`, `basePath`, and `name`.
 
 ### Specifying a Schema
 
@@ -163,6 +163,16 @@ export default [
 		files: ["!*.js"],
 		settings: {
 			js: false,
+		},
+	},
+
+	// specific settings for files inside `src` directory
+	{
+		name: "Source files",
+		basePath: "src",
+		files: ["**/*"],
+		settings: {
+			source: true,
 		},
 	},
 ];
@@ -283,10 +293,10 @@ The config array always returns an object, even if there are no configs matching
 
 A few things to keep in mind:
 
--   If a filename is not an absolute path, it will be resolved relative to the base path directory.
--   The returned config object never has `files`, `ignores`, or `name` properties; the only properties on the object will be the other configuration options specified.
--   The config array caches configs, so subsequent calls to `getConfig()` with the same filename will return in a fast lookup rather than another calculation.
--   A config will only be generated if the filename matches an entry in a `files` key. A config will not be generated without matching a `files` key (configs without a `files` key are only applied when another config with a `files` key is applied; configs without `files` are never applied on their own). Any config with a `files` key entry that is `*` or ends with `/**` or `/*` will only be applied if another entry in the same `files` key matches or another config matches.
+- If a filename is not an absolute path, it will be resolved relative to the base path directory.
+- The returned config object never has `files`, `ignores`, `basePath`, or `name` properties; the only properties on the object will be the other configuration options specified.
+- The config array caches configs, so subsequent calls to `getConfig()` with the same filename will return in a fast lookup rather than another calculation.
+- A config will only be generated if the filename matches an entry in a `files` key. A config will not be generated without matching a `files` key (configs without a `files` key are only applied when another config with a `files` key is applied; configs without `files` are never applied on their own). Any config with a `files` key entry that is `*` or ends with `/**` or `/*` will only be applied if another entry in the same `files` key matches or another config matches.
 
 ## Determining Ignored Paths
 
@@ -298,11 +308,11 @@ const ignored = configs.isFileIgnored("/foo/bar/baz.txt");
 
 A file is considered ignored if any of the following is true:
 
--   **It's parent directory is ignored.** For example, if `foo` is in `ignores`, then `foo/a.js` is considered ignored.
--   **It has an ancestor directory that is ignored.** For example, if `foo` is in `ignores`, then `foo/baz/a.js` is considered ignored.
--   **It matches an ignored file pattern.** For example, if `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
--   **If it matches an entry in `files` and also in `ignores`.** For example, if `**/*.js` is in `files` and `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
--   **The file is outside the `basePath`.** If the `basePath` is `/usr/me`, then `/foo/a.js` is considered ignored.
+- **It's parent directory is ignored.** For example, if `foo` is in `ignores`, then `foo/a.js` is considered ignored.
+- **It has an ancestor directory that is ignored.** For example, if `foo` is in `ignores`, then `foo/baz/a.js` is considered ignored.
+- **It matches an ignored file pattern.** For example, if `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
+- **If it matches an entry in `files` and also in `ignores`.** For example, if `**/*.js` is in `files` and `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
+- **The file is outside the `basePath`.** If the `basePath` is `/usr/me`, then `/foo/a.js` is considered ignored.
 
 For directories, use the `isDirectoryIgnored()` method and pass in the path of any directory, as in this example:
 
@@ -312,11 +322,11 @@ const ignored = configs.isDirectoryIgnored("/foo/bar/");
 
 A directory is considered ignored if any of the following is true:
 
--   **It's parent directory is ignored.** For example, if `foo` is in `ignores`, then `foo/baz` is considered ignored.
--   **It has an ancestor directory that is ignored.** For example, if `foo` is in `ignores`, then `foo/bar/baz/a.js` is considered ignored.
--   **It matches and ignored file pattern.** For example, if `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
--   **If it matches an entry in `files` and also in `ignores`.** For example, if `**/*.js` is in `files` and `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
--   **The file is outside the `basePath`.** If the `basePath` is `/usr/me`, then `/foo/a.js` is considered ignored.
+- **It's parent directory is ignored.** For example, if `foo` is in `ignores`, then `foo/baz` is considered ignored.
+- **It has an ancestor directory that is ignored.** For example, if `foo` is in `ignores`, then `foo/bar/baz/a.js` is considered ignored.
+- **It matches and ignored file pattern.** For example, if `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
+- **If it matches an entry in `files` and also in `ignores`.** For example, if `**/*.js` is in `files` and `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
+- **The file is outside the `basePath`.** If the `basePath` is `/usr/me`, then `/foo/a.js` is considered ignored.
 
 **Important:** A pattern such as `foo/**` means that `foo` and `foo/` are _not_ ignored whereas `foo/bar` is ignored. If you want to ignore `foo` and all of its subdirectories, use the pattern `foo` or `foo/` in `ignores`.
 
@@ -331,9 +341,9 @@ Each `ConfigArray` aggressively caches configuration objects to avoid unnecessar
 
 The design of this project was influenced by feedback on the ESLint RFC, and incorporates ideas from:
 
--   Teddy Katz (@not-an-aardvark)
--   Toru Nagashima (@mysticatea)
--   Kai Cataldo (@kaicataldo)
+- Teddy Katz (@not-an-aardvark)
+- Toru Nagashima (@mysticatea)
+- Kai Cataldo (@kaicataldo)
 
 ## License
 
@@ -349,9 +359,9 @@ to get your logo on our READMEs and [website](https://eslint.org/sponsors).
 
 <h3>Platinum Sponsors</h3>
 <p><a href="https://automattic.com"><img src="https://images.opencollective.com/automattic/d0ef3e1/logo.png" alt="Automattic" height="128"></a> <a href="https://www.airbnb.com/"><img src="https://images.opencollective.com/airbnb/d327d66/logo.png" alt="Airbnb" height="128"></a></p><h3>Gold Sponsors</h3>
-<p><a href="https://trunk.io/"><img src="https://images.opencollective.com/trunkio/fb92d60/avatar.png" alt="trunk.io" height="96"></a></p><h3>Silver Sponsors</h3>
-<p><a href="https://www.serptriumph.com/"><img src="https://images.opencollective.com/serp-triumph5/fea3074/logo.png" alt="SERP Triumph" height="64"></a> <a href="https://www.jetbrains.com/"><img src="https://images.opencollective.com/jetbrains/fe76f99/logo.png" alt="JetBrains" height="64"></a> <a href="https://liftoff.io/"><img src="https://images.opencollective.com/liftoff/5c4fa84/logo.png" alt="Liftoff" height="64"></a> <a href="https://americanexpress.io"><img src="https://avatars.githubusercontent.com/u/3853301?v=4" alt="American Express" height="64"></a> <a href="https://www.workleap.com"><img src="https://avatars.githubusercontent.com/u/53535748?u=d1e55d7661d724bf2281c1bfd33cb8f99fe2465f&v=4" alt="Workleap" height="64"></a></p><h3>Bronze Sponsors</h3>
-<p><a href="https://cybozu.co.jp/"><img src="https://images.opencollective.com/cybozu/933e46d/logo.png" alt="Cybozu" height="32"></a> <a href="https://syntax.fm"><img src="https://github.com/syntaxfm.png" alt="Syntax" height="32"></a> <a href="https://www.wordhint.net/"><img src="https://images.opencollective.com/wordhint/be86813/avatar.png" alt="WordHint" height="32"></a> <a href="https://www.crosswordsolver.org/anagram-solver/"><img src="https://images.opencollective.com/anagram-solver/2666271/logo.png" alt="Anagram Solver" height="32"></a> <a href="https://icons8.com/"><img src="https://images.opencollective.com/icons8/7fa1641/logo.png" alt="Icons8" height="32"></a> <a href="https://discord.com"><img src="https://images.opencollective.com/discordapp/f9645d9/logo.png" alt="Discord" height="32"></a> <a href="https://www.gitbook.com"><img src="https://avatars.githubusercontent.com/u/7111340?v=4" alt="GitBook" height="32"></a> <a href="https://nx.dev"><img src="https://avatars.githubusercontent.com/u/23692104?v=4" alt="Nx" height="32"></a> <a href="https://herocoders.com"><img src="https://avatars.githubusercontent.com/u/37549774?v=4" alt="HeroCoders" height="32"></a></p>
+<p><a href="https://qlty.sh/"><img src="https://images.opencollective.com/qltysh/33d157d/logo.png" alt="Qlty Software" height="96"></a> <a href="https://trunk.io/"><img src="https://images.opencollective.com/trunkio/fb92d60/avatar.png" alt="trunk.io" height="96"></a> <a href="https://shopify.engineering/"><img src="https://avatars.githubusercontent.com/u/8085" alt="Shopify" height="96"></a></p><h3>Silver Sponsors</h3>
+<p><a href="https://vite.dev/"><img src="https://images.opencollective.com/vite/e6d15e1/logo.png" alt="Vite" height="64"></a> <a href="https://liftoff.io/"><img src="https://images.opencollective.com/liftoff/5c4fa84/logo.png" alt="Liftoff" height="64"></a> <a href="https://americanexpress.io"><img src="https://avatars.githubusercontent.com/u/3853301" alt="American Express" height="64"></a> <a href="https://stackblitz.com"><img src="https://avatars.githubusercontent.com/u/28635252" alt="StackBlitz" height="64"></a></p><h3>Bronze Sponsors</h3>
+<p><a href="https://cybozu.co.jp/"><img src="https://images.opencollective.com/cybozu/933e46d/logo.png" alt="Cybozu" height="32"></a> <a href="https://sentry.io"><img src="https://github.com/getsentry.png" alt="Sentry" height="32"></a> <a href="https://www.fortunegames.com"><img src="https://images.opencollective.com/fortunegames/657063f/logo.png" alt="FORTUNE GAMES" height="32"></a> <a href="https://www.crosswordsolver.org/anagram-solver/"><img src="https://images.opencollective.com/anagram-solver/2666271/logo.png" alt="Anagram Solver" height="32"></a> <a href="https://icons8.com/"><img src="https://images.opencollective.com/icons8/7fa1641/logo.png" alt="Icons8" height="32"></a> <a href="https://discord.com"><img src="https://images.opencollective.com/discordapp/f9645d9/logo.png" alt="Discord" height="32"></a> <a href="https://www.gitbook.com"><img src="https://avatars.githubusercontent.com/u/7111340" alt="GitBook" height="32"></a> <a href="https://nx.dev"><img src="https://avatars.githubusercontent.com/u/23692104" alt="Nx" height="32"></a> <a href="https://opensource.mercedes-benz.com/"><img src="https://avatars.githubusercontent.com/u/34240465" alt="Mercedes-Benz Group" height="32"></a> <a href="https://herocoders.com"><img src="https://avatars.githubusercontent.com/u/37549774" alt="HeroCoders" height="32"></a> <a href="https://www.lambdatest.com"><img src="https://avatars.githubusercontent.com/u/171592363" alt="LambdaTest" height="32"></a></p>
 <h3>Technology Sponsors</h3>
 Technology sponsors allow us to use their products and services for free as part of a contribution to the open source ecosystem and our work.
 <p><a href="https://netlify.com"><img src="https://raw.githubusercontent.com/eslint/eslint.org/main/src/assets/images/techsponsors/netlify-icon.svg" alt="Netlify" height="32"></a> <a href="https://algolia.com"><img src="https://raw.githubusercontent.com/eslint/eslint.org/main/src/assets/images/techsponsors/algolia-icon.svg" alt="Algolia" height="32"></a> <a href="https://1password.com"><img src="https://raw.githubusercontent.com/eslint/eslint.org/main/src/assets/images/techsponsors/1password-icon.svg" alt="1Password" height="32"></a></p>

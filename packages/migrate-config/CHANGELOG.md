@@ -1,5 +1,110 @@
 # Changelog
 
+## [1.5.3](https://github.com/eslint/rewrite/compare/migrate-config-v1.5.2...migrate-config-v1.5.3) (2025-08-05)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/compat bumped from ^1.3.1 to ^1.3.2
+
+## [1.5.2](https://github.com/eslint/rewrite/compare/migrate-config-v1.5.1...migrate-config-v1.5.2) (2025-06-25)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/compat bumped from ^1.3.0 to ^1.3.1
+
+## [1.5.1](https://github.com/eslint/rewrite/compare/migrate-config-v1.5.0...migrate-config-v1.5.1) (2025-06-09)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/compat bumped from ^1.2.9 to ^1.3.0
+
+## [1.5.0](https://github.com/eslint/rewrite/compare/migrate-config-v1.4.1...migrate-config-v1.5.0) (2025-05-01)
+
+
+### Features
+
+* Better conversion of .eslintrc.js files in migrate-config ([#172](https://github.com/eslint/rewrite/issues/172)) ([63cb367](https://github.com/eslint/rewrite/commit/63cb3679a4ac931120e6fedfdcb3d934d8f5ed9b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/compat bumped from ^1.2.8 to ^1.2.9
+
+## [1.5.0](https://github.com/eslint/rewrite/compare/migrate-config-v1.4.1...migrate-config-v1.5.0) (2025-04-30)
+
+
+### Features
+
+* Better conversion of .eslintrc.js files in migrate-config ([#172](https://github.com/eslint/rewrite/issues/172)) ([63cb367](https://github.com/eslint/rewrite/commit/63cb3679a4ac931120e6fedfdcb3d934d8f5ed9b))
+
+## [1.4.1](https://github.com/eslint/rewrite/compare/migrate-config-v1.4.0...migrate-config-v1.4.1) (2025-04-01)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/compat bumped from ^1.2.7 to ^1.2.8
+
+## [1.4.0](https://github.com/eslint/rewrite/compare/migrate-config-v1.3.8...migrate-config-v1.4.0) (2025-03-14)
+
+
+### Features
+
+* Use defineConfig() and globalIgnores() helpers ([#164](https://github.com/eslint/rewrite/issues/164)) ([727ec5d](https://github.com/eslint/rewrite/commit/727ec5dfd6870062696ea746b6e9d2a63dc8e34a))
+
+## [1.3.8](https://github.com/eslint/rewrite/compare/migrate-config-v1.3.7...migrate-config-v1.3.8) (2025-02-21)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/compat bumped from ^1.2.6 to ^1.2.7
+
+## [1.3.7](https://github.com/eslint/rewrite/compare/migrate-config-v1.3.6...migrate-config-v1.3.7) (2025-01-31)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/compat bumped from ^1.2.5 to ^1.2.6
+
+## [1.3.6](https://github.com/eslint/rewrite/compare/migrate-config-v1.3.5...migrate-config-v1.3.6) (2025-01-09)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/compat bumped from ^1.2.4 to ^1.2.5
+
+## [1.3.5](https://github.com/eslint/rewrite/compare/migrate-config-v1.3.4...migrate-config-v1.3.5) (2024-12-04)
+
+
+### Bug Fixes
+
+* Update RuleVisitor type ([#135](https://github.com/eslint/rewrite/issues/135)) ([156d601](https://github.com/eslint/rewrite/commit/156d601181deb362a2864c4d47d4e3da8609500b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/compat bumped from ^1.2.3 to ^1.2.4
+
 ## [1.3.4](https://github.com/eslint/rewrite/compare/migrate-config-v1.3.3...migrate-config-v1.3.4) (2024-11-14)
 
 

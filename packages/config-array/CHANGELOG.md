@@ -1,5 +1,59 @@
 # Changelog
 
+## [0.21.0](https://github.com/eslint/rewrite/compare/config-array-v0.20.1...config-array-v0.21.0) (2025-06-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* Support `basePath` property in config objects ([#223](https://github.com/eslint/rewrite/issues/223))
+
+### Features
+
+* Support `basePath` property in config objects ([#223](https://github.com/eslint/rewrite/issues/223)) ([40d31ba](https://github.com/eslint/rewrite/commit/40d31ba42a9fe0da10b6ca5e1b10f1f2b10c5f90))
+
+## [0.20.1](https://github.com/eslint/rewrite/compare/config-array-v0.20.0...config-array-v0.20.1) (2025-06-09)
+
+
+### Bug Fixes
+
+* consider negated patterns universal ([#220](https://github.com/eslint/rewrite/issues/220)) ([2dbe2b9](https://github.com/eslint/rewrite/commit/2dbe2b9c9431997bb4a1ab0335d8101564b62a41))
+* explicit match in array elements of `files` ([#218](https://github.com/eslint/rewrite/issues/218)) ([e84cbd7](https://github.com/eslint/rewrite/commit/e84cbd7468765c25c01fc420b43d75a256533da2))
+
+## [0.20.0](https://github.com/eslint/rewrite/compare/config-array-v0.19.2...config-array-v0.20.0) (2025-03-24)
+
+
+### Features
+
+* normalize patterns to handle "./" prefix in files and ignores ([#162](https://github.com/eslint/rewrite/issues/162)) ([bbbe909](https://github.com/eslint/rewrite/commit/bbbe9098fe112ca646947b83f71fbf5639f932e6))
+
+## [0.19.2](https://github.com/eslint/rewrite/compare/config-array-v0.19.1...config-array-v0.19.2) (2025-01-31)
+
+
+### Bug Fixes
+
+* CommonJS types in all packages ([#148](https://github.com/eslint/rewrite/issues/148)) ([c91866c](https://github.com/eslint/rewrite/commit/c91866cc9fe16fb62bc48fc1cc7f9e18c6fea013))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/object-schema bumped from ^2.1.5 to ^2.1.6
+
+## [0.19.1](https://github.com/eslint/rewrite/compare/config-array-v0.19.0...config-array-v0.19.1) (2024-12-04)
+
+
+### Bug Fixes
+
+* Update RuleVisitor type ([#135](https://github.com/eslint/rewrite/issues/135)) ([156d601](https://github.com/eslint/rewrite/commit/156d601181deb362a2864c4d47d4e3da8609500b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/object-schema bumped from ^2.1.4 to ^2.1.5
+
 ## [0.19.0](https://github.com/eslint/rewrite/compare/config-array-v0.18.0...config-array-v0.19.0) (2024-10-25)
 
 

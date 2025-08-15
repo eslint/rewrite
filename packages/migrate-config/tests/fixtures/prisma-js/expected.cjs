@@ -1,3 +1,9 @@
+const {
+    defineConfig,
+    globalIgnores,
+} = require("eslint/config");
+
+const tsParser = require("@typescript-eslint/parser");
 const typescriptEslint = require("@typescript-eslint/eslint-plugin");
 const jest = require("eslint-plugin-jest");
 const simpleImportSort = require("eslint-plugin-simple-import-sort");
@@ -9,7 +15,6 @@ const {
 } = require("@eslint/compat");
 
 const globals = require("globals");
-const tsParser = require("@typescript-eslint/parser");
 const js = require("@eslint/js");
 
 const {
@@ -21,38 +26,37 @@ const compat = new FlatCompat({
     recommendedConfig: js.configs.recommended,
     allConfig: js.configs.all
 });
+const path = require("path");
+const project = "tsconfig.json";
 
-module.exports = [{
-    ignores: [
-        ".github/renovate.json",
-        "**/dist/",
-        "**/esm/",
-        "**/build/",
-        "**/fixtures/",
-        "**/byline.ts",
-        "**/prism.ts",
-        "**/charm.ts",
-        "**/pnpm-lock.yaml",
-        "**/generated-dmmf.ts",
-        "packages/client/generator-build/",
-        "packages/client/declaration/",
-        "packages/client/runtime/",
-        "packages/client/src/__tests__/types/",
-        "packages/client/scripts/default-index.js",
-        "packages/cli/prisma-client/",
-        "packages/cli/install/",
-        "packages/cli/preinstall/",
-        "packages/cli/**/tmp-*",
-        "**/sandbox/",
-    ],
-}, ...compat.extends(
-    "eslint:recommended",
-    "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:@typescript-eslint/recommended-requiring-type-checking",
-    "plugin:prettier/recommended",
-    "plugin:jest/recommended",
-), {
+const myGlobals = {
+    custom1: "readonly",
+    custom2: "writable",
+};
+
+module.exports = defineConfig([{
+    languageOptions: {
+        parser: tsParser,
+
+        globals: {
+            ...globals.node,
+            custom: true,
+            ...myGlobals,
+        },
+
+        ecmaVersion: 2020,
+        sourceType: "module",
+
+        parserOptions: {
+            project,
+        },
+    },
+
+    linterOptions: {
+        reportUnusedDisableDirectives: true,
+        noInlineConfig: true,
+    },
+
     plugins: {
         "@typescript-eslint": typescriptEslint,
         jest,
@@ -61,29 +65,14 @@ module.exports = [{
         "local-rules": localRules,
     },
 
-    languageOptions: {
-        globals: {
-            ...globals.node,
-        },
-
-        parser: tsParser,
-        ecmaVersion: 2020,
-        sourceType: "module",
-
-        parserOptions: {
-            project: "tsconfig.json",
-        },
-    },
-
-    settings: {
-        jest: {
-            version: 27,
-
-            globalAliases: {
-                describe: "describeIf",
-            },
-        },
-    },
+    extends: compat.extends(
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@typescript-eslint/recommended-requiring-type-checking",
+        "plugin:prettier/recommended",
+        "plugin:jest/recommended",
+    ),
 
     rules: {
         "prettier/prettier": "warn",
@@ -133,7 +122,17 @@ module.exports = [{
         "import/newline-after-import": "error",
         "import/no-duplicates": "error",
     },
-}, {
+
+    settings: {
+        jest: {
+            version: 27,
+
+            globalAliases: {
+                describe: "describeIf",
+            },
+        },
+    },
+}, globalIgnores(["**/tmp"]), {
     files: ["./packages/client/src/runtime/core/types/exported/*.ts"],
     ignores: ["**/index.ts"],
 
@@ -147,4 +146,25 @@ module.exports = [{
     rules: {
         "local-rules/valid-exported-types-index": "error",
     },
-}];
+}, globalIgnores([
+    ".github/renovate.json",
+    "**/dist/",
+    "**/esm/",
+    "**/build/",
+    "**/fixtures/",
+    "**/byline.ts",
+    "**/prism.ts",
+    "**/charm.ts",
+    "**/pnpm-lock.yaml",
+    "**/generated-dmmf.ts",
+    "packages/client/generator-build/",
+    "packages/client/declaration/",
+    "packages/client/runtime/",
+    "packages/client/src/__tests__/types/",
+    "packages/client/scripts/default-index.js",
+    "packages/cli/prisma-client/",
+    "packages/cli/install/",
+    "packages/cli/preinstall/",
+    "packages/cli/**/tmp-*",
+    "**/sandbox/",
+])]);

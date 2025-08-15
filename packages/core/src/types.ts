@@ -6,7 +6,7 @@
 // Imports
 //------------------------------------------------------------------------------
 
-import { JSONSchema4 } from "json-schema";
+import type { JSONSchema4 } from "json-schema";
 
 //------------------------------------------------------------------------------
 // Helper Types
@@ -92,20 +92,17 @@ export type RuleType = "problem" | "suggestion" | "layout";
  */
 export type RuleFixType = "code" | "whitespace";
 
-/* eslint-disable @typescript-eslint/consistent-indexed-object-style -- Needs to be interface so people can extend it. */
 /* eslint-disable @typescript-eslint/no-explicit-any -- Necessary to allow subclasses to work correctly */
 /**
  * An object containing visitor information for a rule. Each method is either the
  * name of a node type or a selector, or is a method that will be called at specific
  * times during the traversal.
  */
-export interface RuleVisitor {
-	/**
-	 * Called for each node in the AST or at specific times during the traversal.
-	 */
-	[key: string]: (...args: any[]) => void;
-}
-/* eslint-enable @typescript-eslint/consistent-indexed-object-style -- Needs to be interface so people can extend it. */
+export type RuleVisitor = Record<
+	string,
+	((...args: any[]) => void) | undefined
+>;
+
 /* eslint-enable @typescript-eslint/no-explicit-any -- Necessary to allow subclasses to work correctly */
 
 /**
@@ -130,8 +127,15 @@ export interface RulesMetaDocs {
 
 	/**
 	 * Indicates if the rule is generally recommended for all users.
+	 *
+	 * Note - this will always be a boolean for core rules, but may be used in any way by plugins.
 	 */
-	recommended?: boolean | undefined;
+	recommended?: unknown;
+
+	/**
+	 * Indicates if the rule is frozen (no longer accepting feature requests).
+	 */
+	frozen?: boolean | undefined;
 }
 
 /**
@@ -139,6 +143,7 @@ export interface RulesMetaDocs {
  */
 export interface RulesMeta<
 	MessageIds extends string = string,
+	RuleOptions = unknown[],
 	ExtRuleDocs = unknown,
 > {
 	/**
@@ -157,19 +162,25 @@ export interface RulesMeta<
 	schema?: JSONSchema4 | JSONSchema4[] | false | undefined;
 
 	/**
+	 * Any default options to be recursively merged on top of any user-provided options.
+	 **/
+	defaultOptions?: RuleOptions;
+
+	/**
 	 * The messages that the rule can report.
 	 */
 	messages?: Record<MessageIds, string>;
 
 	/**
-	 * The deprecated rules for the rule.
+	 * Indicates whether the rule has been deprecated or provides additional metadata about the deprecation. Omit if not deprecated.
 	 */
-	deprecated?: boolean | undefined;
+	deprecated?: boolean | DeprecatedInfo | undefined;
 
 	/**
-	 * When a rule is deprecated, indicates the rule ID(s) that should be used instead.
+	 * @deprecated Use deprecated.replacedBy instead.
+	 * The name of the rule(s) this rule was replaced by, if it was deprecated.
 	 */
-	replacedBy?: string[] | undefined;
+	replacedBy?: readonly string[] | undefined;
 
 	/**
 	 * Indicates if the rule is fixable, and if so, what type of fix it provides.
@@ -180,6 +191,92 @@ export interface RulesMeta<
 	 * Indicates if the rule may provide suggestions.
 	 */
 	hasSuggestions?: boolean | undefined;
+
+	/**
+	 * The language the rule is intended to lint.
+	 */
+	language?: string;
+
+	/**
+	 * The dialects of `language` that the rule is intended to lint.
+	 */
+	dialects?: string[];
+}
+
+/**
+ * Provides additional metadata about a deprecation.
+ */
+export interface DeprecatedInfo {
+	/**
+	 * General message presented to the user, e.g. for the key rule why the rule
+	 * is deprecated or for info how to replace the rule.
+	 */
+	message?: string;
+
+	/**
+	 * URL to more information about this deprecation in general.
+	 */
+	url?: string;
+
+	/**
+	 * An empty array explicitly states that there is no replacement.
+	 */
+	replacedBy?: ReplacedByInfo[];
+
+	/**
+	 * The package version since when the rule is deprecated (should use full
+	 * semver without a leading "v").
+	 */
+	deprecatedSince?: string;
+
+	/**
+	 * The estimated version when the rule is removed (probably the next major
+	 * version). null means the rule is "frozen" (will be available but will not
+	 * be changed).
+	 */
+	availableUntil?: string | null;
+}
+
+/**
+ * Provides metadata about a replacement
+ */
+export interface ReplacedByInfo {
+	/**
+	 * General message presented to the user, e.g. how to replace the rule
+	 */
+	message?: string;
+
+	/**
+	 * URL to more information about this replacement in general
+	 */
+	url?: string;
+
+	/**
+	 * Name should be "eslint" if the replacement is an ESLint core rule. Omit
+	 * the property if the replacement is in the same plugin.
+	 */
+	plugin?: ExternalSpecifier;
+
+	/**
+	 * Name and documentation of the replacement rule
+	 */
+	rule?: ExternalSpecifier;
+}
+
+/**
+ * Specifies the name and url of an external resource. At least one property
+ * should be set.
+ */
+export interface ExternalSpecifier {
+	/**
+	 * Name of the referenced plugin / rule.
+	 */
+	name?: string;
+
+	/**
+	 * URL pointing to documentation for the plugin / rule.
+	 */
+	url?: string;
 }
 
 /**
@@ -190,6 +287,7 @@ export interface RuleContextTypeOptions {
 	Code: SourceCode;
 	RuleOptions: unknown[];
 	Node: unknown;
+	MessageIds: string;
 }
 
 /**
@@ -198,12 +296,7 @@ export interface RuleContextTypeOptions {
  * view into the outside world.
  */
 export interface RuleContext<
-	Options extends RuleContextTypeOptions = {
-		LangOptions: LanguageOptions;
-		Code: SourceCode;
-		RuleOptions: unknown[];
-		Node: unknown;
-	},
+	Options extends RuleContextTypeOptions = RuleContextTypeOptions,
 > {
 	/**
 	 * The current working directory for the session.
@@ -285,7 +378,9 @@ export interface RuleContext<
 	 * The report function that the rule should use to report problems.
 	 * @param violation The violation to report.
 	 */
-	report(violation: ViolationReport<Options["Node"]>): void;
+	report(
+		violation: ViolationReport<Options["Node"], Options["MessageIds"]>,
+	): void;
 }
 
 // #region Rule Fixing
@@ -379,6 +474,15 @@ export interface RuleTextEdit {
 
 // #endregion
 
+/**
+ * Fixes a violation.
+ * @param fixer The text editor to apply the fix.
+ * @returns The fix(es) for the violation.
+ */
+type RuleFixer = (
+	fixer: RuleTextEditor,
+) => RuleTextEdit | Iterable<RuleTextEdit> | null;
+
 interface ViolationReportBase {
 	/**
 	 * The type of node that the violation is for.
@@ -393,23 +497,28 @@ interface ViolationReportBase {
 
 	/**
 	 * The fix to be applied for the violation.
-	 * @param fixer The text editor to apply the fix.
-	 * @returns The fix(es) for the violation.
 	 */
-	fix?(fixer: RuleTextEditor): RuleTextEdit | Iterable<RuleTextEdit> | null;
+	fix?: RuleFixer | null | undefined;
 
 	/**
 	 * An array of suggested fixes for the problem. These fixes may change the
 	 * behavior of the code, so they are not applied automatically.
 	 */
-	suggest?: SuggestedEdit[];
+	suggest?: SuggestedEdit[] | null | undefined;
 }
 
-type ViolationMessage = { message: string } | { messageId: string };
-type ViolationLocation<Node> = { loc: SourceLocation } | { node: Node };
+type ViolationMessage<MessageIds = string> =
+	| { message: string }
+	| { messageId: MessageIds };
+type ViolationLocation<Node> =
+	| { loc: SourceLocation | Position }
+	| { node: Node };
 
-export type ViolationReport<Node = unknown> = ViolationReportBase &
-	ViolationMessage &
+export type ViolationReport<
+	Node = unknown,
+	MessageIds = string,
+> = ViolationReportBase &
+	ViolationMessage<MessageIds> &
 	ViolationLocation<Node>;
 
 // #region Suggestions
@@ -422,10 +531,8 @@ interface SuggestedEditBase {
 
 	/**
 	 * The fix to be applied for the suggestion.
-	 * @param fixer The text editor to apply the fix.
-	 * @returns The fix for the suggestion.
 	 */
-	fix?(fixer: RuleTextEditor): RuleTextEdit | Iterable<RuleTextEdit> | null;
+	fix?: RuleFixer | null | undefined;
 }
 
 type SuggestionMessage = { desc: string } | { messageId: string };
@@ -453,11 +560,17 @@ export interface RuleDefinitionTypeOptions {
 /**
  * The definition of an ESLint rule.
  */
-export interface RuleDefinition<Options extends RuleDefinitionTypeOptions> {
+export interface RuleDefinition<
+	Options extends RuleDefinitionTypeOptions = RuleDefinitionTypeOptions,
+> {
 	/**
 	 * The meta information for the rule.
 	 */
-	meta?: RulesMeta<Options["MessageIds"], Options["ExtRuleDocs"]>;
+	meta?: RulesMeta<
+		Options["MessageIds"],
+		Options["RuleOptions"],
+		Options["ExtRuleDocs"]
+	>;
 
 	/**
 	 * Creates the visitor that ESLint uses to apply the rule during traversal.
@@ -470,9 +583,54 @@ export interface RuleDefinition<Options extends RuleDefinitionTypeOptions> {
 			Code: Options["Code"];
 			RuleOptions: Options["RuleOptions"];
 			Node: Options["Node"];
+			MessageIds: Options["MessageIds"];
 		}>,
 	): Options["Visitor"];
 }
+
+/**
+ * Defaults for non-language-related `RuleDefinition` options.
+ */
+export interface CustomRuleTypeDefinitions {
+	RuleOptions: unknown[];
+	MessageIds: string;
+	ExtRuleDocs: Record<string, unknown>;
+}
+
+/**
+ * A helper type to define language specific specializations of the `RuleDefinition` type.
+ *
+ * @example
+ * ```ts
+ * type YourRuleDefinition<
+ * 	Options extends Partial<CustomRuleTypeDefinitions> = {},
+ * > = CustomRuleDefinitionType<
+ * 	{
+ * 		LangOptions: YourLanguageOptions;
+ * 		Code: YourSourceCode;
+ * 		Visitor: YourRuleVisitor;
+ * 		Node: YourNode;
+ * 	},
+ * 	Options
+ * >;
+ * ```
+ */
+export type CustomRuleDefinitionType<
+	LanguageSpecificOptions extends Omit<
+		RuleDefinitionTypeOptions,
+		keyof CustomRuleTypeDefinitions
+	>,
+	Options extends Partial<CustomRuleTypeDefinitions>,
+> = RuleDefinition<
+	// Language specific type options (non-configurable)
+	LanguageSpecificOptions &
+		Required<
+			// Rule specific type options (custom)
+			Options &
+				// Rule specific type options (defaults)
+				Omit<CustomRuleTypeDefinitions, keyof Options>
+		>
+>;
 
 //------------------------------------------------------------------------------
 // Config
@@ -510,22 +668,36 @@ export interface LinterOptionsConfig {
 	 * Indicates what to do when an unused disable directive is found.
 	 */
 	reportUnusedDisableDirectives?: boolean | Severity;
-}
 
-/**
- * Shared settings that are accessible from within plugins.
- */
-export type SettingsConfig = Record<string, unknown>;
+	/**
+	 * A severity value indicating if and how unused inline configs should be
+	 * tracked and reported.
+	 */
+	reportUnusedInlineConfigs?: Severity;
+}
 
 /**
  * The configuration for a rule.
  */
-export type RuleConfig = Severity | [Severity, ...unknown[]];
+export type RuleConfig<RuleOptions extends unknown[] = unknown[]> =
+	| Severity
+	| [Severity, ...Partial<RuleOptions>];
 
+/* eslint-disable @typescript-eslint/consistent-indexed-object-style -- needed to allow extension */
 /**
  * A collection of rules and their configurations.
  */
-export type RulesConfig = Record<string, RuleConfig>;
+export interface RulesConfig {
+	[key: string]: RuleConfig;
+}
+
+/**
+ * A collection of settings.
+ */
+export interface SettingsConfig {
+	[key: string]: unknown;
+}
+/* eslint-enable @typescript-eslint/consistent-indexed-object-style -- needed to allow extension */
 
 //------------------------------------------------------------------------------
 // Languages
@@ -739,7 +911,7 @@ interface InlineConfigElement {
 /**
  * Generic options for the `SourceCodeBase` type.
  */
-interface SourceCodeBaseTypeOptions {
+export interface SourceCodeBaseTypeOptions {
 	LangOptions: LanguageOptions;
 	RootNode: unknown;
 	SyntaxElementWithLoc: unknown;

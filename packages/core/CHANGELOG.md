@@ -1,5 +1,86 @@
 # Changelog
 
+## [0.15.2](https://github.com/eslint/rewrite/compare/core-v0.15.1...core-v0.15.2) (2025-08-05)
+
+
+### Bug Fixes
+
+* relax type for rule.meta.docs.recommended ([#235](https://github.com/eslint/rewrite/issues/235)) ([9a4fe34](https://github.com/eslint/rewrite/commit/9a4fe343c309b7a000ffb5cd420b557809e4d58e))
+
+## [0.15.1](https://github.com/eslint/rewrite/compare/core-v0.15.0...core-v0.15.1) (2025-06-25)
+
+
+### Bug Fixes
+
+* Allow RuleConfig to have array with just severity ([#228](https://github.com/eslint/rewrite/issues/228)) ([c5f92fa](https://github.com/eslint/rewrite/commit/c5f92fa147ecad74164266c374f47ee217c7ccb7))
+
+## [0.15.0](https://github.com/eslint/rewrite/compare/core-v0.14.0...core-v0.15.0) (2025-06-09)
+
+
+### Features
+
+* Add extendable config types ([#210](https://github.com/eslint/rewrite/issues/210)) ([3089754](https://github.com/eslint/rewrite/commit/3089754848c1acd30368424271810cc9703a6cd4))
+
+## [0.14.0](https://github.com/eslint/rewrite/compare/core-v0.13.0...core-v0.14.0) (2025-04-30)
+
+
+### Features
+
+* add core types for language-specific rule definitions ([#178](https://github.com/eslint/rewrite/issues/178)) ([fd9b571](https://github.com/eslint/rewrite/commit/fd9b571554085cb5ea9f9831a38650a49dfebb32))
+* make `TextSourceCodeBase` a generic type ([#182](https://github.com/eslint/rewrite/issues/182)) ([484b6ca](https://github.com/eslint/rewrite/commit/484b6ca3149354736317fca09efd3156caa4f4f9))
+
+## [0.13.0](https://github.com/eslint/rewrite/compare/core-v0.12.0...core-v0.13.0) (2025-04-01)
+
+
+### Features
+
+* Set type for RuleDefinition.defaultOptions ([#173](https://github.com/eslint/rewrite/issues/173)) ([d5806df](https://github.com/eslint/rewrite/commit/d5806dfe5c2af849b84f39e3eb0300aaa7c29092))
+
+## [0.12.0](https://github.com/eslint/rewrite/compare/core-v0.11.0...core-v0.12.0) (2025-02-21)
+
+
+### Features
+
+* Add meta.language and meta.dialects to RuleDefinition ([#156](https://github.com/eslint/rewrite/issues/156)) ([dac0387](https://github.com/eslint/rewrite/commit/dac0387fc3dd7e74811ae045ab782c70366bb14c))
+
+
+### Bug Fixes
+
+* Types to align with older ESLint types ([#155](https://github.com/eslint/rewrite/issues/155)) ([664740a](https://github.com/eslint/rewrite/commit/664740a8d4a93bee896cec3a661bf2072e893e24))
+
+## [0.11.0](https://github.com/eslint/rewrite/compare/core-v0.10.0...core-v0.11.0) (2025-01-31)
+
+
+### Features
+
+* Update RuleDefinition for frozen and deprecations ([#149](https://github.com/eslint/rewrite/issues/149)) ([4964322](https://github.com/eslint/rewrite/commit/49643228d230f2d0edce6d2a310ccf3131b72d89))
+* Update RuleDefinition with `meta.defaultOptions` ([#150](https://github.com/eslint/rewrite/issues/150)) ([e9a987e](https://github.com/eslint/rewrite/commit/e9a987e8d92a6383e9782332e515aa2a719a18af))
+
+
+### Bug Fixes
+
+* Make meta.replacedBy read only ([#146](https://github.com/eslint/rewrite/issues/146)) ([7dfc0d9](https://github.com/eslint/rewrite/commit/7dfc0d92e617108c0e9493f09db3f86919e02fd1))
+
+## [0.10.0](https://github.com/eslint/rewrite/compare/core-v0.9.1...core-v0.10.0) (2025-01-09)
+
+
+### Features
+
+* Check messageIds in context.report() ([#140](https://github.com/eslint/rewrite/issues/140)) ([1c9ca4d](https://github.com/eslint/rewrite/commit/1c9ca4d0a4726218948a92ebc2e8be7a13d224d4))
+
+
+### Bug Fixes
+
+* make `plugin-kit` types usable in CommonJS ([#143](https://github.com/eslint/rewrite/issues/143)) ([f77ba17](https://github.com/eslint/rewrite/commit/f77ba177d4e4c5d2ed828cfd9a5149df2ccb3a7f))
+* Update RuleDefinition type ([#138](https://github.com/eslint/rewrite/issues/138)) ([0a0ea6f](https://github.com/eslint/rewrite/commit/0a0ea6fbac827b354ee18f5b10eefad2bc0794f7))
+
+## [0.9.1](https://github.com/eslint/rewrite/compare/core-v0.9.0...core-v0.9.1) (2024-12-04)
+
+
+### Bug Fixes
+
+* Update RuleVisitor type ([#135](https://github.com/eslint/rewrite/issues/135)) ([156d601](https://github.com/eslint/rewrite/commit/156d601181deb362a2864c4d47d4e3da8609500b))
+
 ## [0.9.0](https://github.com/eslint/rewrite/compare/core-v0.8.0...core-v0.9.0) (2024-11-14)
 
 

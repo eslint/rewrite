@@ -1,0 +1,43 @@
+{
+  "name": "@eslint/mcp",
+  "version": "0.1.1",
+  "description": "MCP server for ESLint",
+  "type": "module",
+  "bin": "./src/mcp-cli.js",
+  "files": [
+    "src"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "mocha tests/*.js",
+    "test:coverage": "c8 npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eslint/rewrite.git",
+    "directory": "packages/mcp"
+  },
+  "keywords": [
+    "eslint",
+    "mcp"
+  ],
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/eslint/rewrite/issues"
+  },
+  "homepage": "https://github.com/eslint/rewrite/tree/main/packages/mcp#readme",
+  "engines": {
+    "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.11.0",
+    "eslint": "^9.26.0",
+    "zod": "^3.24.4"
+  }
+}

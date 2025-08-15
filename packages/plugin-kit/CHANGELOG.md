@@ -1,5 +1,113 @@
 # Changelog
 
+## [0.3.5](https://github.com/eslint/rewrite/compare/plugin-kit-v0.3.4...plugin-kit-v0.3.5) (2025-08-05)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^0.15.1 to ^0.15.2
+
+## [0.3.4](https://github.com/eslint/rewrite/compare/plugin-kit-v0.3.3...plugin-kit-v0.3.4) (2025-07-21)
+
+
+### Bug Fixes
+
+* potential quadratic runtime in regular expression ([#240](https://github.com/eslint/rewrite/issues/240)) ([b283f64](https://github.com/eslint/rewrite/commit/b283f64099ad6c6b5043387c091691d21b387805))
+
+## [0.3.3](https://github.com/eslint/rewrite/compare/plugin-kit-v0.3.2...plugin-kit-v0.3.3) (2025-06-25)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^0.15.0 to ^0.15.1
+
+## [0.3.2](https://github.com/eslint/rewrite/compare/plugin-kit-v0.3.1...plugin-kit-v0.3.2) (2025-06-09)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^0.14.0 to ^0.15.0
+
+## [0.3.1](https://github.com/eslint/rewrite/compare/plugin-kit-v0.3.0...plugin-kit-v0.3.1) (2025-05-01)
+
+
+### Bug Fixes
+
+* Upgrade @eslint/core ([#197](https://github.com/eslint/rewrite/issues/197)) ([a830283](https://github.com/eslint/rewrite/commit/a830283cd05a7a471aeec5f4589491f3c4092986))
+
+## [0.3.0](https://github.com/eslint/rewrite/compare/plugin-kit-v0.2.8...plugin-kit-v0.3.0) (2025-04-30)
+
+
+### Features
+
+* make `TextSourceCodeBase` a generic type ([#182](https://github.com/eslint/rewrite/issues/182)) ([484b6ca](https://github.com/eslint/rewrite/commit/484b6ca3149354736317fca09efd3156caa4f4f9))
+
+## [0.2.8](https://github.com/eslint/rewrite/compare/plugin-kit-v0.2.7...plugin-kit-v0.2.8) (2025-04-01)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^0.12.0 to ^0.13.0
+
+## [0.2.7](https://github.com/eslint/rewrite/compare/plugin-kit-v0.2.6...plugin-kit-v0.2.7) (2025-02-21)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^0.11.0 to ^0.12.0
+
+## [0.2.6](https://github.com/eslint/rewrite/compare/plugin-kit-v0.2.5...plugin-kit-v0.2.6) (2025-01-31)
+
+
+### Bug Fixes
+
+* CommonJS types in all packages ([#148](https://github.com/eslint/rewrite/issues/148)) ([c91866c](https://github.com/eslint/rewrite/commit/c91866cc9fe16fb62bc48fc1cc7f9e18c6fea013))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^0.10.0 to ^0.11.0
+
+## [0.2.5](https://github.com/eslint/rewrite/compare/plugin-kit-v0.2.4...plugin-kit-v0.2.5) (2025-01-09)
+
+
+### Bug Fixes
+
+* make `plugin-kit` types usable in CommonJS ([#143](https://github.com/eslint/rewrite/issues/143)) ([f77ba17](https://github.com/eslint/rewrite/commit/f77ba177d4e4c5d2ed828cfd9a5149df2ccb3a7f))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^0.9.1 to ^0.10.0
+
+## [0.2.4](https://github.com/eslint/rewrite/compare/plugin-kit-v0.2.3...plugin-kit-v0.2.4) (2024-12-04)
+
+
+### Bug Fixes
+
+* Update RuleVisitor type ([#135](https://github.com/eslint/rewrite/issues/135)) ([156d601](https://github.com/eslint/rewrite/commit/156d601181deb362a2864c4d47d4e3da8609500b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @eslint/core bumped from ^0.9.0 to ^0.9.1
+
 ## [0.2.3](https://github.com/eslint/rewrite/compare/plugin-kit-v0.2.2...plugin-kit-v0.2.3) (2024-11-14)
 
 

@@ -25,4 +25,4 @@ When the new core is ready, we will need to be careful about the migration plan 
 
 ## See Also
 
--   <https://github.com/eslint/eslint/discussions/16557>
+- <https://github.com/eslint/eslint/discussions/16557>
