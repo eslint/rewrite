@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.3.1](https://github.com/eslint/rewrite/compare/config-helpers-v0.3.0...config-helpers-v0.3.1) (2025-08-05)
+
+
+### Bug Fixes
+
+* relax type for rule.meta.docs.recommended ([#235](https://github.com/eslint/rewrite/issues/235)) ([9a4fe34](https://github.com/eslint/rewrite/commit/9a4fe343c309b7a000ffb5cd420b557809e4d58e))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @eslint/core bumped from ^0.15.1 to ^0.15.2
+
 ## [0.3.0](https://github.com/eslint/rewrite/compare/config-helpers-v0.2.3...config-helpers-v0.3.0) (2025-06-25)
 
 
