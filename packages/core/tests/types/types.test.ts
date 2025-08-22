@@ -430,9 +430,9 @@ export const shouldAllowRecommendedString: RulesMetaDocs = {
 export const shouldAllowRecommendedObject: RulesMetaDocs = {
 	recommended: {
 		someKey: "some value",
-	}
+	},
 };
-	
+
 //------------------------------------------------------------------------------
 // Tests for config object types
 //------------------------------------------------------------------------------
