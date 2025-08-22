@@ -869,6 +869,7 @@ export interface GlobalsConfig {
 
 /**
  * The ECMAScript version of the code being linted.
+ * @deprecated Only supported in legacy eslintrc config format.
  */
 export type EcmaVersion =
 	| 3
@@ -901,6 +902,7 @@ export type EcmaVersion =
 
 /**
  * The type of JavaScript source code.
+ * @deprecated Only supported in legacy eslintrc config format.
  */
 type JavaScriptSourceType = "script" | "module" | "commonjs";
 
