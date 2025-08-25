@@ -13,7 +13,7 @@ jobs:
         name: Verify Files
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v5
 
             - uses: actions/setup-node@v4
               with:
@@ -39,7 +39,7 @@ jobs:
                 node-version: [18.x, 20.x, 22.x, 24.x]
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v5
 
             - name: Set up Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v4
@@ -58,7 +58,7 @@ jobs:
         name: Test Types
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v5
 
             - name: Setup Node.js
               uses: actions/setup-node@v4
@@ -89,7 +89,7 @@ jobs:
         name: Verify JSR Publish
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v5
 
             - uses: actions/setup-node@v4
               with:
