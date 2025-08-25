@@ -547,7 +547,6 @@ export type SuggestedEdit = SuggestedEditBase & SuggestionMessage;
  */
 interface LintSuggestion {
 	/** A short description. */
-
 	desc: string;
 
 	/** Fix result info. */
