@@ -783,7 +783,7 @@ export interface SettingsConfig {
  */
 export interface ConfigObject<Rules extends RulesConfig = RulesConfig> {
 	/**
-	 * An string to identify the configuration object. Used in error messages and
+	 * A string to identify the configuration object. Used in error messages and
 	 * inspection tools.
 	 */
 	name?: string;
