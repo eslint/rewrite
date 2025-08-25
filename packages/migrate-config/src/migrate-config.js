@@ -144,7 +144,7 @@ const { naming } = Legacy;
  * @returns {boolean} `true` if the name is a valid identifier.
  */
 function isValidIdentifier(name) {
-	return /^[a-z_$][0-9a-z_$]*$/iu.test(name);
+	return /^[a-z_$][\w$]*$/iu.test(name);
 }
 
 /**
