@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/eslint/rewrite/compare/plugin-kit-v0.3.5...plugin-kit-v0.4.0) (2025-08-25)
+
+
+### Features
+
+* add support for `getLocFromIndex` and `getIndexFromLoc` ([#212](https://github.com/eslint/rewrite/issues/212)) ([a3588d8](https://github.com/eslint/rewrite/commit/a3588d8fb2dc6b9a0b39b26a49d0cdd437646d49))
+
 ## [0.3.5](https://github.com/eslint/rewrite/compare/plugin-kit-v0.3.4...plugin-kit-v0.3.5) (2025-08-05)
 
 
