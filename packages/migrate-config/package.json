@@ -39,7 +39,7 @@
   },
   "homepage": "https://github.com/eslint/rewrite/tree/main/packages/migrate-config#readme",
   "devDependencies": {
-    "@types/eslint": "^9.6.0",
+    "@eslint/core": "^0.15.2",
     "eslint": "^9.27.0"
   },
   "engines": {
