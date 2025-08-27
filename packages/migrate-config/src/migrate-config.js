@@ -19,9 +19,9 @@ import * as espree from "espree";
 // Types
 //-----------------------------------------------------------------------------
 
-/** @typedef {import("eslint").Linter.FlatConfig} FlatConfig */
-/** @typedef {import("eslint").Linter.LegacyConfig} LegacyConfig  */
-/** @typedef {import("eslint").Linter.ConfigOverride} ConfigOverride  */
+/** @typedef {import("@eslint/core").ConfigObject} FlatConfig */
+/** @typedef {import("@eslint/core").LegacyConfigObject} LegacyConfig  */
+/** @typedef {import("@eslint/core").ConfigOverride} ConfigOverride  */
 /** @typedef {import("recast").types.namedTypes.ObjectExpression} ObjectExpression */
 /** @typedef {import("recast").types.namedTypes.ArrayExpression} ArrayExpression */
 /** @typedef {import("recast").types.namedTypes.CallExpression} CallExpression */

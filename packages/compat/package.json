@@ -48,8 +48,10 @@
     "url": "https://github.com/eslint/rewrite/issues"
   },
   "homepage": "https://github.com/eslint/rewrite/tree/main/packages/compat#readme",
+  "dependencies": {
+    "@eslint/core": "^0.15.2"
+  },
   "devDependencies": {
-    "@eslint/core": "^0.15.2",
     "eslint": "^9.27.0"
   },
   "peerDependencies": {
