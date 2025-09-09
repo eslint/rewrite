@@ -485,12 +485,6 @@ type RuleFixer = (
 
 interface ViolationReportBase {
 	/**
-	 * The type of node that the violation is for.
-	 * @deprecated May be removed in the future.
-	 */
-	nodeType?: string | undefined;
-
-	/**
 	 * The data to insert into the message.
 	 */
 	data?: Record<string, string> | undefined;
@@ -580,12 +574,6 @@ export interface LintMessage {
 
 	/** The ID of the message in the rule's meta. */
 	messageId?: string | undefined;
-
-	/**
-	 * Type of node.
-	 * @deprecated `nodeType` is deprecated and will be removed in the next major version.
-	 */
-	nodeType?: string | undefined;
 
 	/** If `true` then this is a fatal error. */
 	fatal?: true | undefined;
