@@ -145,6 +145,7 @@ describe("MCP Server", () => {
 										"Parsing error: Unexpected token }",
 									line: 1,
 									column: 3,
+									nodeType: null,
 								},
 							],
 							suppressedMessages: [],
