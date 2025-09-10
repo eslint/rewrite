@@ -16,7 +16,7 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "mocha tests/*.js",
+    "test": "mocha \"tests/**/*.test.js\"",
     "test:coverage": "c8 npm test"
   },
   "repository": {
