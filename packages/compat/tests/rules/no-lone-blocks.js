@@ -119,7 +119,6 @@ ruleTester.run("no-lone-blocks", fixedUpRule, {
 			errors: [
 				{
 					messageId: "redundantBlock",
-					type: "BlockStatement",
 				},
 			],
 		},
@@ -128,7 +127,6 @@ ruleTester.run("no-lone-blocks", fixedUpRule, {
 			errors: [
 				{
 					messageId: "redundantBlock",
-					type: "BlockStatement",
 				},
 			],
 		},
@@ -137,7 +135,6 @@ ruleTester.run("no-lone-blocks", fixedUpRule, {
 			errors: [
 				{
 					messageId: "redundantBlock",
-					type: "BlockStatement",
 				},
 			],
 		},
@@ -146,7 +143,6 @@ ruleTester.run("no-lone-blocks", fixedUpRule, {
 			errors: [
 				{
 					messageId: "redundantNestedBlock",
-					type: "BlockStatement",
 				},
 			],
 		},
@@ -155,12 +151,10 @@ ruleTester.run("no-lone-blocks", fixedUpRule, {
 			errors: [
 				{
 					messageId: "redundantBlock",
-					type: "BlockStatement",
 					line: 1,
 				},
 				{
 					messageId: "redundantNestedBlock",
-					type: "BlockStatement",
 					line: 2,
 				},
 			],
@@ -170,7 +164,6 @@ ruleTester.run("no-lone-blocks", fixedUpRule, {
 			errors: [
 				{
 					messageId: "redundantNestedBlock",
-					type: "BlockStatement",
 				},
 			],
 		},
@@ -179,7 +172,6 @@ ruleTester.run("no-lone-blocks", fixedUpRule, {
 			errors: [
 				{
 					messageId: "redundantNestedBlock",
-					type: "BlockStatement",
 				},
 			],
 		},
@@ -191,7 +183,6 @@ ruleTester.run("no-lone-blocks", fixedUpRule, {
 			errors: [
 				{
 					messageId: "redundantBlock",
-					type: "BlockStatement",
 				},
 			],
 		},
@@ -201,7 +192,6 @@ ruleTester.run("no-lone-blocks", fixedUpRule, {
 			errors: [
 				{
 					messageId: "redundantBlock",
-					type: "BlockStatement",
 				},
 			],
 		},
@@ -212,7 +202,6 @@ ruleTester.run("no-lone-blocks", fixedUpRule, {
 			errors: [
 				{
 					messageId: "redundantNestedBlock",
-					type: "BlockStatement",
 					line: 2,
 				},
 			],
@@ -223,7 +212,6 @@ ruleTester.run("no-lone-blocks", fixedUpRule, {
 			errors: [
 				{
 					messageId: "redundantBlock",
-					type: "BlockStatement",
 					line: 1,
 				},
 			],
@@ -234,17 +222,14 @@ ruleTester.run("no-lone-blocks", fixedUpRule, {
 			errors: [
 				{
 					messageId: "redundantBlock",
-					type: "BlockStatement",
 					line: 1,
 				},
 				{
 					messageId: "redundantNestedBlock",
-					type: "BlockStatement",
 					line: 2,
 				},
 				{
 					messageId: "redundantBlock",
-					type: "BlockStatement",
 					line: 4,
 				},
 			],
@@ -262,7 +247,6 @@ ruleTester.run("no-lone-blocks", fixedUpRule, {
 			errors: [
 				{
 					messageId: "redundantBlock",
-					type: "BlockStatement",
 					line: 5,
 				},
 			],
@@ -280,7 +264,6 @@ ruleTester.run("no-lone-blocks", fixedUpRule, {
 			errors: [
 				{
 					messageId: "redundantBlock",
-					type: "BlockStatement",
 					line: 4,
 				},
 			],
@@ -297,7 +280,6 @@ ruleTester.run("no-lone-blocks", fixedUpRule, {
 			errors: [
 				{
 					messageId: "redundantNestedBlock",
-					type: "BlockStatement",
 					line: 3,
 				},
 			],
@@ -313,7 +295,6 @@ ruleTester.run("no-lone-blocks", fixedUpRule, {
 			errors: [
 				{
 					messageId: "redundantNestedBlock",
-					type: "BlockStatement",
 					line: 3,
 				},
 			],
@@ -334,7 +315,6 @@ ruleTester.run("no-lone-blocks", fixedUpRule, {
 			errors: [
 				{
 					messageId: "redundantNestedBlock",
-					type: "BlockStatement",
 					line: 5,
 				},
 			],
@@ -356,7 +336,6 @@ ruleTester.run("no-lone-blocks", fixedUpRule, {
 			errors: [
 				{
 					messageId: "redundantNestedBlock",
-					type: "BlockStatement",
 					line: 5,
 				},
 			],
@@ -375,7 +354,6 @@ ruleTester.run("no-lone-blocks", fixedUpRule, {
 			errors: [
 				{
 					messageId: "redundantNestedBlock",
-					type: "BlockStatement",
 					line: 4,
 				},
 			],
@@ -394,7 +372,6 @@ ruleTester.run("no-lone-blocks", fixedUpRule, {
 			errors: [
 				{
 					messageId: "redundantNestedBlock",
-					type: "BlockStatement",
 					line: 4,
 				},
 			],
@@ -413,7 +390,6 @@ ruleTester.run("no-lone-blocks", fixedUpRule, {
 			errors: [
 				{
 					messageId: "redundantNestedBlock",
-					type: "BlockStatement",
 					line: 4,
 				},
 			],
@@ -432,7 +408,6 @@ ruleTester.run("no-lone-blocks", fixedUpRule, {
 			errors: [
 				{
 					messageId: "redundantNestedBlock",
-					type: "BlockStatement",
 					line: 4,
 				},
 			],
@@ -451,7 +426,6 @@ ruleTester.run("no-lone-blocks", fixedUpRule, {
 			errors: [
 				{
 					messageId: "redundantNestedBlock",
-					type: "BlockStatement",
 					line: 4,
 				},
 			],
@@ -471,7 +445,6 @@ ruleTester.run("no-lone-blocks", fixedUpRule, {
 			errors: [
 				{
 					messageId: "redundantNestedBlock",
-					type: "BlockStatement",
 					line: 4,
 				},
 			],
@@ -491,7 +464,6 @@ ruleTester.run("no-lone-blocks", fixedUpRule, {
 			errors: [
 				{
 					messageId: "redundantNestedBlock",
-					type: "BlockStatement",
 					line: 5,
 				},
 			],
@@ -511,7 +483,6 @@ ruleTester.run("no-lone-blocks", fixedUpRule, {
 			errors: [
 				{
 					messageId: "redundantNestedBlock",
-					type: "BlockStatement",
 					line: 4,
 				},
 			],
@@ -531,7 +502,6 @@ ruleTester.run("no-lone-blocks", fixedUpRule, {
 			errors: [
 				{
 					messageId: "redundantNestedBlock",
-					type: "BlockStatement",
 					line: 5,
 				},
 			],
