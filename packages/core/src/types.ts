@@ -485,12 +485,6 @@ type RuleFixer = (
 
 interface ViolationReportBase {
 	/**
-	 * The type of node that the violation is for.
-	 * @deprecated May be removed in the future.
-	 */
-	nodeType?: string | undefined;
-
-	/**
 	 * The data to insert into the message.
 	 */
 	data?: Record<string, string> | undefined;
