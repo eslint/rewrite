@@ -15,7 +15,7 @@ yarn add @eslint/<%= name %>
 # or
 pnpm install @eslint/<%= name %>
 # or
-bun install @eslint/<%= name %>
+bun add @eslint/<%= name %>
 ```
 
 For Deno:

@@ -75,10 +75,11 @@ If you are using a plugin in your `eslint.config.js` that is not yet compatible 
 
 ```js
 // eslint.config.js - ESM example
+import { defineConfig } from "eslint/config";
 import { fixupPluginRules } from "@eslint/compat";
 import somePlugin from "eslint-plugin-some-plugin";
 
-export default [
+export default defineConfig([
 	{
 		plugins: {
 			// insert the fixed plugin instead of the original
@@ -88,17 +89,18 @@ export default [
 			"somePlugin/rule-name": "error",
 		},
 	},
-];
+]);
 ```
 
 Or in CommonJS:
 
 ```js
 // eslint.config.js - CommonJS example
+const { defineConfig } = require("eslint/config");
 const { fixupPluginRules } = require("@eslint/compat");
 const somePlugin = require("eslint-plugin-some-plugin");
 
-module.exports = [
+module.exports = defineConfig([
 	{
 		plugins: {
 			// insert the fixed plugin instead of the original
@@ -108,7 +110,7 @@ module.exports = [
 			"somePlugin/rule-name": "error",
 		},
 	},
-];
+]);
 ```
 
 ### Fixing Configs
@@ -117,30 +119,32 @@ If you are importing other configs into your `eslint.config.js` that use plugins
 
 ```js
 // eslint.config.js - ESM example
+import { defineConfig } from "eslint/config";
 import { fixupConfigRules } from "@eslint/compat";
 import someConfig from "eslint-config-some-config";
 
-export default [
+export default defineConfig([
 	...fixupConfigRules(someConfig),
 	{
 		// your overrides
 	},
-];
+]);
 ```
 
 Or in CommonJS:
 
 ```js
 // eslint.config.js - CommonJS example
+const { defineConfig } = require("eslint/config");
 const { fixupConfigRules } = require("@eslint/compat");
 const someConfig = require("eslint-config-some-config");
 
-module.exports = [
+module.exports = defineConfig([
 	...fixupConfigRules(someConfig),
 	{
 		// your overrides
 	},
-];
+]);
 ```
 
 ### Including Ignore Files
@@ -151,6 +155,7 @@ The `includeIgnoreFile()` function also accepts a second optional `name` paramet
 
 ```js
 // eslint.config.js - ESM example
+import { defineConfig } from "eslint/config";
 import { includeIgnoreFile } from "@eslint/compat";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -159,28 +164,29 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const gitignorePath = path.resolve(__dirname, ".gitignore");
 
-export default [
+export default defineConfig([
 	includeIgnoreFile(gitignorePath, "Imported .gitignore patterns"), // second argument is optional.
 	{
 		// your overrides
 	},
-];
+]);
 ```
 
 Or in CommonJS:
 
 ```js
 // eslint.config.js - CommonJS example
+const { defineConfig } = require("eslint/config");
 const { includeIgnoreFile } = require("@eslint/compat");
 const path = require("node:path");
 const gitignorePath = path.resolve(__dirname, ".gitignore");
 
-module.exports = [
+module.exports = defineConfig([
 	includeIgnoreFile(gitignorePath, "Imported .gitignore patterns"), // second argument is optional.
 	{
 		// your overrides
 	},
-];
+]);
 ```
 
 **Limitation:** This works without modification when the ignore file is in the same directory as your config file. If the ignore file is in a different directory, you may need to modify the patterns manually.
