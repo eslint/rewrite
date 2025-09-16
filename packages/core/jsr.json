@@ -1,6 +1,6 @@
 {
   "name": "@eslint/core",
-  "version": "0.15.2",
+  "version": "0.16.0",
   "exports": "./dist/esm/types.d.ts",
   "publish": {
     "include": [

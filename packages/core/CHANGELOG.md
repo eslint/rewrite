@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.16.0](https://github.com/eslint/rewrite/compare/core-v0.15.2...core-v0.16.0) (2025-09-16)
+
+
+### Features
+
+* Add config types in @eslint/core ([#237](https://github.com/eslint/rewrite/issues/237)) ([7b6dd37](https://github.com/eslint/rewrite/commit/7b6dd370a598ea7fc94fba427a2579342b50b90f))
+
+
+### Bug Fixes
+
+* remove unsupported `nodeType` from types ([#268](https://github.com/eslint/rewrite/issues/268)) ([d800559](https://github.com/eslint/rewrite/commit/d8005593158f55ba32f5279f3385db95ab87075a))
+
 ## [0.15.2](https://github.com/eslint/rewrite/compare/core-v0.15.1...core-v0.15.2) (2025-08-05)
 
 
