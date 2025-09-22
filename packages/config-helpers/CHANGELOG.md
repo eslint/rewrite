@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.4.0](https://github.com/eslint/rewrite/compare/config-helpers-v0.3.1...config-helpers-v0.4.0) (2025-09-16)
+
+
+### Features
+
+* Add config types in @eslint/core ([#237](https://github.com/eslint/rewrite/issues/237)) ([7b6dd37](https://github.com/eslint/rewrite/commit/7b6dd370a598ea7fc94fba427a2579342b50b90f))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^0.15.2 to ^0.16.0
+
 ## [0.3.1](https://github.com/eslint/rewrite/compare/config-helpers-v0.3.0...config-helpers-v0.3.1) (2025-08-05)
 
 
