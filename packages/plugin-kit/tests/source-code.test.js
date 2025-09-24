@@ -1752,7 +1752,7 @@ describe("source-code", () => {
 			});
 
 			it("should handle empty text", () => {
-				assert.deepStrictEqual(
+				assert.strictEqual(
 					new TextSourceCodeBase({
 						ast: {
 							loc: {
@@ -1770,7 +1770,7 @@ describe("source-code", () => {
 					}).getIndexFromLoc({ line: 1, column: 0 }),
 					0,
 				);
-				assert.deepStrictEqual(
+				assert.strictEqual(
 					new TextSourceCodeBase({
 						ast: {
 							loc: {
@@ -1788,7 +1788,7 @@ describe("source-code", () => {
 					}).getIndexFromLoc({ line: 0, column: 1 }),
 					0,
 				);
-				assert.deepStrictEqual(
+				assert.strictEqual(
 					new TextSourceCodeBase({
 						ast: {
 							loc: {
@@ -1806,7 +1806,7 @@ describe("source-code", () => {
 					}).getIndexFromLoc({ line: 0, column: 0 }),
 					0,
 				);
-				assert.deepStrictEqual(
+				assert.strictEqual(
 					new TextSourceCodeBase({
 						ast: {
 							loc: {
