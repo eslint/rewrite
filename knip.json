@@ -30,8 +30,8 @@
       "project": ["src/**/*.{js,ts}", "tests/**/*.{js,ts}"]
     },
     "packages/plugin-kit": {
-      "entry": ["tests/**/*.{js,ts}"],
-      "project": ["src/**/*.{js,ts}", "tests/**/*.{js,ts}"]
+      "entry": ["tests/**/*.{js,ts,cts}"],
+      "project": ["src/**/*.{js,ts}", "tests/**/*.{js,ts,cts}"]
     }
   }
 }
