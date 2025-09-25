@@ -165,7 +165,6 @@ ruleTester.run("no-loop-func", fixedUpRule, {
 				{
 					messageId: "unsafeRefs",
 					data: { varNames: "'i'" },
-					type: "FunctionExpression",
 				},
 			],
 		},
@@ -175,7 +174,6 @@ ruleTester.run("no-loop-func", fixedUpRule, {
 				{
 					messageId: "unsafeRefs",
 					data: { varNames: "'i', 'j'" },
-					type: "FunctionExpression",
 				},
 			],
 		},
@@ -185,7 +183,6 @@ ruleTester.run("no-loop-func", fixedUpRule, {
 				{
 					messageId: "unsafeRefs",
 					data: { varNames: "'i'" },
-					type: "FunctionExpression",
 				},
 			],
 		},
@@ -196,7 +193,6 @@ ruleTester.run("no-loop-func", fixedUpRule, {
 				{
 					messageId: "unsafeRefs",
 					data: { varNames: "'i'" },
-					type: "FunctionExpression",
 				},
 			],
 		},
@@ -207,7 +203,6 @@ ruleTester.run("no-loop-func", fixedUpRule, {
 				{
 					messageId: "unsafeRefs",
 					data: { varNames: "'i'" },
-					type: "ArrowFunctionExpression",
 				},
 			],
 		},
@@ -217,7 +212,6 @@ ruleTester.run("no-loop-func", fixedUpRule, {
 				{
 					messageId: "unsafeRefs",
 					data: { varNames: "'i'" },
-					type: "FunctionExpression",
 				},
 			],
 		},
@@ -227,7 +221,6 @@ ruleTester.run("no-loop-func", fixedUpRule, {
 				{
 					messageId: "unsafeRefs",
 					data: { varNames: "'i'" },
-					type: "FunctionDeclaration",
 				},
 			],
 		},
@@ -237,7 +230,6 @@ ruleTester.run("no-loop-func", fixedUpRule, {
 				{
 					messageId: "unsafeRefs",
 					data: { varNames: "'i'" },
-					type: "FunctionExpression",
 				},
 			],
 		},
@@ -247,7 +239,6 @@ ruleTester.run("no-loop-func", fixedUpRule, {
 				{
 					messageId: "unsafeRefs",
 					data: { varNames: "'i'" },
-					type: "FunctionExpression",
 				},
 			],
 		},
@@ -260,7 +251,6 @@ ruleTester.run("no-loop-func", fixedUpRule, {
 				{
 					messageId: "unsafeRefs",
 					data: { varNames: "'a'" },
-					type: "FunctionExpression",
 				},
 			],
 		},
@@ -271,7 +261,6 @@ ruleTester.run("no-loop-func", fixedUpRule, {
 				{
 					messageId: "unsafeRefs",
 					data: { varNames: "'a'" },
-					type: "FunctionExpression",
 				},
 			],
 		},
@@ -282,7 +271,6 @@ ruleTester.run("no-loop-func", fixedUpRule, {
 				{
 					messageId: "unsafeRefs",
 					data: { varNames: "'a'" },
-					type: "FunctionExpression",
 				},
 			],
 		},
@@ -293,7 +281,6 @@ ruleTester.run("no-loop-func", fixedUpRule, {
 				{
 					messageId: "unsafeRefs",
 					data: { varNames: "'a'" },
-					type: "FunctionExpression",
 				},
 			],
 		},
@@ -304,7 +291,6 @@ ruleTester.run("no-loop-func", fixedUpRule, {
 				{
 					messageId: "unsafeRefs",
 					data: { varNames: "'a'" },
-					type: "FunctionDeclaration",
 				},
 			],
 		},
@@ -315,7 +301,6 @@ ruleTester.run("no-loop-func", fixedUpRule, {
 				{
 					messageId: "unsafeRefs",
 					data: { varNames: "'a'" },
-					type: "ArrowFunctionExpression",
 				},
 			],
 		},
@@ -326,7 +311,6 @@ ruleTester.run("no-loop-func", fixedUpRule, {
 				{
 					messageId: "unsafeRefs",
 					data: { varNames: "'i'" },
-					type: "ArrowFunctionExpression",
 				},
 			],
 		},
@@ -337,7 +321,6 @@ ruleTester.run("no-loop-func", fixedUpRule, {
 				{
 					messageId: "unsafeRefs",
 					data: { varNames: "'a'" },
-					type: "FunctionExpression",
 				},
 			],
 		},
@@ -348,7 +331,6 @@ ruleTester.run("no-loop-func", fixedUpRule, {
 				{
 					messageId: "unsafeRefs",
 					data: { varNames: "'x'" },
-					type: "FunctionExpression",
 				},
 			],
 		},
@@ -359,7 +341,6 @@ ruleTester.run("no-loop-func", fixedUpRule, {
 				{
 					messageId: "unsafeRefs",
 					data: { varNames: "'x'" },
-					type: "FunctionExpression",
 				},
 			],
 		},
@@ -370,7 +351,6 @@ ruleTester.run("no-loop-func", fixedUpRule, {
 				{
 					messageId: "unsafeRefs",
 					data: { varNames: "'a'" },
-					type: "FunctionExpression",
 				},
 			],
 		},
@@ -381,7 +361,6 @@ ruleTester.run("no-loop-func", fixedUpRule, {
 				{
 					messageId: "unsafeRefs",
 					data: { varNames: "'a'" },
-					type: "FunctionExpression",
 				},
 			],
 		},
@@ -392,7 +371,6 @@ ruleTester.run("no-loop-func", fixedUpRule, {
 				{
 					messageId: "unsafeRefs",
 					data: { varNames: "'a'" },
-					type: "FunctionExpression",
 				},
 			],
 		},
@@ -403,7 +381,6 @@ ruleTester.run("no-loop-func", fixedUpRule, {
 				{
 					messageId: "unsafeRefs",
 					data: { varNames: "'a'" },
-					type: "FunctionExpression",
 				},
 			],
 		},

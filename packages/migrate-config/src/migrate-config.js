@@ -19,9 +19,9 @@ import * as espree from "espree";
 // Types
 //-----------------------------------------------------------------------------
 
-/** @typedef {import("eslint").Linter.FlatConfig} FlatConfig */
-/** @typedef {import("eslint").Linter.LegacyConfig} LegacyConfig  */
-/** @typedef {import("eslint").Linter.ConfigOverride} ConfigOverride  */
+/** @typedef {import("@eslint/core").ConfigObject} FlatConfig */
+/** @typedef {import("@eslint/core").LegacyConfigObject} LegacyConfig  */
+/** @typedef {import("@eslint/core").ConfigOverride} ConfigOverride  */
 /** @typedef {import("recast").types.namedTypes.ObjectExpression} ObjectExpression */
 /** @typedef {import("recast").types.namedTypes.ArrayExpression} ArrayExpression */
 /** @typedef {import("recast").types.namedTypes.CallExpression} CallExpression */
@@ -144,7 +144,7 @@ const { naming } = Legacy;
  * @returns {boolean} `true` if the name is a valid identifier.
  */
 function isValidIdentifier(name) {
-	return /^[a-z_$][0-9a-z_$]*$/iu.test(name);
+	return /^[a-z_$][\w$]*$/iu.test(name);
 }
 
 /**

@@ -14,7 +14,7 @@ import path from "node:path";
 // Types
 //-----------------------------------------------------------------------------
 
-/** @typedef {import("eslint").Linter.Config} FlatConfig */
+/** @typedef {import("@eslint/core").ConfigObject} FlatConfig */
 
 //-----------------------------------------------------------------------------
 // Exports
@@ -56,6 +56,7 @@ export function convertIgnorePatternToMinimatch(pattern) {
 	 */
 	const escapedPatternWithoutLeadingSlash =
 		patternWithoutLeadingSlash.replaceAll(
+			// eslint-disable-next-line regexp/no-empty-lookarounds-assertion -- False positive
 			/(?=((?:\\.|[^{(])*))\1([{(])/guy,
 			"$1\\$2",
 		);

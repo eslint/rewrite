@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.6.0](https://github.com/eslint/rewrite/compare/migrate-config-v1.5.3...migrate-config-v1.6.0) (2025-09-16)
+
+
+### Features
+
+* Add config types in @eslint/core ([#237](https://github.com/eslint/rewrite/issues/237)) ([7b6dd37](https://github.com/eslint/rewrite/commit/7b6dd370a598ea7fc94fba427a2579342b50b90f))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/compat bumped from ^1.3.2 to ^1.4.0
+  * devDependencies
+    * @eslint/core bumped from ^0.15.2 to ^0.16.0
+
 ## [1.5.3](https://github.com/eslint/rewrite/compare/migrate-config-v1.5.2...migrate-config-v1.5.3) (2025-08-05)
 
 

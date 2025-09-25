@@ -156,7 +156,7 @@ export class ConfigCommentParser {
 		 */
 		const normalizedString = string
 			.replace(/(?<![-a-zA-Z0-9/])([-a-zA-Z0-9/]+):/gu, '"$1":')
-			.replace(/(\]|[0-9])\s+(?=")/u, "$1,");
+			.replace(/([\]0-9])\s+(?=")/u, "$1,");
 
 		try {
 			const items = JSON.parse(`{${normalizedString}}`);

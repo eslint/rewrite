@@ -23,25 +23,21 @@ const fixedUpRule = fixupRule(rule);
 const VARIABLE_ERROR = {
 	messageId: "nonAtomicUpdate",
 	data: { value: "foo" },
-	type: "AssignmentExpression",
 };
 
 const STATIC_PROPERTY_ERROR = {
 	messageId: "nonAtomicObjectUpdate",
 	data: { value: "foo.bar", object: "foo" },
-	type: "AssignmentExpression",
 };
 
 const COMPUTED_PROPERTY_ERROR = {
 	messageId: "nonAtomicObjectUpdate",
 	data: { value: "foo[bar].baz", object: "foo" },
-	type: "AssignmentExpression",
 };
 
 const PRIVATE_PROPERTY_ERROR = {
 	messageId: "nonAtomicObjectUpdate",
 	data: { value: "foo.#bar", object: "foo" },
-	type: "AssignmentExpression",
 };
 
 ruleTester.run("require-atomic-updates", fixedUpRule, {
@@ -374,13 +370,11 @@ ruleTester.run("require-atomic-updates", fixedUpRule, {
 				{
 					messageId: "nonAtomicObjectUpdate",
 					data: { value: "process.exitCode", object: "process" },
-					type: "AssignmentExpression",
 					line: 6,
 				},
 				{
 					messageId: "nonAtomicObjectUpdate",
 					data: { value: "process.exitCode", object: "process" },
-					type: "AssignmentExpression",
 					line: 8,
 				},
 			],

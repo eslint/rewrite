@@ -7,10 +7,10 @@
 // Type Definitions
 //-----------------------------------------------------------------------------
 
-/** @typedef {import("eslint").Linter.Config} Config */
-/** @typedef {import("eslint").Linter.LegacyConfig} LegacyConfig */
-/** @typedef {import("eslint").ESLint.Plugin} Plugin */
-/** @typedef {import("eslint").Linter.RuleEntry} RuleEntry */
+/** @typedef {import("@eslint/core").ConfigObject} Config */
+/** @typedef {import("@eslint/core").LegacyConfigObject} LegacyConfig */
+/** @typedef {import("@eslint/core").Plugin} Plugin */
+/** @typedef {import("@eslint/core").RuleConfig} RuleConfig */
 /** @typedef {import("./types.ts").ExtendsElement} ExtendsElement */
 /** @typedef {import("./types.ts").SimpleExtendsElement} SimpleExtendsElement */
 /** @typedef {import("./types.ts").ConfigWithExtends} ConfigWithExtends */
@@ -153,7 +153,7 @@ function normalizePluginConfig(userNamespace, plugin, config) {
 	if (result.rules) {
 		const ruleIds = Object.keys(result.rules);
 
-		/** @type {Record<string,RuleEntry|undefined>} */
+		/** @type {Record<string,RuleConfig|undefined>} */
 		const newRules = {};
 
 		for (let i = 0; i < ruleIds.length; i++) {

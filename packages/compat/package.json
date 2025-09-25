@@ -1,6 +1,6 @@
 {
   "name": "@eslint/compat",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "description": "Compatibility utilities for ESLint",
   "type": "module",
   "main": "dist/esm/index.js",
@@ -28,7 +28,7 @@
     "build:cts": "node ../../tools/build-cts.js dist/esm/index.d.ts dist/cjs/index.d.cts",
     "build": "rollup -c && tsc -p tsconfig.esm.json && npm run build:cts",
     "test:jsr": "npx -y jsr@latest publish --dry-run",
-    "test": "mocha tests/*.js",
+    "test": "mocha \"tests/**/*.test.js\"",
     "test:coverage": "c8 npm test"
   },
   "repository": {
@@ -48,8 +48,10 @@
     "url": "https://github.com/eslint/rewrite/issues"
   },
   "homepage": "https://github.com/eslint/rewrite/tree/main/packages/compat#readme",
+  "dependencies": {
+    "@eslint/core": "^0.16.0"
+  },
   "devDependencies": {
-    "@eslint/core": "^0.15.2",
     "eslint": "^9.27.0"
   },
   "peerDependencies": {
