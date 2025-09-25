@@ -3,6 +3,6 @@
   "files": ["src/migrate-config-cli.js"],
   "compilerOptions": {
     "outDir": "dist/esm",
-    "types": ["mocha", "@types/eslint"]
+    "types": ["mocha"]
   }
 }
