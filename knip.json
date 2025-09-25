@@ -5,33 +5,33 @@
     ".": { "entry": ["scripts/*.js", "tools/*.js", ".github/workflows/*.yml"] },
     "packages/compat": {
       "ignoreDependencies": ["eslint"],
-      "entry": ["tests/**/*.{js,ts}"],
-      "project": ["src/**/*.{js,ts}", "tests/*.{js,ts}"]
+      "entry": ["tests/**/*.{cts,js,ts}"],
+      "project": ["src/**/*.{cts,js,ts}", "tests/*.{cts,js,ts}"]
     },
     "packages/config-array": {
-      "entry": ["tests/**/*.{js,ts}", "rollup.std__path-config.js"],
-      "project": ["src/**/*.{js,ts}", "tests/**/*.{js,ts}"]
+      "entry": ["tests/**/*.{cts,js,ts}", "rollup.std__path-config.js"],
+      "project": ["src/**/*.{cts,js,ts}", "tests/**/*.{cts,js,ts}"]
     },
     "packages/config-helpers": {
-      "entry": ["tests/**/*.{js,ts,cts}"],
-      "project": ["src/**/*.{js,ts}", "tests/**/*.{js,ts,cts}"]
+      "entry": ["tests/**/*.{cts,cts,js,ts}"],
+      "project": ["src/**/*.{cts,js,ts}", "tests/**/*.{cts,cts,js,ts}"]
     },
-    "packages/core": { "project": ["src/**/*.{js,ts}"] },
+    "packages/core": { "project": ["src/**/*.{cts,js,ts}"] },
     "packages/mcp": {
-      "entry": ["tests/**/*.{js,ts}"],
-      "project": ["src/**/*.{js,ts}", "tests/**/*.{js,ts}"]
+      "entry": ["tests/**/*.{cts,js,ts}"],
+      "project": ["src/**/*.{cts,js,ts}", "tests/**/*.{cts,js,ts}"]
     },
     "packages/migrate-config": {
-      "entry": ["src/migrate-config.js", "tests/**/*.{js,ts}"],
-      "project": ["src/**/*.{js,ts}", "tests/*.{js,ts}"]
+      "entry": ["src/migrate-config.js", "tests/**/*.{cts,js,ts}"],
+      "project": ["src/**/*.{cts,js,ts}", "tests/*.{cts,js,ts}"]
     },
     "packages/object-schema": {
-      "entry": ["tests/**/*.{js,ts}", "src/types.ts"],
-      "project": ["src/**/*.{js,ts}", "tests/**/*.{js,ts}"]
+      "entry": ["tests/**/*.{cts,js,ts}", "src/types.ts"],
+      "project": ["src/**/*.{cts,js,ts}", "tests/**/*.{cts,js,ts}"]
     },
     "packages/plugin-kit": {
-      "entry": ["tests/**/*.{js,ts,cts}"],
-      "project": ["src/**/*.{js,ts}", "tests/**/*.{js,ts,cts}"]
+      "entry": ["tests/**/*.{cts,cts,js,ts}"],
+      "project": ["src/**/*.{cts,js,ts}", "tests/**/*.{cts,cts,js,ts}"]
     }
   }
 }
