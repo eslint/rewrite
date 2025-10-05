@@ -163,7 +163,7 @@ export interface RulesMeta<
 
 	/**
 	 * Any default options to be recursively merged on top of any user-provided options.
-	 **/
+	 */
 	defaultOptions?: RuleOptions;
 
 	/**
