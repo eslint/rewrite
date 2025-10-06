@@ -845,6 +845,37 @@ describe("defineConfig()", () => {
 				]);
 			});
 
+			it("should use flat config when eslintrc does not exist", () => {
+				const testPlugin = {
+					configs: {
+						"flat/recommended": {
+							rules: { "no-console": "error" },
+						},
+					},
+				};
+
+				const config = defineConfig({
+					plugins: {
+						test: testPlugin,
+					},
+					extends: ["test/recommended"],
+					rules: {
+						"no-debugger": "error",
+					},
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "UserConfig[0] > test/recommended",
+						rules: { "no-console": "error" },
+					},
+					{
+						plugins: { test: testPlugin },
+						rules: { "no-debugger": "error" },
+					},
+				]);
+			});
+
 			it("should throw error when both base and flat configs are legacy", () => {
 				const testPlugin = {
 					configs: {
