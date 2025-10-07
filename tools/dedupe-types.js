@@ -25,19 +25,28 @@ const files = process.argv.slice(2);
 files.forEach(filePath => {
 	const lines = fs.readFileSync(filePath, "utf8").split(/\r?\n/gu);
 	const typedefs = new Set();
+	const importSpecs = new Set();
+	const outputLines = [];
 
-	const remainingLines = lines.filter(line => {
-		if (!line.startsWith("/** @typedef {import")) {
-			return true;
+	for (const line of lines) {
+		const match = line.match(
+			/^(?<start>\/\*\*\s*@typedef\s+\{)import\("(?<importSpec>[^)]+)"\)(?<end>.*)/u,
+		);
+		if (!match) {
+			outputLines.push(line);
+		} else if (!typedefs.has(line)) {
+			typedefs.add(line);
+			const { start, importSpec, end } = match.groups;
+			const importName = `_${importSpec.replaceAll(/\W/gu, "")}`;
+			if (!importSpecs.has(importSpec)) {
+				importSpecs.add(importSpec);
+				outputLines.push(
+					`/** @import * as ${importName} from "${importSpec}"; */`,
+				);
+			}
+			outputLines.push(`${start}${importName}${end}`);
 		}
+	}
 
-		if (typedefs.has(line)) {
-			return false;
-		}
-
-		typedefs.add(line);
-		return true;
-	});
-
-	fs.writeFileSync(filePath, remainingLines.join("\n"), "utf8");
+	fs.writeFileSync(filePath, outputLines.join("\n"), "utf8");
 });
