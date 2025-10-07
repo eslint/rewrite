@@ -25,8 +25,8 @@ if (!newFilename) {
 
 const oldSourceText = await readFile(filename, "utf-8");
 const newSourceText = oldSourceText.replaceAll(
-	'import("./types.ts")',
-	'import("./types.cts")',
+	' from "./types.ts";\n',
+	' from "./types.cts";\n',
 );
 
 await writeFile(newFilename, newSourceText);
