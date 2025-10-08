@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "checkJs": true,
-    "composite": true,
+    "declaration": true,
     "module": "nodenext",
     "noEmit": true
   },
