@@ -31,7 +31,7 @@
     "test": "mocha \"tests/**/*.test.js\"",
     "test:coverage": "c8 npm test",
     "test:jsr": "npx jsr@latest publish --dry-run",
-    "test:pnpm": "cd pnpm-test && pnpm install && pnpm exec tsc",
+    "test:pnpm": "cd tests/pnpm && pnpm install && pnpm exec tsc",
     "test:types": "tsc -p tests/types/tsconfig.json"
   },
   "repository": {
