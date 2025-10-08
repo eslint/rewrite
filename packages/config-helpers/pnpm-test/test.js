@@ -1,2 +1,5 @@
-import { defineConfig } from "@eslint/config-helpers";
-export default defineConfig([]);
+import { defineConfig, globalIgnores } from "@eslint/config-helpers";
+
+export const ignoresConfig = globalIgnores([]);
+
+export default defineConfig([ignoresConfig]);
