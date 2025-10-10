@@ -41,6 +41,11 @@ jobs:
                   node-version: lts/*
                   registry-url: "https://registry.npmjs.org"
 
+            # npm 11.5.1 or later is required so update to latest to be sure
+            - name: Update npm
+              run: npm install -g npm@latest
+              if: ${{ steps.release.outputs.releases_created == 'true' }}
+
             - run: |
                   npm install
                   npm run build
@@ -59,7 +64,6 @@ jobs:
               env:
                   STEPS_RELEASE_OUTPUTS: ${{ toJson(steps.release.outputs) }}
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
                   TWITTER_API_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
                   TWITTER_API_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
                   TWITTER_ACCESS_TOKEN_KEY: ${{ secrets.TWITTER_ACCESS_TOKEN_KEY }}
