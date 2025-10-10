@@ -74,6 +74,13 @@ function getExtensionName(extension, indexPath) {
  * @return {config is LegacyConfig} `true` if the config object is a legacy config.
  */
 function isLegacyConfig(config) {
+	// eslintrc's plugins must be an array; while flat config's must be an object.
+	if (config.plugins) {
+		if (Array.isArray(config.plugins)) {
+			return true;
+		}
+	}
+
 	for (const key of eslintrcKeys) {
 		if (key in config) {
 			return true;
