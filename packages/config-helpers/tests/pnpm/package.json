@@ -1,0 +1,7 @@
+{
+  "type": "module",
+  "dependencies": {
+    "@eslint/config-helpers": "file:../..",
+    "typescript": "^5.9.3"
+  }
+}
