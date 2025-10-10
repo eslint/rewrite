@@ -270,7 +270,7 @@ function findPluginConfig(config, pluginConfigName) {
 		}
 	}
 
-	// If it's a legacy config, or the config does not exsist => look for the flat version
+	// If it's a legacy config, or the config does not exist => look for the flat version
 	const flatConfig = plugin.configs?.[`flat/${configName}`];
 	if (
 		flatConfig &&
@@ -285,9 +285,10 @@ function findPluginConfig(config, pluginConfigName) {
 	}
 
 	// If we get here, then the config was either not found or is a legacy config
-	const message = directConfig
-		? `Plugin config "${configName}" in plugin "${userPluginNamespace}" is an eslintrc config and cannot be used in this context.`
-		: `Plugin config "${configName}" not found in plugin "${userPluginNamespace}".`;
+	const message =
+		directConfig || flatConfig
+			? `Plugin config "${configName}" in plugin "${userPluginNamespace}" is an eslintrc config and cannot be used in this context.`
+			: `Plugin config "${configName}" not found in plugin "${userPluginNamespace}".`;
 	throw new TypeError(message);
 }
 
