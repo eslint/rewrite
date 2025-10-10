@@ -791,6 +791,25 @@ describe("defineConfig()", () => {
 				}, /Plugin config "config1" in plugin "test" is an eslintrc config and cannot be used in this context\./u);
 			});
 
+			it("should throw an error when a plugin config is in eslintrc format (`plugins` is an array)", () => {
+				const testPlugin = {
+					configs: {
+						config1: {
+							plugins: [],
+						},
+					},
+				};
+
+				assert.throws(() => {
+					defineConfig({
+						plugins: {
+							test: testPlugin,
+						},
+						extends: ["test/config1"],
+					});
+				}, /Plugin config "config1" in plugin "test" is an eslintrc config and cannot be used in this context\./u);
+			});
+
 			it("should use flat config when base config is legacy", () => {
 				const testPlugin = {
 					configs: {
