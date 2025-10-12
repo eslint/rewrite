@@ -39,5 +39,8 @@
     "@modelcontextprotocol/sdk": "^1.11.0",
     "eslint": "^9.26.0",
     "zod": "^3.24.4"
+  },
+  "devDependencies": {
+    "@types/node": "^24.7.2"
   }
 }
