@@ -1,5 +1,4 @@
 export default {
-	external: ["node:fs", "node:path"],
 	input: "src/index.js",
 	output: [
 		{
