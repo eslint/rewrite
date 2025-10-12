@@ -790,6 +790,22 @@ describe("defineConfig()", () => {
 					});
 				}, /Plugin config "config1" in plugin "test" is an eslintrc config and cannot be used in this context\./u);
 			});
+			it("should throw an error when a plugin config 'flat/recommended' is in eslintrc format", () => {
+				const testPlugin = {
+					configs: {
+						"flat/recommended": { plugins: [] },
+					},
+				};
+
+				assert.throws(() => {
+					defineConfig({
+						plugins: {
+							test: testPlugin,
+						},
+						extends: ["test/recommended"],
+					});
+				}, /Plugin config "recommended" in plugin "test" is an eslintrc config and cannot be used in this context\./u);
+			});
 
 			it("should throw an error when a plugin config is in eslintrc format (`plugins` is an array)", () => {
 				const testPlugin = {
