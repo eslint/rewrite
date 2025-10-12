@@ -75,6 +75,16 @@ jobs:
               run: |
                   npm run test:types
 
+            - name: Test types (object-schema)
+              working-directory: packages/object-schema
+              run: |
+                  npm run test:types
+
+            - name: Test types (config-array)
+              working-directory: packages/config-array
+              run: |
+                  npm run test:types
+
             - name: Test types (config-helpers)
               working-directory: packages/config-helpers
               run: |
