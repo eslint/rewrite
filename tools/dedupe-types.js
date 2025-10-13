@@ -39,7 +39,7 @@ files.forEach(filePath => {
 			// we haven't seen this typedef before, so process it
 			typedefs.add(line);
 			const { start, importSource, end } = match.groups;
-			const importName = `_${importSource.replace(/\W/gu, "")}`;
+			const importName = `$${importSource.replace(/\W/gu, "")}`;
 			if (!importSources.has(importSource)) {
 				// we haven't seen this import before, so add an @import comment
 				importSources.add(importSource);
