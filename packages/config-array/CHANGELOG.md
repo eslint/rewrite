@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.21.1](https://github.com/eslint/rewrite/compare/config-array-v0.21.0...config-array-v0.21.1) (2025-10-17)
+
+
+### Bug Fixes
+
+* fix `config-array` and `object-schema` types ([#294](https://github.com/eslint/rewrite/issues/294)) ([a902bc4](https://github.com/eslint/rewrite/commit/a902bc4e27639ba5975b5d793314235737dc2c1a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/object-schema bumped from ^2.1.6 to ^2.1.7
+
 ## [0.21.0](https://github.com/eslint/rewrite/compare/config-array-v0.20.1...config-array-v0.21.0) (2025-06-25)
 
 
