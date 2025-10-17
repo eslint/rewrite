@@ -28,9 +28,10 @@
     "build:dedupe-types": "node ../../tools/dedupe-types.js dist/cjs/index.cjs dist/esm/index.js",
     "build:cts": "node ../../tools/build-cts.js dist/esm/index.d.ts dist/cjs/index.d.cts",
     "build": "rollup -c && npm run build:dedupe-types && tsc -p tsconfig.esm.json && npm run build:cts",
-    "test:jsr": "npx jsr@latest publish --dry-run",
     "test": "mocha \"tests/**/*.test.js\"",
     "test:coverage": "c8 npm test",
+    "test:jsr": "npx jsr@latest publish --dry-run",
+    "test:pnpm": "cd tests/pnpm && pnpm install && pnpm exec tsc",
     "test:types": "tsc -p tests/types/tsconfig.json"
   },
   "repository": {

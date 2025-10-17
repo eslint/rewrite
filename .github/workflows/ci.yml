@@ -112,3 +112,25 @@ jobs:
               run: |
                   npm run build
                   npm run test:jsr
+
+    pnpm_test:
+        name: Test pnpm Type Support
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v5
+
+            - uses: pnpm/action-setup@v4
+              with:
+                  version: latest
+
+            - uses: actions/setup-node@v5
+              with:
+                  node-version: "lts/*"
+
+            - name: Install Packages
+              run: npm install
+
+            - name: Run pnpm test
+              run: |
+                  npm run build
+                  npm run test:pnpm --ws --if-present
