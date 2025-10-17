@@ -966,6 +966,7 @@ export class ConfigArray extends Array {
 	 * @param {Object} config The config to finalize.
 	 * @returns {Object} The finalized config.
 	 */
+	// Cast key to `never` to prevent TypeScript from adding the signature `[x: symbol]: (config: any) => any` to the type of the class.
 	[/** @type {never} */ (ConfigArraySymbol.finalizeConfig)](config) {
 		return config;
 	}
@@ -978,6 +979,7 @@ export class ConfigArray extends Array {
 	 * @param {Object} config The config to preprocess.
 	 * @returns {Object} The config to use in place of the argument.
 	 */
+	// Cast key to `never` to prevent TypeScript from adding the signature `[x: symbol]: (config: any) => any` to the type of the class.
 	[/** @type {never} */ (ConfigArraySymbol.preprocessConfig)](config) {
 		return config;
 	}
