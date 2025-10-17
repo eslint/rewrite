@@ -1,7 +1,4 @@
 {
   "extends": "./tsconfig.json",
-  "files": ["dist/esm/index.js"],
-  "compilerOptions": {
-    "allowImportingTsExtensions": true
-  }
+  "files": ["dist/esm/index.js"]
 }
