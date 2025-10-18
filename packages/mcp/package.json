@@ -33,7 +33,7 @@
   },
   "homepage": "https://github.com/eslint/rewrite/tree/main/packages/mcp#readme",
   "engines": {
-    "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
+    "node": "^20.19.0 || ^22.13.0 || >=24"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.11.0",
