@@ -13,8 +13,8 @@
       "project": ["src/**/*.{cts,js,ts}", "tests/**/*.{cts,js,ts}"]
     },
     "packages/config-helpers": {
-      "entry": ["tests/**/*.{cts,cts,js,ts}"],
-      "project": ["src/**/*.{cts,js,ts}", "tests/**/*.{cts,cts,js,ts}"]
+      "entry": ["tests/**/*.{cts,js,ts}"],
+      "project": ["src/**/*.{cts,js,ts}", "tests/**/*.{cts,js,ts}"]
     },
     "packages/core": { "project": ["src/**/*.{cts,js,ts}"] },
     "packages/mcp": {
@@ -30,8 +30,8 @@
       "project": ["src/**/*.{cts,js,ts}", "tests/**/*.{cts,js,ts}"]
     },
     "packages/plugin-kit": {
-      "entry": ["tests/**/*.{cts,cts,js,ts}"],
-      "project": ["src/**/*.{cts,js,ts}", "tests/**/*.{cts,cts,js,ts}"]
+      "entry": ["tests/**/*.{cts,js,ts}"],
+      "project": ["src/**/*.{cts,js,ts}", "tests/**/*.{cts,js,ts}"]
     }
   }
 }
