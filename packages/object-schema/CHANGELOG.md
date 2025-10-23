@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.1.7](https://github.com/eslint/rewrite/compare/object-schema-v2.1.6...object-schema-v2.1.7) (2025-10-17)
+
+
+### Bug Fixes
+
+* fix `config-array` and `object-schema` types ([#294](https://github.com/eslint/rewrite/issues/294)) ([a902bc4](https://github.com/eslint/rewrite/commit/a902bc4e27639ba5975b5d793314235737dc2c1a))
+* improve type support for isolated dependencies in pnpm ([#289](https://github.com/eslint/rewrite/issues/289)) ([f8df139](https://github.com/eslint/rewrite/commit/f8df139631694431ecfc651e656932e283d4d14f))
+
 ## [2.1.6](https://github.com/eslint/rewrite/compare/object-schema-v2.1.5...object-schema-v2.1.6) (2025-01-31)
 
 

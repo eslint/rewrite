@@ -74,6 +74,11 @@ function getExtensionName(extension, indexPath) {
  * @return {config is LegacyConfig} `true` if the config object is a legacy config.
  */
 function isLegacyConfig(config) {
+	// eslintrc's plugins must be an array; while flat config's must be an object.
+	if (Array.isArray(config.plugins)) {
+		return true;
+	}
+
 	for (const key of eslintrcKeys) {
 		if (key in config) {
 			return true;
@@ -251,6 +256,8 @@ function findPluginConfig(config, pluginConfigName) {
 	}
 
 	const directConfig = plugin.configs?.[configName];
+
+	// Prefer direct config, but fall back to flat config if available
 	if (directConfig) {
 		// Arrays are always flat configs, and non-legacy configs can be used directly
 		if (Array.isArray(directConfig) || !isLegacyConfig(directConfig)) {
@@ -261,30 +268,28 @@ function findPluginConfig(config, pluginConfigName) {
 				pluginConfigName,
 			);
 		}
+	}
 
-		// If it's a legacy config, look for the flat version
-		const flatConfig = plugin.configs?.[`flat/${configName}`];
-
-		if (
-			flatConfig &&
-			(Array.isArray(flatConfig) || !isLegacyConfig(flatConfig))
-		) {
-			return deepNormalizePluginConfig(
-				userPluginNamespace,
-				plugin,
-				flatConfig,
-				pluginConfigName,
-			);
-		}
-
-		throw new TypeError(
-			`Plugin config "${configName}" in plugin "${userPluginNamespace}" is an eslintrc config and cannot be used in this context.`,
+	// If it's a legacy config, or the config does not exist => look for the flat version
+	const flatConfig = plugin.configs?.[`flat/${configName}`];
+	if (
+		flatConfig &&
+		(Array.isArray(flatConfig) || !isLegacyConfig(flatConfig))
+	) {
+		return deepNormalizePluginConfig(
+			userPluginNamespace,
+			plugin,
+			flatConfig,
+			pluginConfigName,
 		);
 	}
 
-	throw new TypeError(
-		`Plugin config "${configName}" not found in plugin "${userPluginNamespace}".`,
-	);
+	// If we get here, then the config was either not found or is a legacy config
+	const message =
+		directConfig || flatConfig
+			? `Plugin config "${configName}" in plugin "${userPluginNamespace}" is an eslintrc config and cannot be used in this context.`
+			: `Plugin config "${configName}" not found in plugin "${userPluginNamespace}".`;
+	throw new TypeError(message);
 }
 
 /**

@@ -1,10 +1,10 @@
 {
   "packages/compat": "1.4.0",
-  "packages/config-array": "0.21.0",
-  "packages/config-helpers": "0.4.0",
+  "packages/config-array": "0.21.1",
+  "packages/config-helpers": "0.4.1",
   "packages/core": "0.16.0",
   "packages/mcp": "0.1.1",
   "packages/migrate-config": "1.6.0",
-  "packages/object-schema": "2.1.6",
+  "packages/object-schema": "2.1.7",
   "packages/plugin-kit": "0.4.0"
 }

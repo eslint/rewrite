@@ -163,7 +163,7 @@ export interface RulesMeta<
 
 	/**
 	 * Any default options to be recursively merged on top of any user-provided options.
-	 **/
+	 */
 	defaultOptions?: RuleOptions;
 
 	/**
@@ -479,15 +479,15 @@ export interface RuleTextEdit {
  * @param fixer The text editor to apply the fix.
  * @returns The fix(es) for the violation.
  */
-type RuleFixer = (
+export type RuleFixer = (
 	fixer: RuleTextEditor,
 ) => RuleTextEdit | Iterable<RuleTextEdit> | null;
 
-interface ViolationReportBase {
+export interface ViolationReportBase {
 	/**
 	 * The data to insert into the message.
 	 */
-	data?: Record<string, string> | undefined;
+	data?: Record<string, unknown> | undefined;
 
 	/**
 	 * The fix to be applied for the violation.
@@ -501,10 +501,10 @@ interface ViolationReportBase {
 	suggest?: SuggestedEdit[] | null | undefined;
 }
 
-type ViolationMessage<MessageIds = string> =
+export type ViolationMessage<MessageIds = string> =
 	| { message: string }
 	| { messageId: MessageIds };
-type ViolationLocation<Node> =
+export type ViolationLocation<Node> =
 	| { loc: SourceLocation | Position }
 	| { node: Node };
 
@@ -517,19 +517,19 @@ export type ViolationReport<
 
 // #region Suggestions
 
-interface SuggestedEditBase {
+export interface SuggestedEditBase {
 	/**
 	 * The data to insert into the message.
 	 */
-	data?: Record<string, string> | undefined;
+	data?: Record<string, unknown> | undefined;
 
 	/**
 	 * The fix to be applied for the suggestion.
 	 */
-	fix?: RuleFixer | null | undefined;
+	fix: RuleFixer;
 }
 
-type SuggestionMessage = { desc: string } | { messageId: string };
+export type SuggestionMessage = { desc: string } | { messageId: string };
 
 /**
  * A suggested edit for a rule violation.
@@ -539,7 +539,7 @@ export type SuggestedEdit = SuggestedEditBase & SuggestionMessage;
 /**
  * The normalized version of a lint suggestion.
  */
-interface LintSuggestion {
+export interface LintSuggestion {
 	/** A short description. */
 	desc: string;
 
@@ -904,7 +904,7 @@ export type EcmaVersion =
  * The type of JavaScript source code.
  * @deprecated Only supported in legacy eslintrc config format.
  */
-type JavaScriptSourceType = "script" | "module" | "commonjs";
+export type JavaScriptSourceType = "script" | "module" | "commonjs";
 
 /**
  * Parser options.
@@ -974,7 +974,7 @@ export interface EnvironmentConfig {
 /**
  * A configuration object that may have a `rules` block.
  */
-interface HasRules<Rules extends RulesConfig = RulesConfig> {
+export interface HasRules<Rules extends RulesConfig = RulesConfig> {
 	rules?: Partial<Rules> | undefined;
 }
 
@@ -983,7 +983,7 @@ interface HasRules<Rules extends RulesConfig = RulesConfig> {
  *
  * @see [ESLint Legacy Configuration](https://eslint.org/docs/latest/use/configure/)
  */
-interface BaseConfig<
+export interface BaseConfig<
 	Rules extends RulesConfig = RulesConfig,
 	OverrideRules extends RulesConfig = Rules,
 > extends HasRules<Rules> {
