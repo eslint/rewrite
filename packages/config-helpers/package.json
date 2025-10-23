@@ -51,7 +51,6 @@
     "@eslint/core": "^0.16.0"
   },
   "devDependencies": {
-    "eslint": "^9.27.0",
     "rollup-plugin-copy": "^3.5.0"
   },
   "engines": {
