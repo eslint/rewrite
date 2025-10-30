@@ -29,7 +29,7 @@
     "!(*.{js,ts})": "prettier --write --ignore-unknown"
   },
   "engines": {
-    "node": "^20.19.0 || ^22.13.0 || >=24"
+    "node": "^22.13.0 || >=24"
   },
   "devDependencies": {
     "@eslint/config-helpers": "file:packages/config-helpers",
