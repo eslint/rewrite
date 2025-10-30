@@ -44,5 +44,10 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.0.0",
     "yorkie": "^2.0.0"
+  },
+  "overrides": {
+    "eslint": {
+      "@eslint/core": "file:packages/core"
+    }
   }
 }

@@ -323,16 +323,8 @@ const testRule: RuleDefinition<{
 								foo: "foo",
 								bar: 1,
 								baz: true,
-								quz: 1n,
-								// @ts-expect-error Symbols are not allowed in data
-								quux: Symbol("quux"),
-								// @ts-expect-error Objects are not allowed in data
-								quuz: {
-									hi: "hi",
-								},
-								// @ts-expect-error Functions are not allowed in data
-								corge: () => {},
 							},
+							// @ts-expect-error -- 'fix' is required in suggestion objects
 							fix: null,
 						},
 					],
@@ -347,15 +339,6 @@ const testRule: RuleDefinition<{
 						foo: "foo",
 						bar: 1,
 						baz: true,
-						quz: 1n,
-						// @ts-expect-error Symbols are not allowed in data
-						quux: Symbol("quux"),
-						// @ts-expect-error Objects are not allowed in data
-						quuz: {
-							hi: "hi",
-						},
-						// @ts-expect-error Functions are not allowed in data
-						corge: () => {},
 					},
 					fix: null,
 					suggest: null,
