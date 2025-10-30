@@ -487,7 +487,7 @@ export interface ViolationReportBase {
 	/**
 	 * The data to insert into the message.
 	 */
-	data?: Record<string, unknown> | undefined;
+	data?: Record<string, string> | undefined;
 
 	/**
 	 * The fix to be applied for the violation.
@@ -521,12 +521,12 @@ export interface SuggestedEditBase {
 	/**
 	 * The data to insert into the message.
 	 */
-	data?: Record<string, unknown> | undefined;
+	data?: Record<string, string> | undefined;
 
 	/**
 	 * The fix to be applied for the suggestion.
 	 */
-	fix: RuleFixer;
+	fix?: RuleFixer | null | undefined;
 }
 
 export type SuggestionMessage = { desc: string } | { messageId: string };
