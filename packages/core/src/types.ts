@@ -521,7 +521,7 @@ export interface SuggestedEditBase {
 	/**
 	 * The data to insert into the message.
 	 */
-	data?: Record<string, string | number | boolean | bigint> | undefined; // TODO
+	data?: Record<string, string | number | boolean | bigint> | undefined;
 
 	/**
 	 * The fix to be applied for the suggestion.

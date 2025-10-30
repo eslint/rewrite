@@ -323,9 +323,11 @@ const testRule: RuleDefinition<{
 								foo: "foo",
 								bar: 1,
 								baz: true,
-								qux: 1n,
+								quz: 1n,
+								// @ts-expect-error Symbols are not allowed in data
+								quux: Symbol("quux"),
 								// @ts-expect-error Objects are not allowed in data
-								quux: {
+								quuz: {
 									hi: "hi",
 								},
 								// @ts-expect-error Functions are not allowed in data
@@ -345,8 +347,11 @@ const testRule: RuleDefinition<{
 						foo: "foo",
 						bar: 1,
 						baz: true,
+						quz: 1n,
+						// @ts-expect-error Symbols are not allowed in data
+						quux: Symbol("quux"),
 						// @ts-expect-error Objects are not allowed in data
-						quux: {
+						quuz: {
 							hi: "hi",
 						},
 						// @ts-expect-error Functions are not allowed in data
