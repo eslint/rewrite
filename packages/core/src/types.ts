@@ -487,7 +487,7 @@ export interface ViolationReportBase {
 	/**
 	 * The data to insert into the message.
 	 */
-	data?: Record<string, string> | undefined;
+	data?: Record<string, unknown> | undefined; // TODO
 
 	/**
 	 * The fix to be applied for the violation.
@@ -521,7 +521,7 @@ export interface SuggestedEditBase {
 	/**
 	 * The data to insert into the message.
 	 */
-	data?: Record<string, string> | undefined;
+	data?: Record<string, unknown> | undefined; // TODO
 
 	/**
 	 * The fix to be applied for the suggestion.

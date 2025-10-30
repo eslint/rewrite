@@ -298,6 +298,7 @@ const testRule: RuleDefinition<{
 							start: { line: node.start, column: 1 },
 							end: { line: node.start + 1, column: Infinity },
 						},
+						data: undefined,
 						fix(fixer: RuleTextEditor): RuleTextEdit {
 							return fixer.replaceText(
 								node,
@@ -318,6 +319,12 @@ const testRule: RuleDefinition<{
 					suggest: [
 						{
 							messageId: "Bar",
+							data: {
+								foo: "foo",
+								bar: 1,
+								baz: true,
+								// TODO
+							},
 							fix: null,
 						},
 					],
@@ -328,6 +335,12 @@ const testRule: RuleDefinition<{
 				context.report({
 					message: "This baz is foobar",
 					loc: { line: node.start, column: 1 },
+					data: {
+						foo: "foo",
+						bar: 1,
+						baz: true,
+						// TODO
+					},
 					fix: null,
 					suggest: null,
 				});
