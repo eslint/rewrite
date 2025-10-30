@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.17.0](https://github.com/eslint/rewrite/compare/core-v0.16.0...core-v0.17.0) (2025-10-27)
+
+
+### Features
+
+* export additional core types ([#304](https://github.com/eslint/rewrite/issues/304)) ([5ccde5b](https://github.com/eslint/rewrite/commit/5ccde5bc9442c572d740c063fcb50392bf13c3db))
+
+
+### Bug Fixes
+
+* require `fix` in suggestion objects ([#298](https://github.com/eslint/rewrite/issues/298)) ([02bac50](https://github.com/eslint/rewrite/commit/02bac50b8a053f12a97afbe65b126ccd2c469d9e))
+
+## [0.16.0](https://github.com/eslint/rewrite/compare/core-v0.15.2...core-v0.16.0) (2025-09-16)
+
+
+### Features
+
+* Add config types in @eslint/core ([#237](https://github.com/eslint/rewrite/issues/237)) ([7b6dd37](https://github.com/eslint/rewrite/commit/7b6dd370a598ea7fc94fba427a2579342b50b90f))
+
+
+### Bug Fixes
+
+* remove unsupported `nodeType` from types ([#268](https://github.com/eslint/rewrite/issues/268)) ([d800559](https://github.com/eslint/rewrite/commit/d8005593158f55ba32f5279f3385db95ab87075a))
+
 ## [0.15.2](https://github.com/eslint/rewrite/compare/core-v0.15.1...core-v0.15.2) (2025-08-05)
 
 

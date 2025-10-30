@@ -139,3 +139,9 @@ yarn.lock
 .vscode
 *.code-workspace
 bun.lockb
+
+# Automatically generated files by GitHub Actions workflow
+tools/update-readme.js
+
+# pnpm
+pnpm-lock.yaml

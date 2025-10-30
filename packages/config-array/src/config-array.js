@@ -20,12 +20,10 @@ import { filesAndIgnoresSchema } from "./files-and-ignores-schema.js";
 // Types
 //------------------------------------------------------------------------------
 
-/** @typedef {import("@eslint/object-schema").PropertyDefinition} PropertyDefinition */
-/** @typedef {import("@eslint/object-schema").ObjectDefinition} ObjectDefinition */
 /** @typedef {import("./types.ts").ConfigObject} ConfigObject */
 /** @typedef {import("minimatch").Minimatch} Minimatch */
 /** @typedef {import("minimatch").MinimatchOptions} MinimatchOptions */
-/** @typedef {import("@jsr/std__path")} PathImpl */
+/** @import * as PathImpl from "@jsr/std__path" */
 
 /*
  * This is a bit of a hack to make TypeScript happy with the Rollup-created
@@ -34,7 +32,7 @@ import { filesAndIgnoresSchema } from "./files-and-ignores-schema.js";
  * for `ObjectSchema`. To work around that, we just import the type manually
  * and give it a different name to use in the JSDoc comments.
  */
-/** @typedef {import("@eslint/object-schema").ObjectSchema} ObjectSchemaInstance */
+/** @typedef {ObjectSchema} ObjectSchemaInstance */
 
 //------------------------------------------------------------------------------
 // Helpers
@@ -968,7 +966,8 @@ export class ConfigArray extends Array {
 	 * @param {Object} config The config to finalize.
 	 * @returns {Object} The finalized config.
 	 */
-	[ConfigArraySymbol.finalizeConfig](config) {
+	// Cast key to `never` to prevent TypeScript from adding the signature `[x: symbol]: (config: any) => any` to the type of the class.
+	[/** @type {never} */ (ConfigArraySymbol.finalizeConfig)](config) {
 		return config;
 	}
 
@@ -980,7 +979,8 @@ export class ConfigArray extends Array {
 	 * @param {Object} config The config to preprocess.
 	 * @returns {Object} The config to use in place of the argument.
 	 */
-	[ConfigArraySymbol.preprocessConfig](config) {
+	// Cast key to `never` to prevent TypeScript from adding the signature `[x: symbol]: (config: any) => any` to the type of the class.
+	[/** @type {never} */ (ConfigArraySymbol.preprocessConfig)](config) {
 		return config;
 	}
 

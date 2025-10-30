@@ -1,5 +1,37 @@
 # Changelog
 
+## [0.4.2](https://github.com/eslint/rewrite/compare/config-helpers-v0.4.1...config-helpers-v0.4.2) (2025-10-27)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^0.16.0 to ^0.17.0
+
+## [0.4.1](https://github.com/eslint/rewrite/compare/config-helpers-v0.4.0...config-helpers-v0.4.1) (2025-10-17)
+
+
+### Bug Fixes
+
+* add validation for `plugins`  in isLegacyConfig ([#292](https://github.com/eslint/rewrite/issues/292)) ([74f9427](https://github.com/eslint/rewrite/commit/74f9427b47de313582793ab6fc4c723f1526fdc0))
+* improve type support for isolated dependencies in pnpm ([#289](https://github.com/eslint/rewrite/issues/289)) ([f8df139](https://github.com/eslint/rewrite/commit/f8df139631694431ecfc651e656932e283d4d14f))
+* use flat config when eslintrc config does not exist ([#288](https://github.com/eslint/rewrite/issues/288)) ([ddc8577](https://github.com/eslint/rewrite/commit/ddc857781bacab1cdd7c540e599d3ed968607a09))
+
+## [0.4.0](https://github.com/eslint/rewrite/compare/config-helpers-v0.3.1...config-helpers-v0.4.0) (2025-09-16)
+
+
+### Features
+
+* Add config types in @eslint/core ([#237](https://github.com/eslint/rewrite/issues/237)) ([7b6dd37](https://github.com/eslint/rewrite/commit/7b6dd370a598ea7fc94fba427a2579342b50b90f))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^0.15.2 to ^0.16.0
+
 ## [0.3.1](https://github.com/eslint/rewrite/compare/config-helpers-v0.3.0...config-helpers-v0.3.1) (2025-08-05)
 
 

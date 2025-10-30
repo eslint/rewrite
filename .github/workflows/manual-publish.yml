@@ -1,3 +1,6 @@
+# IMPORTANT: Do not run this workflow because currently it doesn't work.
+# Trusted publishing allows only one workflow file, and we've set it to release-please.yml
+
 name: Manual Package Publish
 
 on:
@@ -30,10 +33,14 @@ jobs:
         steps:
             - uses: actions/checkout@v5
 
-            - uses: actions/setup-node@v5
+            - uses: actions/setup-node@v6
               with:
                   node-version: lts/*
                   registry-url: "https://registry.npmjs.org"
+
+            # npm 11.5.1 or later is required so update to latest to be sure
+            - name: Update npm
+              run: npm install -g npm@latest
 
             - name: Install dependencies
               run: npm install
@@ -61,8 +68,6 @@ jobs:
 
             - name: Publish to npm
               run: npm publish -w packages/${{ inputs.package }} --provenance
-              env:
-                  NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
             - name: Publish to JSR
               run: |
