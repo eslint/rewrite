@@ -323,7 +323,13 @@ const testRule: RuleDefinition<{
 								foo: "foo",
 								bar: 1,
 								baz: true,
-								// TODO
+								qux: 1n,
+								// @ts-expect-error Objects are not allowed in data
+								quux: {
+									hi: "hi",
+								},
+								// @ts-expect-error Functions are not allowed in data
+								corge: () => {},
 							},
 							fix: null,
 						},
@@ -339,7 +345,12 @@ const testRule: RuleDefinition<{
 						foo: "foo",
 						bar: 1,
 						baz: true,
-						// TODO
+						// @ts-expect-error Objects are not allowed in data
+						quux: {
+							hi: "hi",
+						},
+						// @ts-expect-error Functions are not allowed in data
+						corge: () => {},
 					},
 					fix: null,
 					suggest: null,
