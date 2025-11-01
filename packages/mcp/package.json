@@ -3,7 +3,9 @@
   "version": "0.1.1",
   "description": "MCP server for ESLint",
   "type": "module",
-  "bin": "./src/mcp-cli.js",
+  "bin": {
+    "eslint-mcp": "./src/mcp-cli.js"
+  },
   "files": [
     "src"
   ],
