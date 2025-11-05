@@ -9,6 +9,7 @@
 
 /** @typedef {import("@eslint/core").Plugin} FixupPluginDefinition */
 /** @typedef {import("@eslint/core").RuleDefinition} FixupRuleDefinition */
+/** @typedef {FixupRuleDefinition["create"]} FixupLegacyRuleDefinition */
 /** @typedef {import("@eslint/core").ConfigObject} FixupConfig */
 /** @typedef {Array<FixupConfig>} FixupConfigArray */
 
@@ -17,8 +18,37 @@
 //-----------------------------------------------------------------------------
 
 /**
+ * The removed methods from the `context` object that need to be added back.
+ * The keys are the name of the method on the `context` object and the values
+ * are the name of the method on the `sourceCode` object.
+ * @type {Map<string, string>}
+ */
+const removedMethodNames = new Map([
+	["getSource", "getText"],
+	["getSourceLines", "getLines"],
+	["getAllComments", "getAllComments"],
+	["getDeclaredVariables", "getDeclaredVariables"],
+	["getNodeByRangeIndex", "getNodeByRangeIndex"],
+	["getCommentsBefore", "getCommentsBefore"],
+	["getCommentsAfter", "getCommentsAfter"],
+	["getCommentsInside", "getCommentsInside"],
+	["getJSDocComment", "getJSDocComment"],
+	["getFirstToken", "getFirstToken"],
+	["getFirstTokens", "getFirstTokens"],
+	["getLastToken", "getLastToken"],
+	["getLastTokens", "getLastTokens"],
+	["getTokenAfter", "getTokenAfter"],
+	["getTokenBefore", "getTokenBefore"],
+	["getTokenByRangeStart", "getTokenByRangeStart"],
+	["getTokens", "getTokens"],
+	["getTokensAfter", "getTokensAfter"],
+	["getTokensBefore", "getTokensBefore"],
+	["getTokensBetween", "getTokensBetween"],
+]);
+
+/**
  * Tracks the original rule definition and the fixed-up rule definition.
- * @type {WeakMap<FixupRuleDefinition,FixupRuleDefinition>}
+ * @type {WeakMap<FixupRuleDefinition|FixupLegacyRuleDefinition,FixupRuleDefinition>}
  */
 const fixedUpRuleReplacements = new WeakMap();
 
@@ -41,13 +71,53 @@ const fixedUpPluginReplacements = new WeakMap();
 const fixedUpPlugins = new WeakSet();
 
 //-----------------------------------------------------------------------------
+// Helpers
+//-----------------------------------------------------------------------------
+
+/**
+ * Checks whether a node is an export declaration.
+ * @param {object} node An AST node.
+ * @returns {boolean} True if the node is an export declaration.
+ */
+function looksLikeExport(node) {
+	return (
+		node.type === "ExportDefaultDeclaration" ||
+		node.type === "ExportNamedDeclaration"
+	);
+}
+
+/**
+ * Checks for the presence of a JSDoc comment for the given node and returns it.
+ * @param {object} node The AST node to get the comment for.
+ * @param {object} sourceCode A SourceCode instance to get comments.
+ * @returns {object|null} The Block comment token containing the JSDoc comment
+ *      for the given node or null if not found.
+ */
+function findJSDocComment(node, sourceCode) {
+	const tokenBefore = sourceCode.getTokenBefore(node, {
+		includeComments: true,
+	});
+
+	if (
+		tokenBefore &&
+		tokenBefore.type === "Block" &&
+		tokenBefore.value.charAt(0) === "*" &&
+		node.loc.start.line - tokenBefore.loc.end.line <= 1
+	) {
+		return tokenBefore;
+	}
+
+	return null;
+}
+
+//-----------------------------------------------------------------------------
 // Exports
 //-----------------------------------------------------------------------------
 
 /**
  * Takes the given rule and creates a new rule with the `create()` method wrapped
- * to provide the missing methods on the `context` and `sourceCode` objects.
- * @param {FixupRuleDefinition} ruleDefinition The rule to fix up.
+ * to provide missing methods on the `context` and `sourceCode` objects.
+ * @param {FixupRuleDefinition|FixupLegacyRuleDefinition} ruleDefinition The rule to fix up.
  * @returns {FixupRuleDefinition} The fixed-up rule.
  */
 export function fixupRule(ruleDefinition) {
@@ -56,144 +126,214 @@ export function fixupRule(ruleDefinition) {
 		return fixedUpRuleReplacements.get(ruleDefinition);
 	}
 
+	const isLegacyRule = typeof ruleDefinition === "function";
+
 	// check to see if this rule definition has already been fixed up
-	if (fixedUpRules.has(ruleDefinition)) {
+	if (!isLegacyRule && fixedUpRules.has(ruleDefinition)) {
 		return ruleDefinition;
 	}
 
-	const originalCreate = ruleDefinition.create.bind(ruleDefinition);
+	const originalCreate = isLegacyRule
+		? ruleDefinition
+		: ruleDefinition.create.bind(ruleDefinition);
 
 	function ruleCreate(context) {
-		// if getCwd is already there then no need to create old methods
-		if ("getCwd" in context) {
+		const sourceCode = context.sourceCode;
+		const needsContextShims = !("getCwd" in context);
+
+		// if getScope is already there then no need to create old methods
+		if ("getScope" in context) {
 			return originalCreate(context);
 		}
 
-		const sourceCode = context.sourceCode;
-
-		const newSourceCode = Object.assign(Object.create(sourceCode), {
-			getTokenOrCommentBefore(node, skip) {
-				return sourceCode.getTokenBefore(node, {
-					includeComments: true,
-					skip,
-				});
-			},
-			getTokenOrCommentAfter(node, skip) {
-				return sourceCode.getTokenAfter(node, {
-					includeComments: true,
-					skip,
-				});
-			},
-			isSpaceBetweenTokens(first, second) {
-				return sourceCode.isSpaceBetween(first, second);
-			},
-			getJSDocComment(node) {
-				function isCommentToken(token) {
-					return ["Block", "Line", "Shebang"].includes(token.type);
-				}
-
-				function looksLikeExport(astNode) {
-					return (
-						astNode.type === "ExportDefaultDeclaration" ||
-						astNode.type === "ExportNamedDeclaration" ||
-						astNode.type === "ExportAllDeclaration" ||
-						astNode.type === "ExportSpecifier"
-					);
-				}
-
-				function findJSDocComment(astNode) {
-					const tokenBefore = sourceCode.getTokenBefore(astNode, {
+		let compatSourceCode = sourceCode;
+		if (needsContextShims) {
+			compatSourceCode = Object.assign(Object.create(sourceCode), {
+				getTokenOrCommentBefore(node, skip) {
+					return sourceCode.getTokenBefore(node, {
 						includeComments: true,
+						skip,
 					});
+				},
+				getTokenOrCommentAfter(node, skip) {
+					return sourceCode.getTokenAfter(node, {
+						includeComments: true,
+						skip,
+					});
+				},
+				isSpaceBetweenTokens(first, second) {
+					return sourceCode.isSpaceBetween(first, second);
+				},
+				getJSDocComment(node) {
+					let parent = node.parent;
 
-					if (
-						tokenBefore &&
-						isCommentToken(tokenBefore) &&
-						tokenBefore.type === "Block" &&
-						tokenBefore.value.charAt(0) === "*" &&
-						astNode.loc.start.line - tokenBefore.loc.end.line <= 1
-					) {
-						return tokenBefore;
-					}
+					switch (node.type) {
+						case "ClassDeclaration":
+						case "FunctionDeclaration":
+							return findJSDocComment(
+								looksLikeExport(parent) ? parent : node,
+								sourceCode,
+							);
 
-					return null;
-				}
-				let parent = node.parent;
+						case "ClassExpression":
+							return findJSDocComment(parent.parent, sourceCode);
 
-				switch (node.type) {
-					case "ClassDeclaration":
-					case "FunctionDeclaration":
-						return findJSDocComment(
-							looksLikeExport(parent) ? parent : node,
-						);
-
-					case "ClassExpression":
-						return findJSDocComment(parent.parent);
-
-					case "ArrowFunctionExpression":
-					case "FunctionExpression":
-						if (
-							parent.type !== "CallExpression" &&
-							parent.type !== "NewExpression"
-						) {
-							while (
-								!sourceCode.getCommentsBefore(parent).length &&
-								!/Function/u.test(parent.type) &&
-								parent.type !== "MethodDefinition" &&
-								parent.type !== "Property"
+						case "ArrowFunctionExpression":
+						case "FunctionExpression":
+							if (
+								parent.type !== "CallExpression" &&
+								parent.type !== "NewExpression"
 							) {
-								parent = parent.parent;
+								while (
+									!sourceCode.getCommentsBefore(parent)
+										.length &&
+									!/Function/u.test(parent.type) &&
+									parent.type !== "MethodDefinition" &&
+									parent.type !== "Property"
+								) {
+									parent = parent.parent;
 
-								if (!parent) {
-									break;
+									if (!parent) {
+										break;
+									}
+								}
+
+								if (
+									parent &&
+									parent.type !== "FunctionDeclaration" &&
+									parent.type !== "Program"
+								) {
+									return findJSDocComment(parent, sourceCode);
 								}
 							}
 
-							if (
-								parent &&
-								parent.type !== "FunctionDeclaration" &&
-								parent.type !== "Program"
-							) {
-								return findJSDocComment(parent);
-							}
-						}
+							return findJSDocComment(node, sourceCode);
 
-						return findJSDocComment(node);
+						default:
+							return null;
+					}
+				},
+			});
 
-					default:
-						return null;
-				}
+			Object.freeze(compatSourceCode);
+		}
+
+		let currentNode = compatSourceCode.ast;
+
+		let compatContext = Object.assign(Object.create(context), {
+			parserServices: compatSourceCode.parserServices,
+
+			/*
+			 * The following methods rely on the current node in the traversal,
+			 * so we need to add them manually.
+			 */
+			getScope() {
+				return compatSourceCode.getScope(currentNode);
+			},
+
+			getAncestors() {
+				return compatSourceCode.getAncestors(currentNode);
+			},
+
+			markVariableAsUsed(variable) {
+				compatSourceCode.markVariableAsUsed(variable, currentNode);
 			},
 		});
 
-		Object.freeze(newSourceCode);
+		// add passthrough methods
+		for (const [
+			contextMethodName,
+			sourceCodeMethodName,
+		] of removedMethodNames) {
+			compatContext[contextMethodName] =
+				compatSourceCode[sourceCodeMethodName].bind(compatSourceCode);
+		}
 
-		const newContext = new Proxy(context, {
-			get(target, prop, receiver) {
-				switch (prop) {
-					case "getCwd":
-						return () => target.cwd;
-					case "getFilename":
-						return () => target.filename;
-					case "getPhysicalFilename":
-						return () => target.physicalFilename;
-					case "getSourceCode":
-						return () => newSourceCode;
-					case "sourceCode":
-						return newSourceCode;
-					default:
-						return Reflect.get(target, prop, receiver);
-				}
-			},
-		});
+		if (needsContextShims) {
+			compatContext = new Proxy(compatContext, {
+				get(target, prop, receiver) {
+					switch (prop) {
+						case "parserOptions":
+							return target.languageOptions.parserOptions;
+						case "sourceCode":
+							return compatSourceCode;
+						case "getCwd":
+							return () => target.cwd;
+						case "getFilename":
+							return () => target.filename;
+						case "getPhysicalFilename":
+							return () => target.physicalFilename;
+						case "getSourceCode":
+							return () => compatSourceCode;
+						default:
+							return Reflect.get(target, prop, receiver);
+					}
+				},
+			});
+		}
 
-		return originalCreate(newContext);
+		// freeze just like the original context
+		Object.freeze(compatContext);
+
+		/*
+		 * Create the visitor object using the original create() method.
+		 * This is necessary to ensure that the visitor object is created
+		 * with the correct context.
+		 */
+		const visitor = originalCreate(compatContext);
+
+		/*
+		 * Wrap each method in the visitor object to update the currentNode
+		 * before calling the original method. This is necessary because the
+		 * methods like `getScope()` need to know the current node.
+		 */
+		for (const [methodName, method] of Object.entries(visitor)) {
+			/*
+			 * Node is the second argument to most code path methods,
+			 * and the third argument for onCodePathSegmentLoop.
+			 */
+			if (methodName.startsWith("on")) {
+				// eslint-disable-next-line no-loop-func -- intentionally updating shared `currentNode` variable
+				visitor[methodName] = (...args) => {
+					currentNode =
+						args[methodName === "onCodePathSegmentLoop" ? 2 : 1];
+
+					return method.call(visitor, ...args);
+				};
+
+				continue;
+			}
+
+			// eslint-disable-next-line no-loop-func -- intentionally updating shared `currentNode` variable
+			visitor[methodName] = (...args) => {
+				currentNode = args[0];
+
+				return method.call(visitor, ...args);
+			};
+		}
+
+		return visitor;
 	}
 
 	const newRuleDefinition = {
-		...ruleDefinition,
+		...(isLegacyRule ? undefined : ruleDefinition),
 		create: ruleCreate,
 	};
+
+	// copy `schema` property of function-style rule or top-level `schema` property of object-style rule into `meta` object
+	// @ts-ignore -- top-level `schema` property was not officially supported for object-style rules so it doesn't exist in types
+	const { schema } = ruleDefinition;
+	if (schema) {
+		if (!newRuleDefinition.meta) {
+			newRuleDefinition.meta = { schema };
+		} else {
+			newRuleDefinition.meta = {
+				...newRuleDefinition.meta,
+				// top-level `schema` had precedence over `meta.schema` so it's okay to overwrite `meta.schema` if it exists
+				schema,
+			};
+		}
+	}
 
 	// cache the fixed up rule
 	fixedUpRuleReplacements.set(ruleDefinition, newRuleDefinition);
@@ -204,7 +344,7 @@ export function fixupRule(ruleDefinition) {
 
 /**
  * Takes the given plugin and creates a new plugin with all of the rules wrapped
- * to provide the missing methods on the `context` and `sourceCode` objects.
+ * to provide missing methods on the `context` and `sourceCode` objects.
  * @param {FixupPluginDefinition} plugin The plugin to fix up.
  * @returns {FixupPluginDefinition} The fixed-up plugin.
  */
@@ -241,7 +381,7 @@ export function fixupPluginRules(plugin) {
 
 /**
  * Takes the given configuration and creates a new configuration with all of the
- * rules wrapped to provide the missing methods on the `context` and `sourceCode` objects.
+ * rules wrapped to provide missing methods on the `context` and `sourceCode` objects.
  * @param {FixupConfigArray|FixupConfig} config The configuration to fix up.
  * @returns {FixupConfigArray} The fixed-up configuration.
  */
