@@ -36,11 +36,12 @@
     "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.11.0",
+    "@modelcontextprotocol/sdk": "^1.21.0",
     "eslint": "^9.26.0",
     "zod": "^3.24.4"
   },
   "devDependencies": {
+    "@cfworker/json-schema": "^4.1.1",
     "@types/node": "^24.7.2"
   }
 }
