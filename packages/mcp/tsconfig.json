@@ -3,7 +3,6 @@
   "files": ["src/mcp-cli.js"],
   "compilerOptions": {
     "noEmit": true,
-    "strict": true,
-    "types": ["node", "@cfworker/json-schema"]
+    "strict": true
   }
 }
