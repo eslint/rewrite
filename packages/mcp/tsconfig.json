@@ -4,6 +4,6 @@
   "compilerOptions": {
     "noEmit": true,
     "strict": true,
-    "types": ["node"]
+    "types": ["node", "@cfworker/json-schema"]
   }
 }
