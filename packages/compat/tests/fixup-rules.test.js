@@ -497,7 +497,7 @@ describe("@eslint/compat", () => {
 		it("should restore context.parserOptions", () => {
 			const rule = {
 				create(context) {
-					assert.strictEqual(
+					assert.deepStrictEqual(
 						context.parserOptions,
 						context.languageOptions.parserOptions,
 					);
