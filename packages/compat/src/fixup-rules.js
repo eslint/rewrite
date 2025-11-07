@@ -139,15 +139,19 @@ export function fixupRule(ruleDefinition) {
 
 	function ruleCreate(context) {
 		const sourceCode = context.sourceCode;
-		const needsContextShims = !("getCwd" in context);
 
-		// if getScope is already there then no need to create old methods
+		// No need to create old methods for ESLint < 9
 		if ("getScope" in context) {
 			return originalCreate(context);
 		}
 
+		let eslintVersion = 9;
+		if (!("getCwd" in context)) {
+			eslintVersion = 10;
+		}
+
 		let compatSourceCode = sourceCode;
-		if (needsContextShims) {
+		if (eslintVersion >= 10) {
 			compatSourceCode = Object.assign(Object.create(sourceCode), {
 				getTokenOrCommentBefore(node, skip) {
 					return sourceCode.getTokenBefore(node, {
@@ -220,7 +224,7 @@ export function fixupRule(ruleDefinition) {
 
 		let currentNode = compatSourceCode.ast;
 
-		let compatContext = Object.assign(Object.create(context), {
+		const compatContext = Object.assign(Object.create(context), {
 			parserServices: compatSourceCode.parserServices,
 
 			/*
@@ -240,6 +244,34 @@ export function fixupRule(ruleDefinition) {
 			},
 		});
 
+		if (eslintVersion >= 10) {
+			Object.assign(compatContext, {
+				parserOptions: compatContext.languageOptions.parserOptions,
+
+				getCwd() {
+					return compatContext.cwd;
+				},
+
+				getFilename() {
+					return compatContext.filename;
+				},
+
+				getPhysicalFilename() {
+					return compatContext.physicalFilename;
+				},
+
+				getSourceCode() {
+					return compatSourceCode;
+				},
+			});
+
+			Object.defineProperty(compatContext, "sourceCode", {
+				get() {
+					return compatSourceCode;
+				},
+			});
+		}
+
 		// add passthrough methods
 		for (const [
 			contextMethodName,
@@ -247,29 +279,6 @@ export function fixupRule(ruleDefinition) {
 		] of removedMethodNames) {
 			compatContext[contextMethodName] =
 				compatSourceCode[sourceCodeMethodName].bind(compatSourceCode);
-		}
-
-		if (needsContextShims) {
-			compatContext = new Proxy(compatContext, {
-				get(target, prop, receiver) {
-					switch (prop) {
-						case "parserOptions":
-							return target.languageOptions.parserOptions;
-						case "sourceCode":
-							return compatSourceCode;
-						case "getCwd":
-							return () => target.cwd;
-						case "getFilename":
-							return () => target.filename;
-						case "getPhysicalFilename":
-							return () => target.physicalFilename;
-						case "getSourceCode":
-							return () => compatSourceCode;
-						default:
-							return Reflect.get(target, prop, receiver);
-					}
-				},
-			});
 		}
 
 		// freeze just like the original context
