@@ -70,6 +70,9 @@ jobs:
                   npm install
                   npm run build
 
+            - name: Run TypeScript Compiler
+              run: npx tsc
+
             - name: Test types (core)
               working-directory: packages/core
               run: |

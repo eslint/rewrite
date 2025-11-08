@@ -13,7 +13,7 @@
     "fmt": "prettier --write .",
     "fmt:check": "prettier --check .",
     "test:jsr": "npm run test:jsr --workspaces --if-present",
-    "test:types": "tsc"
+    "test:types": "tsc && npm run test:types --workspaces --if-present"
   },
   "workspaces": [
     "packages/*"
