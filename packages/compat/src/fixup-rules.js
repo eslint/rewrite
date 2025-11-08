@@ -75,6 +75,20 @@ const fixedUpPlugins = new WeakSet();
 //-----------------------------------------------------------------------------
 
 /**
+ * Determines if two nodes or tokens overlap.
+ * @param {object} first The first node or token to check.
+ * @param {object} second The second node or token to check.
+ * @returns {boolean} True if the two nodes or tokens overlap.
+ */
+function nodesOrTokensOverlap(first, second) {
+	return (
+		(first.range[0] <= second.range[0] &&
+			first.range[1] >= second.range[0]) ||
+		(second.range[0] <= first.range[0] && second.range[1] >= first.range[0])
+	);
+}
+
+/**
  * Checks whether a node is an export declaration.
  * @param {object} node An AST node.
  * @returns {boolean} True if the node is an export declaration.
@@ -166,7 +180,43 @@ export function fixupRule(ruleDefinition) {
 					});
 				},
 				isSpaceBetweenTokens(first, second) {
-					return sourceCode.isSpaceBetween(first, second);
+					if (nodesOrTokensOverlap(first, second)) {
+						return false;
+					}
+
+					const [startingNodeOrToken, endingNodeOrToken] =
+						first.range[1] <= second.range[0]
+							? [first, second]
+							: [second, first];
+					const firstToken =
+						sourceCode.getLastToken(startingNodeOrToken) ||
+						startingNodeOrToken;
+					const finalToken =
+						sourceCode.getFirstToken(endingNodeOrToken) ||
+						endingNodeOrToken;
+					let currentToken = firstToken;
+
+					while (currentToken !== finalToken) {
+						const nextToken = sourceCode.getTokenAfter(
+							currentToken,
+							{
+								includeComments: true,
+							},
+						);
+
+						if (
+							currentToken.range[1] !== nextToken.range[0] ||
+							(nextToken !== finalToken &&
+								nextToken.type === "JSXText" &&
+								/\s/u.test(nextToken.value))
+						) {
+							return true;
+						}
+
+						currentToken = nextToken;
+					}
+
+					return false;
 				},
 				getJSDocComment(node) {
 					let parent = node.parent;
@@ -266,9 +316,8 @@ export function fixupRule(ruleDefinition) {
 			});
 
 			Object.defineProperty(compatContext, "sourceCode", {
-				get() {
-					return compatSourceCode;
-				},
+				enumerable: true,
+				value: compatSourceCode,
 			});
 		}
 
