@@ -23,6 +23,7 @@
 import fsp from "node:fs/promises";
 import path from "node:path";
 import { migrateConfig, migrateJSConfig } from "./migrate-config.js";
+// @ts-ignore: No types available
 import { Legacy } from "@eslint/eslintrc";
 
 //-----------------------------------------------------------------------------
