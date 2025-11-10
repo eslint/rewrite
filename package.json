@@ -14,7 +14,7 @@
     "fmt": "prettier --write .",
     "fmt:check": "prettier --check .",
     "test:jsr": "npm run test:jsr --workspaces --if-present",
-    "test:types": "tsc"
+    "test:types": "tsc && npm run test:types --workspaces --if-present"
   },
   "workspaces": [
     "packages/*"
@@ -47,5 +47,10 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.0.0",
     "yorkie": "^2.0.0"
+  },
+  "overrides": {
+    "eslint": {
+      "@eslint/core": "file:packages/core"
+    }
   }
 }

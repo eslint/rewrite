@@ -141,7 +141,7 @@ yarn.lock
 bun.lockb
 
 # Automatically generated files by GitHub Actions workflow
-tools/update-readme.js
+/.shared-workflows
 
 # pnpm
 pnpm-lock.yaml

@@ -8,6 +8,7 @@
 //-----------------------------------------------------------------------------
 
 import * as recast from "recast";
+// @ts-ignore: No types available
 import { Legacy } from "@eslint/eslintrc";
 import camelCase from "camelcase";
 import pluginsNeedingCompat from "./compat-plugins.js";
