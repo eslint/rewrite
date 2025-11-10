@@ -3,7 +3,6 @@
   "files": ["src/index.js"],
   "compilerOptions": {
     "outDir": "dist/esm",
-    "strict": true,
-    "types": ["mocha"]
+    "strict": true
   }
 }
