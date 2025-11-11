@@ -2,28 +2,17 @@ import eslintConfigESLint from "eslint-config-eslint";
 import { defineConfig } from "@eslint/config-helpers";
 import tseslint from "typescript-eslint";
 
-const eslintPluginJSDoc = eslintConfigESLint.find(
-	config => config.plugins?.jsdoc,
-).plugins.jsdoc;
-
 export default defineConfig([
 	{
 		ignores: ["**/tests/fixtures/", "**/dist/", "**/coverage/"],
 	},
 
 	{
+		files: ["**/*.js"],
 		extends: [eslintConfigESLint],
 		rules: {
 			// disable rules we don't want to use from eslint-config-eslint
 			"no-undefined": "off",
-
-			// TODO: re-enable eslint-plugin-jsdoc rules
-			...Object.fromEntries(
-				Object.keys(eslintPluginJSDoc.rules).map(name => [
-					`jsdoc/${name}`,
-					"off",
-				]),
-			),
 		},
 	},
 
