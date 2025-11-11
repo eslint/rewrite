@@ -24,7 +24,7 @@ const REPLACEMENT_METHODS = ["getScope", "getAncestors"];
 // Tests
 //-----------------------------------------------------------------------------
 
-describe("@eslint/backcompat", () => {
+describe("@eslint/compat", () => {
 	describe("fixupRule()", () => {
 		it("should return a new rule object with the same own properties", () => {
 			const rule = {
@@ -493,6 +493,319 @@ describe("@eslint/backcompat", () => {
 				);
 			});
 		});
+
+		it("should restore context.parserOptions", () => {
+			const rule = {
+				create(context) {
+					assert.deepStrictEqual(
+						context.parserOptions,
+						context.languageOptions.parserOptions,
+					);
+
+					return {
+						Identifier(node) {
+							context.report(node, "Identifier");
+						},
+					};
+				},
+			};
+
+			const config = {
+				plugins: {
+					test: {
+						rules: {
+							"test-rule": fixupRule(rule),
+						},
+					},
+				},
+				rules: {
+					"test/test-rule": "error",
+				},
+			};
+
+			const linter = new Linter();
+			const code = "let foo;";
+			const messages = linter.verify(code, config);
+
+			assert.strictEqual(messages.length, 1);
+			assert.strictEqual(messages[0].message, "Identifier");
+		});
+
+		it("should restore context.getCwd()", () => {
+			const rule = {
+				create(context) {
+					assert.strictEqual(context.getCwd(), context.cwd);
+
+					return {
+						Identifier(node) {
+							context.report(node, "Identifier");
+						},
+					};
+				},
+			};
+
+			const config = {
+				plugins: {
+					test: {
+						rules: {
+							"test-rule": fixupRule(rule),
+						},
+					},
+				},
+				rules: {
+					"test/test-rule": "error",
+				},
+			};
+
+			const linter = new Linter();
+			const code = "let foo;";
+			const messages = linter.verify(code, config);
+
+			assert.strictEqual(messages.length, 1);
+			assert.strictEqual(messages[0].message, "Identifier");
+		});
+
+		it("should restore context.getFilename()", () => {
+			const rule = {
+				create(context) {
+					assert.strictEqual(context.getFilename(), context.filename);
+
+					return {
+						Identifier(node) {
+							context.report(node, "Identifier");
+						},
+					};
+				},
+			};
+
+			const config = {
+				plugins: {
+					test: {
+						rules: {
+							"test-rule": fixupRule(rule),
+						},
+					},
+				},
+				rules: {
+					"test/test-rule": "error",
+				},
+			};
+
+			const linter = new Linter();
+			const code = "let foo;";
+			const messages = linter.verify(code, config);
+
+			assert.strictEqual(messages.length, 1);
+			assert.strictEqual(messages[0].message, "Identifier");
+		});
+
+		it("should restore context.getPhysicalFilename()", () => {
+			const rule = {
+				create(context) {
+					assert.strictEqual(
+						context.getPhysicalFilename(),
+						context.physicalFilename,
+					);
+
+					return {
+						Identifier(node) {
+							context.report(node, "Identifier");
+						},
+					};
+				},
+			};
+
+			const config = {
+				plugins: {
+					test: {
+						rules: {
+							"test-rule": fixupRule(rule),
+						},
+					},
+				},
+				rules: {
+					"test/test-rule": "error",
+				},
+			};
+
+			const linter = new Linter();
+			const code = "let foo;";
+			const messages = linter.verify(code, config);
+
+			assert.strictEqual(messages.length, 1);
+			assert.strictEqual(messages[0].message, "Identifier");
+		});
+
+		it("should restore context.getSourceCode()", () => {
+			const rule = {
+				create(context) {
+					assert.strictEqual(
+						context.getSourceCode(),
+						context.sourceCode,
+					);
+
+					return {
+						Identifier(node) {
+							context.report(node, "Identifier");
+						},
+					};
+				},
+			};
+
+			const config = {
+				plugins: {
+					test: {
+						rules: {
+							"test-rule": fixupRule(rule),
+						},
+					},
+				},
+				rules: {
+					"test/test-rule": "error",
+				},
+			};
+
+			const linter = new Linter();
+			const code = "let foo;";
+			const messages = linter.verify(code, config);
+
+			assert.strictEqual(messages.length, 1);
+			assert.strictEqual(messages[0].message, "Identifier");
+		});
+
+		it("should restore sourceCode.getTokenOrCommentBefore()", () => {
+			const rule = {
+				create(context) {
+					return {
+						Identifier(node) {
+							assert.strictEqual(
+								context.sourceCode.getTokenOrCommentBefore(node)
+									.value,
+								"let",
+							);
+						},
+					};
+				},
+			};
+
+			const config = {
+				plugins: {
+					test: {
+						rules: {
+							"test-rule": fixupRule(rule),
+						},
+					},
+				},
+				rules: {
+					"test/test-rule": "error",
+				},
+			};
+
+			const linter = new Linter();
+			const code = "let foo;";
+			linter.verify(code, config);
+		});
+
+		it("should restore sourceCode.getTokenOrCommentAfter()", () => {
+			const rule = {
+				create(context) {
+					return {
+						Identifier(node) {
+							assert.strictEqual(
+								context.sourceCode.getTokenOrCommentAfter(node)
+									.value,
+								"=",
+							);
+						},
+					};
+				},
+			};
+
+			const config = {
+				plugins: {
+					test: {
+						rules: {
+							"test-rule": fixupRule(rule),
+						},
+					},
+				},
+				rules: {
+					"test/test-rule": "error",
+				},
+			};
+
+			const linter = new Linter();
+			const code = "let foo = 0;";
+			linter.verify(code, config);
+		});
+
+		it("should restore sourceCode.isSpaceBetweenTokens()", () => {
+			const rule = {
+				create(context) {
+					return {
+						Identifier(node) {
+							assert.strictEqual(
+								context.sourceCode.isSpaceBetweenTokens(
+									node,
+									context.sourceCode.getTokenBefore(node),
+								),
+								true,
+							);
+						},
+					};
+				},
+			};
+
+			const config = {
+				plugins: {
+					test: {
+						rules: {
+							"test-rule": fixupRule(rule),
+						},
+					},
+				},
+				rules: {
+					"test/test-rule": "error",
+				},
+			};
+
+			const linter = new Linter();
+			const code = "let foo";
+			linter.verify(code, config);
+		});
+
+		it("should restore sourceCode.getJSDocComment()", () => {
+			const rule = {
+				create(context) {
+					return {
+						FunctionDeclaration(node) {
+							const jsdoc =
+								context.sourceCode.getJSDocComment(node);
+
+							assert.strictEqual(jsdoc.type, "Block");
+							assert.strictEqual(jsdoc.value, "* Desc");
+						},
+					};
+				},
+			};
+
+			const config = {
+				plugins: {
+					test: {
+						rules: {
+							"test-rule": fixupRule(rule),
+						},
+					},
+				},
+				rules: {
+					"test/test-rule": "error",
+				},
+			};
+
+			const linter = new Linter();
+			const code = ["/** Desc*/", "function foo(){}"].join("\n");
+			linter.verify(code, config);
+		});
 	});
 
 	describe("fixupPluginRules()", () => {
@@ -701,6 +1014,80 @@ describe("@eslint/backcompat", () => {
 				);
 			});
 		});
+
+		it("should restore context.getFilename()", () => {
+			const plugin = {
+				configs: {
+					recommended: {
+						rules: {
+							"test-rule": "error",
+						},
+					},
+				},
+				rules: {
+					"test-rule": {
+						create(context) {
+							assert.strictEqual(
+								context.getFilename(),
+								context.filename,
+							);
+							return {
+								Identifier(node) {
+									context.report(node, "Identifier");
+								},
+							};
+						},
+					},
+				},
+			};
+
+			const linter = new Linter();
+			const code = "let foo;";
+			const config = {
+				plugins: { test: fixupPluginRules(plugin) },
+				rules: { "test/test-rule": "error" },
+			};
+			const messages = linter.verify(code, config);
+
+			assert.strictEqual(messages.length, 1);
+			assert.strictEqual(messages[0].message, "Identifier");
+		});
+
+		it("should restore sourceCode.getTokenOrCommentBefore()", () => {
+			const plugin = {
+				configs: {
+					recommended: {
+						rules: {
+							"test-rule": "error",
+						},
+					},
+				},
+				rules: {
+					"test-rule": {
+						create(context) {
+							return {
+								Identifier(node) {
+									assert.strictEqual(
+										context.sourceCode.getTokenOrCommentBefore(
+											node,
+										).value,
+										"let",
+									);
+								},
+							};
+						},
+					},
+				},
+			};
+
+			const linter = new Linter();
+			const code = "let foo;";
+			const config = {
+				plugins: { test: fixupPluginRules(plugin) },
+				rules: { "test/test-rule": "error" },
+			};
+			linter.verify(code, config);
+		});
 	});
 
 	describe("fixupConfigRules()", () => {
@@ -833,6 +1220,79 @@ describe("@eslint/backcompat", () => {
 					],
 				);
 			});
+		});
+
+		it("should restore context.getFilename()", () => {
+			const config = [
+				{
+					plugins: {
+						test: {
+							rules: {
+								"test-rule": {
+									create(context) {
+										assert.strictEqual(
+											context.getFilename(),
+											context.filename,
+										);
+										return {
+											Identifier(node) {
+												context.report(
+													node,
+													"Identifier",
+												);
+											},
+										};
+									},
+								},
+							},
+						},
+					},
+					rules: {
+						"test/test-rule": "error",
+					},
+				},
+			];
+
+			const linter = new Linter();
+			const code = "let foo;";
+			const messages = linter.verify(code, fixupConfigRules(config));
+
+			assert.strictEqual(messages.length, 1);
+			assert.strictEqual(messages[0].message, "Identifier");
+		});
+
+		it("should restore sourceCode.getTokenOrCommentBefore()", () => {
+			const config = [
+				{
+					plugins: {
+						test: {
+							rules: {
+								"test-rule": {
+									create(context) {
+										return {
+											Identifier(node) {
+												assert.strictEqual(
+													context.sourceCode.getTokenOrCommentBefore(
+														node,
+													).value,
+													"let",
+												);
+											},
+										};
+									},
+								},
+							},
+						},
+					},
+					rules: {
+						"test/test-rule": "error",
+					},
+				},
+			];
+
+			const linter = new Linter();
+			const code = "let foo;";
+			linter.verify(code, fixupConfigRules(config));
 		});
 	});
 });

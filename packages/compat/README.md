@@ -2,9 +2,9 @@
 
 ## Overview
 
-This packages contains functions that allow you to wrap existing ESLint rules, plugins, and configurations that were intended for use with ESLint v8.x to allow them to work as-is in ESLint v9.x.
+This package contains functions that allow you to wrap existing ESLint rules, plugins, and configurations that were intended for use with ESLint v8.x or v9.x to allow them to work as-is in ESLint v9.x and v10.x.
 
-**Note:** All plugins are not guaranteed to work in ESLint v9.x. This package fixes the most common issues but can't fix everything.
+**Note:** All plugins are not guaranteed to work in ESLint v9.x or v10.x. This package fixes the most common issues but can't fix everything.
 
 ## Installation
 
@@ -37,7 +37,7 @@ This package exports the following functions in both ESM and CommonJS format:
 
 ### Fixing Rules
 
-If you have a rule that you'd like to make compatible with ESLint v9.x, you can do so using the `fixupRule()` function:
+If you have a rule that you'd like to make compatible with ESLint v9.x or v10.x, you can do so using the `fixupRule()` function:
 
 ```js
 // ESM example
@@ -71,7 +71,7 @@ module.exports = compatRule;
 
 ### Fixing Plugins
 
-If you are using a plugin in your `eslint.config.js` that is not yet compatible with ESLint 9.x, you can wrap it using the `fixupPluginRules()` function:
+If you are using a plugin in your `eslint.config.js` that is not yet compatible with ESLint v9.x or v10.x, you can wrap it using the `fixupPluginRules()` function:
 
 ```js
 // eslint.config.js - ESM example
@@ -115,7 +115,7 @@ module.exports = defineConfig([
 
 ### Fixing Configs
 
-If you are importing other configs into your `eslint.config.js` that use plugins that are not yet compatible with ESLint 9.x, you can wrap the entire array or a single object using the `fixupConfigRules()` function:
+If you are importing other configs into your `eslint.config.js` that use plugins that are not yet compatible with ESLint v9.x or v10.x, you can wrap the entire array or a single object using the `fixupConfigRules()` function:
 
 ```js
 // eslint.config.js - ESM example
