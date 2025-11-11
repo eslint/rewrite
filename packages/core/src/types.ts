@@ -324,21 +324,9 @@ export interface RuleContext<
 	settings: SettingsConfig;
 
 	/**
-	 * Parser-specific options for the configuration.
-	 * @deprecated Use `languageOptions.parserOptions` instead.
-	 */
-	parserOptions: Record<string, unknown>;
-
-	/**
 	 * The language options for the configuration.
 	 */
 	languageOptions: Options["LangOptions"];
-
-	/**
-	 * The CommonJS path to the parser used while parsing this file.
-	 * @deprecated No longer used.
-	 */
-	parserPath: string | undefined;
 
 	/**
 	 * The rule ID.
