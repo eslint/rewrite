@@ -1,7 +1,13 @@
 {
 	$schema: "https://docs.renovatebot.com/renovate-schema.json",
 	extends: ["github>eslint/workflows//.github/renovate/eslint-base.json5"],
+	packageRules: [
+		{
+			description: "Update `eslint` in dependencies",
+			matchDepTypes: ["dependencies"],
+			matchPackageNames: ["eslint"],
+			minimumReleaseAge: null, // Don't wait for these packages
+			rangeStrategy: "bump",
+		},
+	],
 }
-
-
-// TODO
