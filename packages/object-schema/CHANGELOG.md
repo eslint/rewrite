@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/eslint/rewrite/compare/object-schema-v2.1.7...object-schema-v3.0.0) (2025-11-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* Require Node.js ^20.19.0 || ^22.13.0 || >=24 ([#297](https://github.com/eslint/rewrite/issues/297))
+
+### Features
+
+* Require Node.js ^20.19.0 || ^22.13.0 || &gt;=24 ([#297](https://github.com/eslint/rewrite/issues/297)) ([acc623c](https://github.com/eslint/rewrite/commit/acc623c807bf8237a26b18291f04dd99e4e4981a))
+
 ## [2.1.7](https://github.com/eslint/rewrite/compare/object-schema-v2.1.6...object-schema-v2.1.7) (2025-10-17)
 
 

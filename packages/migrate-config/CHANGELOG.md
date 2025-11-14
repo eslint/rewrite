@@ -1,5 +1,25 @@
 # Changelog
 
+## [2.0.0](https://github.com/eslint/rewrite/compare/migrate-config-v1.6.1...migrate-config-v2.0.0) (2025-11-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* Require Node.js ^20.19.0 || ^22.13.0 || >=24 ([#297](https://github.com/eslint/rewrite/issues/297))
+
+### Features
+
+* Require Node.js ^20.19.0 || ^22.13.0 || &gt;=24 ([#297](https://github.com/eslint/rewrite/issues/297)) ([acc623c](https://github.com/eslint/rewrite/commit/acc623c807bf8237a26b18291f04dd99e4e4981a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/compat bumped from ^1.4.1 to ^2.0.0
+  * devDependencies
+    * @eslint/core bumped from ^0.17.0 to ^1.0.0
+
 ## [1.6.1](https://github.com/eslint/rewrite/compare/migrate-config-v1.6.0...migrate-config-v1.6.1) (2025-10-27)
 
 

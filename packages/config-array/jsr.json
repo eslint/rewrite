@@ -1,6 +1,6 @@
 {
   "name": "@eslint/config-array",
-  "version": "0.21.1",
+  "version": "0.22.0",
   "exports": "./dist/esm/index.js",
   "publish": {
     "include": [
