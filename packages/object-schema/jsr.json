@@ -1,6 +1,6 @@
 {
   "name": "@eslint/object-schema",
-  "version": "2.1.7",
+  "version": "3.0.0",
   "exports": "./dist/esm/index.js",
   "publish": {
     "include": [

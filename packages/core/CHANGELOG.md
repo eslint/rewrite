@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.0.0](https://github.com/eslint/rewrite/compare/core-v0.17.0...core-v1.0.0) (2025-11-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* Remove deprecated RuleContext methods ([#263](https://github.com/eslint/rewrite/issues/263))
+* remove deprecated `nodeType` property ([#265](https://github.com/eslint/rewrite/issues/265))
+* Require Node.js ^20.19.0 || ^22.13.0 || >=24 ([#297](https://github.com/eslint/rewrite/issues/297))
+
+### Features
+
+* Require Node.js ^20.19.0 || ^22.13.0 || &gt;=24 ([#297](https://github.com/eslint/rewrite/issues/297)) ([acc623c](https://github.com/eslint/rewrite/commit/acc623c807bf8237a26b18291f04dd99e4e4981a))
+
+
+### Bug Fixes
+
+* remove deprecated `nodeType` property ([#265](https://github.com/eslint/rewrite/issues/265)) ([7d6a2a8](https://github.com/eslint/rewrite/commit/7d6a2a8dfb73203790403dea240669b6ab543340))
+* Remove deprecated RuleContext methods ([#263](https://github.com/eslint/rewrite/issues/263)) ([0455323](https://github.com/eslint/rewrite/commit/0455323682227ba2e219645a49c20085ab76cbf0))
+
 ## [0.17.0](https://github.com/eslint/rewrite/compare/core-v0.16.0...core-v0.17.0) (2025-10-27)
 
 
