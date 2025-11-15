@@ -37,7 +37,6 @@
     },
     "packages/core": {
       "release-type": "node",
-      "release-as": "1.0.0",
       "extra-files": [
         {
           "type": "json",
