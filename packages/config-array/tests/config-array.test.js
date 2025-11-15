@@ -1807,6 +1807,136 @@ describe("ConfigArray", () => {
 				});
 			});
 
+			describe("POSIX character classes", () => {
+				it("should match `files` patterns using [[:digit:]]", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["src/file[[:digit:]].js"],
+								defs: { severity: "error" },
+							},
+						],
+						{ basePath, schema },
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig("src/file1.js").defs.severity,
+						"error",
+					);
+					assert.strictEqual(
+						configs.getConfig("src/file9.js").defs.severity,
+						"error",
+					);
+					assert.strictEqual(
+						configs.getConfig("src/filea.js"),
+						undefined,
+					);
+					assert.strictEqual(
+						configs.getConfig("src/file10.js"),
+						undefined,
+					);
+				});
+
+				it("should match `files` patterns using [[:alpha:]], [[:lower:]], and [[:upper:]]", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["alpha_[[:alpha:]].js"],
+								defs: { kind: "alpha" },
+							},
+							{
+								files: ["lower_[[:lower:]].js"],
+								defs: { kind: "lower" },
+							},
+							{
+								files: ["upper_[[:upper:]].js"],
+								defs: { kind: "upper" },
+							},
+						],
+						{ basePath, schema },
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig("alpha_a.js").defs.kind,
+						"alpha",
+					);
+					assert.strictEqual(
+						configs.getConfig("alpha_Z.js").defs.kind,
+						"alpha",
+					);
+					assert.strictEqual(
+						configs.getConfig("lower_a.js").defs.kind,
+						"lower",
+					);
+					assert.strictEqual(
+						configs.getConfig("lower_Z.js"),
+						undefined,
+					);
+					assert.strictEqual(
+						configs.getConfig("upper_Z.js").defs.kind,
+						"upper",
+					);
+					assert.strictEqual(
+						configs.getConfig("upper_a.js"),
+						undefined,
+					);
+				});
+
+				it("should honor POSIX classes inside `ignores` patterns", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+								ignores: ["src/[[:digit:]]/**"],
+								defs: { severity: "error" },
+							},
+						],
+						{ basePath, schema },
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig("src/3/file.js"),
+						undefined,
+					);
+					assert.strictEqual(
+						configs.getConfig("src/a/file.js").defs.severity,
+						"error",
+					);
+				});
+
+				it("should honor POSIX classes in global `ignores` patterns", () => {
+					configs = new ConfigArray(
+						[
+							{
+								ignores: ["[[:upper:]]"],
+							},
+							{
+								files: ["**/*.js"],
+								defs: { severity: "error" },
+							},
+						],
+						{ basePath, schema },
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfig("A/file.js"),
+						undefined,
+					);
+					assert.strictEqual(
+						configs.getConfig("a/file.js").defs.severity,
+						"error",
+					);
+				});
+			});
+
 			describe("config objects with `basePath` property", () => {
 				it("should apply config object without `files` or `ignores` to the `basePath` directory and its subdirectories only (relative paths)", () => {
 					configs = new ConfigArray(
@@ -3006,6 +3136,71 @@ describe("ConfigArray", () => {
 					assert.strictEqual(
 						configs.getConfigStatus(filename),
 						"ignored",
+					);
+				});
+			});
+
+			describe("POSIX character classes", () => {
+				it("should return statuses for [[:digit:]] in `files` patterns", () => {
+					configs = new ConfigArray(
+						[{ files: ["src/file[[:digit:]].js"] }],
+						{ basePath },
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus("src/file1.js"),
+						"matched",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus("src/filea.js"),
+						"unconfigured",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus("src/file10.js"),
+						"unconfigured",
+					);
+				});
+
+				it("should return 'unconfigured' for `ignores` using POSIX classes", () => {
+					configs = new ConfigArray(
+						[
+							{
+								files: ["**/*.js"],
+								ignores: ["src/[[:digit:]]/**"],
+							},
+						],
+						{ basePath },
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus("src/3/file.js"),
+						"unconfigured",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus("src/a/file.js"),
+						"matched",
+					);
+				});
+
+				it("should return 'ignored' for global `ignores` using POSIX classes", () => {
+					configs = new ConfigArray(
+						[{ ignores: ["[[:upper:]]"] }, { files: ["**/*.js"] }],
+						{ basePath },
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus("A/file.js"),
+						"ignored",
+					);
+					assert.strictEqual(
+						configs.getConfigStatus("a/file.js"),
+						"matched",
 					);
 				});
 			});
