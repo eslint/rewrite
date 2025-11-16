@@ -155,14 +155,11 @@ The `includeIgnoreFile()` function also accepts a second optional `name` paramet
 
 ```js
 // eslint.config.js - ESM example
-import { defineConfig } from "eslint/config";
-import { includeIgnoreFile } from "@eslint/compat";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { includeIgnoreFile } from '@eslint/compat';
+import { defineConfig } from 'eslint/config';
+import path from 'node:path';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const gitignorePath = path.resolve(__dirname, ".gitignore");
+const gitignorePath = path.resolve(import.meta.dirname, '.gitignore');
 
 export default defineConfig([
 	includeIgnoreFile(gitignorePath, "Imported .gitignore patterns"), // second argument is optional.
