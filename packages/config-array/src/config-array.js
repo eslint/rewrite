@@ -9,7 +9,7 @@
 
 import * as posixPath from "@jsr/std__path/posix";
 import * as windowsPath from "@jsr/std__path/windows";
-import { minimatch } from "minimatch";
+import { Minimatch } from "minimatch";
 import createDebug from "debug";
 
 import { ObjectSchema } from "@eslint/object-schema";
@@ -21,7 +21,6 @@ import { filesAndIgnoresSchema } from "./files-and-ignores-schema.js";
 //------------------------------------------------------------------------------
 
 /** @typedef {import("./types.ts").ConfigObject} ConfigObject */
-/** @typedef {import("minimatch").Minimatch} Minimatch */
 /** @typedef {import("minimatch").MinimatchOptions} MinimatchOptions */
 /** @import * as PathImpl from "@jsr/std__path" */
 
@@ -38,7 +37,6 @@ import { filesAndIgnoresSchema } from "./files-and-ignores-schema.js";
 // Helpers
 //------------------------------------------------------------------------------
 
-const Minimatch = minimatch.Minimatch;
 const debug = createDebug("@eslint/config-array");
 
 /**
@@ -60,7 +58,6 @@ const negatedMinimatchCache = new Map();
 const MINIMATCH_OPTIONS = {
 	// matchBase: true,
 	dot: true,
-	allowWindowsEscape: true,
 };
 
 /**
