@@ -1,6 +1,6 @@
 {
   "name": "@eslint/config-array",
-  "version": "0.22.0",
+  "version": "0.23.0",
   "description": "General purpose glob-based configuration matching.",
   "author": "Nicholas C. Zakas",
   "type": "module",
