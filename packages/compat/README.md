@@ -155,8 +155,8 @@ The `includeIgnoreFile()` function also accepts a second optional `name` paramet
 
 ```js
 // eslint.config.js - ESM example
-import { includeIgnoreFile } from '@eslint/compat';
 import { defineConfig } from 'eslint/config';
+import { includeIgnoreFile } from '@eslint/compat';
 import path from 'node:path';
 
 const gitignorePath = path.resolve(import.meta.dirname, '.gitignore');
