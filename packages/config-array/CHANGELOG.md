@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.23.0](https://github.com/eslint/rewrite/compare/config-array-v0.22.0...config-array-v0.23.0) (2025-11-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* update minimatch ([#273](https://github.com/eslint/rewrite/issues/273))
+
+### Features
+
+* update minimatch ([#273](https://github.com/eslint/rewrite/issues/273)) ([8b92470](https://github.com/eslint/rewrite/commit/8b9247004d76aef90da7c211902a0ca118d4b47f))
+
 ## [0.22.0](https://github.com/eslint/rewrite/compare/config-array-v0.21.1...config-array-v0.22.0) (2025-11-14)
 
 
