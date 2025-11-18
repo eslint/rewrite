@@ -6,6 +6,10 @@ This package is the future home of the rewritten, runtime-agnostic ESLint core.
 
 Right now, it exports the core types necessary to implement language plugins.
 
+## Installation
+
+Prerequisites: Node.js (^20.19.0, ^22.13.0, or >=24) built with SSL support. (If you are using an official Node.js distribution, SSL is always built in.)
+
 ## License
 
 Apache 2.0
