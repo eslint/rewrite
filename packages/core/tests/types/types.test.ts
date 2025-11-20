@@ -323,6 +323,28 @@ const testRule: RuleDefinition<{
 								foo: "foo",
 								bar: 1,
 								baz: true,
+								qux: false,
+								a: 1n,
+								b: null,
+								c: undefined,
+								d: void 0,
+								// @ts-expect-error -- Symbols are not allowed in `data`.
+								e: Symbol("b"),
+								// @ts-expect-error -- Objects are not allowed in `data`.
+								f: {
+									hi: "hi",
+								},
+								// @ts-expect-error -- Arrays are not allowed in `data`.
+								g: [1, 2, 3],
+								// @ts-expect-error -- Sets are not allowed in `data`.
+								h: new Set([1, 2, 3]),
+								// @ts-expect-error -- Maps are not allowed in `data`.
+								i: new Map([
+									["a", 1],
+									["b", 2],
+								]),
+								// @ts-expect-error -- Functions are not allowed in `data`.
+								j: () => {},
 							},
 							// @ts-expect-error -- 'fix' is required in suggestion objects
 							fix: null,
@@ -339,6 +361,28 @@ const testRule: RuleDefinition<{
 						foo: "foo",
 						bar: 1,
 						baz: true,
+						qux: false,
+						a: 1n,
+						b: null,
+						c: undefined,
+						d: void 0,
+						// @ts-expect-error -- Symbols are not allowed in `data`.
+						e: Symbol("b"),
+						// @ts-expect-error -- Objects are not allowed in `data`.
+						f: {
+							hi: "hi",
+						},
+						// @ts-expect-error -- Arrays are not allowed in `data`.
+						g: [1, 2, 3],
+						// @ts-expect-error -- Sets are not allowed in `data`.
+						h: new Set([1, 2, 3]),
+						// @ts-expect-error -- Maps are not allowed in `data`.
+						i: new Map([
+							["a", 1],
+							["b", 2],
+						]),
+						// @ts-expect-error -- Functions are not allowed in `data`.
+						j: () => {},
 					},
 					fix: null,
 					suggest: null,
