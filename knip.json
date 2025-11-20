@@ -1,0 +1,37 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "ignore": ["templates/**/*"],
+  "workspaces": {
+    ".": { "entry": ["scripts/*.js", "tools/*.js", ".github/workflows/*.yml"] },
+    "packages/compat": {
+      "ignoreDependencies": ["eslint"],
+      "entry": ["tests/**/*.{cts,js,ts}"],
+      "project": ["src/**/*.{cts,js,ts}", "tests/*.{cts,js,ts}"]
+    },
+    "packages/config-array": {
+      "entry": ["tests/**/*.{cts,js,ts}", "rollup.std__path-config.js"],
+      "project": ["src/**/*.{cts,js,ts}", "tests/**/*.{cts,js,ts}"]
+    },
+    "packages/config-helpers": {
+      "entry": ["tests/**/*.{cts,js,ts}"],
+      "project": ["src/**/*.{cts,js,ts}", "tests/**/*.{cts,js,ts}"]
+    },
+    "packages/core": { "project": ["src/**/*.{cts,js,ts}"] },
+    "packages/mcp": {
+      "entry": ["tests/**/*.{cts,js,ts}"],
+      "project": ["src/**/*.{cts,js,ts}", "tests/**/*.{cts,js,ts}"]
+    },
+    "packages/migrate-config": {
+      "entry": ["src/migrate-config.js", "tests/**/*.{cts,js,ts}"],
+      "project": ["src/**/*.{cts,js,ts}", "tests/*.{cts,js,ts}"]
+    },
+    "packages/object-schema": {
+      "entry": ["tests/**/*.{cts,js,ts}", "src/types.ts"],
+      "project": ["src/**/*.{cts,js,ts}", "tests/**/*.{cts,js,ts}"]
+    },
+    "packages/plugin-kit": {
+      "entry": ["tests/**/*.{cts,js,ts}"],
+      "project": ["src/**/*.{cts,js,ts}", "tests/**/*.{cts,js,ts}"]
+    }
+  }
+}
