@@ -4,6 +4,10 @@
 
 [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server for ESLint.
 
+## Installation
+
+Prerequisites: Node.js (^20.19.0, ^22.13.0, or >=24) built with SSL support. (If you are using an official Node.js distribution, SSL is always built in.)
+
 ## Usage
 
 The ESLint MCP server is designed to be run by an IDE-based MCP client like [Visual Studio Code's Copilot](https://code.visualstudio.com/docs/copilot/chat/chat-agent-mode). The command is:

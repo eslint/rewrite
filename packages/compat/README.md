@@ -8,6 +8,8 @@ This package contains functions that allow you to wrap existing ESLint rules, pl
 
 ## Installation
 
+Prerequisites: Node.js (^20.19.0, ^22.13.0, or >=24) built with SSL support. (If you are using an official Node.js distribution, SSL is always built in.)
+
 For Node.js and compatible runtimes:
 
 ```shell

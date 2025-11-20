@@ -16,6 +16,10 @@ This tool currently works well for the following config file formats:
 
 If you are using a JavaScript configuration file (`.eslintrc.js`, `.eslintrc.cjs`, `.eslintrc.mjs`), this tool currently is only capable of migrating the _evaluated_ configuration. That means any logic you may have inside of the file will be lost. If your configuration file is mostly static, then you'll get a good result; if your configuration file is more complex (using functions, calculating paths, etc.) then this tool will not provide an equivalent configuration file.
 
+## Installation
+
+Prerequisites: Node.js (^20.19.0, ^22.13.0, or >=24) built with SSL support. (If you are using an official Node.js distribution, SSL is always built in.)
+
 ## Usage
 
 You can run this package on the command line without installing it first by using `npx` or a similar tool:
