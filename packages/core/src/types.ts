@@ -447,13 +447,15 @@ export type RuleFixer = (
 	fixer: RuleTextEditor,
 ) => RuleTextEdit | Iterable<RuleTextEdit> | null;
 
+export type MessagePlaceholderData =
+	| Record<string, string | number | boolean | bigint | null | undefined>
+	| undefined;
+
 export interface ViolationReportBase {
 	/**
 	 * The data to insert into the message.
 	 */
-	data?:
-		| Record<string, string | number | boolean | bigint | null | undefined> // NOTE: If you update this, please also update the `SuggestedEditBase['data']` type.
-		| undefined;
+	data?: MessagePlaceholderData;
 
 	/**
 	 * The fix to be applied for the violation.
@@ -487,9 +489,7 @@ export interface SuggestedEditBase {
 	/**
 	 * The data to insert into the message.
 	 */
-	data?:
-		| Record<string, string | number | boolean | bigint | null | undefined> // NOTE: If you update this, please also update the `ViolationReportBase['data']` type.
-		| undefined;
+	data?: MessagePlaceholderData;
 
 	/**
 	 * The fix to be applied for the suggestion.
