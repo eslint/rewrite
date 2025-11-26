@@ -304,21 +304,9 @@ export interface RuleContext<
 	cwd: string;
 
 	/**
-	 * Returns the current working directory for the session.
-	 * @deprecated Use `cwd` instead.
-	 */
-	getCwd(): string;
-
-	/**
 	 * The filename of the file being linted.
 	 */
 	filename: string;
-
-	/**
-	 * Returns the filename of the file being linted.
-	 * @deprecated Use `filename` instead.
-	 */
-	getFilename(): string;
 
 	/**
 	 * The physical filename of the file being linted.
@@ -326,21 +314,9 @@ export interface RuleContext<
 	physicalFilename: string;
 
 	/**
-	 * Returns the physical filename of the file being linted.
-	 * @deprecated Use `physicalFilename` instead.
-	 */
-	getPhysicalFilename(): string;
-
-	/**
 	 * The source code object that the rule is running on.
 	 */
 	sourceCode: Options["Code"];
-
-	/**
-	 * Returns the source code object that the rule is running on.
-	 * @deprecated Use `sourceCode` instead.
-	 */
-	getSourceCode(): Options["Code"];
 
 	/**
 	 * Shared settings for the configuration.
@@ -348,21 +324,9 @@ export interface RuleContext<
 	settings: SettingsConfig;
 
 	/**
-	 * Parser-specific options for the configuration.
-	 * @deprecated Use `languageOptions.parserOptions` instead.
-	 */
-	parserOptions: Record<string, unknown>;
-
-	/**
 	 * The language options for the configuration.
 	 */
 	languageOptions: Options["LangOptions"];
-
-	/**
-	 * The CommonJS path to the parser used while parsing this file.
-	 * @deprecated No longer used.
-	 */
-	parserPath: string | undefined;
 
 	/**
 	 * The rule ID.
@@ -574,12 +538,6 @@ export interface LintMessage {
 
 	/** The ID of the message in the rule's meta. */
 	messageId?: string | undefined;
-
-	/**
-	 * Type of node.
-	 * @deprecated `nodeType` is deprecated and will be removed in the next major version.
-	 */
-	nodeType?: string | undefined;
 
 	/** If `true` then this is a fatal error. */
 	fatal?: true | undefined;

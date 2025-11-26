@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.23.0](https://github.com/eslint/rewrite/compare/config-array-v0.22.0...config-array-v0.23.0) (2025-11-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* update minimatch ([#273](https://github.com/eslint/rewrite/issues/273))
+
+### Features
+
+* update minimatch ([#273](https://github.com/eslint/rewrite/issues/273)) ([8b92470](https://github.com/eslint/rewrite/commit/8b9247004d76aef90da7c211902a0ca118d4b47f))
+
+## [0.22.0](https://github.com/eslint/rewrite/compare/config-array-v0.21.1...config-array-v0.22.0) (2025-11-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* Require Node.js ^20.19.0 || ^22.13.0 || >=24 ([#297](https://github.com/eslint/rewrite/issues/297))
+
+### Features
+
+* Require Node.js ^20.19.0 || ^22.13.0 || &gt;=24 ([#297](https://github.com/eslint/rewrite/issues/297)) ([acc623c](https://github.com/eslint/rewrite/commit/acc623c807bf8237a26b18291f04dd99e4e4981a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/object-schema bumped from ^2.1.7 to ^3.0.0
+
 ## [0.21.1](https://github.com/eslint/rewrite/compare/config-array-v0.21.0...config-array-v0.21.1) (2025-10-17)
 
 

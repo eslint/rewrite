@@ -1,5 +1,24 @@
 # Changelog
 
+## [2.0.0](https://github.com/eslint/rewrite/compare/compat-v1.4.1...compat-v2.0.0) (2025-11-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* Require Node.js ^20.19.0 || ^22.13.0 || >=24 ([#297](https://github.com/eslint/rewrite/issues/297))
+
+### Features
+
+* patch missing context and SourceCode methods for v10 ([#311](https://github.com/eslint/rewrite/issues/311)) ([a40d8c6](https://github.com/eslint/rewrite/commit/a40d8c60af5bc09ea5e1c778655312a34ddc9f83))
+* Require Node.js ^20.19.0 || ^22.13.0 || &gt;=24 ([#297](https://github.com/eslint/rewrite/issues/297)) ([acc623c](https://github.com/eslint/rewrite/commit/acc623c807bf8237a26b18291f04dd99e4e4981a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^0.17.0 to ^1.0.0
+
 ## [1.4.1](https://github.com/eslint/rewrite/compare/compat-v1.4.0...compat-v1.4.1) (2025-10-27)
 
 

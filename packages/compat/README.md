@@ -2,9 +2,9 @@
 
 ## Overview
 
-This packages contains functions that allow you to wrap existing ESLint rules, plugins, and configurations that were intended for use with ESLint v8.x to allow them to work as-is in ESLint v9.x.
+This package contains functions that allow you to wrap existing ESLint rules, plugins, and configurations that were intended for use with ESLint v8.x or v9.x to allow them to work as-is in ESLint v9.x and v10.x.
 
-**Note:** All plugins are not guaranteed to work in ESLint v9.x. This package fixes the most common issues but can't fix everything.
+**Note:** All plugins are not guaranteed to work in ESLint v9.x or v10.x. This package fixes the most common issues but can't fix everything.
 
 ## Installation
 
@@ -37,7 +37,7 @@ This package exports the following functions in both ESM and CommonJS format:
 
 ### Fixing Rules
 
-If you have a rule that you'd like to make compatible with ESLint v9.x, you can do so using the `fixupRule()` function:
+If you have a rule that you'd like to make compatible with ESLint v9.x or v10.x, you can do so using the `fixupRule()` function:
 
 ```js
 // ESM example
@@ -71,7 +71,7 @@ module.exports = compatRule;
 
 ### Fixing Plugins
 
-If you are using a plugin in your `eslint.config.js` that is not yet compatible with ESLint 9.x, you can wrap it using the `fixupPluginRules()` function:
+If you are using a plugin in your `eslint.config.js` that is not yet compatible with ESLint v9.x or v10.x, you can wrap it using the `fixupPluginRules()` function:
 
 ```js
 // eslint.config.js - ESM example
@@ -115,7 +115,7 @@ module.exports = defineConfig([
 
 ### Fixing Configs
 
-If you are importing other configs into your `eslint.config.js` that use plugins that are not yet compatible with ESLint 9.x, you can wrap the entire array or a single object using the `fixupConfigRules()` function:
+If you are importing other configs into your `eslint.config.js` that use plugins that are not yet compatible with ESLint v9.x or v10.x, you can wrap the entire array or a single object using the `fixupConfigRules()` function:
 
 ```js
 // eslint.config.js - ESM example
@@ -158,11 +158,8 @@ The `includeIgnoreFile()` function also accepts a second optional `name` paramet
 import { defineConfig } from "eslint/config";
 import { includeIgnoreFile } from "@eslint/compat";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const gitignorePath = path.resolve(__dirname, ".gitignore");
+const gitignorePath = path.resolve(import.meta.dirname, ".gitignore");
 
 export default defineConfig([
 	includeIgnoreFile(gitignorePath, "Imported .gitignore patterns"), // second argument is optional.
@@ -207,7 +204,7 @@ to get your logo on our READMEs and [website](https://eslint.org/sponsors).
 <p><a href="https://automattic.com"><img src="https://images.opencollective.com/automattic/d0ef3e1/logo.png" alt="Automattic" height="128"></a> <a href="https://www.airbnb.com/"><img src="https://images.opencollective.com/airbnb/d327d66/logo.png" alt="Airbnb" height="128"></a></p><h3>Gold Sponsors</h3>
 <p><a href="https://qlty.sh/"><img src="https://images.opencollective.com/qltysh/33d157d/logo.png" alt="Qlty Software" height="96"></a> <a href="https://shopify.engineering/"><img src="https://avatars.githubusercontent.com/u/8085" alt="Shopify" height="96"></a></p><h3>Silver Sponsors</h3>
 <p><a href="https://vite.dev/"><img src="https://images.opencollective.com/vite/e6d15e1/logo.png" alt="Vite" height="64"></a> <a href="https://liftoff.io/"><img src="https://images.opencollective.com/liftoff/2d6c3b6/logo.png" alt="Liftoff" height="64"></a> <a href="https://americanexpress.io"><img src="https://avatars.githubusercontent.com/u/3853301" alt="American Express" height="64"></a> <a href="https://stackblitz.com"><img src="https://avatars.githubusercontent.com/u/28635252" alt="StackBlitz" height="64"></a></p><h3>Bronze Sponsors</h3>
-<p><a href="https://cybozu.co.jp/"><img src="https://images.opencollective.com/cybozu/933e46d/logo.png" alt="Cybozu" height="32"></a> <a href="https://icons8.com/"><img src="https://images.opencollective.com/icons8/7fa1641/logo.png" alt="Icons8" height="32"></a> <a href="https://discord.com"><img src="https://images.opencollective.com/discordapp/f9645d9/logo.png" alt="Discord" height="32"></a> <a href="https://www.gitbook.com"><img src="https://avatars.githubusercontent.com/u/7111340" alt="GitBook" height="32"></a> <a href="https://nx.dev"><img src="https://avatars.githubusercontent.com/u/23692104" alt="Nx" height="32"></a> <a href="https://opensource.mercedes-benz.com/"><img src="https://avatars.githubusercontent.com/u/34240465" alt="Mercedes-Benz Group" height="32"></a> <a href="https://herocoders.com"><img src="https://avatars.githubusercontent.com/u/37549774" alt="HeroCoders" height="32"></a> <a href="https://www.lambdatest.com"><img src="https://avatars.githubusercontent.com/u/171592363" alt="LambdaTest" height="32"></a></p>
+<p><a href="https://cybozu.co.jp/"><img src="https://images.opencollective.com/cybozu/933e46d/logo.png" alt="Cybozu" height="32"></a> <a href="https://syntax.fm"><img src="https://github.com/syntaxfm.png" alt="Syntax" height="32"></a> <a href="https://www.n-ix.com/"><img src="https://images.opencollective.com/n-ix-ltd/575a7a5/logo.png" alt="N-iX Ltd" height="32"></a> <a href="https://icons8.com/"><img src="https://images.opencollective.com/icons8/7fa1641/logo.png" alt="Icons8" height="32"></a> <a href="https://discord.com"><img src="https://images.opencollective.com/discordapp/f9645d9/logo.png" alt="Discord" height="32"></a> <a href="https://www.gitbook.com"><img src="https://avatars.githubusercontent.com/u/7111340" alt="GitBook" height="32"></a> <a href="https://nx.dev"><img src="https://avatars.githubusercontent.com/u/23692104" alt="Nx" height="32"></a> <a href="https://opensource.mercedes-benz.com/"><img src="https://avatars.githubusercontent.com/u/34240465" alt="Mercedes-Benz Group" height="32"></a> <a href="https://herocoders.com"><img src="https://avatars.githubusercontent.com/u/37549774" alt="HeroCoders" height="32"></a> <a href="https://www.lambdatest.com"><img src="https://avatars.githubusercontent.com/u/171592363" alt="LambdaTest" height="32"></a></p>
 <h3>Technology Sponsors</h3>
 Technology sponsors allow us to use their products and services for free as part of a contribution to the open source ecosystem and our work.
 <p><a href="https://netlify.com"><img src="https://raw.githubusercontent.com/eslint/eslint.org/main/src/assets/images/techsponsors/netlify-icon.svg" alt="Netlify" height="32"></a> <a href="https://algolia.com"><img src="https://raw.githubusercontent.com/eslint/eslint.org/main/src/assets/images/techsponsors/algolia-icon.svg" alt="Algolia" height="32"></a> <a href="https://1password.com"><img src="https://raw.githubusercontent.com/eslint/eslint.org/main/src/assets/images/techsponsors/1password-icon.svg" alt="1Password" height="32"></a></p>

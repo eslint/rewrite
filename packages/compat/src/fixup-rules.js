@@ -1,5 +1,5 @@
 /**
- * @filedescription Functions to fix up rules to provide missing methods on the `context` object.
+ * @fileoverview Functions to fix up rules to provide missing methods on the `context` and `sourceCode` objects.
  * @author Nicholas C. Zakas
  */
 
@@ -71,12 +71,66 @@ const fixedUpPluginReplacements = new WeakMap();
 const fixedUpPlugins = new WeakSet();
 
 //-----------------------------------------------------------------------------
+// Helpers
+//-----------------------------------------------------------------------------
+
+/**
+ * Determines if two nodes or tokens overlap.
+ * @param {object} first The first node or token to check.
+ * @param {object} second The second node or token to check.
+ * @returns {boolean} True if the two nodes or tokens overlap.
+ */
+function nodesOrTokensOverlap(first, second) {
+	return (
+		(first.range[0] <= second.range[0] &&
+			first.range[1] >= second.range[0]) ||
+		(second.range[0] <= first.range[0] && second.range[1] >= first.range[0])
+	);
+}
+
+/**
+ * Checks whether a node is an export declaration.
+ * @param {object} node An AST node.
+ * @returns {boolean} True if the node is an export declaration.
+ */
+function looksLikeExport(node) {
+	return (
+		node.type === "ExportDefaultDeclaration" ||
+		node.type === "ExportNamedDeclaration"
+	);
+}
+
+/**
+ * Checks for the presence of a JSDoc comment for the given node and returns it.
+ * @param {object} node The AST node to get the comment for.
+ * @param {object} sourceCode A SourceCode instance to get comments.
+ * @returns {object|null} The Block comment token containing the JSDoc comment
+ *      for the given node or null if not found.
+ */
+function findJSDocComment(node, sourceCode) {
+	const tokenBefore = sourceCode.getTokenBefore(node, {
+		includeComments: true,
+	});
+
+	if (
+		tokenBefore &&
+		tokenBefore.type === "Block" &&
+		tokenBefore.value.charAt(0) === "*" &&
+		node.loc.start.line - tokenBefore.loc.end.line <= 1
+	) {
+		return tokenBefore;
+	}
+
+	return null;
+}
+
+//-----------------------------------------------------------------------------
 // Exports
 //-----------------------------------------------------------------------------
 
 /**
  * Takes the given rule and creates a new rule with the `create()` method wrapped
- * to provide the missing methods on the `context` object.
+ * to provide missing methods on the `context` and `sourceCode` objects.
  * @param {FixupRuleDefinition|FixupLegacyRuleDefinition} ruleDefinition The rule to fix up.
  * @returns {FixupRuleDefinition} The fixed-up rule.
  */
@@ -98,52 +152,193 @@ export function fixupRule(ruleDefinition) {
 		: ruleDefinition.create.bind(ruleDefinition);
 
 	function ruleCreate(context) {
-		// if getScope is already there then no need to create old methods
+		const sourceCode = context.sourceCode;
+
+		// No need to create old methods for ESLint < 9
 		if ("getScope" in context) {
 			return originalCreate(context);
 		}
 
-		const sourceCode = context.sourceCode;
-		let currentNode = sourceCode.ast;
+		let eslintVersion = 9;
+		if (!("getCwd" in context)) {
+			eslintVersion = 10;
+		}
 
-		const newContext = Object.assign(Object.create(context), {
-			parserServices: sourceCode.parserServices,
+		let compatSourceCode = sourceCode;
+		if (eslintVersion >= 10) {
+			compatSourceCode = Object.assign(Object.create(sourceCode), {
+				getTokenOrCommentBefore(node, skip) {
+					return sourceCode.getTokenBefore(node, {
+						includeComments: true,
+						skip,
+					});
+				},
+				getTokenOrCommentAfter(node, skip) {
+					return sourceCode.getTokenAfter(node, {
+						includeComments: true,
+						skip,
+					});
+				},
+				isSpaceBetweenTokens(first, second) {
+					if (nodesOrTokensOverlap(first, second)) {
+						return false;
+					}
+
+					const [startingNodeOrToken, endingNodeOrToken] =
+						first.range[1] <= second.range[0]
+							? [first, second]
+							: [second, first];
+					const firstToken =
+						sourceCode.getLastToken(startingNodeOrToken) ||
+						startingNodeOrToken;
+					const finalToken =
+						sourceCode.getFirstToken(endingNodeOrToken) ||
+						endingNodeOrToken;
+					let currentToken = firstToken;
+
+					while (currentToken !== finalToken) {
+						const nextToken = sourceCode.getTokenAfter(
+							currentToken,
+							{
+								includeComments: true,
+							},
+						);
+
+						if (
+							currentToken.range[1] !== nextToken.range[0] ||
+							(nextToken !== finalToken &&
+								nextToken.type === "JSXText" &&
+								/\s/u.test(nextToken.value))
+						) {
+							return true;
+						}
+
+						currentToken = nextToken;
+					}
+
+					return false;
+				},
+				getJSDocComment(node) {
+					let parent = node.parent;
+
+					switch (node.type) {
+						case "ClassDeclaration":
+						case "FunctionDeclaration":
+							return findJSDocComment(
+								looksLikeExport(parent) ? parent : node,
+								sourceCode,
+							);
+
+						case "ClassExpression":
+							return findJSDocComment(parent.parent, sourceCode);
+
+						case "ArrowFunctionExpression":
+						case "FunctionExpression":
+							if (
+								parent.type !== "CallExpression" &&
+								parent.type !== "NewExpression"
+							) {
+								while (
+									!sourceCode.getCommentsBefore(parent)
+										.length &&
+									!/Function/u.test(parent.type) &&
+									parent.type !== "MethodDefinition" &&
+									parent.type !== "Property"
+								) {
+									parent = parent.parent;
+
+									if (!parent) {
+										break;
+									}
+								}
+
+								if (
+									parent &&
+									parent.type !== "FunctionDeclaration" &&
+									parent.type !== "Program"
+								) {
+									return findJSDocComment(parent, sourceCode);
+								}
+							}
+
+							return findJSDocComment(node, sourceCode);
+
+						default:
+							return null;
+					}
+				},
+			});
+
+			Object.freeze(compatSourceCode);
+		}
+
+		let currentNode = compatSourceCode.ast;
+
+		const compatContext = Object.assign(Object.create(context), {
+			parserServices: compatSourceCode.parserServices,
 
 			/*
 			 * The following methods rely on the current node in the traversal,
 			 * so we need to add them manually.
 			 */
 			getScope() {
-				return sourceCode.getScope(currentNode);
+				return compatSourceCode.getScope(currentNode);
 			},
 
 			getAncestors() {
-				return sourceCode.getAncestors(currentNode);
+				return compatSourceCode.getAncestors(currentNode);
 			},
 
 			markVariableAsUsed(variable) {
-				sourceCode.markVariableAsUsed(variable, currentNode);
+				compatSourceCode.markVariableAsUsed(variable, currentNode);
 			},
 		});
+
+		if (eslintVersion >= 10) {
+			Object.assign(compatContext, {
+				parserOptions: compatContext.languageOptions.parserOptions,
+
+				getCwd() {
+					return compatContext.cwd;
+				},
+
+				getFilename() {
+					return compatContext.filename;
+				},
+
+				getPhysicalFilename() {
+					return compatContext.physicalFilename;
+				},
+
+				getSourceCode() {
+					return compatSourceCode;
+				},
+			});
+
+			Object.defineProperty(compatContext, "sourceCode", {
+				enumerable: true,
+				value: compatSourceCode,
+			});
+		}
 
 		// add passthrough methods
 		for (const [
 			contextMethodName,
 			sourceCodeMethodName,
 		] of removedMethodNames) {
-			newContext[contextMethodName] =
-				sourceCode[sourceCodeMethodName].bind(sourceCode);
+			compatContext[contextMethodName] =
+				compatSourceCode[sourceCodeMethodName].bind(compatSourceCode);
 		}
 
 		// freeze just like the original context
-		Object.freeze(newContext);
+		Object.freeze(compatContext);
 
 		/*
 		 * Create the visitor object using the original create() method.
 		 * This is necessary to ensure that the visitor object is created
 		 * with the correct context.
 		 */
-		const visitor = originalCreate(newContext);
+		const visitor = originalCreate(compatContext);
 
 		/*
 		 * Wrap each method in the visitor object to update the currentNode
@@ -184,7 +379,7 @@ export function fixupRule(ruleDefinition) {
 	};
 
 	// copy `schema` property of function-style rule or top-level `schema` property of object-style rule into `meta` object
-	// @ts-ignore -- top-level `schema` property was not offically supported for object-style rules so it doesn't exist in types
+	// @ts-ignore -- top-level `schema` property was not officially supported for object-style rules so it doesn't exist in types
 	const { schema } = ruleDefinition;
 	if (schema) {
 		if (!newRuleDefinition.meta) {
@@ -207,7 +402,7 @@ export function fixupRule(ruleDefinition) {
 
 /**
  * Takes the given plugin and creates a new plugin with all of the rules wrapped
- * to provide the missing methods on the `context` object.
+ * to provide missing methods on the `context` and `sourceCode` objects.
  * @param {FixupPluginDefinition} plugin The plugin to fix up.
  * @returns {FixupPluginDefinition} The fixed-up plugin.
  */
@@ -244,7 +439,7 @@ export function fixupPluginRules(plugin) {
 
 /**
  * Takes the given configuration and creates a new configuration with all of the
- * rules wrapped to provide the missing methods on the `context` object.
+ * rules wrapped to provide missing methods on the `context` and `sourceCode` objects.
  * @param {FixupConfigArray|FixupConfig} config The configuration to fix up.
  * @returns {FixupConfigArray} The fixed-up configuration.
  */

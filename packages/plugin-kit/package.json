@@ -1,6 +1,6 @@
 {
   "name": "@eslint/plugin-kit",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Utilities for building ESLint plugins.",
   "author": "Nicholas C. Zakas",
   "type": "module",
@@ -38,7 +38,7 @@
     "pretest": "npm run build",
     "test": "mocha \"tests/**/*.test.js\"",
     "test:coverage": "c8 npm test",
-    "test:jsr": "npx jsr@latest publish --dry-run",
+    "test:jsr": "npx -y jsr@latest publish --dry-run",
     "test:types": "tsc -p tests/types/tsconfig.json"
   },
   "keywords": [
@@ -48,7 +48,7 @@
   ],
   "license": "Apache-2.0",
   "dependencies": {
-    "@eslint/core": "^0.17.0",
+    "@eslint/core": "^1.0.0",
     "levn": "^0.4.1"
   },
   "devDependencies": {
@@ -56,6 +56,6 @@
     "rollup-plugin-copy": "^3.5.0"
   },
   "engines": {
-    "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
+    "node": "^20.19.0 || ^22.13.0 || >=24"
   }
 }

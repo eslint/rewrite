@@ -1,6 +1,6 @@
 {
   "name": "@eslint/config-helpers",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "description": "Helper utilities for creating ESLint configuration",
   "type": "module",
   "main": "dist/esm/index.js",
@@ -30,7 +30,7 @@
     "build": "rollup -c && npm run build:dedupe-types && tsc -p tsconfig.esm.json && npm run build:cts",
     "test": "mocha \"tests/**/*.test.js\"",
     "test:coverage": "c8 npm test",
-    "test:jsr": "npx jsr@latest publish --dry-run",
+    "test:jsr": "npx -y jsr@latest publish --dry-run",
     "test:pnpm": "cd tests/pnpm && pnpm install && pnpm exec tsc",
     "test:types": "tsc -p tests/types/tsconfig.json"
   },
@@ -48,13 +48,12 @@
   },
   "homepage": "https://github.com/eslint/rewrite/tree/main/packages/config-helpers#readme",
   "dependencies": {
-    "@eslint/core": "^0.17.0"
+    "@eslint/core": "^1.0.0"
   },
   "devDependencies": {
-    "eslint": "^9.27.0",
     "rollup-plugin-copy": "^3.5.0"
   },
   "engines": {
-    "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
+    "node": "^20.19.0 || ^22.13.0 || >=24"
   }
 }

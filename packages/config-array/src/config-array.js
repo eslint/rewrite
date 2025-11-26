@@ -9,7 +9,7 @@
 
 import * as posixPath from "@jsr/std__path/posix";
 import * as windowsPath from "@jsr/std__path/windows";
-import minimatch from "minimatch";
+import { Minimatch } from "minimatch";
 import createDebug from "debug";
 
 import { ObjectSchema } from "@eslint/object-schema";
@@ -21,8 +21,7 @@ import { filesAndIgnoresSchema } from "./files-and-ignores-schema.js";
 //------------------------------------------------------------------------------
 
 /** @typedef {import("./types.ts").ConfigObject} ConfigObject */
-/** @typedef {import("minimatch").IMinimatchStatic} IMinimatchStatic */
-/** @typedef {import("minimatch").IMinimatch} IMinimatch */
+/** @typedef {import("minimatch").MinimatchOptions} MinimatchOptions */
 /** @import * as PathImpl from "@jsr/std__path" */
 
 /*
@@ -38,29 +37,27 @@ import { filesAndIgnoresSchema } from "./files-and-ignores-schema.js";
 // Helpers
 //------------------------------------------------------------------------------
 
-const Minimatch = minimatch.Minimatch;
 const debug = createDebug("@eslint/config-array");
 
 /**
  * A cache for minimatch instances.
- * @type {Map<string, IMinimatch>}
+ * @type {Map<string, Minimatch>}
  */
 const minimatchCache = new Map();
 
 /**
  * A cache for negated minimatch instances.
- * @type {Map<string, IMinimatch>}
+ * @type {Map<string, Minimatch>}
  */
 const negatedMinimatchCache = new Map();
 
 /**
  * Options to use with minimatch.
- * @type {Object}
+ * @type {MinimatchOptions}
  */
 const MINIMATCH_OPTIONS = {
 	// matchBase: true,
 	dot: true,
-	allowWindowsEscape: true,
 };
 
 /**

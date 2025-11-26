@@ -13,7 +13,7 @@ jobs:
         name: Verify Files
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
 
             - uses: actions/setup-node@v6
               with:
@@ -27,6 +27,9 @@ jobs:
             - name: Lint Files
               run: npm run lint
 
+            - name: Lint Files, Dependencies, & Exports
+              run: npm run lint:unused
+
             - name: Check Formatting
               run: npm run fmt:check
 
@@ -36,10 +39,10 @@ jobs:
         strategy:
             matrix:
                 os: [windows-latest, macOS-latest, ubuntu-latest]
-                node-version: [18.x, 20.x, 22.x, 24.x, 25.x]
+                node-version: [25.x, 24.x, 22.x, 20.x, "20.19.0"]
 
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
 
             - name: Set up Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v6
@@ -58,7 +61,7 @@ jobs:
         name: Test Types
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
 
             - name: Setup Node.js
               uses: actions/setup-node@v6
@@ -102,7 +105,7 @@ jobs:
         name: Verify JSR Publish
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
 
             - uses: actions/setup-node@v6
               with:
@@ -120,7 +123,7 @@ jobs:
         name: Test pnpm Type Support
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
 
             - uses: pnpm/action-setup@v4
               with:
