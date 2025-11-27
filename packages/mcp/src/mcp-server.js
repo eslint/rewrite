@@ -21,9 +21,9 @@ const mcpServer = new McpServer({
 });
 
 // Important: Cursor throws an error when `describe()` is used in the schema.
-const filePathsSchema = {
+const filePathsSchema = Object.freeze({
 	filePaths: z.array(z.string().min(1)).nonempty(),
-};
+});
 
 //-----------------------------------------------------------------------------
 // Tools
