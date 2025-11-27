@@ -28,6 +28,11 @@ const mcpServer = new McpServer({
 	version: "0.2.0", // x-release-please-version
 });
 
+// Important: Cursor throws an error when `describe()` is used in the schema.
+const filePathsSchema = /** @type {ZodRawShape} */ ({
+	filePaths: /** @type {unknown} */ (z.array(z.string().min(1)).nonempty()),
+});
+
 //-----------------------------------------------------------------------------
 // Tools
 //-----------------------------------------------------------------------------
@@ -35,10 +40,7 @@ const mcpServer = new McpServer({
 mcpServer.tool(
 	"lint-files",
 	"Lint files using ESLint. You must provide a list of absolute file paths to the files you want to lint. The absolute file paths should be in the correct format for your operating system (e.g., forward slashes on Unix-like systems, backslashes on Windows).",
-	// Important: Cursor throws an error when `describe()` is used in the schema.
-	{
-		filePaths: z.array(z.string().min(1)).nonempty(),
-	},
+	filePathsSchema,
 	async ({ filePaths }) => {
 		const eslint = new ESLint({
 			// enable lookup from file rather than from cwd
