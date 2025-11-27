@@ -8,16 +8,8 @@
 //-----------------------------------------------------------------------------
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { ESLint } from "eslint";
-
-//-----------------------------------------------------------------------------
-// Type Definitions
-//-----------------------------------------------------------------------------
-
-/**
- * @import { ZodRawShape } from "zod";
- */
 
 //-----------------------------------------------------------------------------
 // Server
@@ -29,9 +21,9 @@ const mcpServer = new McpServer({
 });
 
 // Important: Cursor throws an error when `describe()` is used in the schema.
-const filePathsSchema = /** @type {ZodRawShape} */ ({
-	filePaths: /** @type {unknown} */ (z.array(z.string().min(1)).nonempty()),
-});
+const filePathsSchema = {
+	filePaths: z.array(z.string().min(1)).nonempty(),
+};
 
 //-----------------------------------------------------------------------------
 // Tools
