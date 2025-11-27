@@ -447,11 +447,16 @@ export type RuleFixer = (
 	fixer: RuleTextEditor,
 ) => RuleTextEdit | Iterable<RuleTextEdit> | null;
 
+export type MessagePlaceholderData = Record<
+	string,
+	string | number | boolean | bigint | null | undefined
+>;
+
 export interface ViolationReportBase {
 	/**
 	 * The data to insert into the message.
 	 */
-	data?: Record<string, unknown> | undefined;
+	data?: MessagePlaceholderData | undefined;
 
 	/**
 	 * The fix to be applied for the violation.
@@ -485,7 +490,7 @@ export interface SuggestedEditBase {
 	/**
 	 * The data to insert into the message.
 	 */
-	data?: Record<string, unknown> | undefined;
+	data?: MessagePlaceholderData | undefined;
 
 	/**
 	 * The fix to be applied for the suggestion.
@@ -1030,8 +1035,9 @@ export interface BaseConfig<
 /**
  * The overwrites that apply more differing configuration to specific files or directories.
  */
-export interface ConfigOverride<Rules extends RulesConfig = RulesConfig>
-	extends BaseConfig<Rules> {
+export interface ConfigOverride<
+	Rules extends RulesConfig = RulesConfig,
+> extends BaseConfig<Rules> {
 	/**
 	 * The glob patterns for excluded files.
 	 */
