@@ -12,6 +12,14 @@ import { z } from "zod";
 import { ESLint } from "eslint";
 
 //-----------------------------------------------------------------------------
+// Type Definitions
+//-----------------------------------------------------------------------------
+
+/**
+ * @import { ZodRawShape } from "zod";
+ */
+
+//-----------------------------------------------------------------------------
 // Server
 //-----------------------------------------------------------------------------
 
@@ -21,9 +29,9 @@ const mcpServer = new McpServer({
 });
 
 // Important: Cursor throws an error when `describe()` is used in the schema.
-const filePathsSchema = {
-	filePaths: z.array(z.string().min(1)).min(1),
-};
+const filePathsSchema = /** @satisfies {ZodRawShape} */ ({
+	filePaths: z.array(z.string().min(1)).nonempty(),
+});
 
 //-----------------------------------------------------------------------------
 // Tools
