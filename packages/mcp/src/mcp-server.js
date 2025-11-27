@@ -12,6 +12,14 @@ import { z } from "zod";
 import { ESLint } from "eslint";
 
 //-----------------------------------------------------------------------------
+// Type Definitions
+//-----------------------------------------------------------------------------
+
+/**
+ * @import { ZodRawShape } from "zod";
+ */
+
+//-----------------------------------------------------------------------------
 // Server
 //-----------------------------------------------------------------------------
 
@@ -21,21 +29,18 @@ const mcpServer = new McpServer({
 });
 
 // Important: Cursor throws an error when `describe()` is used in the schema.
-const filePathsSchema = {
+const filePathsSchema = /** @type {ZodRawShape} */ ({
 	filePaths: z.array(z.string().min(1)).nonempty(),
-};
+});
 
 //-----------------------------------------------------------------------------
 // Tools
 //-----------------------------------------------------------------------------
 
-mcpServer.registerTool(
+mcpServer.tool(
 	"lint-files",
-	{
-		description:
-			"Lint files using ESLint. You must provide a list of absolute file paths to the files you want to lint. The absolute file paths should be in the correct format for your operating system (e.g., forward slashes on Unix-like systems, backslashes on Windows).",
-		inputSchema: filePathsSchema,
-	},
+	"Lint files using ESLint. You must provide a list of absolute file paths to the files you want to lint. The absolute file paths should be in the correct format for your operating system (e.g., forward slashes on Unix-like systems, backslashes on Windows).",
+	filePathsSchema,
 	async ({ filePaths }) => {
 		const eslint = new ESLint({
 			// enable lookup from file rather than from cwd
