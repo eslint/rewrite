@@ -159,7 +159,7 @@ function publishPackagesToJsr(packageDirs) {
 
 		console.log(`Publishing ${packageDir}...`);
 		try {
-			exec(`npx jsr publish`, {
+			exec(`npx -y jsr@latest publish`, {
 				stdio: "inherit",
 				env: process.env,
 				cwd: packageDir,
