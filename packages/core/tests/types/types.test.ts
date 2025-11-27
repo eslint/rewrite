@@ -96,15 +96,12 @@ interface TestLanguageOptions extends LanguageOptions {
 	howMuch?: "yes" | "no" | boolean;
 }
 
-class TestSourceCode
-	implements
-		TextSourceCode<{
-			LangOptions: TestLanguageOptions;
-			RootNode: TestRootNode;
-			SyntaxElementWithLoc: unknown;
-			ConfigNode: unknown;
-		}>
-{
+class TestSourceCode implements TextSourceCode<{
+	LangOptions: TestLanguageOptions;
+	RootNode: TestRootNode;
+	SyntaxElementWithLoc: unknown;
+	ConfigNode: unknown;
+}> {
 	text: string;
 	ast: TestRootNode;
 	notMuch: "no" | false;
@@ -438,8 +435,8 @@ const testRuleWithInvalidDefaultOptions: RuleDefinition<{
 testRuleWithInvalidDefaultOptions.meta satisfies RulesMeta | undefined;
 
 type TestRuleDefinition<
-	Options extends
-		Partial<CustomRuleTypeDefinitions> = CustomRuleTypeDefinitions,
+	Options extends Partial<CustomRuleTypeDefinitions> =
+		CustomRuleTypeDefinitions,
 > = CustomRuleDefinitionType<
 	{
 		LangOptions: TestLanguageOptions;
