@@ -3,6 +3,7 @@
   "files": ["src/mcp-cli.js"],
   "compilerOptions": {
     "noEmit": true,
-    "strict": true
+    "strict": true,
+    "skipLibCheck": true
   }
 }
