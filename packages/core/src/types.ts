@@ -1030,8 +1030,9 @@ export interface BaseConfig<
 /**
  * The overwrites that apply more differing configuration to specific files or directories.
  */
-export interface ConfigOverride<Rules extends RulesConfig = RulesConfig>
-	extends BaseConfig<Rules> {
+export interface ConfigOverride<
+	Rules extends RulesConfig = RulesConfig,
+> extends BaseConfig<Rules> {
 	/**
 	 * The glob patterns for excluded files.
 	 */
