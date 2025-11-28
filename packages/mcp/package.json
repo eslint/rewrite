@@ -36,9 +36,9 @@
     "node": "^20.19.0 || ^22.13.0 || >=24"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "https://pkg.pr.new/modelcontextprotocol/typescript-sdk/@modelcontextprotocol/sdk@1181",
+    "@modelcontextprotocol/sdk": "^1.23.0",
     "eslint": "^9.39.1",
-    "zod": "^3.25.76"
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@cfworker/json-schema": "^4.1.1",
