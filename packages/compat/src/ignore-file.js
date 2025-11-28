@@ -84,8 +84,13 @@ export function includeIgnoreFile(ignoreFilePath, name) {
 	return {
 		name: name || "Imported .gitignore patterns",
 		ignores: lines
-			.map(line => line.trim())
-			.filter(line => line && !line.startsWith("#"))
+			.map(line =>
+				line
+					.trim()
+					.replace(/\s?[^\\]?#.*/gu, "")
+					.trim(),
+			)
+			.filter(Boolean)
 			.map(convertIgnorePatternToMinimatch),
 	};
 }
