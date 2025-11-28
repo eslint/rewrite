@@ -34,10 +34,7 @@ mcpServer.tool(
 	"Lint files using ESLint. You must provide a list of absolute file paths to the files you want to lint. The absolute file paths should be in the correct format for your operating system (e.g., forward slashes on Unix-like systems, backslashes on Windows).",
 	filePathsSchema,
 	async ({ filePaths }) => {
-		const eslint = new ESLint({
-			// enable lookup from file rather than from cwd
-			flags: ["unstable_config_lookup_from_file"],
-		});
+		const eslint = new ESLint();
 
 		const type = /** @type {const} */ ("text");
 		const results = await eslint.lintFiles(filePaths);
