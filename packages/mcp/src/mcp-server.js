@@ -39,7 +39,7 @@ mcpServer.registerTool(
 	async ({ filePaths }) => {
 		const eslint = new ESLint({
 			// enable lookup from file rather than from cwd
-			flags: ["v10_config_lookup_from_file"],
+			flags: ["unstable_config_lookup_from_file"],
 		});
 
 		const type = /** @type {const} */ ("text");
