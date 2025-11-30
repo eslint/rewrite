@@ -20,6 +20,7 @@ const EXECUTABLE_PATH = path.resolve("./src/mcp-cli.js");
 
 /**
  * Forks the process to run an instance of ESLint.
+ * @param {childProcess.ForkOptions} [options] Options passed to childProcess.fork
  * @returns {childProcess.ChildProcess} The resulting child process
  */
 function runServer(options) {

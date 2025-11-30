@@ -1,13 +1,15 @@
 import eslintConfigESLint from "eslint-config-eslint";
-import { defineConfig } from "@eslint/config-helpers";
+import globals from "globals";
+import { defineConfig, globalIgnores } from "@eslint/config-helpers";
 import tseslint from "typescript-eslint";
 
 export default defineConfig([
+	globalIgnores(
+		["**/tests/fixtures/", "**/dist/", "**/coverage/"],
+		"rewrite/global-ignores",
+	),
 	{
-		ignores: ["**/tests/fixtures/", "**/dist/", "**/coverage/"],
-	},
-
-	{
+		name: "rewrite/js",
 		files: ["**/*.js"],
 		extends: [eslintConfigESLint],
 		rules: {
@@ -15,9 +17,8 @@ export default defineConfig([
 			"no-undefined": "off",
 		},
 	},
-
-	// Tools and CLI
 	{
+		name: "rewrite/tools",
 		files: [
 			"scripts/**",
 			"tools/**",
@@ -28,30 +29,22 @@ export default defineConfig([
 			"n/no-process-exit": "off",
 		},
 	},
-
 	{
+		name: "rewrite/tests",
 		files: ["**/tests/**"],
 		languageOptions: {
 			globals: {
-				describe: "readonly",
-				xdescribe: "readonly",
-				it: "readonly",
-				xit: "readonly",
-				beforeEach: "readonly",
-				afterEach: "readonly",
-				before: "readonly",
-				after: "readonly",
+				...globals.mocha,
 			},
 		},
 	},
-
-	// TypeScript
-	...tseslint.config({
+	{
+		name: "rewrite/ts",
 		files: ["**/*.ts"],
 		ignores: ["**/tests/**/*.ts"],
-		extends: [...tseslint.configs.strict, ...tseslint.configs.stylistic],
+		extends: [tseslint.configs.strict, tseslint.configs.stylistic],
 		rules: {
 			"no-use-before-define": "off",
 		},
-	}),
+	},
 ]);

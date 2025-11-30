@@ -12,6 +12,13 @@
 
 import { readFile, writeFile } from "node:fs/promises";
 
+/**
+ * Replaces all occurrences of a pattern in a file with a replacement string.
+ * @param {string} file The file path to modify.
+ * @param {RegExp} search The regular expression to search for.
+ * @param {string} replacement The replacement string.
+ * @returns {Promise<void>} Resolves when the file has been written.
+ */
 async function replaceInFile(file, search, replacement) {
 	let text = await readFile(file, "utf-8");
 	text = text.replace(search, replacement);
