@@ -447,6 +447,9 @@ export type RuleFixer = (
 	fixer: RuleTextEditor,
 ) => RuleTextEdit | Iterable<RuleTextEdit> | null;
 
+/**
+ * Data that can be used to fill placeholders in error messages.
+ */
 export type MessagePlaceholderData = Record<
 	string,
 	string | number | boolean | bigint | null | undefined
