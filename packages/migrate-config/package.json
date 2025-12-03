@@ -47,7 +47,7 @@
   },
   "dependencies": {
     "@eslint/compat": "^2.0.0",
-    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/eslintrc": "^3.3.3",
     "camelcase": "^8.0.0",
     "espree": "^10.4.0",
     "recast": "^0.23.7"
