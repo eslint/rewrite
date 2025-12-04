@@ -50,7 +50,7 @@ const releaseOutputs = JSON.parse(process.env.STEPS_RELEASE_OUTPUTS);
  * Gets the output of a GitHub Actions step from the environment variables.
  * @param {string} packageDir The directory of the package.
  * @param {string} name The name of the output.
- * @return {string} The output value.
+ * @returns {string} The output value.
  */
 function getReleaseOutput(packageDir, name) {
 	return releaseOutputs[`${packageDir}--${name}`];
@@ -59,7 +59,7 @@ function getReleaseOutput(packageDir, name) {
 /**
  * Gets the list of packages to publish.
  * @param {Array<string>} packageDirs The list of package directories.
- * @return {Array<string>} The list of packages to publish.
+ * @returns {Array<string>} The list of packages to publish.
  */
 function getPackagesToPublish(packageDirs) {
 	return packageDirs.filter(
@@ -72,7 +72,7 @@ function getPackagesToPublish(packageDirs) {
  * Maps the dependencies into a structure where they keys are package
  * paths and the values are an array of package paths.
  * @param {Map<string, { name:string, dir: string, dependencies: Set<string> }>} dependencies The dependencies to map.
- * @return {Map<string, Set<string>>} The mapped dependencies.
+ * @returns {Map<string, Set<string>>} The mapped dependencies.
  */
 function mapDependenciesToPaths(dependencies) {
 	const mappedDependencies = new Map();
@@ -92,7 +92,7 @@ function mapDependenciesToPaths(dependencies) {
  * will still be published.
  * @param {Array<string>} packageDirs The list of package directories.
  * @param {Map<string, Set<string>>} dependencies The dependencies between packages.
- * @return {Map<string,string>} A map of package directory to whether it was published successfully.
+ * @returns {Map<string,string>} A map of package directory to whether it was published successfully.
  */
 function publishPackagesToNpm(packageDirs, dependencies) {
 	console.log(
@@ -140,8 +140,8 @@ function publishPackagesToNpm(packageDirs, dependencies) {
  * Publishes the packages to JSR. If one package fails to publish, the rest
  * will still be published.
  * @param {Array<string>} packageDirs The list of package directories.
- * @return {Map<string,string>} A map of package directory to whether it was published successfully.
- **/
+ * @returns {Map<string,string>} A map of package directory to whether it was published successfully.
+ */
 function publishPackagesToJsr(packageDirs) {
 	console.log(
 		`Publishing packages to JSR in this order: ${packageDirs.join(", ")}`,
@@ -181,7 +181,7 @@ function publishPackagesToJsr(packageDirs) {
 /**
  * Posts the results to social media.
  * @param {Map<string,string>} npmPublishResults The results of the npm publish.
- * @return {void}
+ * @returns {void}
  */
 function postResultToSocialMedia(npmPublishResults) {
 	const messages = [];
