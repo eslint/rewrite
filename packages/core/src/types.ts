@@ -447,11 +447,19 @@ export type RuleFixer = (
 	fixer: RuleTextEditor,
 ) => RuleTextEdit | Iterable<RuleTextEdit> | null;
 
+/**
+ * Data that can be used to fill placeholders in error messages.
+ */
+export type MessagePlaceholderData = Record<
+	string,
+	string | number | boolean | bigint | null | undefined
+>;
+
 export interface ViolationReportBase {
 	/**
 	 * The data to insert into the message.
 	 */
-	data?: Record<string, unknown> | undefined;
+	data?: MessagePlaceholderData | undefined;
 
 	/**
 	 * The fix to be applied for the violation.
@@ -485,7 +493,7 @@ export interface SuggestedEditBase {
 	/**
 	 * The data to insert into the message.
 	 */
-	data?: Record<string, unknown> | undefined;
+	data?: MessagePlaceholderData | undefined;
 
 	/**
 	 * The fix to be applied for the suggestion.
