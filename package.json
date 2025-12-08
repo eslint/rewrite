@@ -10,6 +10,7 @@
     "prepare": "npm run build",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
+    "lint:types": "npm run lint:types --workspaces --if-present",
     "lint:unused": "knip",
     "fmt": "prettier --write .",
     "fmt:check": "prettier --check .",
@@ -33,6 +34,7 @@
     "node": "^22.13.0 || >=24"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.2",
     "@eslint/config-helpers": "file:packages/config-helpers",
     "@types/mocha": "^10.0.7",
     "@types/node": "^24.9.1",

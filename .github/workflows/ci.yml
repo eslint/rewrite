@@ -101,6 +101,23 @@ jobs:
               run: |
                   npm run test:types
 
+    are-the-types-wrong:
+        name: Are the types wrong?
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v6
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v6
+              with:
+                  node-version: "lts/*"
+
+            - name: Install Packages
+              run: npm install
+
+            - name: Check validity of type definitions
+              run: npm run lint:types
+
     jsr_test:
         name: Verify JSR Publish
         runs-on: ubuntu-latest
