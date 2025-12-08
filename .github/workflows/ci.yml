@@ -20,9 +20,7 @@ jobs:
                   node-version: "lts/*"
 
             - name: Install Packages
-              run: |
-                  npm install
-                  npm run build
+              run: npm install
 
             - name: Lint Files
               run: npm run lint
@@ -52,7 +50,6 @@ jobs:
             - name: npm install and test
               run: |
                   npm install
-                  npm run build
                   npm test
               env:
                   CI: true
@@ -69,9 +66,7 @@ jobs:
                   node-version: "lts/*"
 
             - name: Install Packages
-              run: |
-                  npm install
-                  npm run build
+              run: npm install
 
             - name: Run TypeScript Compiler
               run: npx tsc
@@ -132,9 +127,7 @@ jobs:
               run: npm install
 
             - name: Run --dry-run
-              run: |
-                  npm run build
-                  npm run test:jsr
+              run: npm run test:jsr
 
     pnpm_test:
         name: Test pnpm Type Support
@@ -154,6 +147,4 @@ jobs:
               run: npm install
 
             - name: Run pnpm test
-              run: |
-                  npm run build
-                  npm run test:pnpm --ws --if-present
+              run: npm run test:pnpm --ws --if-present
