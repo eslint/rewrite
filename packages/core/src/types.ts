@@ -809,7 +809,7 @@ export interface ConfigObject<Rules extends RulesConfig = RulesConfig> {
 	 * An object containing name-value pairs of information that should be
 	 * available to all rules.
 	 */
-	settings?: Record<string, unknown>;
+	settings?: SettingsConfig;
 }
 
 //------------------------------------------------------------------------------
