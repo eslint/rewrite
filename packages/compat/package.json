@@ -27,9 +27,10 @@
   "scripts": {
     "build:cts": "node ../../tools/build-cts.js dist/esm/index.d.ts dist/cjs/index.d.cts",
     "build": "rollup -c && tsc -p tsconfig.esm.json && npm run build:cts",
-    "test:jsr": "npx -y jsr@latest publish --dry-run",
+    "lint:types": "attw --pack",
     "test": "mocha \"tests/**/*.test.js\"",
-    "test:coverage": "c8 npm test"
+    "test:coverage": "c8 npm test",
+    "test:jsr": "npx -y jsr@latest publish --dry-run"
   },
   "repository": {
     "type": "git",
