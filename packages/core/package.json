@@ -19,6 +19,7 @@
   "scripts": {
     "build:cts": "node -e \"fs.cpSync('dist/esm/types.d.ts', 'dist/cjs/types.d.cts')\"",
     "build": "tsc && npm run build:cts",
+    "lint:types": "attw --pack",
     "test:jsr": "npx -y jsr@latest publish --dry-run",
     "test:types": "tsc -p tests/types/tsconfig.json"
   },

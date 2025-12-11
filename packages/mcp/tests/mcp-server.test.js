@@ -23,6 +23,8 @@ const passingFilePath = path.join(dirname, "fixtures", "passing.js");
 const syntaxErrorFilePath = path.join(dirname, "fixtures", "syntax-error.js");
 
 const filePathsJsonSchema = {
+	$schema: "http://json-schema.org/draft-07/schema#",
+	additionalProperties: false,
 	properties: {
 		filePaths: {
 			items: {
