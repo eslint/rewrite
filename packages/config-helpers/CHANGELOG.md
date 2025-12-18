@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.5.1](https://github.com/eslint/rewrite/compare/config-helpers-v0.5.0...config-helpers-v0.5.1) (2025-12-18)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^1.0.0 to ^1.0.1
+
 ## [0.5.0](https://github.com/eslint/rewrite/compare/config-helpers-v0.4.2...config-helpers-v0.5.0) (2025-11-14)
 
 

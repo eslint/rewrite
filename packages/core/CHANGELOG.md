@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/eslint/rewrite/compare/core-v1.0.0...core-v1.0.1) (2025-12-18)
+
+
+### Bug Fixes
+
+* make `data` property stricter ([#327](https://github.com/eslint/rewrite/issues/327)) ([26e6a50](https://github.com/eslint/rewrite/commit/26e6a50b85bb07b24244095e38e649f746508765))
+
 ## [1.0.0](https://github.com/eslint/rewrite/compare/core-v0.17.0...core-v1.0.0) (2025-11-14)
 
 

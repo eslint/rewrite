@@ -1,6 +1,6 @@
 {
   "name": "@eslint/compat",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Compatibility utilities for ESLint",
   "type": "module",
   "main": "dist/esm/index.js",
@@ -50,7 +50,7 @@
   },
   "homepage": "https://github.com/eslint/rewrite/tree/main/packages/compat#readme",
   "dependencies": {
-    "@eslint/core": "^1.0.0"
+    "@eslint/core": "^1.0.1"
   },
   "devDependencies": {
     "@types/node": "^24.7.2",
