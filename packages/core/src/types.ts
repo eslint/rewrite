@@ -120,12 +120,6 @@ export interface RulesMetaDocs {
 	url?: string | undefined;
 
 	/**
-	 * The category the rule falls under.
-	 * @deprecated No longer used.
-	 */
-	category?: string | undefined;
-
-	/**
 	 * Indicates if the rule is generally recommended for all users.
 	 *
 	 * Note - this will always be a boolean for core rules, but may be used in any way by plugins.
