@@ -45,13 +45,13 @@ const commentParser = new ConfigCommentParser();
 
 // pass in a comment string without the comment delimiters
 const directive = commentParser.parseDirective(
-	"eslint-disable prefer-const, semi -- I don't want to use these.",
+	"eslint-disable prefer-const, no-var -- I don't want to use these.",
 );
 
 // will be undefined when a directive can't be parsed
 if (directive) {
 	console.log(directive.label); // "eslint-disable"
-	console.log(directive.value); // "prefer-const, semi"
+	console.log(directive.value); // "prefer-const, no-var"
 	console.log(directive.justification); // "I don't want to use these."
 }
 ```
@@ -65,8 +65,8 @@ import { ConfigCommentParser } from "@eslint/plugin-kit";
 const commentParser = new ConfigCommentParser();
 
 // list format
-const list = commentParser.parseListConfig("prefer-const, semi");
-console.log(Object.entries(list)); // [["prefer-const", true], ["semi", true]]
+const list = commentParser.parseListConfig("prefer-const, no-var");
+console.log(Object.entries(list)); // [["prefer-const", true], ["no-var", true]]
 
 // string format
 const strings = commentParser.parseStringConfig("foo:off, bar");
@@ -74,9 +74,9 @@ console.log(Object.entries(strings)); // [["foo", "off"], ["bar", null]]
 
 // JSON-like config format
 const jsonLike = commentParser.parseJSONLikeConfig(
-	"semi:[error, never], prefer-const: warn",
+	"radix:[error, always], prefer-const: warn",
 );
-console.log(Object.entries(jsonLike.config)); // [["semi", ["error", "never"]], ["prefer-const", "warn"]]
+console.log(Object.entries(jsonLike.config)); // [["radix", ["error", "always"]], ["prefer-const", "warn"]]
 ```
 
 ### `VisitNodeStep` and `CallMethodStep`

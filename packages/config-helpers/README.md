@@ -41,7 +41,7 @@ export default defineConfig([
 		plugins: { js },
 		extends: ["js/recommended"],
 		rules: {
-			semi: "error",
+			"no-var": "error",
 			"prefer-const": "error",
 		},
 	},
@@ -66,7 +66,7 @@ export default defineConfig([
 	{
 		files: ["src/**/*.js"],
 		rules: {
-			semi: "error",
+			"no-var": "error",
 			"prefer-const": "error",
 		},
 	},
