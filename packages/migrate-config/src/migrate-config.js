@@ -609,6 +609,7 @@ function createFilesArray(patterns) {
  * Creates an array expression from a node representing files.
  * @param {ArrayExpression|Literal} files The node to convert.
  * @returns {ArrayExpression} The AST for the array expression.
+ * @throws {TypeError} If the provided node is not an ArrayExpression or string Literal.
  */
 function createFilesArrayFromNode(files) {
 	if (files.type === "ArrayExpression") {
@@ -1099,6 +1100,10 @@ function convertLegacyConfigExpression(config, migration) {
 	/** @type {ObjectExpression} */
 	let globals;
 
+	/**
+	 * Adds the languageOptions property to the config object if it hasn't been created yet.
+	 * @returns {void}
+	 */
 	function createLanguageOptionsNode() {
 		if (languageOptionsProperties.length === 0) {
 			newProperties.push(
@@ -1111,6 +1116,10 @@ function convertLegacyConfigExpression(config, migration) {
 		}
 	}
 
+	/**
+	 * Adds the globals property to the languageOptions object if globals are present.
+	 * @returns {void}
+	 */
 	function createGlobalsNode() {
 		if (globals) {
 			languageOptionsProperties.push(
@@ -1547,6 +1556,7 @@ export function migrateConfig(
  * @param {boolean} [options.gitignore] `true` to include contents of a .gitignore file.
  * @returns {{code:string,messages:Array<string>,imports:Map<string,MigrationImport>}} The migrated config and
  * any messages to display to the user.
+ * @throws {TypeError} If the config file does not export an object expression.
  */
 export function migrateJSConfig(
 	code,

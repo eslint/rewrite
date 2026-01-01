@@ -16,7 +16,7 @@
 
 /**
  * Asserts that a given value is an array.
- * @param {*} value The value to check.
+ * @param {any} value The value to check.
  * @returns {void}
  * @throws {TypeError} When the value is not an array.
  */
@@ -28,7 +28,7 @@ function assertIsArray(value) {
 
 /**
  * Asserts that a given value is an array containing only strings and functions.
- * @param {*} value The value to check.
+ * @param {any} value The value to check.
  * @returns {void}
  * @throws {TypeError} When the value is not an array of strings and functions.
  */
@@ -48,7 +48,7 @@ function assertIsArrayOfStringsAndFunctions(value) {
 
 /**
  * Asserts that a given value is a non-empty array.
- * @param {*} value The value to check.
+ * @param {any} value The value to check.
  * @returns {void}
  * @throws {TypeError} When the value is not an array or an empty array.
  */
