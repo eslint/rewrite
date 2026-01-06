@@ -8,15 +8,16 @@
 //-----------------------------------------------------------------------------
 
 import {
-	BooleanConfig,
+	type BooleanConfig,
 	CallMethodStep,
 	ConfigCommentParser,
+	type CustomRuleVisitorWithExit,
 	Directive,
-	DirectiveType,
-	RulesConfig,
-	SourceLocation,
-	SourceRange,
-	StringConfig,
+	type DirectiveType,
+	type RulesConfig,
+	type SourceLocation,
+	type SourceRange,
+	type StringConfig,
 	TextSourceCodeBase,
 	VisitNodeStep,
 } from "@eslint/plugin-kit";
@@ -182,3 +183,41 @@ step1.kind satisfies 1;
 step1.phase satisfies 1 | 2;
 step1.target satisfies object;
 step1.type satisfies "visit";
+
+type TestVisitor = {
+	Program: (node: { type: "Program" }) => void;
+	Identifier: (node: { type: "Identifier"; name: string }) => void;
+	"FunctionDeclaration > Identifier": (node: { type: "Identifier" }) => void;
+};
+
+type VisitorWithExit = CustomRuleVisitorWithExit<TestVisitor>;
+
+const visitor: VisitorWithExit = {
+	Program(node) {
+		node.type satisfies "Program";
+	},
+	Identifier(node) {
+		node.type satisfies "Identifier";
+		node.name satisfies string;
+	},
+	"FunctionDeclaration > Identifier"(node) {
+		node.type satisfies "Identifier";
+	},
+	"Program:exit"(node) {
+		node.type satisfies "Program";
+	},
+	"Identifier:exit"(node) {
+		node.type satisfies "Identifier";
+		node.name satisfies string;
+	},
+	"FunctionDeclaration > Identifier:exit"(node) {
+		node.type satisfies "Identifier";
+	},
+	// @ts-expect-error -- Extra keys should not be allowed
+	Foo() {},
+};
+
+visitor.Program satisfies TestVisitor["Program"];
+visitor["Program:exit"] satisfies TestVisitor["Program"];
+// @ts-expect-error -- Exit key must correspond to an existing selector
+visitor["Expression:exit"] = () => {};
