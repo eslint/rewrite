@@ -9,11 +9,15 @@
       "project": ["src/**/*.{cts,js,ts}", "tests/*.{cts,js,ts}"]
     },
     "packages/config-array": {
-      "entry": ["tests/**/*.{cts,js,ts}", "rollup.std__path-config.js"],
+      "entry": [
+        "tests/**/*.{cts,js,ts}",
+        "src/types.ts",
+        "rollup.std__path-config.js"
+      ],
       "project": ["src/**/*.{cts,js,ts}", "tests/**/*.{cts,js,ts}"]
     },
     "packages/config-helpers": {
-      "entry": ["tests/**/*.{cts,js,ts}"],
+      "entry": ["tests/**/*.{cts,js,ts}", "src/types.ts"],
       "project": ["src/**/*.{cts,js,ts}", "tests/**/*.{cts,js,ts}"]
     },
     "packages/core": { "project": ["src/**/*.{cts,js,ts}"] },
@@ -23,7 +27,11 @@
       "project": ["src/**/*.{cts,js,ts}", "tests/**/*.{cts,js,ts}"]
     },
     "packages/migrate-config": {
-      "entry": ["src/migrate-config.js", "tests/**/*.{cts,js,ts}"],
+      "entry": [
+        "src/migrate-config.js",
+        "src/types.ts",
+        "tests/**/*.{cts,js,ts}"
+      ],
       "project": ["src/**/*.{cts,js,ts}", "tests/*.{cts,js,ts}"]
     },
     "packages/object-schema": {
@@ -31,7 +39,7 @@
       "project": ["src/**/*.{cts,js,ts}", "tests/**/*.{cts,js,ts}"]
     },
     "packages/plugin-kit": {
-      "entry": ["tests/**/*.{cts,js,ts}"],
+      "entry": ["tests/**/*.{cts,js,ts}", "src/types.ts"],
       "project": ["src/**/*.{cts,js,ts}", "tests/**/*.{cts,js,ts}"]
     }
   }
