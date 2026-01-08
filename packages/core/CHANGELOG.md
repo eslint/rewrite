@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.1](https://github.com/eslint/rewrite/compare/core-v1.0.0...core-v1.0.1) (2026-01-08)
+
+
+### Bug Fixes
+
+* make `data` property stricter ([#327](https://github.com/eslint/rewrite/issues/327)) ([26e6a50](https://github.com/eslint/rewrite/commit/26e6a50b85bb07b24244095e38e649f746508765))
+* remove `category` property from `RulesMetaDocs` interface ([#345](https://github.com/eslint/rewrite/issues/345)) ([b197f00](https://github.com/eslint/rewrite/commit/b197f00f30f96fce72aca4537c2863eaefd83d43))
+* remove `experimentalObjectRestSpread` option from types ([#343](https://github.com/eslint/rewrite/issues/343)) ([e3533bc](https://github.com/eslint/rewrite/commit/e3533bcf06a9bc36502fff260f827a289b9c2059))
+
 ## [1.0.0](https://github.com/eslint/rewrite/compare/core-v0.17.0...core-v1.0.0) (2025-11-14)
 
 
