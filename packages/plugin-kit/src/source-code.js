@@ -22,6 +22,12 @@
  * @typedef {import("@eslint/core").TextSourceCode<Options>} TextSourceCode<Options>
  * @template {SourceCodeBaseTypeOptions} [Options=SourceCodeBaseTypeOptions]
  */
+/** @typedef {import("./types.ts").CustomRuleTypeDefinitions} CustomRuleTypeDefinitions */
+/**
+ * @typedef {import("./types.ts").CustomRuleDefinitionType<LanguageSpecificOptions, Options>} CustomRuleDefinitionType
+ * @template {Omit<import("@eslint/core").RuleDefinitionTypeOptions, keyof CustomRuleTypeDefinitions>} LanguageSpecificOptions
+ * @template {Partial<CustomRuleTypeDefinitions>} Options
+ */
 
 //-----------------------------------------------------------------------------
 // Helpers
