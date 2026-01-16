@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/eslint/rewrite/compare/plugin-kit-v0.5.1...plugin-kit-v0.6.0) (2026-01-16)
+
+
+### Features
+
+* add `CustomRuleVisitorWithExit` type to `@eslint/plugin-kit` ([#351](https://github.com/eslint/rewrite/issues/351)) ([e7d1be4](https://github.com/eslint/rewrite/commit/e7d1be4066b38142b38e21e7877bf9b530b65ec9))
+
 ## [0.5.1](https://github.com/eslint/rewrite/compare/plugin-kit-v0.5.0...plugin-kit-v0.5.1) (2026-01-08)
 
 
