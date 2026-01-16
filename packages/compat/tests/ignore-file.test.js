@@ -1,5 +1,5 @@
 /**
- * @filedescription Fixup tests
+ * @fileoverview Fixup tests
  */
 
 //-----------------------------------------------------------------------------

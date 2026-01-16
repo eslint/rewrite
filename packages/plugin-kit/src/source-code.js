@@ -34,7 +34,7 @@
 
 /**
  * Determines if a node has ESTree-style loc information.
- * @param {object} node The node to check.
+ * @param {Object} node The node to check.
  * @returns {node is {loc:SourceLocation}} `true` if the node has ESTree-style loc information, `false` if not.
  */
 function hasESTreeStyleLoc(node) {
@@ -43,7 +43,7 @@ function hasESTreeStyleLoc(node) {
 
 /**
  * Determines if a node has position-style loc information.
- * @param {object} node The node to check.
+ * @param {Object} node The node to check.
  * @returns {node is {position:SourceLocation}} `true` if the node has position-style range information, `false` if not.
  */
 function hasPosStyleLoc(node) {
@@ -52,7 +52,7 @@ function hasPosStyleLoc(node) {
 
 /**
  * Determines if a node has ESTree-style range information.
- * @param {object} node The node to check.
+ * @param {Object} node The node to check.
  * @returns {node is {range:SourceRange}} `true` if the node has ESTree-style range information, `false` if not.
  */
 function hasESTreeStyleRange(node) {
@@ -61,7 +61,7 @@ function hasESTreeStyleRange(node) {
 
 /**
  * Determines if a node has position-style range information.
- * @param {object} node The node to check.
+ * @param {Object} node The node to check.
  * @returns {node is {position:SourceLocationWithOffset}} `true` if the node has position-style range information, `false` if not.
  */
 function hasPosStyleRange(node) {
@@ -120,7 +120,7 @@ export class VisitNodeStep {
 
 	/**
 	 * The target of the step.
-	 * @type {object}
+	 * @type {Object}
 	 */
 	target;
 
@@ -139,7 +139,7 @@ export class VisitNodeStep {
 	/**
 	 * Creates a new instance.
 	 * @param {Object} options The options for the step.
-	 * @param {object} options.target The target of the step.
+	 * @param {Object} options.target The target of the step.
 	 * @param {1|2} options.phase The phase of the step.
 	 * @param {Array<any>} options.args The arguments of the step.
 	 */
@@ -628,6 +628,7 @@ export class TextSourceCodeBase {
 
 	/**
 	 * Traverse the source code and return the steps that were taken.
+	 * @abstract
 	 * @returns {Iterable<TraversalStep>} The steps that were taken while traversing the source code.
 	 */
 	traverse() {

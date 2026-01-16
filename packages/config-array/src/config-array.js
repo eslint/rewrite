@@ -147,9 +147,10 @@ function getConfigName(config) {
 
 /**
  * Rethrows a config error with additional information about the config object.
- * @param {object} config The config object to get the name of.
+ * @param {ConfigObject} config The config object to get the name of.
  * @param {number} index The index of the config object in the array.
  * @param {Error} error The error to rethrow.
+ * @returns {void}
  * @throws {ConfigError} When the error is rethrown for a config.
  */
 function rethrowConfigError(config, index, error) {
@@ -160,7 +161,7 @@ function rethrowConfigError(config, index, error) {
 /**
  * Shorthand for checking if a value is a string.
  * @param {any} value The value to check.
- * @returns {boolean} True if a string, false if not.
+ * @returns {value is string} True if a string, false if not.
  */
 function isString(value) {
 	return typeof value === "string";
@@ -220,8 +221,8 @@ function assertValidBaseConfig(config, index) {
  * faster matching speed over multiple file path evaluations.
  * @param {string} filepath The file path to match.
  * @param {string} pattern The glob pattern to match against.
- * @param {object} options The minimatch options to use.
- * @returns
+ * @param {MinimatchOptions} options The minimatch options to use.
+ * @returns {boolean} True if the filepath matches the pattern.
  */
 function doMatch(filepath, pattern, options = {}) {
 	let cache = minimatchCache;
@@ -266,7 +267,6 @@ function normalizePattern(pattern) {
  * Checks if a given pattern requires normalization.
  * @param {any} pattern The pattern to check.
  * @returns {boolean} True if the pattern needs normalization, false otherwise.
- *
  */
 function needsPatternNormalization(pattern) {
 	return (
@@ -363,6 +363,12 @@ async function normalize(
 	const allowFunctions = extraConfigTypes.includes("function");
 	const allowArrays = extraConfigTypes.includes("array");
 
+	/**
+	 * Recursively flattens and resolves items in the array into config objects.
+	 * @param {Array} array The array to traverse.
+	 * @returns {AsyncGenerator<Object, void, void>} Async generator yielding config objects.
+	 * @throws {TypeError} If an unexpected function or array is encountered.
+	 */
 	async function* flatTraverse(array) {
 		for (let item of array) {
 			if (typeof item === "function") {
@@ -395,7 +401,7 @@ async function normalize(
 	 * Async iterables cannot be used with the spread operator, so we need to manually
 	 * create the array to return.
 	 */
-	const asyncIterable = await flatTraverse(items);
+	const asyncIterable = flatTraverse(items);
 	const configs = [];
 
 	for await (const config of asyncIterable) {
@@ -427,6 +433,12 @@ function normalizeSync(
 	const allowFunctions = extraConfigTypes.includes("function");
 	const allowArrays = extraConfigTypes.includes("array");
 
+	/**
+	 * Recursively flattens and resolves items in the array into config objects.
+	 * @param {Array} array The array to traverse.
+	 * @returns {Generator<Object, void, void>} Generator yielding config objects.
+	 * @throws {TypeError} If an unexpected function, array, or async function is encountered.
+	 */
 	function* flatTraverse(array) {
 		for (let item of array) {
 			if (typeof item === "function") {
@@ -484,13 +496,13 @@ function toRelativePath(fileOrDirPath, namespacedBasePath, path) {
 /**
  * Determines if a given file path should be ignored based on the given
  * matcher.
- * @param {Array<{ basePath?: string, ignores: Array<string|((string) => boolean)>}>} configs Configuration objects containing `ignores`.
+ * @param {Array<{ basePath?: string, ignores: Array<string|((filePath: string) => boolean)>}>} configs Configuration objects containing `ignores`.
  * @param {string} filePath The unprocessed file path to check.
  * @param {string} relativeFilePath The path of the file to check relative to the base path,
  * 		using forward slash (`"/"`) as a separator.
  * @param {Object} [basePathData] Additional data needed to recalculate paths for configuration objects
  *  	that have `basePath` property.
- * @param {string} [basePathData.basePath] Namespaced path to witch `relativeFilePath` is relative.
+ * @param {string} [basePathData.basePath] Namespaced path to which `relativeFilePath` is relative.
  * @param {PathImpl} [basePathData.path] Path-handling implementation.
  * @returns {boolean} True if the path should be ignored and false if not.
  */
@@ -565,6 +577,12 @@ function shouldIgnorePath(
  */
 function pathMatches(filePath, relativeFilePath, config) {
 	// match both strings and functions
+	/**
+	 * Matches a pattern against the provided file path.
+	 * @param {string|((filePath: string) => boolean)} pattern The matcher pattern or function.
+	 * @returns {boolean} True if the pattern matches, false otherwise.
+	 * @throws {TypeError} When the matcher type is unexpected.
+	 */
 	function match(pattern) {
 		if (isString(pattern)) {
 			return doMatch(relativeFilePath, pattern);
@@ -725,7 +743,6 @@ export class ConfigArray extends Array {
 
 		/**
 		 * Tracks if the array has been normalized.
-		 * @property isNormalized
 		 * @type {boolean}
 		 * @private
 		 */
@@ -733,7 +750,6 @@ export class ConfigArray extends Array {
 
 		/**
 		 * The schema used for validating and merging configs.
-		 * @property schema
 		 * @type {ObjectSchemaInstance}
 		 * @private
 		 */
@@ -748,7 +764,6 @@ export class ConfigArray extends Array {
 		/**
 		 * The path of the config file that this array was loaded from.
 		 * This is used to calculate filename matches.
-		 * @property basePath
 		 * @type {string}
 		 */
 		this.basePath = basePath;
@@ -764,7 +779,6 @@ export class ConfigArray extends Array {
 
 		/**
 		 * A cache to store calculated configs for faster repeat lookup.
-		 * @property configCache
 		 * @type {Map<string, Object>}
 		 * @private
 		 */
