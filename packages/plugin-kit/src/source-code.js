@@ -22,6 +22,11 @@
  * @typedef {import("@eslint/core").TextSourceCode<Options>} TextSourceCode<Options>
  * @template {SourceCodeBaseTypeOptions} [Options=SourceCodeBaseTypeOptions]
  */
+/** @typedef {import("@eslint/core").RuleVisitor} RuleVisitor */
+/**
+ * @typedef {import("./types.ts").CustomRuleVisitorWithExit<RuleVisitorType>} CustomRuleVisitorWithExit<RuleVisitorType>
+ * @template {RuleVisitor} RuleVisitorType
+ */
 
 //-----------------------------------------------------------------------------
 // Helpers
