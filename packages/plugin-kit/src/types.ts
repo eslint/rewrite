@@ -7,11 +7,59 @@
 // Imports
 //------------------------------------------------------------------------------
 
-import type { RuleVisitor } from "@eslint/core";
+import type {
+	RuleDefinition,
+	RuleDefinitionTypeOptions,
+	RuleVisitor,
+} from "@eslint/core";
 
 //------------------------------------------------------------------------------
 // Exports
 //------------------------------------------------------------------------------
+
+/**
+ * Defaults for non-language-related `RuleDefinition` options.
+ */
+export interface CustomRuleTypeDefinitions {
+	RuleOptions: unknown[];
+	MessageIds: string;
+	ExtRuleDocs: Record<string, unknown>;
+}
+
+/**
+ * A helper type to define language specific specializations of the `RuleDefinition` type.
+ *
+ * @example
+ * ```ts
+ * type YourRuleDefinition<
+ * 	Options extends Partial<CustomRuleTypeDefinitions> = {},
+ * > = CustomRuleDefinitionType<
+ * 	{
+ * 		LangOptions: YourLanguageOptions;
+ * 		Code: YourSourceCode;
+ * 		Visitor: YourRuleVisitor;
+ * 		Node: YourNode;
+ * 	},
+ * 	Options
+ * >;
+ * ```
+ */
+export type CustomRuleDefinitionType<
+	LanguageSpecificOptions extends Omit<
+		RuleDefinitionTypeOptions,
+		keyof CustomRuleTypeDefinitions
+	>,
+	Options extends Partial<CustomRuleTypeDefinitions>,
+> = RuleDefinition<
+	// Language specific type options (non-configurable)
+	LanguageSpecificOptions &
+		Required<
+			// Rule specific type options (custom)
+			Options &
+				// Rule specific type options (defaults)
+				Omit<CustomRuleTypeDefinitions, keyof Options>
+		>
+>;
 
 /**
  * Adds matching `:exit` selector properties for each key of a `RuleVisitor`.

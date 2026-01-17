@@ -602,6 +602,7 @@ export interface RuleDefinition<
 
 /**
  * Defaults for non-language-related `RuleDefinition` options.
+ * @deprecated Use the same type from `@eslint/plugin-kit` instead.
  */
 export interface CustomRuleTypeDefinitions {
 	RuleOptions: unknown[];
@@ -611,6 +612,7 @@ export interface CustomRuleTypeDefinitions {
 
 /**
  * A helper type to define language specific specializations of the `RuleDefinition` type.
+ * @deprecated Use the same type from `@eslint/plugin-kit` instead.
  *
  * @example
  * ```ts
