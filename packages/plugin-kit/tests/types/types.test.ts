@@ -187,6 +187,7 @@ step1.phase satisfies 1 | 2;
 step1.target satisfies object;
 step1.type satisfies "visit";
 
+// CustomRuleDefinitionType
 interface TestNode {
 	type: string;
 	start: number;
@@ -312,6 +313,7 @@ type Rule5 = TestRuleDefinition<{ Code: TestTextSourceCode }>;
 // @ts-expect-error -- undefined value not allowed for optional property
 type Rule6 = TestRuleDefinition<{ RuleOptions: undefined }>;
 
+// CustomRuleVisitorWithExit
 type TestVisitor = {
 	Program: (node: { type: "Program" }) => void;
 	Identifier: (node: { type: "Identifier"; name: string }) => void;
