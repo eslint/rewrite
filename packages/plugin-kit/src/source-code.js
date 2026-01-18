@@ -19,12 +19,12 @@
 /** @typedef {import("@eslint/core").DirectiveType} DirectiveType */
 /** @typedef {import("@eslint/core").SourceCodeBaseTypeOptions} SourceCodeBaseTypeOptions */
 /**
- * @typedef {import("@eslint/core").TextSourceCode<Options>} TextSourceCode<Options>
+ * @typedef {import("@eslint/core").TextSourceCode<Options>} TextSourceCode
  * @template {SourceCodeBaseTypeOptions} [Options=SourceCodeBaseTypeOptions]
  */
 /** @typedef {import("@eslint/core").RuleVisitor} RuleVisitor */
 /**
- * @typedef {import("./types.ts").CustomRuleVisitorWithExit<RuleVisitorType>} CustomRuleVisitorWithExit<RuleVisitorType>
+ * @typedef {import("./types.ts").CustomRuleVisitorWithExit<RuleVisitorType>} CustomRuleVisitorWithExit
  * @template {RuleVisitor} RuleVisitorType
  */
 
