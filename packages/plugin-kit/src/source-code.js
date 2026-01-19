@@ -27,6 +27,12 @@
  * @typedef {import("./types.ts").CustomRuleVisitorWithExit<RuleVisitorType>} CustomRuleVisitorWithExit
  * @template {RuleVisitor} RuleVisitorType
  */
+/** @typedef {import("./types.ts").CustomRuleTypeDefinitions} CustomRuleTypeDefinitions */
+/**
+ * @typedef {import("./types.ts").CustomRuleDefinitionType<LanguageSpecificOptions, Options>} CustomRuleDefinitionType
+ * @template {Omit<import("@eslint/core").RuleDefinitionTypeOptions, keyof CustomRuleTypeDefinitions>} LanguageSpecificOptions
+ * @template {Partial<CustomRuleTypeDefinitions>} Options
+ */
 
 //-----------------------------------------------------------------------------
 // Helpers
