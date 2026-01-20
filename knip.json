@@ -27,7 +27,7 @@
       "project": ["src/**/*.{cts,js,ts}", "tests/*.{cts,js,ts}"]
     },
     "packages/object-schema": {
-      "entry": ["tests/**/*.{cts,js,ts}", "src/types.ts"],
+      "entry": ["tests/**/*.{cts,js,ts}"],
       "project": ["src/**/*.{cts,js,ts}", "tests/**/*.{cts,js,ts}"]
     },
     "packages/plugin-kit": {
