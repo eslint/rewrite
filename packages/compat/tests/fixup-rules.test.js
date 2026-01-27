@@ -15,6 +15,12 @@ import {
 import { Linter } from "eslint";
 
 //-----------------------------------------------------------------------------
+// Types
+//-----------------------------------------------------------------------------
+
+/** @typedef {import("@eslint/core").RuleDefinition["create"]} LegacyRuleDefinition */
+
+//-----------------------------------------------------------------------------
 // Data
 //-----------------------------------------------------------------------------
 
@@ -170,6 +176,10 @@ describe("@eslint/compat", () => {
 		});
 
 		it("should return a rule object when a function-style rule is passed to fixupRule", () => {
+			/**
+			 * Test fixture simulating a legacy function-style rule.
+			 * @type {LegacyRuleDefinition}
+			 */
 			function rule(context) {
 				return {
 					Identifier(node) {
@@ -208,6 +218,10 @@ describe("@eslint/compat", () => {
 		});
 
 		it("should return a rule object with `meta.schema` when a function-style rule with schema is passed to fixupRule", () => {
+			/**
+			 * Test fixture simulating a legacy function-style rule.
+			 * @type {LegacyRuleDefinition}
+			 */
 			function rule(context) {
 				return {
 					Identifier(node) {
