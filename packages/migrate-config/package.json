@@ -1,6 +1,6 @@
 {
   "name": "@eslint/migrate-config",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Configuration migration for ESLint",
   "type": "module",
   "bin": {
@@ -39,14 +39,14 @@
   },
   "homepage": "https://github.com/eslint/rewrite/tree/main/packages/migrate-config#readme",
   "devDependencies": {
-    "@eslint/core": "^1.0.1",
+    "@eslint/core": "^1.1.0",
     "eslint": "^9.27.0"
   },
   "engines": {
     "node": "^20.19.0 || ^22.13.0 || >=24"
   },
   "dependencies": {
-    "@eslint/compat": "^2.0.1",
+    "@eslint/compat": "^2.0.2",
     "@eslint/eslintrc": "^3.3.3",
     "camelcase": "^8.0.0",
     "espree": "^10.4.0",
