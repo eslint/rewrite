@@ -37,10 +37,7 @@ mcpServer.registerTool(
 		inputSchema: filePathsSchema,
 	},
 	async ({ filePaths }) => {
-		const eslint = new ESLint({
-			// enable lookup from file rather than from cwd
-			flags: ["unstable_config_lookup_from_file"],
-		});
+		const eslint = new ESLint();
 
 		const type = /** @type {const} */ ("text");
 		const results = await eslint.lintFiles(filePaths);
