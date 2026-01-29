@@ -33,7 +33,7 @@
     "test:coverage": "c8 npm test",
     "test:jsr": "npx -y jsr@latest publish --dry-run",
     "test:pnpm": "cd tests/pnpm && pnpm install && pnpm exec tsc",
-    "test:types": "tsc -p tests/types/tsconfig.json"
+    "test:types": "npm run build && tsc -p tests/types/tsconfig.json"
   },
   "repository": {
     "type": "git",
