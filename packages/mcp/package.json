@@ -15,8 +15,10 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "mocha \"tests/**/*.test.js\"",
-    "test:coverage": "c8 npm test"
+    "pretest": "npm run build",
+    "test": "npm run test:unit",
+    "test:coverage": "npm run build && c8 npm run test:unit",
+    "test:unit": "mocha \"tests/**/*.test.js\""
   },
   "repository": {
     "type": "git",
