@@ -59,7 +59,7 @@
     "eslint": "^9.27.0"
   },
   "peerDependencies": {
-    "eslint": "^8.40 || 9"
+    "eslint": "^8.40 || 9 || 10"
   },
   "peerDependenciesMeta": {
     "eslint": {

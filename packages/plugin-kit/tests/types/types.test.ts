@@ -7,10 +7,13 @@
 // Imports
 //-----------------------------------------------------------------------------
 
+import type { LanguageOptions, RuleVisitor } from "@eslint/core";
 import {
 	type BooleanConfig,
 	CallMethodStep,
 	ConfigCommentParser,
+	type CustomRuleDefinitionType,
+	type CustomRuleTypeDefinitions,
 	type CustomRuleVisitorWithExit,
 	Directive,
 	type DirectiveType,
@@ -184,6 +187,133 @@ step1.phase satisfies 1 | 2;
 step1.target satisfies object;
 step1.type satisfies "visit";
 
+// CustomRuleDefinitionType
+interface TestNode {
+	type: string;
+	start: number;
+}
+
+interface TestLanguageOptions extends LanguageOptions {
+	ecmaVersion?: number;
+}
+
+interface TestRuleVisitor extends RuleVisitor {
+	Foo?: (node: TestNode) => void;
+}
+
+type TestRuleDefinition<
+	Options extends Partial<CustomRuleTypeDefinitions> =
+		CustomRuleTypeDefinitions,
+> = CustomRuleDefinitionType<
+	{
+		LangOptions: TestLanguageOptions;
+		Code: TestTextSourceCode;
+		Visitor: TestRuleVisitor;
+		Node: TestNode;
+	},
+	Options
+>;
+
+const testRule: TestRuleDefinition<{
+	RuleOptions: [{ foo: string; bar: number }];
+	MessageIds: "badFoo" | "wrongBar";
+	ExtRuleDocs: { foo: boolean; bar: number };
+}> = {
+	meta: {
+		type: "problem",
+		fixable: "code",
+		docs: {
+			recommended: true,
+			foo: true,
+			// @ts-expect-error -- bar should be number, not string
+			bar: "1",
+		},
+		deprecated: {
+			message: "use something else",
+			url: "https://example.com",
+			replacedBy: [
+				{
+					message: "use this instead",
+					url: "https://example.com",
+					rule: {
+						name: "new-rule",
+						url: "https://example.com/rules/new-rule",
+					},
+					plugin: {
+						name: "new-plugin",
+						url: "https://example.com/plugins/new-plugin",
+					},
+				},
+			],
+		},
+		schema: [
+			{
+				type: "object",
+				properties: {
+					foo: {
+						type: "string",
+					},
+					bar: {
+						type: "integer",
+					},
+				},
+				additionalProperties: false,
+			},
+		],
+		defaultOptions: [
+			{
+				foo: "always",
+				bar: 5,
+				// @ts-expect-error -- invalid default option "baz"
+				baz: "invalid",
+			},
+		],
+		messages: {
+			badFoo: "change this foo",
+			wrongBar: "fix this bar",
+			// @ts-expect-error -- invalid message id "baz"
+			baz: "invalid message",
+		},
+		language: "javascript",
+		dialects: ["javascript", "typescript"],
+	},
+
+	create(context) {
+		context.languageOptions.ecmaVersion satisfies number | undefined;
+		context.options satisfies [{ foo: string; bar: number }];
+		context.sourceCode satisfies TestTextSourceCode;
+
+		return {
+			Foo(node) {
+				if (context.options[0].foo === "always") {
+					context.report({
+						messageId: "badFoo",
+						loc: {
+							start: { line: node.start, column: 1 },
+							end: { line: node.start + 1, column: Infinity },
+						},
+					});
+				}
+			},
+		};
+	},
+};
+
+type Rule1 = TestRuleDefinition;
+type Rule2 = TestRuleDefinition<{}>;
+type Rule3 = TestRuleDefinition<{
+	RuleOptions: [number, string];
+	MessageIds: "foo" | "bar";
+	ExtRuleDocs: { baz: number; qux: string };
+}>;
+// @ts-expect-error -- non-object not allowed
+type Rule4 = TestRuleDefinition<null>;
+// @ts-expect-error -- non-customizable properties not allowed
+type Rule5 = TestRuleDefinition<{ Code: TestTextSourceCode }>;
+// @ts-expect-error -- undefined value not allowed for optional property
+type Rule6 = TestRuleDefinition<{ RuleOptions: undefined }>;
+
+// CustomRuleVisitorWithExit
 type TestVisitor = {
 	Program: (node: { type: "Program" }) => void;
 	Identifier: (node: { type: "Identifier"; name: string }) => void;
