@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/eslint/rewrite/compare/core-v1.0.1...core-v1.1.0) (2026-01-29)
+
+
+### Features
+
+* Add custom rule type helpers to `@eslint/plugin-kit` ([#355](https://github.com/eslint/rewrite/issues/355)) ([8ac8530](https://github.com/eslint/rewrite/commit/8ac853046aa1d4288d06d639be234c09988ade5e))
+
 ## [1.0.1](https://github.com/eslint/rewrite/compare/core-v1.0.0...core-v1.0.1) (2026-01-08)
 
 
