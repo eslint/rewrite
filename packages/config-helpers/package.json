@@ -31,7 +31,7 @@
     "lint:types": "attw --pack",
     "pretest": "npm run build",
     "test": "npm run test:types && npm run test:unit",
-    "test:coverage": "npm run build && c8 npm run test:unit",
+    "test:coverage": "c8 npm run test:unit",
     "test:jsr": "npx -y jsr@latest publish --dry-run",
     "test:pnpm": "cd tests/pnpm && pnpm install && pnpm exec tsc",
     "test:types": "tsc -p tests/types/tsconfig.json",

@@ -30,7 +30,7 @@
     "lint:types": "attw --pack",
     "pretest": "npm run build",
     "test": "npm run test:unit",
-    "test:coverage": "npm run build && c8 npm run test:unit",
+    "test:coverage": "c8 npm run test:unit",
     "test:jsr": "npx -y jsr@latest publish --dry-run",
     "test:unit": "mocha \"tests/**/*.test.js\""
   },

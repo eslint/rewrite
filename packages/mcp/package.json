@@ -17,7 +17,7 @@
     "build": "tsc",
     "pretest": "npm run build",
     "test": "npm run test:unit",
-    "test:coverage": "npm run build && c8 npm run test:unit",
+    "test:coverage": "c8 npm run test:unit",
     "test:unit": "mocha \"tests/**/*.test.js\""
   },
   "repository": {
