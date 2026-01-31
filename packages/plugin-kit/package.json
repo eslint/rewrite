@@ -1,6 +1,6 @@
 {
   "name": "@eslint/plugin-kit",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "Utilities for building ESLint plugins.",
   "author": "Nicholas C. Zakas",
   "type": "module",
@@ -50,7 +50,7 @@
   ],
   "license": "Apache-2.0",
   "dependencies": {
-    "@eslint/core": "^1.0.1",
+    "@eslint/core": "^1.1.0",
     "levn": "^0.4.1"
   },
   "devDependencies": {
