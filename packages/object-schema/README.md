@@ -39,7 +39,7 @@ const schema = new ObjectSchema({
 	// define a definition for the "downloads" key
 	downloads: {
 		required: true,
-		merge(value1, value2) {
+		merge(value1 = 0, value2) {
 			return value1 + value2;
 		},
 		validate(value) {
@@ -52,7 +52,7 @@ const schema = new ObjectSchema({
 	// define a strategy for the "versions" key
 	versions: {
 		required: true,
-		merge(value1, value2) {
+		merge(value1 = [], value2) {
 			return value1.concat(value2);
 		},
 		validate(value) {
@@ -81,11 +81,10 @@ schema.validate(record2);
 const result = schema.merge(record1, record2);
 
 // result looks like this:
-
-const result = {
-	downloads: 75,
-	versions: ["v1.0.0", "v1.1.0", "v1.2.0", "v2.0.0", "v2.1.0", "v3.0.0"],
-};
+// {
+// 	downloads: 150,
+// 	versions: ["v1.0.0", "v1.1.0", "v1.2.0", "v2.0.0", "v2.1.0", "v3.0.0"],
+// }
 ```
 
 ## Tips and Tricks
@@ -134,7 +133,7 @@ const schema = new ObjectSchema({
 
 ### Subschemas
 
-If you are defining a key that is, itself, an object, you can simplify the process by using a subschema. Instead of defining `merge()` and `validate()`, assign a `schema` key that contains a schema definition, like this:
+If you are defining a key that is, itself, an object, you can simplify the process by using a subschema. Instead of defining `merge()` and `validate()`, set a `schema` property that contains a schema definition, like this:
 
 ```js
 const schema = new ObjectSchema({
@@ -171,7 +170,9 @@ const schema = new ObjectSchema({
 			return undefined;
 		},
 		validate(value) {
-			Date.parse(value); // throws an error when invalid
+			if (isNaN(Date.parse(value))) {
+				throw new Error("Invalid date.");
+			}
 		},
 	},
 });
@@ -195,7 +196,9 @@ const schema = new ObjectSchema({
 			return undefined;
 		},
 		validate(value) {
-			Date.parse(value); // throws an error when invalid
+			if (isNaN(Date.parse(value))) {
+				throw new Error("Invalid date.");
+			}
 		},
 	},
 	time: {
@@ -209,7 +212,7 @@ const schema = new ObjectSchema({
 	},
 });
 
-// throws error: Key "time" requires keys "date"
+// throws error: Key "time" requires keys "date".
 schema.validate({
 	time: "13:45",
 });
