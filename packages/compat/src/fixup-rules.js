@@ -76,8 +76,8 @@ const fixedUpPlugins = new WeakSet();
 
 /**
  * Determines if two nodes or tokens overlap.
- * @param {object} first The first node or token to check.
- * @param {object} second The second node or token to check.
+ * @param {Object} first The first node or token to check.
+ * @param {Object} second The second node or token to check.
  * @returns {boolean} True if the two nodes or tokens overlap.
  */
 function nodesOrTokensOverlap(first, second) {
@@ -90,7 +90,7 @@ function nodesOrTokensOverlap(first, second) {
 
 /**
  * Checks whether a node is an export declaration.
- * @param {object} node An AST node.
+ * @param {Object} node An AST node.
  * @returns {boolean} True if the node is an export declaration.
  */
 function looksLikeExport(node) {
@@ -102,8 +102,8 @@ function looksLikeExport(node) {
 
 /**
  * Checks for the presence of a JSDoc comment for the given node and returns it.
- * @param {object} node The AST node to get the comment for.
- * @param {object} sourceCode A SourceCode instance to get comments.
+ * @param {Object} node The AST node to get the comment for.
+ * @param {Object} sourceCode A SourceCode instance to get comments.
  * @returns {object|null} The Block comment token containing the JSDoc comment
  *      for the given node or null if not found.
  */
@@ -151,6 +151,11 @@ export function fixupRule(ruleDefinition) {
 		? ruleDefinition
 		: ruleDefinition.create.bind(ruleDefinition);
 
+	/**
+	 * Compatibility rule creator that adds missing methods to context and sourceCode objects.
+	 * @param {Object} context The rule context.
+	 * @returns {Object} The rule visitor.
+	 */
 	function ruleCreate(context) {
 		const sourceCode = context.sourceCode;
 
