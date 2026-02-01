@@ -29,11 +29,13 @@
     "build:cts": "node ../../tools/build-cts.js dist/esm/index.d.ts dist/cjs/index.d.cts",
     "build": "rollup -c && npm run build:dedupe-types && tsc -p tsconfig.esm.json && npm run build:cts",
     "lint:types": "attw --pack",
-    "test": "mocha \"tests/**/*.test.js\"",
-    "test:coverage": "c8 npm test",
+    "pretest": "npm run build",
+    "test": "npm run test:types && npm run test:unit",
+    "test:coverage": "c8 npm run test:unit",
     "test:jsr": "npx -y jsr@latest publish --dry-run",
     "test:pnpm": "cd tests/pnpm && pnpm install && pnpm exec tsc",
-    "test:types": "tsc -p tests/types/tsconfig.json"
+    "test:types": "tsc -p tests/types/tsconfig.json",
+    "test:unit": "mocha \"tests/**/*.test.js\""
   },
   "repository": {
     "type": "git",

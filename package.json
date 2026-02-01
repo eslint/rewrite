@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "npm test --workspaces --if-present",
     "build": "node scripts/build.js",
     "build:new-pkg": "node tools/new-pkg.js",
     "prepare": "npm run build",
@@ -14,8 +13,10 @@
     "lint:unused": "knip",
     "fmt": "prettier --write .",
     "fmt:check": "prettier --check .",
+    "test": "npm test --workspaces --if-present",
     "test:jsr": "npm run test:jsr --workspaces --if-present",
-    "test:types": "tsc && npm run test:types --workspaces --if-present"
+    "test:types": "tsc && npm run test:types --workspaces --if-present",
+    "test:unit": "npm run test:unit --workspaces --if-present"
   },
   "workspaces": [
     "packages/*"
