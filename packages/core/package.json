@@ -1,6 +1,6 @@
 {
   "name": "@eslint/core",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Runtime-agnostic core of ESLint",
   "type": "module",
   "types": "./dist/esm/types.d.ts",
@@ -20,6 +20,8 @@
     "build:cts": "node -e \"fs.cpSync('dist/esm/types.d.ts', 'dist/cjs/types.d.cts')\"",
     "build": "tsc && npm run build:cts",
     "lint:types": "attw --pack",
+    "pretest": "npm run build",
+    "test": "npm run test:types",
     "test:jsr": "npx -y jsr@latest publish --dry-run",
     "test:types": "tsc -p tests/types/tsconfig.json"
   },
