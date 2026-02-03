@@ -17,7 +17,41 @@ import {
 } from "@eslint/object-schema";
 
 //-----------------------------------------------------------------------------
-// Tests
+// Tests for BuiltInValidationStrategy
+//-----------------------------------------------------------------------------
+
+// #region BuiltInValidationStrategy
+
+const validationArray: BuiltInValidationStrategy = "array";
+const validationBoolean: BuiltInValidationStrategy = "boolean";
+const validationNumber: BuiltInValidationStrategy = "number";
+const validationObject: BuiltInValidationStrategy = "object";
+const validationObjectOptional: BuiltInValidationStrategy = "object?";
+const validationString: BuiltInValidationStrategy = "string";
+const validationNonEmptyString: BuiltInValidationStrategy = "string!";
+
+// @ts-expect-error -- Invalid validation strategy
+const invalidValidation: BuiltInValidationStrategy = "invalid";
+
+// #endregion BuiltInValidationStrategy
+
+//-----------------------------------------------------------------------------
+// Tests for BuiltInMergeStrategy
+//-----------------------------------------------------------------------------
+
+// #region BuiltInMergeStrategy
+
+const mergeAssign: BuiltInMergeStrategy = "assign";
+const mergeOverwrite: BuiltInMergeStrategy = "overwrite";
+const mergeReplace: BuiltInMergeStrategy = "replace";
+
+// @ts-expect-error -- Invalid merge strategy
+const invalidMerge: BuiltInMergeStrategy = "invalid";
+
+// #endregion BuiltInMergeStrategy
+
+//-----------------------------------------------------------------------------
+// Tests for MergeStrategy
 //-----------------------------------------------------------------------------
 
 // #region MergeStrategy
@@ -98,34 +132,10 @@ MergeStrategy.assign({ a: 1 }, { a: "a" }) satisfies {
 // #endregion MergeStrategy
 
 //-----------------------------------------------------------------------------
-// Tests for BuiltInValidationStrategy
-//-----------------------------------------------------------------------------
-
-const validationArray: BuiltInValidationStrategy = "array";
-const validationBoolean: BuiltInValidationStrategy = "boolean";
-const validationNumber: BuiltInValidationStrategy = "number";
-const validationObject: BuiltInValidationStrategy = "object";
-const validationObjectOptional: BuiltInValidationStrategy = "object?";
-const validationString: BuiltInValidationStrategy = "string";
-const validationNonEmptyString: BuiltInValidationStrategy = "string!";
-
-// @ts-expect-error -- Invalid validation strategy
-const invalidValidation: BuiltInValidationStrategy = "invalid";
-
-//-----------------------------------------------------------------------------
-// Tests for BuiltInMergeStrategy
-//-----------------------------------------------------------------------------
-
-const mergeAssign: BuiltInMergeStrategy = "assign";
-const mergeOverwrite: BuiltInMergeStrategy = "overwrite";
-const mergeReplace: BuiltInMergeStrategy = "replace";
-
-// @ts-expect-error -- Invalid merge strategy
-const invalidMerge: BuiltInMergeStrategy = "invalid";
-
-//-----------------------------------------------------------------------------
 // Tests for PropertyDefinition
 //-----------------------------------------------------------------------------
+
+// #region PropertyDefinition
 
 // PropertyDefinition with built-in strategies
 const propertyWithBuiltInStrategies: PropertyDefinition = {
@@ -181,9 +191,13 @@ const propertyWithSchema: PropertyDefinition = {
 
 propertyWithSchema.schema satisfies ObjectDefinition;
 
+// #endregion PropertyDefinition
+
 //-----------------------------------------------------------------------------
 // Tests for ObjectDefinition
 //-----------------------------------------------------------------------------
+
+// #region ObjectDefinition
 
 const emptyDefinition: ObjectDefinition = {};
 
@@ -214,9 +228,13 @@ const objectDefinition: ObjectDefinition = {
 
 objectDefinition satisfies Record<string, PropertyDefinition>;
 
+// #endregion ObjectDefinition
+
 //-----------------------------------------------------------------------------
 // Tests for ObjectSchema class
 //-----------------------------------------------------------------------------
+
+// #region ObjectSchema
 
 const schema = new ObjectSchema({
 	name: {
@@ -276,3 +294,5 @@ const schemaWithSubschema = new ObjectSchema({
 		},
 	},
 });
+
+// #endregion ObjectSchema
