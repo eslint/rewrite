@@ -41,7 +41,7 @@ export class MergeStrategy {
 
 	/**
 	 * Merges two properties by assigning properties from the second to the first.
-	 * @template {Record<string | number | symbol, unknown>} TValue1 The type of the value from the first object key.
+	 * @template {Record<string | number | symbol, unknown> | undefined} TValue1 The type of the value from the first object key.
 	 * @template {Record<string | number | symbol, unknown>} TValue2 The type of the value from the second object key.
 	 * @param {TValue1} value1 The value from the first object key.
 	 * @param {TValue2} value2 The value from the second object key.

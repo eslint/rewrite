@@ -113,6 +113,9 @@ MergeStrategy.assign({ a: 1 } as const, { b: 2 } as const) satisfies {
 MergeStrategy.assign({ a: 1 }, { a: "a" }) satisfies {
 	a: "a";
 };
+MergeStrategy.assign(undefined, { bar: true }) satisfies {
+	bar: true;
+};
 
 // @ts-expect-error Type 'number' is not assignable to parameter of type 'Record<string | number | symbol, unknown>'.
 MergeStrategy.assign(1, 2);
@@ -124,10 +127,6 @@ MergeStrategy.assign(true, false);
 MergeStrategy.assign({ a: 1 }, { a: "a" }) satisfies {
 	a: 1;
 };
-
-// MergeStrategy.assign(undefined, { bar: true }) satisfies {
-// 	bar: true;
-// };
 
 // #endregion MergeStrategy
 
