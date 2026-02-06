@@ -18,7 +18,7 @@
     },
     "packages/core": { "project": ["src/**/*.{cts,js,ts}"] },
     "packages/mcp": {
-      "ignoreDependencies": ["@eslint/plugin-kit", "@types/express"],
+      "ignoreDependencies": ["@types/express"],
       "entry": ["tests/**/*.{cts,js,ts}"],
       "project": ["src/**/*.{cts,js,ts}", "tests/**/*.{cts,js,ts}"]
     },
