@@ -38,7 +38,7 @@
     "node": "^20.19.0 || ^22.13.0 || >=24"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "1.25.3",
+    "@modelcontextprotocol/sdk": "1.26.0",
     "eslint": "^10.0.0",
     "zod": "^4.1.13"
   },
