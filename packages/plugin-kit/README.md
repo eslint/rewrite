@@ -45,13 +45,13 @@ const commentParser = new ConfigCommentParser();
 
 // pass in a comment string without the comment delimiters
 const directive = commentParser.parseDirective(
-	"eslint-disable prefer-const, semi -- I don't want to use these.",
+	"eslint-disable prefer-const, no-var -- I don't want to use these.",
 );
 
 // will be undefined when a directive can't be parsed
 if (directive) {
 	console.log(directive.label); // "eslint-disable"
-	console.log(directive.value); // "prefer-const, semi"
+	console.log(directive.value); // "prefer-const, no-var"
 	console.log(directive.justification); // "I don't want to use these."
 }
 ```
@@ -65,8 +65,8 @@ import { ConfigCommentParser } from "@eslint/plugin-kit";
 const commentParser = new ConfigCommentParser();
 
 // list format
-const list = commentParser.parseListConfig("prefer-const, semi");
-console.log(Object.entries(list)); // [["prefer-const", true], ["semi", true]]
+const list = commentParser.parseListConfig("prefer-const, no-var");
+console.log(Object.entries(list)); // [["prefer-const", true], ["no-var", true]]
 
 // string format
 const strings = commentParser.parseStringConfig("foo:off, bar");
@@ -74,9 +74,9 @@ console.log(Object.entries(strings)); // [["foo", "off"], ["bar", null]]
 
 // JSON-like config format
 const jsonLike = commentParser.parseJSONLikeConfig(
-	"semi:[error, never], prefer-const: warn",
+	"radix:[error, always], prefer-const: warn",
 );
-console.log(Object.entries(jsonLike.config)); // [["semi", ["error", "never"]], ["prefer-const", "warn"]]
+console.log(Object.entries(jsonLike.config)); // [["radix", ["error", "always"]], ["prefer-const", "warn"]]
 ```
 
 ### `VisitNodeStep` and `CallMethodStep`
@@ -263,10 +263,10 @@ The following companies, organizations, and individuals support ESLint's ongoing
 to get your logo on our READMEs and [website](https://eslint.org/sponsors).
 
 <h3>Platinum Sponsors</h3>
-<p><a href="https://automattic.com"><img src="https://images.opencollective.com/automattic/d0ef3e1/logo.png" alt="Automattic" height="128"></a> <a href="https://www.airbnb.com/"><img src="https://images.opencollective.com/airbnb/d327d66/logo.png" alt="Airbnb" height="128"></a></p><h3>Gold Sponsors</h3>
+<p><a href="https://automattic.com"><img src="https://images.opencollective.com/automattic/d0ef3e1/logo.png" alt="Automattic" height="128"></a></p><h3>Gold Sponsors</h3>
 <p><a href="https://qlty.sh/"><img src="https://images.opencollective.com/qltysh/33d157d/logo.png" alt="Qlty Software" height="96"></a> <a href="https://shopify.engineering/"><img src="https://avatars.githubusercontent.com/u/8085" alt="Shopify" height="96"></a></p><h3>Silver Sponsors</h3>
-<p><a href="https://vite.dev/"><img src="https://images.opencollective.com/vite/e6d15e1/logo.png" alt="Vite" height="64"></a> <a href="https://liftoff.io/"><img src="https://images.opencollective.com/liftoff/2d6c3b6/logo.png" alt="Liftoff" height="64"></a> <a href="https://americanexpress.io"><img src="https://avatars.githubusercontent.com/u/3853301" alt="American Express" height="64"></a> <a href="https://stackblitz.com"><img src="https://avatars.githubusercontent.com/u/28635252" alt="StackBlitz" height="64"></a></p><h3>Bronze Sponsors</h3>
-<p><a href="https://cybozu.co.jp/"><img src="https://images.opencollective.com/cybozu/933e46d/logo.png" alt="Cybozu" height="32"></a> <a href="https://www.n-ix.com/"><img src="https://images.opencollective.com/n-ix-ltd/575a7a5/logo.png" alt="N-iX Ltd" height="32"></a> <a href="https://icons8.com/"><img src="https://images.opencollective.com/icons8/7fa1641/logo.png" alt="Icons8" height="32"></a> <a href="https://discord.com"><img src="https://images.opencollective.com/discordapp/f9645d9/logo.png" alt="Discord" height="32"></a> <a href="https://www.gitbook.com"><img src="https://avatars.githubusercontent.com/u/7111340" alt="GitBook" height="32"></a> <a href="https://nx.dev"><img src="https://avatars.githubusercontent.com/u/23692104" alt="Nx" height="32"></a> <a href="https://herocoders.com"><img src="https://avatars.githubusercontent.com/u/37549774" alt="HeroCoders" height="32"></a> <a href="https://www.lambdatest.com"><img src="https://avatars.githubusercontent.com/u/171592363" alt="LambdaTest" height="32"></a></p>
+<p><a href="https://vite.dev/"><img src="https://images.opencollective.com/vite/d472863/logo.png" alt="Vite" height="64"></a> <a href="https://liftoff.io/"><img src="https://images.opencollective.com/liftoff/2d6c3b6/logo.png" alt="Liftoff" height="64"></a> <a href="https://americanexpress.io"><img src="https://avatars.githubusercontent.com/u/3853301" alt="American Express" height="64"></a> <a href="https://stackblitz.com"><img src="https://avatars.githubusercontent.com/u/28635252" alt="StackBlitz" height="64"></a></p><h3>Bronze Sponsors</h3>
+<p><a href="https://cybozu.co.jp/"><img src="https://images.opencollective.com/cybozu/933e46d/logo.png" alt="Cybozu" height="32"></a> <a href="https://opensource.sap.com"><img src="https://avatars.githubusercontent.com/u/2531208" alt="SAP" height="32"></a> <a href="https://www.crawljobs.com/"><img src="https://images.opencollective.com/crawljobs-poland/fa43a17/logo.png" alt="CrawlJobs" height="32"></a> <a href="https://depot.dev"><img src="https://images.opencollective.com/depot/39125a1/logo.png" alt="Depot" height="32"></a> <a href="https://www.n-ix.com/"><img src="https://images.opencollective.com/n-ix-ltd/575a7a5/logo.png" alt="N-iX Ltd" height="32"></a> <a href="https://icons8.com/"><img src="https://images.opencollective.com/icons8/7fa1641/logo.png" alt="Icons8" height="32"></a> <a href="https://discord.com"><img src="https://images.opencollective.com/discordapp/f9645d9/logo.png" alt="Discord" height="32"></a> <a href="https://www.gitbook.com"><img src="https://avatars.githubusercontent.com/u/7111340" alt="GitBook" height="32"></a> <a href="https://herocoders.com"><img src="https://avatars.githubusercontent.com/u/37549774" alt="HeroCoders" height="32"></a> <a href="https://www.lambdatest.com"><img src="https://avatars.githubusercontent.com/u/171592363" alt="TestMu AI Open Source Office (Formerly LambdaTest)" height="32"></a></p>
 <h3>Technology Sponsors</h3>
 Technology sponsors allow us to use their products and services for free as part of a contribution to the open source ecosystem and our work.
 <p><a href="https://netlify.com"><img src="https://raw.githubusercontent.com/eslint/eslint.org/main/src/assets/images/techsponsors/netlify-icon.svg" alt="Netlify" height="32"></a> <a href="https://algolia.com"><img src="https://raw.githubusercontent.com/eslint/eslint.org/main/src/assets/images/techsponsors/algolia-icon.svg" alt="Algolia" height="32"></a> <a href="https://1password.com"><img src="https://raw.githubusercontent.com/eslint/eslint.org/main/src/assets/images/techsponsors/1password-icon.svg" alt="1Password" height="32"></a></p>

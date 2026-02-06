@@ -20,9 +20,7 @@ jobs:
                   node-version: "lts/*"
 
             - name: Install Packages
-              run: |
-                  npm install
-                  npm run build
+              run: npm install
 
             - name: Lint Files
               run: npm run lint
@@ -52,8 +50,7 @@ jobs:
             - name: npm install and test
               run: |
                   npm install
-                  npm run build
-                  npm test
+                  npm run test:unit
               env:
                   CI: true
 
@@ -69,9 +66,7 @@ jobs:
                   node-version: "lts/*"
 
             - name: Install Packages
-              run: |
-                  npm install
-                  npm run build
+              run: npm install
 
             - name: Run TypeScript Compiler
               run: npx tsc
@@ -101,6 +96,23 @@ jobs:
               run: |
                   npm run test:types
 
+    are-the-types-wrong:
+        name: Are the types wrong?
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v6
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v6
+              with:
+                  node-version: "lts/*"
+
+            - name: Install Packages
+              run: npm install
+
+            - name: Check validity of type definitions
+              run: npm run lint:types
+
     jsr_test:
         name: Verify JSR Publish
         runs-on: ubuntu-latest
@@ -115,9 +127,7 @@ jobs:
               run: npm install
 
             - name: Run --dry-run
-              run: |
-                  npm run build
-                  npm run test:jsr
+              run: npm run test:jsr
 
     pnpm_test:
         name: Test pnpm Type Support
@@ -125,7 +135,7 @@ jobs:
         steps:
             - uses: actions/checkout@v6
 
-            - uses: pnpm/action-setup@v4
+            - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4
               with:
                   version: latest
 
@@ -137,6 +147,4 @@ jobs:
               run: npm install
 
             - name: Run pnpm test
-              run: |
-                  npm run build
-                  npm run test:pnpm --ws --if-present
+              run: npm run test:pnpm --ws --if-present

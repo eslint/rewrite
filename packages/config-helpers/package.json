@@ -1,6 +1,6 @@
 {
   "name": "@eslint/config-helpers",
-  "version": "0.5.0",
+  "version": "0.5.2",
   "description": "Helper utilities for creating ESLint configuration",
   "type": "module",
   "main": "dist/esm/index.js",
@@ -28,11 +28,14 @@
     "build:dedupe-types": "node ../../tools/dedupe-types.js dist/cjs/index.cjs dist/esm/index.js",
     "build:cts": "node ../../tools/build-cts.js dist/esm/index.d.ts dist/cjs/index.d.cts",
     "build": "rollup -c && npm run build:dedupe-types && tsc -p tsconfig.esm.json && npm run build:cts",
-    "test": "mocha \"tests/**/*.test.js\"",
-    "test:coverage": "c8 npm test",
+    "lint:types": "attw --pack",
+    "pretest": "npm run build",
+    "test": "npm run test:types && npm run test:unit",
+    "test:coverage": "c8 npm run test:unit",
     "test:jsr": "npx -y jsr@latest publish --dry-run",
     "test:pnpm": "cd tests/pnpm && pnpm install && pnpm exec tsc",
-    "test:types": "tsc -p tests/types/tsconfig.json"
+    "test:types": "tsc -p tests/types/tsconfig.json",
+    "test:unit": "mocha \"tests/**/*.test.js\""
   },
   "repository": {
     "type": "git",
@@ -48,7 +51,7 @@
   },
   "homepage": "https://github.com/eslint/rewrite/tree/main/packages/config-helpers#readme",
   "dependencies": {
-    "@eslint/core": "^1.0.0"
+    "@eslint/core": "^1.1.0"
   },
   "devDependencies": {
     "rollup-plugin-copy": "^3.5.0"

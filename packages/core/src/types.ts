@@ -120,12 +120,6 @@ export interface RulesMetaDocs {
 	url?: string | undefined;
 
 	/**
-	 * The category the rule falls under.
-	 * @deprecated No longer used.
-	 */
-	category?: string | undefined;
-
-	/**
 	 * Indicates if the rule is generally recommended for all users.
 	 *
 	 * Note - this will always be a boolean for core rules, but may be used in any way by plugins.
@@ -447,11 +441,19 @@ export type RuleFixer = (
 	fixer: RuleTextEditor,
 ) => RuleTextEdit | Iterable<RuleTextEdit> | null;
 
+/**
+ * Data that can be used to fill placeholders in error messages.
+ */
+export type MessagePlaceholderData = Record<
+	string,
+	string | number | boolean | bigint | null | undefined
+>;
+
 export interface ViolationReportBase {
 	/**
 	 * The data to insert into the message.
 	 */
-	data?: Record<string, unknown> | undefined;
+	data?: MessagePlaceholderData | undefined;
 
 	/**
 	 * The fix to be applied for the violation.
@@ -485,7 +487,7 @@ export interface SuggestedEditBase {
 	/**
 	 * The data to insert into the message.
 	 */
-	data?: Record<string, unknown> | undefined;
+	data?: MessagePlaceholderData | undefined;
 
 	/**
 	 * The fix to be applied for the suggestion.
@@ -600,6 +602,7 @@ export interface RuleDefinition<
 
 /**
  * Defaults for non-language-related `RuleDefinition` options.
+ * @deprecated Use the same type from `@eslint/plugin-kit` instead.
  */
 export interface CustomRuleTypeDefinitions {
 	RuleOptions: unknown[];
@@ -609,6 +612,7 @@ export interface CustomRuleTypeDefinitions {
 
 /**
  * A helper type to define language specific specializations of the `RuleDefinition` type.
+ * @deprecated Use the same type from `@eslint/plugin-kit` instead.
  *
  * @example
  * ```ts
@@ -801,7 +805,7 @@ export interface ConfigObject<Rules extends RulesConfig = RulesConfig> {
 	 * An object containing name-value pairs of information that should be
 	 * available to all rules.
 	 */
-	settings?: Record<string, unknown>;
+	settings?: SettingsConfig;
 }
 
 //------------------------------------------------------------------------------
@@ -913,7 +917,6 @@ export interface JavaScriptParserOptionsConfig {
 				globalReturn?: boolean | undefined;
 				impliedStrict?: boolean | undefined;
 				jsx?: boolean | undefined;
-				experimentalObjectRestSpread?: boolean | undefined;
 				[key: string]: any;
 		  }
 		| undefined;

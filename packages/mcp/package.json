@@ -15,8 +15,10 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "mocha \"tests/**/*.test.js\"",
-    "test:coverage": "c8 npm test"
+    "pretest": "npm run build",
+    "test": "npm run test:unit",
+    "test:coverage": "c8 npm run test:unit",
+    "test:unit": "mocha \"tests/**/*.test.js\""
   },
   "repository": {
     "type": "git",
@@ -37,7 +39,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.24.1",
-    "eslint": "^9.39.1",
+    "eslint": "^9.39.2",
     "zod": "^4.1.13"
   },
   "devDependencies": {

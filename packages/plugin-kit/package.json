@@ -1,6 +1,6 @@
 {
   "name": "@eslint/plugin-kit",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Utilities for building ESLint plugins.",
   "author": "Nicholas C. Zakas",
   "type": "module",
@@ -35,11 +35,13 @@
     "build:dedupe-types": "node ../../tools/dedupe-types.js dist/cjs/index.cjs dist/esm/index.js",
     "build:cts": "node ../../tools/build-cts.js dist/esm/index.d.ts dist/cjs/index.d.cts",
     "build": "rollup -c && npm run build:dedupe-types && tsc -p tsconfig.esm.json && npm run build:cts",
+    "lint:types": "attw --pack",
     "pretest": "npm run build",
-    "test": "mocha \"tests/**/*.test.js\"",
-    "test:coverage": "c8 npm test",
+    "test": "npm run test:types && npm run test:unit",
+    "test:coverage": "npm run build && c8 npm run test:unit",
     "test:jsr": "npx -y jsr@latest publish --dry-run",
-    "test:types": "tsc -p tests/types/tsconfig.json"
+    "test:types": "tsc -p tests/types/tsconfig.json",
+    "test:unit": "mocha \"tests/**/*.test.js\""
   },
   "keywords": [
     "eslint",
@@ -48,7 +50,7 @@
   ],
   "license": "Apache-2.0",
   "dependencies": {
-    "@eslint/core": "^1.0.0",
+    "@eslint/core": "^1.1.0",
     "levn": "^0.4.1"
   },
   "devDependencies": {
