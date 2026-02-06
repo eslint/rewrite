@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.3.0](https://github.com/eslint/rewrite/compare/mcp-v0.2.0...mcp-v0.3.0) (2026-02-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove `unstable_config_lookup_from_file` from MCP in v10 ([#334](https://github.com/eslint/rewrite/issues/334))
+
+### Bug Fixes
+
+* remove `unstable_config_lookup_from_file` from MCP in v10 ([#334](https://github.com/eslint/rewrite/issues/334)) ([69b0635](https://github.com/eslint/rewrite/commit/69b0635bbb3a46439e079a1854769ddf41a92d25))
+
 ## [0.2.0](https://github.com/eslint/rewrite/compare/mcp-v0.1.1...mcp-v0.2.0) (2025-11-14)
 
 

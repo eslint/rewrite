@@ -17,7 +17,7 @@ import { ESLint } from "eslint";
 
 const mcpServer = new McpServer({
 	name: "ESLint",
-	version: "0.2.0", // x-release-please-version
+	version: "0.3.0", // x-release-please-version
 });
 
 // Important: Cursor throws an error when `describe()` is used in the schema.
