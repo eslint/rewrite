@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.1](https://github.com/eslint/rewrite/compare/object-schema-v3.0.0...object-schema-v3.0.1) (2026-02-06)
+
+
+### Bug Fixes
+
+* export BuiltInMergeStrategy and BuiltInValidationStrategy types ([#362](https://github.com/eslint/rewrite/issues/362)) ([d9646d6](https://github.com/eslint/rewrite/commit/d9646d69c516d69b551131b84d9503cefaaa5c63))
+
 ## [3.0.0](https://github.com/eslint/rewrite/compare/object-schema-v2.1.7...object-schema-v3.0.0) (2025-11-14)
 
 

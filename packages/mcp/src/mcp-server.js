@@ -17,7 +17,7 @@ import { ESLint } from "eslint";
 
 const mcpServer = new McpServer({
 	name: "ESLint",
-	version: "0.2.0", // x-release-please-version
+	version: "0.3.0", // x-release-please-version
 });
 
 // Important: Cursor throws an error when `describe()` is used in the schema.
@@ -37,10 +37,7 @@ mcpServer.registerTool(
 		inputSchema: filePathsSchema,
 	},
 	async ({ filePaths }) => {
-		const eslint = new ESLint({
-			// enable lookup from file rather than from cwd
-			flags: ["unstable_config_lookup_from_file"],
-		});
+		const eslint = new ESLint();
 
 		const type = /** @type {const} */ ("text");
 		const results = await eslint.lintFiles(filePaths);
