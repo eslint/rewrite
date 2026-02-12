@@ -79,6 +79,13 @@ export function createBuildOrder(dependencies) {
 	const buildOrder = [];
 	const seen = new Set();
 
+	/**
+	 * Recursively visits a package and its dependencies to determine build order.
+	 * Visits all dependencies first (depth-first) before adding the current package
+	 * to ensure dependencies are built before their dependents.
+	 * @param {string} name The package name to visit.
+	 * @returns {void}
+	 */
 	function visit(name) {
 		if (!seen.has(name)) {
 			seen.add(name);
