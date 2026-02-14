@@ -11,4 +11,8 @@ on:
 
 jobs:
     ci-package-manager:
+        # Skip on Release Please PRs
+        # https://github.com/eslint/rewrite/issues/366
+        if: >-
+            !(github.event_name == 'pull_request' && contains(github.event.pull_request.title, 'chore: release'))
         uses: eslint/workflows/.github/workflows/ci-package-manager.yml@main
