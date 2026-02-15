@@ -2,10 +2,11 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "noEmit": true,
-    "rootDir": "../.."
-    // "strict": true,
-    // "exactOptionalPropertyTypes": true,
-    // "useUnknownInCatchVariables": false
+    "rootDir": "../..",
+    "strict": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitAny": false,
+    "useUnknownInCatchVariables": false
   },
   "include": [".", "../../dist"]
 }
