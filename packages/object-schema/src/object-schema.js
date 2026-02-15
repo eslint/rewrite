@@ -13,6 +13,8 @@ import { ValidationStrategy } from "./validation-strategy.js";
 // Types
 //-----------------------------------------------------------------------------
 
+/** @typedef {import("./types.ts").BuiltInMergeStrategy} BuiltInMergeStrategy */
+/** @typedef {import("./types.ts").BuiltInValidationStrategy} BuiltInValidationStrategy */
 /** @typedef {import("./types.ts").ObjectDefinition} ObjectDefinition */
 /** @typedef {import("./types.ts").PropertyDefinition} PropertyDefinition */
 

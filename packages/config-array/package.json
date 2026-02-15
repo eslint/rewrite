@@ -1,6 +1,6 @@
 {
   "name": "@eslint/config-array",
-  "version": "0.23.0",
+  "version": "0.23.1",
   "description": "General purpose glob-based configuration matching.",
   "author": "Nicholas C. Zakas",
   "type": "module",
@@ -38,10 +38,11 @@
     "build": "rollup -c && npm run build:dedupe-types && tsc -p tsconfig.esm.json && npm run build:cts && npm run build:std__path",
     "lint:types": "attw --pack",
     "pretest": "npm run build",
-    "test": "mocha \"tests/**/*.test.js\"",
-    "test:coverage": "c8 npm test",
+    "test": "npm run test:types && npm run test:unit",
+    "test:coverage": "npm run build && c8 npm run test:unit",
     "test:jsr": "npx -y jsr@latest publish --dry-run",
-    "test:types": "tsc -p tests/types/tsconfig.json"
+    "test:types": "tsc -p tests/types/tsconfig.json",
+    "test:unit": "mocha \"tests/**/*.test.js\""
   },
   "keywords": [
     "configuration",
@@ -50,7 +51,7 @@
   ],
   "license": "Apache-2.0",
   "dependencies": {
-    "@eslint/object-schema": "^3.0.0",
+    "@eslint/object-schema": "^3.0.1",
     "debug": "^4.3.1",
     "minimatch": "^10.1.1"
   },

@@ -60,6 +60,10 @@ describe("MCP Server", () => {
 		await client.connect(clientTransport);
 	});
 
+	afterEach(async () => {
+		await mcpServer.close();
+	});
+
 	describe("Tools", () => {
 		it("should list tools", async () => {
 			const { tools } = await client.listTools();
@@ -145,7 +149,6 @@ describe("MCP Server", () => {
 										"Parsing error: Unexpected token }",
 									line: 1,
 									column: 3,
-									nodeType: null,
 								},
 							],
 							suppressedMessages: [],
