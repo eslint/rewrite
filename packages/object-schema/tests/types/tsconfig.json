@@ -3,6 +3,9 @@
   "compilerOptions": {
     "noEmit": true,
     "rootDir": "../.."
+    // "strict": true,
+    // "exactOptionalPropertyTypes": true,
+    // "useUnknownInCatchVariables": false
   },
   "include": [".", "../../dist"]
 }
