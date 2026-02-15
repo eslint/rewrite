@@ -60,6 +60,10 @@ describe("MCP Server", () => {
 		await client.connect(clientTransport);
 	});
 
+	afterEach(async () => {
+		await mcpServer.close();
+	});
+
 	describe("Tools", () => {
 		it("should list tools", async () => {
 			const { tools } = await client.listTools();
