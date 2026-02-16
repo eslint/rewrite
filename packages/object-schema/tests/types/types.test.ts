@@ -137,23 +137,28 @@ MergeStrategy.assign({ a: 1 }, { a: "a" }) satisfies {
 // #region PropertyDefinition
 
 // PropertyDefinition with built-in strategies
-const propertyWithBuiltInStrategies: PropertyDefinition = {
+const propertyWithBuiltInStrategies = {
+	merge: "replace",
+	validate: "string",
+} satisfies PropertyDefinition;
+
+// PropertyDefinition with a required flag
+const propertyWithRequired = {
 	required: true,
 	merge: "replace",
 	validate: "string",
-};
+} satisfies PropertyDefinition;
 
-propertyWithBuiltInStrategies.required satisfies boolean;
 propertyWithBuiltInStrategies.merge satisfies
 	| BuiltInMergeStrategy
 	| ((target: any, source: any) => any);
 propertyWithBuiltInStrategies.validate satisfies
 	| BuiltInValidationStrategy
 	| ((value: any) => void);
+propertyWithRequired.required satisfies boolean;
 
 // PropertyDefinition with custom functions
-const propertyWithCustomFunctions: PropertyDefinition = {
-	required: false,
+const propertyWithCustomFunctions = {
 	merge(target, source) {
 		return source ?? target;
 	},
@@ -162,33 +167,38 @@ const propertyWithCustomFunctions: PropertyDefinition = {
 			throw new TypeError("Expected a string.");
 		}
 	},
-};
+} satisfies PropertyDefinition;
 
 // PropertyDefinition with requires
-const propertyWithRequires: PropertyDefinition = {
-	required: false,
+const propertyWithRequires = {
 	requires: ["otherKey1", "otherKey2"],
 	merge: "overwrite",
 	validate: "object",
-};
+} satisfies PropertyDefinition;
 
 propertyWithRequires.requires satisfies string[];
 
 // PropertyDefinition with subschema
-const propertyWithSchema: PropertyDefinition = {
-	required: false,
-	merge: "assign",
-	validate: "object",
+const propertyWithSchema = {
 	schema: {
 		nestedKey: {
-			required: true,
 			merge: "replace",
 			validate: "string",
 		},
 	},
-};
+} satisfies PropertyDefinition;
 
 propertyWithSchema.schema satisfies ObjectDefinition;
+
+// @ts-expect-error -- merge and validate are required when schema isn't present
+const propertyMissingMerge: PropertyDefinition = {
+	validate: "string",
+};
+
+// @ts-expect-error -- merge and validate are required when schema isn't present
+const propertyMissingValidate: PropertyDefinition = {
+	merge: "replace",
+};
 
 // #endregion PropertyDefinition
 
