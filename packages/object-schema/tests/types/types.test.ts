@@ -172,7 +172,7 @@ const propertyWithRequires: PropertyDefinition = {
 	validate: "object",
 };
 
-propertyWithRequires.requires satisfies string[];
+propertyWithRequires.requires satisfies string[] | undefined; // `requires` is optional.
 
 // PropertyDefinition with subschema
 const propertyWithSchema: PropertyDefinition = {
@@ -188,7 +188,7 @@ const propertyWithSchema: PropertyDefinition = {
 	},
 };
 
-propertyWithSchema.schema satisfies ObjectDefinition;
+propertyWithSchema.schema satisfies ObjectDefinition | undefined; // `schema` is optional.
 
 // #endregion PropertyDefinition
 
