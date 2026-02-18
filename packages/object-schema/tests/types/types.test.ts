@@ -180,7 +180,7 @@ const propertyWithRequires: PropertyDefinition = {
 	validate: "object",
 };
 
-propertyWithRequires.requires satisfies string[] | undefined;
+propertyWithRequires.requires satisfies string[] | undefined; // `requires` is optional.
 
 // PropertyDefinition with subschema
 const propertyWithSchema: PropertyDefinition = {
@@ -192,7 +192,7 @@ const propertyWithSchema: PropertyDefinition = {
 	},
 };
 
-propertyWithSchema.schema satisfies ObjectDefinition | undefined;
+propertyWithSchema.schema satisfies ObjectDefinition | undefined; // `schema` is optional.
 
 // @ts-expect-error -- merge and validate are required when schema isn't present
 const propertyMissingMerge: PropertyDefinition = {
@@ -259,10 +259,12 @@ const propertyDefinitionWithSchemaAndStrategies: PropertyDefinitionWithSchema =
 propertyDefinitionWithSchemaAndStrategies.schema satisfies ObjectDefinition;
 propertyDefinitionWithSchemaAndStrategies.merge satisfies
 	| BuiltInMergeStrategy
-	| CustomMergeStrategy;
+	| CustomMergeStrategy
+	| undefined;
 propertyDefinitionWithSchemaAndStrategies.validate satisfies
 	| BuiltInValidationStrategy
-	| CustomValidationStrategy;
+	| CustomValidationStrategy
+	| undefined;
 
 // #endregion PropertyDefinitionWithStrategies and PropertyDefinitionWithSchema
 

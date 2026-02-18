@@ -150,7 +150,7 @@ export class ObjectSchema {
 	#definitions = new Map();
 
 	/**
-	 * Separately track any keys that are required for faster validtion.
+	 * Separately track any keys that are required for faster validation.
 	 * @type {Map<string, PropertyDefinition>}
 	 */
 	#requiredKeys = new Map();
@@ -283,7 +283,9 @@ export class ObjectSchema {
 			}
 
 			// validate existing keys
-			const definition = this.#definitions.get(key);
+			const definition = /** @type {PropertyDefinition} */ (
+				this.#definitions.get(key)
+			); // `definition` is guaranteed to exist since we check with `hasKey()` above.
 
 			// first check to see if any other keys are required
 			if (Array.isArray(definition.requires)) {
