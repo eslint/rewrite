@@ -23,13 +23,13 @@ export type BuiltInMergeStrategy = "assign" | "overwrite" | "replace";
  * Custom merge strategy.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- https://github.com/eslint/rewrite/pull/90#discussion_r1687206213
-type CustomMergeStrategy = (target: any, source: any) => any;
+export type CustomMergeStrategy = (target: any, source: any) => any;
 
 /**
  * Custom validation strategy.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- https://github.com/eslint/rewrite/pull/90#discussion_r1687206213
-type CustomValidationStrategy = (value: any) => void;
+export type CustomValidationStrategy = (value: any) => void;
 
 interface BasePropertyDefinition {
 	/**
@@ -43,7 +43,16 @@ interface BasePropertyDefinition {
 	requires?: string[];
 }
 
-interface PropertyDefinitionWithStrategies extends BasePropertyDefinition {
+/**
+ * Property definition that specifies explicit merge and validation strategies.
+ * This form cannot include a `schema`.
+ */
+export interface PropertyDefinitionWithStrategies extends BasePropertyDefinition {
+	/**
+	 * The schema for the object value of this property.
+	 */
+	schema?: never;
+
 	/**
 	 * The strategy to merge the property.
 	 */
@@ -53,14 +62,13 @@ interface PropertyDefinitionWithStrategies extends BasePropertyDefinition {
 	 * The strategy to validate the property.
 	 */
 	validate: BuiltInValidationStrategy | CustomValidationStrategy;
-
-	/**
-	 * The schema for the object value of this property.
-	 */
-	schema?: never;
 }
 
-interface PropertyDefinitionWithSchema extends BasePropertyDefinition {
+/**
+ * Property definition that uses a nested `schema`.
+ * When `schema` is present, merge and validation strategies are optional.
+ */
+export interface PropertyDefinitionWithSchema extends BasePropertyDefinition {
 	/**
 	 * The schema for the object value of this property.
 	 */

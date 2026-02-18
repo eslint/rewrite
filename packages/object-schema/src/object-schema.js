@@ -15,8 +15,12 @@ import { ValidationStrategy } from "./validation-strategy.js";
 
 /** @typedef {import("./types.ts").BuiltInMergeStrategy} BuiltInMergeStrategy */
 /** @typedef {import("./types.ts").BuiltInValidationStrategy} BuiltInValidationStrategy */
+/** @typedef {import("./types.ts").CustomMergeStrategy} CustomMergeStrategy */
+/** @typedef {import("./types.ts").CustomValidationStrategy} CustomValidationStrategy */
 /** @typedef {import("./types.ts").ObjectDefinition} ObjectDefinition */
 /** @typedef {import("./types.ts").PropertyDefinition} PropertyDefinition */
+/** @typedef {import("./types.ts").PropertyDefinitionWithSchema} PropertyDefinitionWithSchema */
+/** @typedef {import("./types.ts").PropertyDefinitionWithStrategies} PropertyDefinitionWithStrategies */
 
 //-----------------------------------------------------------------------------
 // Private

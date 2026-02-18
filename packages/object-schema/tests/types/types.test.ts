@@ -10,10 +10,14 @@
 import {
 	type BuiltInMergeStrategy,
 	type BuiltInValidationStrategy,
+	type CustomMergeStrategy,
+	type CustomValidationStrategy,
 	MergeStrategy,
 	type ObjectDefinition,
 	ObjectSchema,
 	type PropertyDefinition,
+	type PropertyDefinitionWithSchema,
+	type PropertyDefinitionWithStrategies,
 } from "@eslint/object-schema";
 
 //-----------------------------------------------------------------------------
@@ -137,28 +141,28 @@ MergeStrategy.assign({ a: 1 }, { a: "a" }) satisfies {
 // #region PropertyDefinition
 
 // PropertyDefinition with built-in strategies
-const propertyWithBuiltInStrategies = {
+const propertyWithBuiltInStrategies: PropertyDefinition = {
 	merge: "replace",
 	validate: "string",
-} satisfies PropertyDefinition;
+};
 
 // PropertyDefinition with a required flag
-const propertyWithRequired = {
+const propertyWithRequired: PropertyDefinition = {
 	required: true,
 	merge: "replace",
 	validate: "string",
-} satisfies PropertyDefinition;
+};
 
 propertyWithBuiltInStrategies.merge satisfies
 	| BuiltInMergeStrategy
-	| ((target: any, source: any) => any);
+	| CustomMergeStrategy;
 propertyWithBuiltInStrategies.validate satisfies
 	| BuiltInValidationStrategy
-	| ((value: any) => void);
-propertyWithRequired.required satisfies boolean;
+	| CustomValidationStrategy;
+propertyWithRequired.required satisfies boolean | undefined;
 
 // PropertyDefinition with custom functions
-const propertyWithCustomFunctions = {
+const propertyWithCustomFunctions: PropertyDefinition = {
 	merge(target, source) {
 		return source ?? target;
 	},
@@ -167,28 +171,28 @@ const propertyWithCustomFunctions = {
 			throw new TypeError("Expected a string.");
 		}
 	},
-} satisfies PropertyDefinition;
+};
 
 // PropertyDefinition with requires
-const propertyWithRequires = {
+const propertyWithRequires: PropertyDefinition = {
 	requires: ["otherKey1", "otherKey2"],
 	merge: "overwrite",
 	validate: "object",
-} satisfies PropertyDefinition;
+};
 
-propertyWithRequires.requires satisfies string[];
+propertyWithRequires.requires satisfies string[] | undefined;
 
 // PropertyDefinition with subschema
-const propertyWithSchema = {
+const propertyWithSchema: PropertyDefinition = {
 	schema: {
 		nestedKey: {
 			merge: "replace",
 			validate: "string",
 		},
 	},
-} satisfies PropertyDefinition;
+};
 
-propertyWithSchema.schema satisfies ObjectDefinition;
+propertyWithSchema.schema satisfies ObjectDefinition | undefined;
 
 // @ts-expect-error -- merge and validate are required when schema isn't present
 const propertyMissingMerge: PropertyDefinition = {
@@ -201,6 +205,66 @@ const propertyMissingValidate: PropertyDefinition = {
 };
 
 // #endregion PropertyDefinition
+
+//-----------------------------------------------------------------------------
+// Tests for CustomMergeStrategy and CustomValidationStrategy
+//-----------------------------------------------------------------------------
+
+// #region CustomMergeStrategy and CustomValidationStrategy
+
+const customMergeStrategy: CustomMergeStrategy = (target, source) =>
+	source ?? target;
+
+const customValidationStrategy: CustomValidationStrategy = value => {
+	if (typeof value !== "string") {
+		throw new TypeError("Expected a string.");
+	}
+};
+
+customMergeStrategy(1, undefined);
+customValidationStrategy("value");
+
+// #endregion CustomMergeStrategy and CustomValidationStrategy
+
+//-----------------------------------------------------------------------------
+// Tests for PropertyDefinitionWithStrategies and PropertyDefinitionWithSchema
+//-----------------------------------------------------------------------------
+
+// #region PropertyDefinitionWithStrategies and PropertyDefinitionWithSchema
+
+const propertyDefinitionWithStrategies: PropertyDefinitionWithStrategies = {
+	merge: "replace",
+	validate: "string",
+};
+
+const propertyDefinitionWithStrategiesSchema: PropertyDefinitionWithStrategies =
+	{
+		// @ts-expect-error -- schema should not be present
+		schema: {},
+		merge: "replace",
+		validate: "string",
+	};
+
+const propertyDefinitionWithSchema: PropertyDefinitionWithSchema = {
+	schema: {},
+};
+
+const propertyDefinitionWithSchemaAndStrategies: PropertyDefinitionWithSchema =
+	{
+		schema: {},
+		merge: "replace",
+		validate: "string",
+	};
+
+propertyDefinitionWithSchemaAndStrategies.schema satisfies ObjectDefinition;
+propertyDefinitionWithSchemaAndStrategies.merge satisfies
+	| BuiltInMergeStrategy
+	| CustomMergeStrategy;
+propertyDefinitionWithSchemaAndStrategies.validate satisfies
+	| BuiltInValidationStrategy
+	| CustomValidationStrategy;
+
+// #endregion PropertyDefinitionWithStrategies and PropertyDefinitionWithSchema
 
 //-----------------------------------------------------------------------------
 // Tests for ObjectDefinition
