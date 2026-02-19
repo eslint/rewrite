@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.2](https://github.com/eslint/rewrite/compare/object-schema-v3.0.1...object-schema-v3.0.2) (2026-02-19)
+
+
+### Bug Fixes
+
+* tighten types of `MergeStrategy` in `object-schema` ([#348](https://github.com/eslint/rewrite/issues/348)) ([9266041](https://github.com/eslint/rewrite/commit/9266041ba46fe7f19788c0aac9bd13f1691b6ea7))
+
 ## [3.0.1](https://github.com/eslint/rewrite/compare/object-schema-v3.0.0...object-schema-v3.0.1) (2026-02-06)
 
 
