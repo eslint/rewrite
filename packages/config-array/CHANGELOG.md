@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.23.2](https://github.com/eslint/rewrite/compare/config-array-v0.23.1...config-array-v0.23.2) (2026-02-19)
+
+
+### Bug Fixes
+
+* update `minimatch` to `10.2.1` to address security vulnerabilities ([#376](https://github.com/eslint/rewrite/issues/376)) ([9a3dc87](https://github.com/eslint/rewrite/commit/9a3dc87340799eeeb2fd88fd943b55b6bcf4873a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/object-schema bumped from ^3.0.1 to ^3.0.2
+
 ## [0.23.1](https://github.com/eslint/rewrite/compare/config-array-v0.23.0...config-array-v0.23.1) (2026-02-06)
 
 
