@@ -192,7 +192,10 @@ const propertyWithSchema: PropertyDefinition = {
 	},
 };
 
-propertyWithSchema.schema satisfies ObjectDefinition | undefined; // `schema` is optional.
+propertyWithSchema.schema satisfies ObjectDefinition;
+
+(property: PropertyDefinition) =>
+	property.schema satisfies ObjectDefinition | undefined;
 
 // @ts-expect-error -- merge and validate are required when schema isn't present
 const propertyMissingMerge: PropertyDefinition = {
