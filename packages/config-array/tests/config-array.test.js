@@ -506,12 +506,6 @@ describe("ConfigArray", () => {
 			}, /ConfigError: Config \(unnamed\): Unexpected null config./u);
 		});
 
-		it("should throw an error when basePath is a relative path", () => {
-			assert.throws(() => {
-				void new ConfigArray([{}], { basePath: "foo/bar" });
-			}, /Expected an absolute path/u);
-		});
-
 		it("should throw an error when basePath is an empty string", () => {
 			assert.throws(
 				() => {
@@ -532,6 +526,32 @@ describe("ConfigArray", () => {
 				{
 					constructor: TypeError,
 					message: "basePath must be a non-empty string",
+				},
+			);
+		});
+
+		it("should throw an error when referenceLocation is an empty string", () => {
+			assert.throws(
+				() => {
+					void new ConfigArray([{}], { referenceLocation: "" });
+				},
+				{
+					constructor: TypeError,
+					message: "referenceLocation must be a non-empty string",
+				},
+			);
+		});
+
+		it("should throw an error when referenceLocation is not a string", () => {
+			assert.throws(
+				() => {
+					void new ConfigArray([{}], {
+						referenceLocation: ["/tmp/foo"],
+					});
+				},
+				{
+					constructor: TypeError,
+					message: "referenceLocation must be a non-empty string",
 				},
 			);
 		});
