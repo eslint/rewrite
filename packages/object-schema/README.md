@@ -131,6 +131,38 @@ const schema = new ObjectSchema({
 });
 ```
 
+### Built-in strategy classes
+
+The package also exports the built-in merge and validation strategies as two classes with static methods:
+
+- `MergeStrategy` - built-in merge functions (`assign`, `overwrite`, `replace`).
+- `ValidationStrategy` - built-in validation functions (`array`, `boolean`, `number`, `object`, `object?`, `string`, `string!`).
+
+These are the same strategies used when you specify a strategy by name (for example, `merge: "replace"`). You can reference the functions directly if you prefer passing a function instead of a string:
+
+```js
+import {
+	ObjectSchema,
+	MergeStrategy,
+	ValidationStrategy,
+} from "@eslint/object-schema";
+
+const schema = new ObjectSchema({
+	name: {
+		required: true,
+		merge: MergeStrategy.replace,
+		validate: ValidationStrategy["string!"],
+	},
+	options: {
+		required: false,
+		merge: MergeStrategy.assign,
+		validate: ValidationStrategy["object?"],
+	},
+});
+```
+
+Note: Because `object?` and `string!` aren't valid identifiers, you must access them using bracket notation (for example, `ValidationStrategy["object?"]`).
+
 ### Subschemas
 
 If you are defining a key that is, itself, an object, you can simplify the process by using a subschema. Instead of defining `merge()` and `validate()`, set a `schema` property that contains a schema definition, like this:
