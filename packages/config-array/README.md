@@ -65,8 +65,13 @@ const { ConfigArray } = require("@eslint/config-array");
 When you create a new instance of `ConfigArray`, you must pass in two arguments: an array of configs and an options object. The array of configs is most likely read in from a configuration file, so here's a typical example:
 
 ```js
+import path from "node:path";
+import { pathToFileURL } from "node:url";
+import { ConfigArray } from "@eslint/config-array";
+
 const configFilename = path.resolve(process.cwd(), "my.config.js");
-const { default: rawConfigs } = await import(configFilename);
+const { default: rawConfigs } = await import(pathToFileURL(configFilename));
+
 const configs = new ConfigArray(rawConfigs, {
 	// the path to match filenames from
 	basePath: process.cwd(),
@@ -84,35 +89,32 @@ The `schema` option is required for you to use additional properties in config o
 
 ```js
 const configFilename = path.resolve(process.cwd(), "my.config.js");
-const { default: rawConfigs } = await import(configFilename);
+const { default: rawConfigs } = await import(pathToFileURL(configFilename));
 
 const mySchema = {
-
-    // define the handler key in configs
-    handler: {
-        required: true,
-        merge(a, b) {
-            if (!b) return a;
-            if (!a) return b;
-        },
-        validate(value) {
-            if (typeof value !== "function") {
-                throw new TypeError("Function expected.");
-            }
-        }
-    }
+	// define the handler key in configs
+	handler: {
+		required: true,
+		merge(a, b) {
+			return b ?? a;
+		},
+		validate(value) {
+			if (typeof value !== "function") {
+				throw new TypeError("Function expected.");
+			}
+		},
+	},
 };
 
 const configs = new ConfigArray(rawConfigs, {
+	// the path to match filenames from
+	basePath: process.cwd(),
 
-    // the path to match filenames from
-    basePath: process.cwd(),
+	// additional item schemas in each config
+	schema: mySchema,
 
-    // additional item schemas in each config
-    schema: mySchema,
-
-    // additional config types supported (default: [])
-    extraConfigTypes: ["array", "function"];
+	// additional config types supported (default: [])
+	extraConfigTypes: ["array", "function"],
 });
 ```
 
@@ -190,18 +192,17 @@ You can also specify an `ignores` key that will force files matching those patte
 
 ```js
 export default [
+	// Always ignored
+	{
+		ignores: ["**/.git/**", "**/node_modules/**"],
+	},
 
-    // Always ignored
-    {
-        ignores: ["**/.git/**", "**/node_modules/**"]
-    },
-
-    // .eslintrc.js file is ignored only when .js file matches
-    {
-        files: ["**/*.js"],
-        ignores: [".eslintrc.js"]
-        handler: jsHandler
-    }
+	// .eslintrc.js file is ignored only when .js file matches
+	{
+		files: ["**/*.js"],
+		ignores: [".eslintrc.js"],
+		handler: jsHandler,
+	},
 ];
 ```
 
@@ -271,7 +272,7 @@ The `normalize()` method returns a promise, so be sure to use the `await` operat
 If you want to disallow async config functions, you can call `normalizeSync()` instead. This method is completely synchronous and does not require using the `await` operator as it does not return a promise:
 
 ```js
-await configs.normalizeSync({
+configs.normalizeSync({
 	name: "MyApp",
 });
 ```
@@ -308,7 +309,7 @@ const ignored = configs.isFileIgnored("/foo/bar/baz.txt");
 
 A file is considered ignored if any of the following is true:
 
-- **It's parent directory is ignored.** For example, if `foo` is in `ignores`, then `foo/a.js` is considered ignored.
+- **Its parent directory is ignored.** For example, if `foo` is in `ignores`, then `foo/a.js` is considered ignored.
 - **It has an ancestor directory that is ignored.** For example, if `foo` is in `ignores`, then `foo/baz/a.js` is considered ignored.
 - **It matches an ignored file pattern.** For example, if `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
 - **If it matches an entry in `files` and also in `ignores`.** For example, if `**/*.js` is in `files` and `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
@@ -322,9 +323,9 @@ const ignored = configs.isDirectoryIgnored("/foo/bar/");
 
 A directory is considered ignored if any of the following is true:
 
-- **It's parent directory is ignored.** For example, if `foo` is in `ignores`, then `foo/baz` is considered ignored.
+- **Its parent directory is ignored.** For example, if `foo` is in `ignores`, then `foo/baz` is considered ignored.
 - **It has an ancestor directory that is ignored.** For example, if `foo` is in `ignores`, then `foo/bar/baz/a.js` is considered ignored.
-- **It matches and ignored file pattern.** For example, if `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
+- **It matches an ignored file pattern.** For example, if `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
 - **If it matches an entry in `files` and also in `ignores`.** For example, if `**/*.js` is in `files` and `**/a.js` is in `ignores`, then `foo/a.js` and `foo/baz/a.js` are considered ignored.
 - **The file is outside the `basePath`.** If the `basePath` is `/usr/me`, then `/foo/a.js` is considered ignored.
 
