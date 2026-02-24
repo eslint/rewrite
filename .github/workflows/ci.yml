@@ -55,8 +55,13 @@ jobs:
                   CI: true
 
     test_types:
-        name: Test Types
+        name: Test Types (TypeScript ${{ matrix.typescript }})
         runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                typescript: ["5.x", "5.3.2"]
+
         steps:
             - uses: actions/checkout@v6
 
@@ -68,33 +73,26 @@ jobs:
             - name: Install Packages
               run: npm install
 
-            - name: Run TypeScript Compiler
+            - name: Install TypeScript ${{ matrix.typescript }}
+              run: npm install --ignore-scripts --no-save typescript@${{ matrix.typescript }}
+
+            - name: Run TypeScript Compiler (TypeScript ${{ matrix.typescript }})
               run: npx tsc
 
-            - name: Test types (core)
-              working-directory: packages/core
-              run: |
-                  npm run test:types
+            - name: Test types (config-array, TypeScript ${{ matrix.typescript }})
+              run: npm run test:types -w packages/config-array
 
-            - name: Test types (object-schema)
-              working-directory: packages/object-schema
-              run: |
-                  npm run test:types
+            - name: Test types (config-helpers, TypeScript ${{ matrix.typescript }})
+              run: npm run test:types -w packages/config-helpers
 
-            - name: Test types (config-array)
-              working-directory: packages/config-array
-              run: |
-                  npm run test:types
+            - name: Test types (core, TypeScript ${{ matrix.typescript }})
+              run: npm run test:types -w packages/core
 
-            - name: Test types (config-helpers)
-              working-directory: packages/config-helpers
-              run: |
-                  npm run test:types
+            - name: Test types (object-schema, TypeScript ${{ matrix.typescript }})
+              run: npm run test:types -w packages/object-schema
 
-            - name: Test types (plugin-kit)
-              working-directory: packages/plugin-kit
-              run: |
-                  npm run test:types
+            - name: Test types (plugin-kit, TypeScript ${{ matrix.typescript }})
+              run: npm run test:types -w packages/plugin-kit
 
     are-the-types-wrong:
         name: Are the types wrong?
