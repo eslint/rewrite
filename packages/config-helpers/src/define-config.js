@@ -385,9 +385,7 @@ function extendConfig(baseConfig, baseConfigName, extension, extensionName) {
 
 	result.name = `${baseConfigName} > ${extensionName}`;
 
-	// @ts-ignore -- ESLint types aren't updated yet
 	if (baseConfig.basePath) {
-		// @ts-ignore -- ESLint types aren't updated yet
 		result.basePath = baseConfig.basePath;
 	}
 
