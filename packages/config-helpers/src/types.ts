@@ -36,7 +36,4 @@ export interface ConfigWithExtends extends ConfigObject {
 	extends?: ExtendsElement[];
 }
 
-export type ConfigWithExtendsArray = [
-	InfiniteArray<ConfigWithExtends>,
-	...InfiniteArray<ConfigWithExtends>[],
-];
+export type ConfigWithExtendsArray = InfiniteArray<ConfigWithExtends>[];

@@ -9,6 +9,7 @@
 
 import {
 	defineConfig,
+	type Config,
 	type ConfigWithExtends,
 	type ExtensionConfigObject,
 	globalIgnores,
@@ -61,9 +62,6 @@ import {
 
 // #region defineConfig
 
-// @ts-expect-error -- defineConfig() requires at least one argument
-defineConfig();
-
 // @ts-expect-error -- configs must be objects
 defineConfig(1);
 
@@ -73,6 +71,12 @@ defineConfig([]);
 defineConfig([], {});
 defineConfig([{}]);
 defineConfig([globalIgnores(["node_modules"])], []);
+
+declare const recommendedConfigs: Config[];
+
+defineConfig(...recommendedConfigs, {
+	linterOptions: { noInlineConfig: true },
+});
 
 defineConfig({
 	extends: [],
