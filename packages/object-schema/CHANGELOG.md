@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.3](https://github.com/eslint/rewrite/compare/object-schema-v3.0.2...object-schema-v3.0.3) (2026-02-27)
+
+
+### Bug Fixes
+
+* align `object-schema` `PropertyDefinition` types with runtime ([#372](https://github.com/eslint/rewrite/issues/372)) ([6182ebf](https://github.com/eslint/rewrite/commit/6182ebf7979c96d9d9d763204341b4856105c3ce))
+
 ## [3.0.2](https://github.com/eslint/rewrite/compare/object-schema-v3.0.1...object-schema-v3.0.2) (2026-02-19)
 
 

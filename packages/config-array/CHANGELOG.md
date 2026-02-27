@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.23.3](https://github.com/eslint/rewrite/compare/config-array-v0.23.2...config-array-v0.23.3) (2026-02-27)
+
+
+### Bug Fixes
+
+* correct `config-array` matcher types ([#373](https://github.com/eslint/rewrite/issues/373)) ([7b89f2f](https://github.com/eslint/rewrite/commit/7b89f2f99379682148d03f6bb7ef03b0fce223d4))
+* correct extraConfigTypes validation error messages ([#388](https://github.com/eslint/rewrite/issues/388)) ([25aba34](https://github.com/eslint/rewrite/commit/25aba34b8f4ed13b3e01382302a5e6395e4302a1))
+* update dependency minimatch to ^10.2.4 ([#387](https://github.com/eslint/rewrite/issues/387)) ([538c049](https://github.com/eslint/rewrite/commit/538c049d9e0956df85806400b498e7d92f4229aa))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/object-schema bumped from ^3.0.2 to ^3.0.3
+
 ## [0.23.2](https://github.com/eslint/rewrite/compare/config-array-v0.23.1...config-array-v0.23.2) (2026-02-19)
 
 
