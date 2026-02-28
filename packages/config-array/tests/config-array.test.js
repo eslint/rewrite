@@ -535,6 +535,52 @@ describe("ConfigArray", () => {
 				},
 			);
 		});
+
+		it("should throw an error when extraConfigTypes is not an array", () => {
+			assert.throws(
+				() => {
+					void new ConfigArray([], {
+						basePath,
+						extraConfigTypes: "array",
+					});
+				},
+				{
+					constructor: TypeError,
+					message: "extraConfigTypes must be an array.",
+				},
+			);
+		});
+
+		it("should throw an error when extraConfigTypes has more than two items", () => {
+			assert.throws(
+				() => {
+					void new ConfigArray([], {
+						basePath,
+						extraConfigTypes: ["array", "function", "array"],
+					});
+				},
+				{
+					constructor: TypeError,
+					message: "extraConfigTypes must contain at most two items.",
+				},
+			);
+		});
+
+		it("should throw an error when extraConfigTypes contains an invalid item", () => {
+			assert.throws(
+				() => {
+					void new ConfigArray([], {
+						basePath,
+						extraConfigTypes: ["array", "object"],
+					});
+				},
+				{
+					constructor: TypeError,
+					message:
+						'Unexpected config type "object" in extraConfigTypes. Expected one of: "array", "function".',
+				},
+			);
+		});
 	});
 
 	describe("Config Pattern Normalization", () => {
