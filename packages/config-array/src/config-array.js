@@ -399,7 +399,7 @@ async function normalize(
 	 * Async iterables cannot be used with the spread operator, so we need to manually
 	 * create the array to return.
 	 */
-	const asyncIterable = await flatTraverse(items);
+	const asyncIterable = flatTraverse(items);
 	const configs = [];
 
 	for await (const config of asyncIterable) {
