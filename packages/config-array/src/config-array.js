@@ -631,10 +631,12 @@ function assertNormalized(configArray) {
  * @throws {TypeError} When the config types array is invalid.
  */
 function assertExtraConfigTypes(extraConfigTypes) {
+	if (!Array.isArray(extraConfigTypes)) {
+		throw new TypeError("extraConfigTypes must be an array.");
+	}
+
 	if (extraConfigTypes.length > 2) {
-		throw new TypeError(
-			"extraConfigTypes must be an array with at most two items.",
-		);
+		throw new TypeError("extraConfigTypes must contain at most two items.");
 	}
 
 	for (const configType of extraConfigTypes) {
