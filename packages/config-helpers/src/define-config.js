@@ -12,6 +12,7 @@
 /** @typedef {import("@eslint/core").Plugin} Plugin */
 /** @typedef {import("@eslint/core").RuleConfig} RuleConfig */
 /** @typedef {import("./types.ts").ExtendsElement} ExtendsElement */
+/** @typedef {import("./types.ts").ExtensionConfigObject} ExtensionConfigObject */
 /** @typedef {import("./types.ts").SimpleExtendsElement} SimpleExtendsElement */
 /** @typedef {import("./types.ts").ConfigWithExtends} ConfigWithExtends */
 /** @typedef {import("./types.ts").InfiniteArray<Config>} InfiniteConfigArray */
