@@ -2,6 +2,7 @@ on:
     push:
         branches:
             - main
+            - "release/*/v**"
 
 name: release-please
 
@@ -48,13 +49,7 @@ jobs:
             - run: npm install
               if: ${{ steps.release.outputs.releases_created == 'true' }}
 
-            #-----------------------------------------------------------------------------
-            # NOTE: This script currently doesn't do anything. It just outputs the
-            # release information to the console. We will do this for a few releases
-            # to make sure everything is working correctly before we switch to use this
-            # script exclusively.
-            #-----------------------------------------------------------------------------
-
+            # publish the packages using our custom script which also posts to social media
             - name: Publish using new script
               run: node scripts/publish.js
               if: ${{ steps.release.outputs.releases_created == 'true' }}
