@@ -55,6 +55,7 @@ jobs:
               if: ${{ steps.release.outputs.releases_created == 'true' }}
               env:
                   STEPS_RELEASE_OUTPUTS: ${{ toJson(steps.release.outputs) }}
+                  GITHUB_REF_NAME: ${{ github.ref_name }}
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   TWITTER_API_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
                   TWITTER_API_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
