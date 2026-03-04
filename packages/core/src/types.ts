@@ -449,7 +449,7 @@ export type MessagePlaceholderData = Record<
 	string | number | boolean | bigint | null | undefined
 >;
 
-export interface ViolationReportBase {
+export interface ViolationReportBase<MessageIds extends string = string> {
 	/**
 	 * The data to insert into the message.
 	 */
@@ -464,10 +464,10 @@ export interface ViolationReportBase {
 	 * An array of suggested fixes for the problem. These fixes may change the
 	 * behavior of the code, so they are not applied automatically.
 	 */
-	suggest?: SuggestedEdit[] | null | undefined;
+	suggest?: SuggestedEdit<MessageIds>[] | null | undefined;
 }
 
-export type ViolationMessage<MessageIds = string> =
+export type ViolationMessage<MessageIds extends string = string> =
 	| { message: string }
 	| { messageId: MessageIds };
 export type ViolationLocation<Node> =
@@ -476,8 +476,8 @@ export type ViolationLocation<Node> =
 
 export type ViolationReport<
 	Node = unknown,
-	MessageIds = string,
-> = ViolationReportBase &
+	MessageIds extends string = string,
+> = ViolationReportBase<MessageIds> &
 	ViolationMessage<MessageIds> &
 	ViolationLocation<Node>;
 
@@ -495,12 +495,15 @@ export interface SuggestedEditBase {
 	fix: RuleFixer;
 }
 
-export type SuggestionMessage = { desc: string } | { messageId: string };
+export type SuggestionMessage<MessageIds extends string = string> =
+	| { desc: string }
+	| { messageId: MessageIds };
 
 /**
  * A suggested edit for a rule violation.
  */
-export type SuggestedEdit = SuggestedEditBase & SuggestionMessage;
+export type SuggestedEdit<MessageIds extends string = string> =
+	SuggestedEditBase & SuggestionMessage<MessageIds>;
 
 /**
  * The normalized version of a lint suggestion.

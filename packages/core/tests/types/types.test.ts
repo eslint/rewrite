@@ -315,7 +315,7 @@ const testRule: RuleDefinition<{
 					node,
 					suggest: [
 						{
-							messageId: "Bar",
+							messageId: "wrongBar",
 							data: {
 								foo: "foo",
 								bar: 1,
@@ -345,6 +345,19 @@ const testRule: RuleDefinition<{
 							},
 							// @ts-expect-error -- 'fix' is required in suggestion objects
 							fix: null,
+						},
+						{
+							messageId: "badFoo",
+							fix(fixer) {
+								return fixer.insertTextAfter(node, "badFoo");
+							},
+						},
+						{
+							// @ts-expect-error -- suggestion messageId must be a valid MessageId
+							messageId: "Bar",
+							fix(fixer) {
+								return fixer.insertTextAfter(node, "Bar");
+							},
 						},
 					],
 				});
