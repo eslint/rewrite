@@ -57,6 +57,7 @@ jobs:
     test_types:
         name: Test Types
         runs-on: ubuntu-latest
+
         steps:
             - uses: actions/checkout@v6
 
@@ -71,30 +72,26 @@ jobs:
             - name: Run TypeScript Compiler
               run: npx tsc
 
-            - name: Test types (core)
-              working-directory: packages/core
-              run: |
-                  npm run test:types
-
-            - name: Test types (object-schema)
-              working-directory: packages/object-schema
-              run: |
-                  npm run test:types
-
             - name: Test types (config-array)
-              working-directory: packages/config-array
-              run: |
-                  npm run test:types
+              run: npm run test:types -w packages/config-array
 
             - name: Test types (config-helpers)
-              working-directory: packages/config-helpers
-              run: |
-                  npm run test:types
+              run: npm run test:types -w packages/config-helpers
+
+            - name: Test types (core)
+              run: npm run test:types -w packages/core
+
+            - name: Test types (object-schema)
+              run: npm run test:types -w packages/object-schema
 
             - name: Test types (plugin-kit)
-              working-directory: packages/plugin-kit
-              run: |
-                  npm run test:types
+              run: npm run test:types -w packages/plugin-kit
+
+            - name: Install TypeScript 5.3.2
+              run: npm install --no-save typescript@5.3.2
+
+            - name: Check dist types compile (TypeScript 5.3.2)
+              run: npx tsc -p tsconfig.dist.json
 
     are-the-types-wrong:
         name: Are the types wrong?
