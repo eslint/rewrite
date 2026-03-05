@@ -118,7 +118,13 @@ function publishPackagesToNpm(packageDirs, dependencies) {
 
 		console.log(`Publishing ${packageDir}...`);
 		try {
-			exec(`npm publish -w ${packageDir} --provenance`, {
+			const tag =
+				process.env.GITHUB_REF_NAME &&
+				process.env.GITHUB_REF_NAME !== "main"
+					? "--tag maintenance"
+					: "";
+
+			exec(`npm publish -w ${packageDir} --provenance ${tag}`, {
 				stdio: "inherit",
 				env: process.env,
 			});
