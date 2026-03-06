@@ -2,22 +2,22 @@ on:
     push:
         branches:
             - main
+            - "release/*/v**"
 
 name: release-please
 
 permissions:
-    contents: write
-    pull-requests: write
+    contents: read
     id-token: write
 
 jobs:
     release-please:
         runs-on: ubuntu-latest
         steps:
-            - uses: googleapis/release-please-action@v4
+            - uses: googleapis/release-please-action@16a9c90856f42705d54a6fda1823352bdc62cf38 # v4
               id: release
               with:
-                  token: ${{secrets.GITHUB_TOKEN}}
+                  token: ${{ secrets.WORKFLOW_PUSH_BOT_TOKEN }}
 
             # Output which releases were created
             - name: Output release info
@@ -31,11 +31,11 @@ jobs:
                   echo "packages/plugin-kit--release_created" ${{ steps.release.outputs['packages/plugin-kit--release_created'] }}
 
             # Check to see if we need to do any releases and if so check out the repo
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
               if: ${{ steps.release.outputs.releases_created == 'true' }}
 
             # Node.js release
-            - uses: actions/setup-node@v5
+            - uses: actions/setup-node@v6
               if: ${{ steps.release.outputs.releases_created == 'true' }}
               with:
                   node-version: lts/*
@@ -46,23 +46,16 @@ jobs:
               run: npm install -g npm@latest
               if: ${{ steps.release.outputs.releases_created == 'true' }}
 
-            - run: |
-                  npm install
-                  npm run build
+            - run: npm install
               if: ${{ steps.release.outputs.releases_created == 'true' }}
 
-            #-----------------------------------------------------------------------------
-            # NOTE: This script currently doesn't do anything. It just outputs the
-            # release information to the console. We will do this for a few releases
-            # to make sure everything is working correctly before we switch to use this
-            # script exclusively.
-            #-----------------------------------------------------------------------------
-
+            # publish the packages using our custom script which also posts to social media
             - name: Publish using new script
               run: node scripts/publish.js
               if: ${{ steps.release.outputs.releases_created == 'true' }}
               env:
                   STEPS_RELEASE_OUTPUTS: ${{ toJson(steps.release.outputs) }}
+                  GITHUB_REF_NAME: ${{ github.ref_name }}
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   TWITTER_API_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
                   TWITTER_API_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}

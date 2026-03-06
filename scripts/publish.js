@@ -118,7 +118,13 @@ function publishPackagesToNpm(packageDirs, dependencies) {
 
 		console.log(`Publishing ${packageDir}...`);
 		try {
-			exec(`npm publish -w ${packageDir} --provenance`, {
+			const tag =
+				process.env.GITHUB_REF_NAME &&
+				process.env.GITHUB_REF_NAME !== "main"
+					? "--tag maintenance"
+					: "";
+
+			exec(`npm publish -w ${packageDir} --provenance ${tag}`, {
 				stdio: "inherit",
 				env: process.env,
 			});
@@ -159,7 +165,7 @@ function publishPackagesToJsr(packageDirs) {
 
 		console.log(`Publishing ${packageDir}...`);
 		try {
-			exec(`npx jsr publish`, {
+			exec(`npx -y jsr@latest publish`, {
 				stdio: "inherit",
 				env: process.env,
 				cwd: packageDir,
