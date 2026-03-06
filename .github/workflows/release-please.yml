@@ -18,6 +18,7 @@ jobs:
               id: release
               with:
                   token: ${{ secrets.WORKFLOW_PUSH_BOT_TOKEN }}
+                  target-branch: ${{ github.ref_name }}
 
             # Output which releases were created
             - name: Output release info
