@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/eslint/rewrite/compare/core-v1.1.0...core-v1.1.1) (2026-03-06)
+
+
+### Bug Fixes
+
+* type-check suggestion messageId against MessageIds ([#392](https://github.com/eslint/rewrite/issues/392)) ([76c2196](https://github.com/eslint/rewrite/commit/76c2196107d361661907a29e31b6032dd2d044f2))
+
 ## [1.1.0](https://github.com/eslint/rewrite/compare/core-v1.0.1...core-v1.1.0) (2026-01-29)
 
 

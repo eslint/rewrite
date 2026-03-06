@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.6.1](https://github.com/eslint/rewrite/compare/plugin-kit-v0.6.0...plugin-kit-v0.6.1) (2026-03-06)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^1.1.0 to ^1.1.1
+
 ## [0.6.0](https://github.com/eslint/rewrite/compare/plugin-kit-v0.5.1...plugin-kit-v0.6.0) (2026-01-29)
 
 
