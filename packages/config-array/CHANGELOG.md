@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.21.2](https://github.com/eslint/rewrite/compare/config-array-v0.21.1...config-array-v0.21.2) (2026-03-06)
+
+
+### Bug Fixes
+
+* Upgrade minimatch 3.1.2 -&gt; 3.1.5 ([a77f71d](https://github.com/eslint/rewrite/commit/a77f71d257a7916aee4f8777d1e93d91cd1b8943))
+
 ## [0.21.1](https://github.com/eslint/rewrite/compare/config-array-v0.21.0...config-array-v0.21.1) (2025-10-17)
 
 
