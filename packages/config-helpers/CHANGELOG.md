@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.5.3](https://github.com/eslint/rewrite/compare/config-helpers-v0.5.2...config-helpers-v0.5.3) (2026-03-06)
+
+
+### Bug Fixes
+
+* tighten extends typing in config-helpers ([#385](https://github.com/eslint/rewrite/issues/385)) ([939bc32](https://github.com/eslint/rewrite/commit/939bc3272de8c5787800282eadec7fa9ae39638a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^1.1.0 to ^1.1.1
+
 ## [0.5.2](https://github.com/eslint/rewrite/compare/config-helpers-v0.5.1...config-helpers-v0.5.2) (2026-01-29)
 
 
