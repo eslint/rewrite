@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.4](https://github.com/eslint/rewrite/compare/migrate-config-v2.0.3...migrate-config-v2.0.4) (2026-03-07)
+
+
+### Bug Fixes
+
+* update dependency @eslint/eslintrc to ^3.3.5 ([#397](https://github.com/eslint/rewrite/issues/397)) ([8567c19](https://github.com/eslint/rewrite/commit/8567c1969f82f5582f86d9202058ac7e41c0d53d))
+
 ## [2.0.3](https://github.com/eslint/rewrite/compare/migrate-config-v2.0.2...migrate-config-v2.0.3) (2026-03-06)
 
 
