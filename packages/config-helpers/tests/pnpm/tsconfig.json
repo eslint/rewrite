@@ -3,7 +3,8 @@
     "checkJs": true,
     "declaration": true,
     "module": "nodenext",
-    "noEmit": true
+    "noEmit": true,
+    "types": []
   },
   "files": ["test-eslint.config.js"]
 }
