@@ -30,7 +30,7 @@ export class ValidationStrategy {
 	 */
 	static boolean(value) {
 		if (typeof value !== "boolean") {
-			throw new TypeError("Expected a Boolean.");
+			throw new TypeError("Expected a boolean.");
 		}
 	}
 
