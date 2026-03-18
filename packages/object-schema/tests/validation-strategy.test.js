@@ -22,25 +22,25 @@ describe("ValidationStrategy", () => {
 		it("should throw an error when the value is null", () => {
 			assert.throws(() => {
 				ValidationStrategy.boolean(null);
-			}, /Expected a Boolean/u);
+			}, /Expected a boolean/u);
 		});
 
 		it("should throw an error when the value is a string", () => {
 			assert.throws(() => {
 				ValidationStrategy.boolean("foo");
-			}, /Expected a Boolean/u);
+			}, /Expected a boolean/u);
 		});
 
 		it("should throw an error when the value is a number", () => {
 			assert.throws(() => {
 				ValidationStrategy.boolean(123);
-			}, /Expected a Boolean/u);
+			}, /Expected a boolean/u);
 		});
 
 		it("should throw an error when the value is an object", () => {
 			assert.throws(() => {
 				ValidationStrategy.boolean({});
-			}, /Expected a Boolean/u);
+			}, /Expected a boolean/u);
 		});
 	});
 
