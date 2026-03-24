@@ -53,7 +53,7 @@ export class ValidationStrategy {
 	 * @throws {TypeError} If the value is invalid.
 	 */
 	static object(value) {
-		if (!value || typeof value !== "object") {
+		if (!value || typeof value !== "object" || Array.isArray(value)) {
 			throw new TypeError("Expected an object.");
 		}
 	}

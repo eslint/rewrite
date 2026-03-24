@@ -90,6 +90,12 @@ describe("ValidationStrategy", () => {
 				ValidationStrategy.object("");
 			}, /Expected an object/u);
 		});
+
+		it("should throw an error when the value is an array", () => {
+			assert.throws(() => {
+				ValidationStrategy.object([]);
+			}, /Expected an object/u);
+		});
 	});
 
 	describe("array", () => {
