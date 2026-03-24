@@ -18,6 +18,7 @@ import {
 	type PropertyDefinition,
 	type PropertyDefinitionWithSchema,
 	type PropertyDefinitionWithStrategies,
+	ValidationStrategy,
 } from "@eslint/object-schema";
 
 //-----------------------------------------------------------------------------
@@ -133,6 +134,40 @@ MergeStrategy.assign({ a: 1 }, { a: "a" }) satisfies {
 };
 
 // #endregion MergeStrategy
+
+//-----------------------------------------------------------------------------
+// Tests for ValidationStrategy
+//-----------------------------------------------------------------------------
+
+// #region ValidationStrategy
+
+const validateArray: CustomValidationStrategy = ValidationStrategy.array;
+const validateBoolean: CustomValidationStrategy = ValidationStrategy.boolean;
+const validateNumber: CustomValidationStrategy = ValidationStrategy.number;
+const validateObject: CustomValidationStrategy = ValidationStrategy.object;
+const validateObjectOptional: CustomValidationStrategy =
+	ValidationStrategy["object?"];
+const validateString: CustomValidationStrategy = ValidationStrategy.string;
+const validateNonEmptyString: CustomValidationStrategy =
+	ValidationStrategy["string!"];
+
+ValidationStrategy.array([]);
+ValidationStrategy.boolean(true);
+ValidationStrategy.number(123);
+ValidationStrategy.object({ foo: 1 });
+ValidationStrategy["object?"](null);
+ValidationStrategy.string("foo");
+ValidationStrategy["string!"]("foo");
+
+validateArray([]);
+validateBoolean(true);
+validateNumber(123);
+validateObject({ foo: 1 });
+validateObjectOptional(null);
+validateString("foo");
+validateNonEmptyString("foo");
+
+// #endregion ValidationStrategy
 
 //-----------------------------------------------------------------------------
 // Tests for PropertyDefinition
