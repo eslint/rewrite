@@ -79,6 +79,14 @@ describe("ValidationStrategy", () => {
 			ValidationStrategy.object({});
 		});
 
+		it("should not throw an error when the value is an array", () => {
+			ValidationStrategy.object([]);
+		});
+
+		it("should not throw an error when the value is a non-plain object", () => {
+			ValidationStrategy.object(new Date());
+		});
+
 		it("should throw an error when the value is null", () => {
 			assert.throws(() => {
 				ValidationStrategy.object(null);
@@ -119,6 +127,14 @@ describe("ValidationStrategy", () => {
 	describe("object?", () => {
 		it("should not throw an error when the value is an object", () => {
 			ValidationStrategy["object?"]({});
+		});
+
+		it("should not throw an error when the value is an array", () => {
+			ValidationStrategy["object?"]([]);
+		});
+
+		it("should not throw an error when the value is a non-plain object", () => {
+			ValidationStrategy["object?"](new Date());
 		});
 
 		it("should not throw an error when the value is null", () => {
