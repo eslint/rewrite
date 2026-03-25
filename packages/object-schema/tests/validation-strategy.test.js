@@ -75,7 +75,7 @@ describe("ValidationStrategy", () => {
 	});
 
 	describe("object", () => {
-		it("should not throw an error when the value is an object", () => {
+		it("should not throw an error when the value is a plain object", () => {
 			ValidationStrategy.object({});
 		});
 
@@ -125,7 +125,7 @@ describe("ValidationStrategy", () => {
 	});
 
 	describe("object?", () => {
-		it("should not throw an error when the value is an object", () => {
+		it("should not throw an error when the value is a plain object", () => {
 			ValidationStrategy["object?"]({});
 		});
 

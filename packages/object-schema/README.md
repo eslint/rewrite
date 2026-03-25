@@ -115,8 +115,8 @@ Instead of specifying a `validate()` method, you can specify one of the followin
 - `"array"` - value must be an array.
 - `"boolean"` - value must be a boolean.
 - `"number"` - value must be a number.
-- `"object"` - value must be an object.
-- `"object?"` - value must be an object or null.
+- `"object"` - value must be a non-null object, including arrays and non-plain objects.
+- `"object?"` - value must be an object or null, including arrays and non-plain objects.
 - `"string"` - value must be a string.
 - `"string!"` - value must be a non-empty string.
 
