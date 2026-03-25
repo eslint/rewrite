@@ -9,7 +9,7 @@
  */
 
 import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
+import path from "node:path/posix";
 
 const filename = process.argv[2];
 const newFilename = process.argv[3];
