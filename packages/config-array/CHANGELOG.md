@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.23.4](https://github.com/eslint/rewrite/compare/config-array-v0.23.3...config-array-v0.23.4) (2026-03-25)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/object-schema bumped from ^3.0.3 to ^3.0.4
+
 ## [0.23.3](https://github.com/eslint/rewrite/compare/config-array-v0.23.2...config-array-v0.23.3) (2026-03-06)
 
 
