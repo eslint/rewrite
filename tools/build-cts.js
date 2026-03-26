@@ -1,9 +1,8 @@
 /**
- * @fileoverview Rewrites import expressions for CommonJS compatibility.
- * This script creates "dist/cjs/index.d.cts" by importing types from "dist/esm/index.d.ts" and
- * re-exporting them using CommonJS syntax.
+ * @fileoverview Creates a CommonJS type declaration file that re-exports ESM types.
  *
- *    node tools/build-cts.js /path/to/esm/index.d.ts path/to/cjs/index.d.cts
+ * Usage:
+ *    node tools/build-cts.js /path/to/esm/index.d.ts /path/to/cjs/index.d.cts
  *
  * @author Francesco Trotta
  */
