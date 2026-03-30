@@ -1175,7 +1175,7 @@ export interface Language<
 	/**
 	 * Default language options. User-defined options are merged with this object.
 	 */
-	defaultLanguageOptions?: LanguageOptions;
+	defaultLanguageOptions?: Options["LangOptions"];
 
 	/**
 	 * Validates languageOptions for this language.
