@@ -276,6 +276,7 @@ const testRule: TestRuleDefinition<{
 		},
 		language: "javascript",
 		dialects: ["javascript", "typescript"],
+		languages: ["js/js", "ts/ts"],
 	},
 
 	create(context) {

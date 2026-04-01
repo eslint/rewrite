@@ -195,6 +195,12 @@ export interface RulesMeta<
 	 * The dialects of `language` that the rule is intended to lint.
 	 */
 	dialects?: string[];
+
+	/**
+	 * Languages supported by this rule in the format `"plugin/language"`.
+	 * Use `"*"` for any language or `"plugin/*"` for any language from a specific plugin.
+	 */
+	languages?: string[] | undefined;
 }
 
 /**

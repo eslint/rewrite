@@ -331,6 +331,7 @@ const testRule: RuleDefinition<{
 		},
 		language: "javascript",
 		dialects: ["javascript", "typescript"],
+		languages: ["js/js", "ts/ts"],
 	},
 
 	create(context: TestRuleContext): TestRuleVisitor {
