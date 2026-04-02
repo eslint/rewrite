@@ -199,6 +199,8 @@ export interface RulesMeta<
 	/**
 	 * Languages supported by this rule in the format `"plugin/language"`.
 	 * Use `"*"` for any language or `"plugin/*"` for any language from a specific plugin.
+	 * @example
+	 * ["js/js", "markdown/gfm", "json/jsonc", "css/css"]
 	 */
 	languages?: string[] | undefined;
 }
