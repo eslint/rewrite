@@ -291,6 +291,7 @@ const testRule: RuleDefinition<{
 		fixable: "code",
 		docs: {
 			recommended: true,
+			dialects: ["JavaScript", "TypeScript"],
 		},
 		deprecated: {
 			message: "use something else",
