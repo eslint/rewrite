@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.5.4](https://github.com/eslint/rewrite/compare/config-helpers-v0.5.3...config-helpers-v0.5.4) (2026-04-03)
+
+
+### Bug Fixes
+
+* re-export ESM types in CommonJS ([#416](https://github.com/eslint/rewrite/issues/416)) ([ef16f80](https://github.com/eslint/rewrite/commit/ef16f80b9221c412992a1e9d54b35d155db1b4ed))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^1.1.1 to ^1.2.0
+
 ## [0.5.3](https://github.com/eslint/rewrite/compare/config-helpers-v0.5.2...config-helpers-v0.5.3) (2026-03-06)
 
 
