@@ -224,6 +224,7 @@ const testRule: TestRuleDefinition<{
 		fixable: "code",
 		docs: {
 			recommended: true,
+			dialects: ["JavaScript", "TypeScript"],
 			foo: true,
 			// @ts-expect-error -- bar should be number, not string
 			bar: "1",
@@ -276,6 +277,7 @@ const testRule: TestRuleDefinition<{
 		},
 		language: "javascript",
 		dialects: ["javascript", "typescript"],
+		languages: ["js/js", "ts/ts"],
 	},
 
 	create(context) {

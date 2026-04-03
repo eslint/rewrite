@@ -291,6 +291,7 @@ const testRule: RuleDefinition<{
 		fixable: "code",
 		docs: {
 			recommended: true,
+			dialects: ["JavaScript", "TypeScript"],
 		},
 		deprecated: {
 			message: "use something else",
@@ -331,6 +332,7 @@ const testRule: RuleDefinition<{
 		},
 		language: "javascript",
 		dialects: ["javascript", "typescript"],
+		languages: ["js/js", "ts/ts"],
 	},
 
 	create(context: TestRuleContext): TestRuleVisitor {
