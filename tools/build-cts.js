@@ -26,7 +26,7 @@ if (!newFilename) {
 const newDir = path.dirname(newFilename);
 const esmPath = path.relative(newDir, filename).replace(/\.d\.ts$/u, ".js");
 const newSourceText = `
-import type * as types from "${esmPath}" with { "resolution-mode": "import" };
+import * as types from "${esmPath}" with { "resolution-mode": "import" };
 export = types;
 `.trimStart();
 
