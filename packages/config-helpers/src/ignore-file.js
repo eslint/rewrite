@@ -1,6 +1,9 @@
 /**
- * @fileoverview Ignore file utilities for the compat package.
+ * @fileoverview Ignore file utilities for the config-helpers package.
+ * This file was forked from the source code for the compat package.
+ *
  * @author Nicholas C. Zakas
+ * @author Kirk Waiblinger
  */
 
 //-----------------------------------------------------------------------------
@@ -14,7 +17,7 @@ import path from "node:path";
 // Types
 //-----------------------------------------------------------------------------
 
-/** @typedef {import("@eslint/core").ConfigObject} FlatConfig */
+/** @typedef {import("@eslint/core").ConfigObject} Config */
 
 //-----------------------------------------------------------------------------
 // Exports
@@ -67,25 +70,123 @@ export function convertIgnorePatternToMinimatch(pattern) {
 }
 
 /**
- * Reads an ignore file and returns an object with the ignore patterns.
- * @param {string} ignoreFilePath The absolute path to the ignore file.
- * @param {string} [name] The name of the ignore file config.
- * @returns {FlatConfig} An object with an `ignores` property that is an array of ignore patterns.
- * @throws {Error} If the ignore file path is not an absolute path.
+ * @param {string} ignoreFilePath
+ * @returns {string[]}
  */
-export function includeIgnoreFile(ignoreFilePath, name) {
-	if (!path.isAbsolute(ignoreFilePath)) {
-		throw new Error("The ignore file location must be an absolute path.");
-	}
-
+function ignoreFilePathToPatterns(ignoreFilePath) {
 	const ignoreFile = fs.readFileSync(ignoreFilePath, "utf8");
 	const lines = ignoreFile.split(/\r?\n/u);
 
-	return {
-		name: name || "Imported .gitignore patterns",
-		ignores: lines
-			.map(line => line.trim())
-			.filter(line => line && !line.startsWith("#"))
-			.map(convertIgnorePatternToMinimatch),
-	};
+	return lines
+		.map(line => line.trim())
+		.filter(line => line && !line.startsWith("#"))
+		.map(convertIgnorePatternToMinimatch);
+}
+
+/**
+ * @override
+ *
+ * Reads ignore files and returns objects with the ignore patterns.
+ *
+ * @param {string[]} ignoreFilePathArg
+ * @param {object} [options]
+ * @param {"eslintignore" | "gitignore"} [options.mode] Whether to interpret the contents of the ignore file relative to the cwd or the ignore file.
+ * - mode: "eslintrc" (default): Interprets the ignore patterns relative to the cwd
+ * - mode: "gitignore": Interprets the ignore patterns relative to the file
+ *
+ * @param {string} [options.name] The name to give the output config objects.
+ *
+ * @returns {Config[]}
+ */
+
+/**
+ * @override
+ *
+ * Reads an ignore file and returns an object with the ignore patterns.
+ *
+ * @param {string} ignoreFilePathArg
+ * @param {object} [options]
+ * @param {"eslintignore" | "gitignore"} [options.mode] Whether to interpret the contents of the ignore file relative to the cwd or the ignore file.
+ * - mode: "eslintrc" (default): Interprets the ignore patterns relative to the cwd
+ * - mode: "gitignore": Interprets the ignore patterns relative to the file
+ *
+ * @param {string} [options.name] The name to give the output config object.
+ *
+ * @returns {Config}
+ */
+
+/**
+ * @override
+ *
+ * Reads an ignore file(s) and returns an object(s) with the ignore patterns.
+ *
+ * @param {string[] | string} ignoreFilePathArg
+ * @param {object} [options]
+ * @param {"eslintignore" | "gitignore"} [options.mode] Whether to interpret the contents of the ignore file relative to the cwd or the ignore file.
+ * - mode: "eslintrc" (default): Interprets the ignore patterns relative to the cwd
+ * - mode: "gitignore": Interprets the ignore patterns relative to the file
+ *
+ * @param {string} [options.name] The name to give the output config objects.
+ *
+ * @returns {Config[] | Config}
+ */
+export function includeIgnoreFile(ignoreFilePathArg, options) {
+	const returnSingleObject = !Array.isArray(ignoreFilePathArg);
+	const ignoreFilePaths = Array.isArray(ignoreFilePathArg)
+		? ignoreFilePathArg
+		: [ignoreFilePathArg];
+	for (const ignorePath of ignoreFilePaths) {
+		if (typeof ignorePath !== "string") {
+			throw new Error(
+				"The first argument to `includeIgnoreFile()` should be a string or array of strings",
+			);
+		}
+		if (!path.isAbsolute(ignorePath)) {
+			throw new Error(
+				`The ignore file location must be an absolute path. Received ${ignorePath}`,
+			);
+		}
+	}
+
+	const { mode, name } = (() => {
+		// legacy compatibility with @eslint/compat's `includeIgnoreFile`
+		if (typeof options === "string") {
+			return { mode: "eslintignore", name: options };
+		}
+		// eslint-disable-next-line no-shadow -- shadowing during initialization
+		const mode = options?.mode ?? "eslintignore";
+		if (!(mode === "gitignore" || mode === "eslintignore")) {
+			throw new Error(
+				'The `mode` option must be specified as "gitignore" or "eslintignore"',
+			);
+		}
+
+		// eslint-disable-next-line no-shadow -- shadowing during initialization
+		const name = options?.name ?? `Imported .${mode} patterns`;
+		if (typeof name !== "string") {
+			throw new Error(
+				"The `name` option must be specified as a string or omitted.",
+			);
+		}
+
+		return { mode, name };
+	})();
+
+	if (returnSingleObject) {
+		return {
+			name,
+			ignores: ignoreFilePathToPatterns(ignoreFilePathArg),
+			...(mode === "gitignore"
+				? { basePath: path.dirname(ignoreFilePathArg) }
+				: {}),
+		};
+	}
+
+	return ignoreFilePaths.map((ignoreFilePath, i) => ({
+		name: `${name} (${i})`,
+		ignores: ignoreFilePathToPatterns(ignoreFilePath),
+		...(mode === "gitignore"
+			? { basePath: path.dirname(ignoreFilePath) }
+			: {}),
+	}));
 }

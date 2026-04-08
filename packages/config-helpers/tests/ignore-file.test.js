@@ -1,5 +1,7 @@
 /**
- * @filedescription Fixup tests
+ * @filedescription Tests for `includeIgnoreFile()` and `convertIgnorePatternToMinimatch()`
+ * @author Nicholas C. Zakas
+ * @author Kirk Waiblinger
  */
 
 //-----------------------------------------------------------------------------
@@ -17,7 +19,7 @@ import { fileURLToPath } from "node:url";
 // Tests
 //-----------------------------------------------------------------------------
 
-describe("@eslint/compat", () => {
+describe("@eslint/config-helpers", () => {
 	describe("convertIgnorePatternToMinimatch", () => {
 		const tests = [
 			["", ""],
@@ -58,12 +60,13 @@ describe("@eslint/compat", () => {
 	});
 
 	describe("includeIgnoreFile", () => {
-		it("should throw an error when a relative path is passed", () => {
-			const ignoreFilePath =
-				"../tests/fixtures/ignore-files/gitignore1.txt";
+		it("should throw an error when an array of relative paths is passed", () => {
+			const ignoreFilePath = [
+				"../tests/fixtures/ignore-files/gitignore1.txt",
+			];
 			assert.throws(() => {
 				includeIgnoreFile(ignoreFilePath);
-			}, /The ignore file location must be an absolute path./u);
+			}, /The ignore file location must be an absolute path. Received .*/u);
 		});
 
 		it("should return an object with an `ignores` property", () => {
@@ -73,7 +76,13 @@ describe("@eslint/compat", () => {
 					import.meta.url,
 				),
 			);
-			const result = includeIgnoreFile(ignoreFilePath);
+			const result = includeIgnoreFile(ignoreFilePath, {
+				mode: "gitignore",
+			});
+			const basePath = fileURLToPath(
+				new URL("../tests/fixtures/ignore-files", import.meta.url),
+			);
+
 			assert.deepStrictEqual(result, {
 				name: "Imported .gitignore patterns",
 				ignores: [
@@ -86,6 +95,7 @@ describe("@eslint/compat", () => {
 					"*/foo.js",
 					"dir/**/*",
 				],
+				basePath,
 			});
 		});
 
@@ -112,4 +122,65 @@ describe("@eslint/compat", () => {
 			});
 		});
 	});
+});
+
+// These tests ensure that the `includeIgnoreFile` is a superset of the
+// functionality of the `includeIgnoreFile` in `@eslint/compat`. The only
+// discrepancy is the default name has been changed to reflect that it is
+// really eslintignore mode by default.
+describe("`includeIgnoreFile` compat with @eslint/compat", () => {
+	it("should throw an error when a relative path is passed", () => {
+		const ignoreFilePath = "../tests/fixtures/ignore-files/gitignore1.txt";
+		assert.throws(() => {
+			includeIgnoreFile(ignoreFilePath);
+		}, /The ignore file location must be an absolute path./u);
+	});
+
+	it("should return an object with an `ignores` property", () => {
+		const ignoreFilePath = fileURLToPath(
+			new URL(
+				"../tests/fixtures/ignore-files/gitignore1.txt",
+				import.meta.url,
+			),
+		);
+		const result = includeIgnoreFile(ignoreFilePath);
+		assert.deepStrictEqual(result, {
+			name: "Imported .eslintignore patterns",
+			ignores: [
+				"**/node_modules",
+				"!fixtures/node_modules",
+				"dist",
+				"**/*.log",
+				"**/.cache/",
+				".vuepress/dist",
+				"*/foo.js",
+				"dir/**/*",
+			],
+		});
+	});
+
+	it("should return an object with a custom name", () => {
+		const ignoreFilePath = fileURLToPath(
+			new URL(
+				"../tests/fixtures/ignore-files/gitignore1.txt",
+				import.meta.url,
+			),
+		);
+		const result = includeIgnoreFile(ignoreFilePath, "Custom Name");
+		assert.deepStrictEqual(result, {
+			name: "Custom Name",
+			ignores: [
+				"**/node_modules",
+				"!fixtures/node_modules",
+				"dist",
+				"**/*.log",
+				"**/.cache/",
+				".vuepress/dist",
+				"*/foo.js",
+				"dir/**/*",
+			],
+		});
+	});
+
+	it("should ");
 });

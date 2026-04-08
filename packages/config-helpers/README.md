@@ -74,6 +74,84 @@ export default defineConfig([
 ]);
 ```
 
+### `includeIgnoreFile()`
+
+The `includeIgnoreFile()` function reads an ignore file (such as a `.gitignore`) and returns a config object with the patterns converted to a global ignores object. Pass the absolute path to the ignore file as the first argument:
+
+```js
+// eslint.config.js
+
+import { includeIgnoreFile } from "@eslint/config-helpers";
+import path from "node:path";
+
+const ignorePath = path.join(import.meta.dirname, ".gitignore");
+
+export default defineConfig(
+	includeIgnoreFile(ignorePath, {
+		mode: "gitignore",
+	}),
+	// ...
+);
+```
+
+#### Options
+
+The second argument is an optional options object:
+
+- **`mode`** : Controls how ignore patterns are interpreted.
+    - `"eslintignore"` (default) — patterns are resolved relative to the current working directory, matching the behavior of `.eslintignore` files.
+    - `"gitignore"` — patterns are resolved relative to the ignore file itself (via `basePath`), matching the behavior of `.gitignore` files.
+- **`name`** (`string`): A custom name for the resulting config object.
+
+For backwards compatibility with `includeIgnoreFile()` from `@eslint/compat`, passing a string instead of an object as the second argument is treated as equivalent to providing a value for `name`.
+
+#### Multiple files
+
+You can also pass an array of absolute paths to include multiple ignore files at once. In this case an array of config objects is returned:
+
+```js
+// eslint.config.js
+
+import { defineConfig, includeIgnoreFile } from "@eslint/config-helpers";
+import path from "node:path";
+
+export default defineConfig(
+	includeIgnoreFile(
+		[
+			path.join(import.meta.dirname, ".gitignore"),
+			path.join(import.meta.dirname, "packages/lib/.gitignore"),
+		],
+		{ mode: "gitignore" },
+	),
+	// ...
+);
+```
+
+### `convertIgnorePatternToMinimatch()`
+
+This is used under the hood by `includeIgnoreFile()` to convert patterns found in eslintignore/gitignore files. You can use it to construct your own ignore objects if you wish:
+
+```js
+// eslint.config.js
+
+import {
+	defineConfig,
+	convertIgnorePatternToMinimatch,
+} from "@eslint/config-helpers";
+
+export default defineConfig(
+	// approximate implementation of `includeIgnoreFile()` in eslintrc mode.
+	{
+		ignores: fs
+			.readFileSync("some/path", "utf8")
+			.split(/\r?\n/u)
+			.map(line => line.trim())
+			.filter(line => line && !line.startsWith("#"))
+			.map(convertIgnorePatternToMinimatch),
+	},
+);
+```
+
 ## License
 
 Apache 2.0
