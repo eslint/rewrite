@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.3.4](https://github.com/eslint/rewrite/compare/mcp-v0.3.3...mcp-v0.3.4) (2026-04-08)
+
+
+### Bug Fixes
+
+* update dependency eslint to ^10.2.0 ([#423](https://github.com/eslint/rewrite/issues/423)) ([fda136b](https://github.com/eslint/rewrite/commit/fda136b3c2223fa0e4819c18acd687a99d2a793f))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @eslint/plugin-kit bumped from ^0.7.0 to ^0.7.1
+
 ## [0.3.3](https://github.com/eslint/rewrite/compare/mcp-v0.3.2...mcp-v0.3.3) (2026-04-03)
 
 

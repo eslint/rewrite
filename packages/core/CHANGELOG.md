@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/eslint/rewrite/compare/core-v1.2.0...core-v1.2.1) (2026-04-08)
+
+
+### Bug Fixes
+
+* revert re-export ESM types in CommonJS ([#427](https://github.com/eslint/rewrite/issues/427)) ([9b16fe1](https://github.com/eslint/rewrite/commit/9b16fe1af3432e92bdb193a5d1f6c89c4b0e3093))
+
 ## [1.2.0](https://github.com/eslint/rewrite/compare/core-v1.1.1...core-v1.2.0) (2026-04-03)
 
 

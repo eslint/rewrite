@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.23.5](https://github.com/eslint/rewrite/compare/config-array-v0.23.4...config-array-v0.23.5) (2026-04-08)
+
+
+### Bug Fixes
+
+* revert re-export ESM types in CommonJS ([#427](https://github.com/eslint/rewrite/issues/427)) ([9b16fe1](https://github.com/eslint/rewrite/commit/9b16fe1af3432e92bdb193a5d1f6c89c4b0e3093))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/object-schema bumped from ^3.0.4 to ^3.0.5
+
 ## [0.23.4](https://github.com/eslint/rewrite/compare/config-array-v0.23.3...config-array-v0.23.4) (2026-04-03)
 
 
