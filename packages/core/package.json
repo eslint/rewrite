@@ -17,7 +17,7 @@
     "access": "public"
   },
   "scripts": {
-    "build:cts": "node ../../tools/build-cts.js dist/esm/types.d.ts dist/cjs/types.d.cts",
+    "build:cts": "node -e \"fs.cpSync('dist/esm/types.d.ts', 'dist/cjs/types.d.cts')\"",
     "build": "tsc && npm run build:cts",
     "lint:types": "attw --pack",
     "pretest": "npm run build",

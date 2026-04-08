@@ -1,14 +1,14 @@
 /**
- * @fileoverview Creates a CommonJS type declaration file that re-exports ESM types.
+ * @fileoverview Rewrites import expressions for CommonJS compatibility.
+ * This script creates "dist/cjs/index.d.cts" from "dist/esm/index.d.ts" by modifying imports
+ * from `"./types.ts"` to `"./types.cts"`.
  *
- * Usage:
- *    node tools/build-cts.js /path/to/esm/index.d.ts /path/to/cjs/index.d.cts
+ *    node tools/build-cts.js /path/to/esm/index.d.ts path/to/cjs/index.d.cts
  *
  * @author Francesco Trotta
  */
 
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path/posix";
+import { readFile, writeFile } from "node:fs/promises";
 
 const filename = process.argv[2];
 const newFilename = process.argv[3];
@@ -23,12 +23,7 @@ if (!newFilename) {
 	process.exit(1);
 }
 
-const newDir = path.dirname(newFilename);
-const esmPath = path.relative(newDir, filename).replace(/\.d\.ts$/u, ".js");
-const newSourceText = `
-import type * as types from "${esmPath}" with { "resolution-mode": "import" };
-export = types;
-`.trimStart();
+const oldSourceText = await readFile(filename, "utf-8");
+const newSourceText = oldSourceText.replaceAll('"./types.ts"', '"./types.cts"');
 
-await mkdir(newDir, { recursive: true });
 await writeFile(newFilename, newSourceText);
