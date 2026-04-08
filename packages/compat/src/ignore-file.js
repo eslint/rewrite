@@ -67,6 +67,80 @@ export function convertIgnorePatternToMinimatch(pattern) {
 }
 
 /**
+ * Checks if a gitattributes attribute entry matches the requested attribute.
+ * @param {string} entry The attribute entry from the line (e.g., "attr", "-attr", "attr=value").
+ * @param {string} attrName The attribute name to match.
+ * @param {string|undefined} attrValue The expected value, or undefined for bare name matching.
+ * @returns {boolean} Whether the entry matches.
+ */
+function matchesAttribute(entry, attrName, attrValue) {
+	// Unset: -attr
+	if (entry.startsWith("-")) {
+		return false;
+	}
+
+	const [entryName, entryValue] = entry.split("=");
+
+	if (entryValue === undefined) {
+		// Bare entry: "attr" — matches bare name queries only
+		return attrValue === undefined && entryName === attrName;
+	}
+
+	if (entryName !== attrName) {
+		return false;
+	}
+
+	if (attrValue !== undefined) {
+		// name=value query: exact match
+		return entryValue === attrValue;
+	}
+
+	// Bare name query with value entry: only "true" is truthy
+	return entryValue === "true";
+}
+
+/**
+ * Reads a .gitattributes file and returns an object with ignore patterns
+ * for files matching the specified attribute.
+ * @param {string} gitattributesPath The absolute path to the .gitattributes file.
+ * @param {string} attribute The attribute to match. Either a bare name or "name=value".
+ * @param {string} [name] The name of the config.
+ * @returns {FlatConfig} An object with `name` and `ignores` properties.
+ * @throws {Error} If the path is not an absolute path.
+ */
+export function ignoreFilesWithGitAttribute(
+	gitattributesPath,
+	attribute,
+	name,
+) {
+	if (!path.isAbsolute(gitattributesPath)) {
+		throw new Error("The ignore file location must be an absolute path.");
+	}
+
+	const [attrName, attrValue] = attribute.split("=");
+
+	const file = fs.readFileSync(gitattributesPath, "utf8");
+	const lines = file
+		.split(/\r?\n/u)
+		.map(line => line.trim())
+		.filter(line => line && !line.startsWith("#"));
+
+	return {
+		name: name || `Imported .gitattributes patterns for ${attribute}`,
+		ignores: lines
+			.map(line => line.split(/\s+/u))
+			.filter(parts =>
+				parts
+					.slice(1)
+					.some(entry =>
+						matchesAttribute(entry, attrName, attrValue),
+					),
+			)
+			.map(parts => convertIgnorePatternToMinimatch(parts[0])),
+	};
+}
+
+/**
  * Reads an ignore file and returns an object with the ignore patterns.
  * @param {string} ignoreFilePath The absolute path to the ignore file.
  * @param {string} [name] The name of the ignore file config.

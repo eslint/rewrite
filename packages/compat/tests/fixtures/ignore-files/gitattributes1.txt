@@ -1,0 +1,22 @@
+# Comment line
+generated/*.js linguist-generated
+vendor/**      linguist-vendored
+src/**         text
+
+# Attribute with =true
+build/*.js linguist-generated=true
+
+# Unset attribute
+lib/*.js -linguist-generated
+
+# Attribute with =false
+dist/*.js linguist-generated=false
+
+# Attribute with custom value
+docs/*.js custom=myvalue
+
+# Multiple attributes on one line
+output/*.js linguist-generated text auto
+
+# Attribute with non-truthy value
+tmp/*.js linguist-generated=other
