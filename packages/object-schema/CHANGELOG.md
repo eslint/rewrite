@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.5](https://github.com/eslint/rewrite/compare/object-schema-v3.0.4...object-schema-v3.0.5) (2026-04-08)
+
+
+### Bug Fixes
+
+* revert re-export ESM types in CommonJS ([#427](https://github.com/eslint/rewrite/issues/427)) ([9b16fe1](https://github.com/eslint/rewrite/commit/9b16fe1af3432e92bdb193a5d1f6c89c4b0e3093))
+
 ## [3.0.4](https://github.com/eslint/rewrite/compare/object-schema-v3.0.3...object-schema-v3.0.4) (2026-04-03)
 
 
