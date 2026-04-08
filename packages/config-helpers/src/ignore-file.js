@@ -84,6 +84,35 @@ function ignoreFilePathToPatterns(ignoreFilePath) {
 }
 
 /**
+ * Helper to parse and validate the options to `includeIgnoreFile()`
+ *
+ * @param {{ mode?: unknown, name?: unknown } | undefined} options
+ * @returns {{ mode: "eslintignore" | "gitignore", name: string }}
+ */
+function parseOptions(options) {
+	// legacy compatibility with @eslint/compat's `includeIgnoreFile`
+	if (typeof options === "string") {
+		return { mode: "eslintignore", name: options };
+	}
+
+	const mode = options?.mode ?? "eslintignore";
+	if (!(mode === "gitignore" || mode === "eslintignore")) {
+		throw new Error(
+			'The `mode` option must be specified as "gitignore" or "eslintignore"',
+		);
+	}
+
+	const name = options?.name ?? `Imported .${mode} patterns`;
+	if (typeof name !== "string") {
+		throw new Error(
+			"The `name` option must be specified as a string or omitted.",
+		);
+	}
+
+	return { mode, name };
+}
+
+/**
  * @override
  *
  * Reads ignore files and returns objects with the ignore patterns.
@@ -148,29 +177,7 @@ export function includeIgnoreFile(ignoreFilePathArg, options) {
 		}
 	}
 
-	const { mode, name } = (() => {
-		// legacy compatibility with @eslint/compat's `includeIgnoreFile`
-		if (typeof options === "string") {
-			return { mode: "eslintignore", name: options };
-		}
-		// eslint-disable-next-line no-shadow -- shadowing during initialization
-		const mode = options?.mode ?? "eslintignore";
-		if (!(mode === "gitignore" || mode === "eslintignore")) {
-			throw new Error(
-				'The `mode` option must be specified as "gitignore" or "eslintignore"',
-			);
-		}
-
-		// eslint-disable-next-line no-shadow -- shadowing during initialization
-		const name = options?.name ?? `Imported .${mode} patterns`;
-		if (typeof name !== "string") {
-			throw new Error(
-				"The `name` option must be specified as a string or omitted.",
-			);
-		}
-
-		return { mode, name };
-	})();
+	const { mode, name } = parseOptions(options);
 
 	if (returnSingleObject) {
 		return {
