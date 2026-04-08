@@ -121,6 +121,53 @@ describe("@eslint/config-helpers", () => {
 				],
 			});
 		});
+
+		it("should handle when both name and mode are specified", () => {
+			const ignoreFilePath = fileURLToPath(
+				new URL(
+					"../tests/fixtures/ignore-files/gitignore1.txt",
+					import.meta.url,
+				),
+			);
+			const basePath = fileURLToPath(
+				new URL("../tests/fixtures/ignore-files", import.meta.url),
+			);
+
+			const result = includeIgnoreFile([ignoreFilePath, ignoreFilePath], {
+				mode: "gitignore",
+				name: "Custom Name",
+			});
+			assert.deepStrictEqual(result, [
+				{
+					name: "Custom Name (0)",
+					basePath,
+					ignores: [
+						"**/node_modules",
+						"!fixtures/node_modules",
+						"dist",
+						"**/*.log",
+						"**/.cache/",
+						".vuepress/dist",
+						"*/foo.js",
+						"dir/**/*",
+					],
+				},
+				{
+					name: "Custom Name (1)",
+					basePath,
+					ignores: [
+						"**/node_modules",
+						"!fixtures/node_modules",
+						"dist",
+						"**/*.log",
+						"**/.cache/",
+						".vuepress/dist",
+						"*/foo.js",
+						"dir/**/*",
+					],
+				},
+			]);
+		});
 	});
 });
 
