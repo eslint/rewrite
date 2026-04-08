@@ -181,6 +181,4 @@ describe("`includeIgnoreFile` compat with @eslint/compat", () => {
 			],
 		});
 	});
-
-	it("should ");
 });
