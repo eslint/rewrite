@@ -1,5 +1,5 @@
 /**
- * @filedescription Tests for `includeIgnoreFile()` and `convertIgnorePatternToMinimatch()`
+ * @fileoverview Tests for `includeIgnoreFile()` and `convertIgnorePatternToMinimatch()`
  * @author Nicholas C. Zakas
  */
 
