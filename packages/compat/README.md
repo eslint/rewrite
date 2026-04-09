@@ -150,7 +150,7 @@ module.exports = defineConfig([
 ### Including Ignore Files
 
 > [!WARNING]
-> The `includeIgnoreFile()` exported by this package has been deprecated ([eslint/rewrite#329](https://github.com/eslint/rewrite/issues/329)). Use the `convertIgnorePatternToMinimatch()` function exported by `@eslint/config-helpers` instead (also available at `eslint/config`). This section is only preserved for historical reasons.
+> The `includeIgnoreFile()` exported by this package has been deprecated ([eslint/rewrite#329](https://github.com/eslint/rewrite/issues/329)). Use the `includeIgnoreFile()` function exported by `@eslint/config-helpers` instead (also available at `eslint/config`). This section is only preserved for historical reasons.
 
 If you were using an alternate ignore file in ESLint v8.x, such as using `--ignore-path .gitignore` on the command line, you can include those patterns programmatically in your config file using the `includeIgnoreFile()` function.
 
