@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.2.1](https://github.com/eslint/rewrite/compare/core-v1.2.0...core-v1.2.1) (2026-04-08)
+
+
+### Bug Fixes
+
+* revert re-export ESM types in CommonJS ([#427](https://github.com/eslint/rewrite/issues/427)) ([9b16fe1](https://github.com/eslint/rewrite/commit/9b16fe1af3432e92bdb193a5d1f6c89c4b0e3093))
+
+## [1.2.0](https://github.com/eslint/rewrite/compare/core-v1.1.1...core-v1.2.0) (2026-04-03)
+
+
+### Features
+
+* add `languages` and `docs.dialects` to rule `meta` types ([#421](https://github.com/eslint/rewrite/issues/421)) ([7680f69](https://github.com/eslint/rewrite/commit/7680f692119a094abb1c8317aba713168563c07c))
+
+
+### Bug Fixes
+
+* re-export ESM types in CommonJS ([#416](https://github.com/eslint/rewrite/issues/416)) ([ef16f80](https://github.com/eslint/rewrite/commit/ef16f80b9221c412992a1e9d54b35d155db1b4ed))
+* type-check defaultLanguageOptions against LangOptions ([#420](https://github.com/eslint/rewrite/issues/420)) ([7bf5704](https://github.com/eslint/rewrite/commit/7bf57046b8df02855dde132dc970f89cd5f8437e))
+
 ## [1.1.1](https://github.com/eslint/rewrite/compare/core-v1.1.0...core-v1.1.1) (2026-03-06)
 
 
