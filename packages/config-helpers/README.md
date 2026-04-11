@@ -127,31 +127,6 @@ export default defineConfig(
 );
 ```
 
-### `convertIgnorePatternToMinimatch()`
-
-This is used under the hood by `includeIgnoreFile()` to convert patterns found in eslintignore/gitignore files. You can use it to construct your own ignore objects if you wish:
-
-```js
-// eslint.config.js
-
-import {
-	defineConfig,
-	convertIgnorePatternToMinimatch,
-} from "@eslint/config-helpers";
-
-export default defineConfig(
-	// approximate implementation of `includeIgnoreFile()` in eslintrc mode.
-	{
-		ignores: fs
-			.readFileSync("some/path", "utf8")
-			.split(/\r?\n/u)
-			.map(line => line.trim())
-			.filter(line => line && !line.startsWith("#"))
-			.map(convertIgnorePatternToMinimatch),
-	},
-);
-```
-
 ## License
 
 Apache 2.0
