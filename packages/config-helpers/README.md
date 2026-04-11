@@ -81,7 +81,7 @@ The `includeIgnoreFile()` function reads a file with gitignore-style patterns (s
 ```js
 // eslint.config.js
 
-import { includeIgnoreFile } from "@eslint/config-helpers";
+import { defineConfig, includeIgnoreFile } from "@eslint/config-helpers";
 import path from "node:path";
 
 const ignorePath = path.join(import.meta.dirname, ".gitignore");
