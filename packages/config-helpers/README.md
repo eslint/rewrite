@@ -76,7 +76,7 @@ export default defineConfig([
 
 ### `includeIgnoreFile()`
 
-The `includeIgnoreFile()` function reads an ignore file (such as a `.gitignore`) and returns a config object with the patterns converted to a global ignores object. Pass the absolute path to the ignore file as the first argument:
+The `includeIgnoreFile()` function reads a file with gitignore-style patterns (such as a `.gitignore`) and returns a config object with the patterns converted to a global ignores object. Pass the absolute path to the ignore file as the first argument:
 
 ```js
 // eslint.config.js
