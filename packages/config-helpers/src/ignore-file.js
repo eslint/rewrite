@@ -119,9 +119,9 @@ function parseOptions(options) {
  *
  * @param {string[]} ignoreFilePathArg
  * @param {object} [options]
- * @param {"eslintignore" | "gitignore"} [options.mode] Whether to interpret the contents of the ignore file relative to the cwd or the ignore file.
- * - mode: "eslintrc" (default): Interprets the ignore patterns relative to the cwd
- * - mode: "gitignore": Interprets the ignore patterns relative to the file
+ * @param {"eslintignore" | "gitignore"} [options.mode] Whether to interpret the contents of the ignore file relative to the config file or the ignore file.
+ * - mode: "eslintignore" (default): Interprets the ignore patterns relative to the config file
+ * - mode: "gitignore": Interprets the ignore patterns relative to the ignore file
  *
  * @param {string} [options.name] The name to give the output config objects.
  *
@@ -135,9 +135,9 @@ function parseOptions(options) {
  *
  * @param {string} ignoreFilePathArg
  * @param {object} [options]
- * @param {"eslintignore" | "gitignore"} [options.mode] Whether to interpret the contents of the ignore file relative to the cwd or the ignore file.
- * - mode: "eslintrc" (default): Interprets the ignore patterns relative to the cwd
- * - mode: "gitignore": Interprets the ignore patterns relative to the file
+ * @param {"eslintignore" | "gitignore"} [options.mode] Whether to interpret the contents of the ignore file relative to the config file or the ignore file.
+ * - mode: "eslintignore" (default): Interprets the ignore patterns relative to the config file
+ * - mode: "gitignore": Interprets the ignore patterns relative to the ignore file
  *
  * @param {string} [options.name] The name to give the output config object.
  *
@@ -151,9 +151,9 @@ function parseOptions(options) {
  *
  * @param {string[] | string} ignoreFilePathArg
  * @param {object} [options]
- * @param {"eslintignore" | "gitignore"} [options.mode] Whether to interpret the contents of the ignore file relative to the cwd or the ignore file.
- * - mode: "eslintrc" (default): Interprets the ignore patterns relative to the cwd
- * - mode: "gitignore": Interprets the ignore patterns relative to the file
+ * @param {"eslintignore" | "gitignore"} [options.mode] Whether to interpret the contents of the ignore file relative to the config file or the ignore file.
+ * - mode: "eslintignore" (default): Interprets the ignore patterns relative to the config file
+ * - mode: "gitignore": Interprets the ignore patterns relative to the ignore file
  *
  * @param {string} [options.name] The name to give the output config objects.
  *
