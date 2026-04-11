@@ -99,7 +99,7 @@ export default defineConfig(
 The second argument is an optional options object:
 
 - **`mode`** : Controls how ignore patterns are interpreted.
-    - `"eslintignore"` (default) — patterns are resolved relative to the current working directory, matching the behavior of `.eslintignore` files.
+    - `"eslintignore"` (default) — patterns are resolved relative to the location of the configuration file.
     - `"gitignore"` — patterns are resolved relative to the ignore file itself (via `basePath`), matching the behavior of `.gitignore` files.
 - **`name`** (`string`): A custom name for the resulting config object.
 
