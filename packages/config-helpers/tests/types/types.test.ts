@@ -13,6 +13,7 @@ import {
 	type ConfigWithExtends,
 	type ExtensionConfigObject,
 	globalIgnores,
+	includeIgnoreFile,
 } from "@eslint/config-helpers";
 
 //-----------------------------------------------------------------------------
@@ -229,3 +230,34 @@ globalIgnores([1]);
 globalIgnores(["node_modules"], 1);
 
 // #endregion globalIgnores
+
+//-----------------------------------------------------------------------------
+// Tests for includeIgnoreFile()
+//-----------------------------------------------------------------------------
+
+// #region includeIgnoreFile
+
+// string path should return a single config object
+
+includeIgnoreFile(".gitignore").ignores;
+includeIgnoreFile(".gitignore", {}).ignores;
+includeIgnoreFile(".gitignore", { gitignoreResolution: true, name: "falafel" })
+	.ignores;
+
+// array of string paths should return an array of config objects
+includeIgnoreFile([".gitignore", ".eslintignore"]).map(
+	config => config.ignores,
+);
+
+declare const pathOrPaths: string | string[];
+includeIgnoreFile(pathOrPaths, { gitignoreResolution: true, name: "falafel" });
+// @ts-expect-error -- return type shouldn't be able to access field of config object
+includeIgnoreFile(pathOrPaths, { gitignoreResolution: true, name: "falafel" })
+	.ignores;
+// @ts-expect-error -- return type shouldn't be able to access array method
+includeIgnoreFile(pathOrPaths, {
+	gitignoreResolution: true,
+	name: "falafel",
+}).map(config => config.ignores);
+
+// #endregion includeIgnoreFile

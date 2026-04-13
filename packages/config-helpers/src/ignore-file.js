@@ -113,7 +113,7 @@ function parseOptions(options) {
 }
 
 /**
- * @override
+ * @overload
  *
  * Reads ignore files and returns objects with the ignore patterns.
  *
@@ -129,7 +129,7 @@ function parseOptions(options) {
  */
 
 /**
- * @override
+ * @overload
  *
  * Reads an ignore file and returns an object with the ignore patterns.
  *
@@ -145,8 +145,22 @@ function parseOptions(options) {
  */
 
 /**
- * @override
+ * @overload
  *
+ * Reads an ignore file(s) and returns an object(s) with the ignore patterns.
+ *
+ * @param {string[] | string} ignoreFilePathArg The path(s) of the ignore file(s) to include.
+ * @param {object} [options]
+ * @param {boolean} [options.gitignoreResolution] Whether to interpret the contents of the ignore file relative to the config file or the ignore file.
+ * - gitignoreResolution: false (default): Interprets the ignore patterns relative to the config file
+ * - gitignoreResolution: true: Interprets the ignore patterns relative to the ignore file
+ *
+ * @param {string} [options.name] The name to give the output config object(s).
+ *
+ * @returns {Config[] | Config}
+ */
+
+/**
  * Reads an ignore file(s) and returns an object(s) with the ignore patterns.
  *
  * @param {string[] | string} ignoreFilePathArg The path(s) of the ignore file(s) to include.
