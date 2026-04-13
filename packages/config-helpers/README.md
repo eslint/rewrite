@@ -88,7 +88,7 @@ const ignorePath = path.join(import.meta.dirname, ".gitignore");
 
 export default defineConfig(
 	includeIgnoreFile(ignorePath, {
-		mode: "gitignore",
+		gitignoreResolution: true,
 	}),
 	// ...
 );
@@ -98,9 +98,9 @@ export default defineConfig(
 
 The second argument is an optional options object:
 
-- **`mode`** : Controls how ignore patterns are interpreted.
-    - `"eslintignore"` (default) — patterns are resolved relative to the location of the configuration file.
-    - `"gitignore"` — patterns are resolved relative to the ignore file itself (via `basePath`), matching the behavior of `.gitignore` files.
+- **`gitignoreResolution`** (`boolean`) : Controls how ignore patterns are interpreted.
+    - `false` (default) — patterns are resolved relative to the location of the configuration file.
+    - `true` — patterns are resolved relative to the location of the ignore file, matching the behavior of `.gitignore` files.
 - **`name`** (`string`): A custom name for the resulting config object.
 
 For backwards compatibility with `includeIgnoreFile()` from `@eslint/compat`, passing a string instead of an object as the second argument is treated as equivalent to providing a value for `name`.
@@ -121,7 +121,7 @@ export default defineConfig(
 			path.join(import.meta.dirname, ".gitignore"),
 			path.join(import.meta.dirname, "packages/lib/.gitignore"),
 		],
-		{ mode: "gitignore" },
+		{ gitignoreResolution: true },
 	),
 	// ...
 );

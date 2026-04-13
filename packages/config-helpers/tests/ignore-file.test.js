@@ -77,7 +77,7 @@ describe("@eslint/config-helpers", () => {
 				),
 			);
 			const result = includeIgnoreFile(ignoreFilePath, {
-				mode: "gitignore",
+				gitignoreResolution: true,
 			});
 			const basePath = fileURLToPath(
 				new URL("../tests/fixtures/ignore-files", import.meta.url),
@@ -122,7 +122,7 @@ describe("@eslint/config-helpers", () => {
 			});
 		});
 
-		it("should handle when both name and mode are specified", () => {
+		it("should handle when both name and gitignoreResolution are specified", () => {
 			const ignoreFilePath = fileURLToPath(
 				new URL(
 					"../tests/fixtures/ignore-files/gitignore1.txt",
@@ -134,7 +134,7 @@ describe("@eslint/config-helpers", () => {
 			);
 
 			const result = includeIgnoreFile([ignoreFilePath, ignoreFilePath], {
-				mode: "gitignore",
+				gitignoreResolution: true,
 				name: "Custom Name",
 			});
 			assert.deepStrictEqual(result, [
@@ -171,10 +171,8 @@ describe("@eslint/config-helpers", () => {
 	});
 });
 
-// These tests ensure that the `includeIgnoreFile` is a superset of the
-// functionality of the `includeIgnoreFile` in `@eslint/compat`. The only
-// discrepancy is the default name has been changed to reflect that it is
-// really eslintignore mode by default.
+// These tests are copied from @eslint/compat and ensure that the `includeIgnoreFile` is a superset of the
+// functionality of the `includeIgnoreFile` in `@eslint/compat`.
 describe("`includeIgnoreFile` compat with @eslint/compat", () => {
 	it("should throw an error when a relative path is passed", () => {
 		const ignoreFilePath = "../tests/fixtures/ignore-files/gitignore1.txt";
@@ -192,7 +190,7 @@ describe("`includeIgnoreFile` compat with @eslint/compat", () => {
 		);
 		const result = includeIgnoreFile(ignoreFilePath);
 		assert.deepStrictEqual(result, {
-			name: "Imported .eslintignore patterns",
+			name: "Imported .gitignore patterns",
 			ignores: [
 				"**/node_modules",
 				"!fixtures/node_modules",
