@@ -251,13 +251,16 @@ includeIgnoreFile([".gitignore", ".eslintignore"]).map(
 
 declare const pathOrPaths: string | string[];
 includeIgnoreFile(pathOrPaths, { gitignoreResolution: true, name: "falafel" });
-// @ts-expect-error -- return type shouldn't be able to access field of config object
+
+// prettier-ignore
 includeIgnoreFile(pathOrPaths, { gitignoreResolution: true, name: "falafel" })
+	// @ts-expect-error -- return type shouldn't be able to access field of config object
 	.ignores;
-// @ts-expect-error -- return type shouldn't be able to access array method
 includeIgnoreFile(pathOrPaths, {
 	gitignoreResolution: true,
 	name: "falafel",
-}).map(config => config.ignores);
+})
+	// @ts-expect-error -- return type shouldn't be able to access array method
+	.map(config => config.ignores);
 
 // #endregion includeIgnoreFile
