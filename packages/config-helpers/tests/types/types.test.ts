@@ -263,4 +263,10 @@ includeIgnoreFile(pathOrPaths, {
 	// @ts-expect-error -- return type shouldn't be able to access array method
 	.map(config => config.ignores);
 
+// should be able to provide a string options argument for compatibility reasons.
+includeIgnoreFile("foo", "string-name");
+
+// @ts-expect-error -- options should not a number.
+includeIgnoreFile("foo", 22);
+
 // #endregion includeIgnoreFile

@@ -19,6 +19,21 @@ import path from "node:path";
 
 /** @typedef {import("@eslint/core").ConfigObject} Config */
 
+/**
+ * @typedef {object} IncludeIgnoreFileOptionsObject
+ * @property {boolean} [gitignoreResolution] Whether to interpret the contents of an ignore file relative to the config file or the ignore file.
+ * - gitignoreResolution: false (default): Interprets ignore patterns relative to the config file
+ * - gitignoreResolution: true: Interprets the ignore patterns in a file relative to the ignore file
+ * @property {string} [name] The name to give the output config object(s).
+ */
+
+/**
+ * Options for `includeIgnoreFile()`. May be provided as an object or, for
+ * legacy compatibility with `@eslint/compat`, as a string which is treated as
+ * the `name` option.
+ * @typedef {IncludeIgnoreFileOptionsObject | string} IncludeIgnoreFileOptions
+ */
+
 //-----------------------------------------------------------------------------
 // Exports
 //-----------------------------------------------------------------------------
@@ -86,7 +101,7 @@ function ignoreFilePathToPatterns(ignoreFilePath) {
 /**
  * Helper to parse and validate the options to `includeIgnoreFile()`
  *
- * @param {{ gitignoreResolution?: unknown, name?: unknown } | undefined} options
+ * @param {string | { gitignoreResolution?: unknown, name?: unknown } | undefined} options
  * @returns {{ gitignoreResolution: boolean, name: string }}
  */
 function parseOptions(options) {
@@ -118,13 +133,7 @@ function parseOptions(options) {
  * Reads ignore files and returns objects with the ignore patterns.
  *
  * @param {string[]} ignoreFilePathArg The paths of ignore files to include
- * @param {object} [options]
- * @param {boolean} [options.gitignoreResolution] Whether to interpret the contents of the ignore file relative to the config file or the ignore file.
- * - gitignoreResolution: false (default): Interprets the ignore patterns relative to the config file
- * - gitignoreResolution: true: Interprets the ignore patterns relative to the ignore file
- *
- * @param {string} [options.name] The name to give the output config objects.
- *
+ * @param {IncludeIgnoreFileOptions} [options]
  * @returns {Config[]}
  */
 
@@ -134,13 +143,7 @@ function parseOptions(options) {
  * Reads an ignore file and returns an object with the ignore patterns.
  *
  * @param {string} ignoreFilePathArg The path of the ignore file to include
- * @param {object} [options]
- * @param {boolean} [options.gitignoreResolution] Whether to interpret the contents of the ignore file relative to the config file or the ignore file.
- * - gitignoreResolution: false (default): Interprets the ignore patterns relative to the config file
- * - gitignoreResolution: true: Interprets the ignore patterns relative to the ignore file
- *
- * @param {string} [options.name] The name to give the output config object.
- *
+ * @param {IncludeIgnoreFileOptions} [options]
  * @returns {Config}
  */
 
@@ -150,13 +153,7 @@ function parseOptions(options) {
  * Reads an ignore file(s) and returns an object(s) with the ignore patterns.
  *
  * @param {string[] | string} ignoreFilePathArg The path(s) of the ignore file(s) to include.
- * @param {object} [options]
- * @param {boolean} [options.gitignoreResolution] Whether to interpret the contents of the ignore file relative to the config file or the ignore file.
- * - gitignoreResolution: false (default): Interprets the ignore patterns relative to the config file
- * - gitignoreResolution: true: Interprets the ignore patterns relative to the ignore file
- *
- * @param {string} [options.name] The name to give the output config object(s).
- *
+ * @param {IncludeIgnoreFileOptions} [options]
  * @returns {Config[] | Config}
  */
 
@@ -164,13 +161,7 @@ function parseOptions(options) {
  * Reads an ignore file(s) and returns an object(s) with the ignore patterns.
  *
  * @param {string[] | string} ignoreFilePathArg The path(s) of the ignore file(s) to include.
- * @param {object} [options]
- * @param {boolean} [options.gitignoreResolution] Whether to interpret the contents of the ignore file relative to the config file or the ignore file.
- * - gitignoreResolution: false (default): Interprets the ignore patterns relative to the config file
- * - gitignoreResolution: true: Interprets the ignore patterns relative to the ignore file
- *
- * @param {string} [options.name] The name to give the output config object(s).
- *
+ * @param {IncludeIgnoreFileOptions} [options]
  * @returns {Config[] | Config}
  */
 export function includeIgnoreFile(ignoreFilePathArg, options) {
