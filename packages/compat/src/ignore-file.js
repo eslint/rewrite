@@ -26,7 +26,7 @@ import path from "node:path";
  * @returns {string} The converted pattern.
  *
  * @deprecated Use the `convertIgnorePatternToMinimatch()` function exported by
- * `@eslint/config-helpers` instead (also available at `eslint/config`).
+ * `@eslint/config-helpers` instead.
  */
 export function convertIgnorePatternToMinimatch(pattern) {
 	const isNegated = pattern.startsWith("!");
