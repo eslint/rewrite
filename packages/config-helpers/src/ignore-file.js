@@ -132,7 +132,7 @@ function parseOptions(options) {
  *
  * Reads ignore files and returns objects with the ignore patterns.
  *
- * @param {string[]} ignoreFilePathArg The paths of ignore files to include
+ * @param {string[]} ignoreFilePathArg The paths of ignore files to include.
  * @param {IncludeIgnoreFileOptions} [options]
  * @returns {Config[]}
  */
