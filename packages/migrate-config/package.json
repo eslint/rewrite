@@ -50,7 +50,7 @@
     "@eslint/compat": "^2.0.5",
     "@eslint/eslintrc": "^3.3.5",
     "camelcase": "^8.0.0",
-    "espree": "^10.4.0",
+    "espree": "^11.2.0",
     "recast": "^0.23.7"
   }
 }
