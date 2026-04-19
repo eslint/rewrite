@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.7](https://github.com/eslint/rewrite/compare/migrate-config-v2.0.6...migrate-config-v2.0.7) (2026-04-19)
+
+
+### Bug Fixes
+
+* update `espree` to the latest ([#437](https://github.com/eslint/rewrite/issues/437)) ([a8ff72f](https://github.com/eslint/rewrite/commit/a8ff72f6f473ce87df4156d3eb9b6e4992084337))
+
 ## [2.0.6](https://github.com/eslint/rewrite/compare/migrate-config-v2.0.5...migrate-config-v2.0.6) (2026-04-08)
 
 
