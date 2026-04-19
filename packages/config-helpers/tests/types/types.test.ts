@@ -13,6 +13,7 @@ import {
 	type ConfigWithExtends,
 	type ExtensionConfigObject,
 	globalIgnores,
+	includeIgnoreFile,
 } from "@eslint/config-helpers";
 
 //-----------------------------------------------------------------------------
@@ -229,3 +230,43 @@ globalIgnores([1]);
 globalIgnores(["node_modules"], 1);
 
 // #endregion globalIgnores
+
+//-----------------------------------------------------------------------------
+// Tests for includeIgnoreFile()
+//-----------------------------------------------------------------------------
+
+// #region includeIgnoreFile
+
+// string path should return a single config object
+
+includeIgnoreFile(".gitignore").ignores;
+includeIgnoreFile(".gitignore", {}).ignores;
+includeIgnoreFile(".gitignore", { gitignoreResolution: true, name: "falafel" })
+	.ignores;
+
+// array of string paths should return an array of config objects
+includeIgnoreFile([".gitignore", ".eslintignore"]).map(
+	config => config.ignores,
+);
+
+declare const pathOrPaths: string | string[];
+includeIgnoreFile(pathOrPaths, { gitignoreResolution: true, name: "falafel" });
+
+// prettier-ignore
+includeIgnoreFile(pathOrPaths, { gitignoreResolution: true, name: "falafel" })
+	// @ts-expect-error -- return type shouldn't be able to access field of config object
+	.ignores;
+includeIgnoreFile(pathOrPaths, {
+	gitignoreResolution: true,
+	name: "falafel",
+})
+	// @ts-expect-error -- return type shouldn't be able to access array method
+	.map(config => config.ignores);
+
+// should be able to provide a string options argument for compatibility reasons.
+includeIgnoreFile("foo", "string-name");
+
+// @ts-expect-error -- options should not a number.
+includeIgnoreFile("foo", 22);
+
+// #endregion includeIgnoreFile
