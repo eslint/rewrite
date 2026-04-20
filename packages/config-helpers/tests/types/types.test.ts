@@ -14,6 +14,7 @@ import {
 	type ExtensionConfigObject,
 	globalIgnores,
 	includeIgnoreFile,
+	convertIgnorePatternToMinimatch,
 } from "@eslint/config-helpers";
 
 //-----------------------------------------------------------------------------
@@ -270,3 +271,17 @@ includeIgnoreFile("foo", "string-name");
 includeIgnoreFile("foo", 22);
 
 // #endregion includeIgnoreFile
+
+//-----------------------------------------------------------------------------
+// Tests for convertIgnorePatternToMinimatch()
+//-----------------------------------------------------------------------------
+
+// #region convertIgnorePatternToMinimatch
+
+// should be string => string.
+convertIgnorePatternToMinimatch("foo") satisfies string;
+
+// @ts-expect-error -- input should be a string.
+convertIgnorePatternToMinimatch(12345);
+
+// #endregion convertIgnorePatternToMinimatch
