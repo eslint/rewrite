@@ -266,7 +266,7 @@ includeIgnoreFile(pathOrPaths, {
 // should be able to provide a string options argument for compatibility reasons.
 includeIgnoreFile("foo", "string-name");
 
-// @ts-expect-error -- options should not a number.
+// @ts-expect-error -- options should not be a number.
 includeIgnoreFile("foo", 22);
 
 // #endregion includeIgnoreFile
