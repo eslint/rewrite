@@ -240,13 +240,13 @@ globalIgnores(["node_modules"], 1);
 
 // string path should return a single config object
 
-includeIgnoreFile(".gitignore").ignores;
-includeIgnoreFile(".gitignore", {}).ignores;
-includeIgnoreFile(".gitignore", { gitignoreResolution: true, name: "falafel" })
+includeIgnoreFile("some-string").ignores;
+includeIgnoreFile("some-string", {}).ignores;
+includeIgnoreFile("some-string", { gitignoreResolution: true, name: "falafel" })
 	.ignores;
 
 // array of string paths should return an array of config objects
-includeIgnoreFile([".gitignore", ".eslintignore"]).map(
+includeIgnoreFile(["some-string", "some-other-string"]).map(
 	config => config.ignores,
 );
 
@@ -268,7 +268,7 @@ includeIgnoreFile(pathOrPaths, {
 includeIgnoreFile("foo", "string-name");
 
 // @ts-expect-error -- options should not be a number.
-includeIgnoreFile("foo", 22);
+includeIgnoreFile("bar", 22);
 
 // #endregion includeIgnoreFile
 
