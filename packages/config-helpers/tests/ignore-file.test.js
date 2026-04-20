@@ -168,6 +168,21 @@ describe("@eslint/config-helpers", () => {
 				},
 			]);
 		});
+
+		// convert above to for ... of loop
+		for (const value of [true, 1, 123n, [1, 2, 3]]) {
+			it(`should throw an error when the second argument is ${value}`, () => {
+				const ignoreFilePath = fileURLToPath(
+					new URL(
+						"../tests/fixtures/ignore-files/gitignore1.txt",
+						import.meta.url,
+					),
+				);
+				assert.throws(() => {
+					includeIgnoreFile(ignoreFilePath, value);
+				}, /The options argument to `includeIgnoreFile\(\)` should be an object or a string./u);
+			});
+		}
 	});
 });
 
