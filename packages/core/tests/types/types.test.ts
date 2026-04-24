@@ -210,6 +210,55 @@ const testLanguage: Language = {
 
 testLanguage.defaultLanguageOptions satisfies LanguageOptions | undefined;
 
+const testLanguage2: Language<{
+	LangOptions: {
+		howMuch: boolean;
+		howMany: number;
+	};
+	Code: TestSourceCode;
+	RootNode: TestRootNode;
+	Node: TestNode;
+}> = {
+	fileType: "text",
+	lineStart: 1,
+	columnStart: 1,
+	nodeTypeKey: "type",
+	defaultLanguageOptions: {
+		howMuch: true,
+		// @ts-expect-error -- defaultLanguageOptions must match the language options.
+		howMany: "a lot",
+	},
+
+	validateLanguageOptions(languageOptions) {
+		languageOptions.howMuch satisfies boolean;
+		languageOptions.howMany satisfies number;
+	},
+
+	parse(file, context): ParseResult<TestRootNode> {
+		context.languageOptions.howMuch satisfies boolean;
+		context.languageOptions.howMany satisfies number;
+
+		return {
+			ok: true,
+			ast: {
+				type: "root",
+				start: 0,
+				length: file.body.length,
+			},
+		};
+	},
+
+	createSourceCode(file, input, context): TestSourceCode {
+		context.languageOptions.howMuch satisfies boolean;
+		context.languageOptions.howMany satisfies number;
+		return new TestSourceCode(String(file.body), input.ast);
+	},
+};
+
+testLanguage2.defaultLanguageOptions satisfies
+	| { howMuch: boolean; howMany: number }
+	| undefined;
+
 //-----------------------------------------------------------------------------
 // Tests for rule-related types
 //-----------------------------------------------------------------------------
@@ -242,6 +291,7 @@ const testRule: RuleDefinition<{
 		fixable: "code",
 		docs: {
 			recommended: true,
+			dialects: ["JavaScript", "TypeScript"],
 		},
 		deprecated: {
 			message: "use something else",
@@ -282,6 +332,7 @@ const testRule: RuleDefinition<{
 		},
 		language: "javascript",
 		dialects: ["javascript", "typescript"],
+		languages: ["js/js", "ts/ts"],
 	},
 
 	create(context: TestRuleContext): TestRuleVisitor {

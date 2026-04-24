@@ -1,5 +1,38 @@
 # Changelog
 
+## [0.7.1](https://github.com/eslint/rewrite/compare/plugin-kit-v0.7.0...plugin-kit-v0.7.1) (2026-04-08)
+
+
+### Bug Fixes
+
+* revert re-export ESM types in CommonJS ([#427](https://github.com/eslint/rewrite/issues/427)) ([9b16fe1](https://github.com/eslint/rewrite/commit/9b16fe1af3432e92bdb193a5d1f6c89c4b0e3093))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^1.2.0 to ^1.2.1
+
+## [0.7.0](https://github.com/eslint/rewrite/compare/plugin-kit-v0.6.1...plugin-kit-v0.7.0) (2026-04-03)
+
+
+### Features
+
+* add `languages` and `docs.dialects` to rule `meta` types ([#421](https://github.com/eslint/rewrite/issues/421)) ([7680f69](https://github.com/eslint/rewrite/commit/7680f692119a094abb1c8317aba713168563c07c))
+
+
+### Bug Fixes
+
+* re-export ESM types in CommonJS ([#416](https://github.com/eslint/rewrite/issues/416)) ([ef16f80](https://github.com/eslint/rewrite/commit/ef16f80b9221c412992a1e9d54b35d155db1b4ed))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^1.1.1 to ^1.2.0
+
 ## [0.6.1](https://github.com/eslint/rewrite/compare/plugin-kit-v0.6.0...plugin-kit-v0.6.1) (2026-03-06)
 
 

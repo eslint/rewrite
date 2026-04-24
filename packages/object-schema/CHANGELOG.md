@@ -1,5 +1,21 @@
 # Changelog
 
+## [3.0.5](https://github.com/eslint/rewrite/compare/object-schema-v3.0.4...object-schema-v3.0.5) (2026-04-08)
+
+
+### Bug Fixes
+
+* revert re-export ESM types in CommonJS ([#427](https://github.com/eslint/rewrite/issues/427)) ([9b16fe1](https://github.com/eslint/rewrite/commit/9b16fe1af3432e92bdb193a5d1f6c89c4b0e3093))
+
+## [3.0.4](https://github.com/eslint/rewrite/compare/object-schema-v3.0.3...object-schema-v3.0.4) (2026-04-03)
+
+
+### Bug Fixes
+
+* avoid mutating object schema definitions during construction ([#412](https://github.com/eslint/rewrite/issues/412)) ([f0fd9a2](https://github.com/eslint/rewrite/commit/f0fd9a2ff756b9d40699239d9f9ba9a31dac8339))
+* correct ValidationStrategy parameter types ([#406](https://github.com/eslint/rewrite/issues/406)) ([42a30ea](https://github.com/eslint/rewrite/commit/42a30eaae5d42fae1a6b888c7f34f396469c52ae))
+* re-export ESM types in CommonJS ([#416](https://github.com/eslint/rewrite/issues/416)) ([ef16f80](https://github.com/eslint/rewrite/commit/ef16f80b9221c412992a1e9d54b35d155db1b4ed))
+
 ## [3.0.3](https://github.com/eslint/rewrite/compare/object-schema-v3.0.2...object-schema-v3.0.3) (2026-03-06)
 
 

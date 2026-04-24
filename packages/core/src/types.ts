@@ -130,6 +130,13 @@ export interface RulesMetaDocs {
 	 * Indicates if the rule is frozen (no longer accepting feature requests).
 	 */
 	frozen?: boolean | undefined;
+
+	/**
+	 * The dialects of the languages that the rule is intended to lint.
+	 * @example
+	 * ["JavaScript", "TypeScript"]
+	 */
+	dialects?: string[] | undefined;
 }
 
 /**
@@ -188,13 +195,23 @@ export interface RulesMeta<
 
 	/**
 	 * The language the rule is intended to lint.
+	 * @deprecated Use `languages` instead.
 	 */
 	language?: string;
 
 	/**
 	 * The dialects of `language` that the rule is intended to lint.
+	 * @deprecated Use `docs.dialects` instead.
 	 */
 	dialects?: string[];
+
+	/**
+	 * Languages supported by this rule in the format `"plugin/language"`.
+	 * Use `"*"` for any language or `"plugin/*"` for any language from a specific plugin.
+	 * @example
+	 * ["js/js", "markdown/gfm", "json/jsonc", "css/css"]
+	 */
+	languages?: string[] | undefined;
 }
 
 /**
@@ -1175,7 +1192,7 @@ export interface Language<
 	/**
 	 * Default language options. User-defined options are merged with this object.
 	 */
-	defaultLanguageOptions?: LanguageOptions;
+	defaultLanguageOptions?: Options["LangOptions"];
 
 	/**
 	 * Validates languageOptions for this language.

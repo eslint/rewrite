@@ -42,6 +42,11 @@
           "type": "json",
           "path": "jsr.json",
           "jsonpath": "$.version"
+        },
+        {
+          "type": "json",
+          "path": "/templates/package/package.json",
+          "jsonpath": "$.devDependencies['@eslint/core']"
         }
       ]
     },
