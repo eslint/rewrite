@@ -4,8 +4,7 @@
     "declaration": true,
     "module": "nodenext",
     "noEmit": true,
-    "types": [],
-    "strict": false
+    "types": []
   },
   "files": ["test-eslint.config.js"]
 }
