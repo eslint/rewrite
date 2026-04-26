@@ -90,11 +90,11 @@ jobs:
             - name: Test types (plugin-kit)
               run: npm run test:types -w packages/plugin-kit
 
-            - name: Install TypeScript 5.3.2
-              run: npm install --no-save typescript@5.3.2
+            - name: Check dist types compile (TypeScript 5.3)
+              run: npm run test:types:5.3
 
-            - name: Check dist types compile (TypeScript 5.3.2)
-              run: npx tsc -p tsconfig.dist.json
+            - name: Check dist types compile (TypeScript 5.x)
+              run: npm run test:types:5.x
 
     are-the-types-wrong:
         name: Are the types wrong?

@@ -1,11 +1,15 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "exactOptionalPropertyTypes": true,
+    "allowJs": false,
+    "checkJs": false,
     "noEmit": true,
     "rootDir": "../..",
     "strict": true,
-    "verbatimModuleSyntax": true
+    "exactOptionalPropertyTypes": true,
+    "verbatimModuleSyntax": true,
+    "erasableSyntaxOnly": true
   },
+  "files": [],
   "include": [".", "../../dist"]
 }
