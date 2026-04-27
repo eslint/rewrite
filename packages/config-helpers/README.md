@@ -86,12 +86,12 @@ import path from "node:path";
 
 const ignorePath = path.join(import.meta.dirname, ".gitignore");
 
-export default defineConfig(
+export default defineConfig([
 	includeIgnoreFile(ignorePath, {
 		gitignoreResolution: true,
 	}),
 	// ...
-);
+]);
 ```
 
 #### Options
@@ -115,7 +115,7 @@ You can also pass an array of absolute paths to include multiple ignore files at
 import { defineConfig, includeIgnoreFile } from "@eslint/config-helpers";
 import path from "node:path";
 
-export default defineConfig(
+export default defineConfig([
 	includeIgnoreFile(
 		[
 			path.join(import.meta.dirname, ".gitignore"),
@@ -124,7 +124,7 @@ export default defineConfig(
 		{ gitignoreResolution: true },
 	),
 	// ...
-);
+]);
 ```
 
 ## License
