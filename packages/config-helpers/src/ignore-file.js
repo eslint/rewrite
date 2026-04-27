@@ -112,21 +112,21 @@ function parseOptions(options) {
 
 	const optionsObject = options ?? {};
 	if (typeof optionsObject !== "object" || Array.isArray(optionsObject)) {
-		throw new Error(
+		throw new TypeError(
 			"The options argument to `includeIgnoreFile()` should be an object or a string.",
 		);
 	}
 
 	const gitignoreResolution = optionsObject.gitignoreResolution ?? false;
 	if (typeof gitignoreResolution !== "boolean") {
-		throw new Error(
+		throw new TypeError(
 			"The `gitignoreResolution` option must be specified a boolean or omitted",
 		);
 	}
 
 	const name = optionsObject.name ?? `Imported .gitignore patterns`;
 	if (typeof name !== "string") {
-		throw new Error(
+		throw new TypeError(
 			"The `name` option must be specified as a string or omitted.",
 		);
 	}
@@ -178,7 +178,7 @@ export function includeIgnoreFile(ignoreFilePathArg, options) {
 		: [ignoreFilePathArg];
 	for (const ignorePath of ignoreFilePaths) {
 		if (typeof ignorePath !== "string") {
-			throw new Error(
+			throw new TypeError(
 				"The first argument to `includeIgnoreFile()` should be a string or array of strings",
 			);
 		}
