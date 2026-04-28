@@ -1,15 +1,7 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../../../tsconfig.dist.json",
   "compilerOptions": {
-    "allowJs": false,
-    "checkJs": false,
-    "noEmit": true,
-    "rootDir": "../..",
-    "strict": true,
-    "exactOptionalPropertyTypes": true,
-    "verbatimModuleSyntax": true,
-    "erasableSyntaxOnly": true
+    "rootDir": "../.."
   },
-  "files": [],
   "include": [".", "../../dist"]
 }
