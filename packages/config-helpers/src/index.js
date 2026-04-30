@@ -4,3 +4,7 @@
 
 export { defineConfig } from "./define-config.js";
 export { globalIgnores } from "./global-ignores.js";
+export {
+	includeIgnoreFile,
+	convertIgnorePatternToMinimatch,
+} from "./ignore-file.js";

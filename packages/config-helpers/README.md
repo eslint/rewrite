@@ -74,6 +74,59 @@ export default defineConfig([
 ]);
 ```
 
+### `includeIgnoreFile()`
+
+The `includeIgnoreFile()` function reads a file with gitignore-style patterns (such as a `.gitignore`) and returns a config object with the patterns converted to a global ignores object. Pass the absolute path to the ignore file as the first argument:
+
+```js
+// eslint.config.js
+
+import { defineConfig, includeIgnoreFile } from "@eslint/config-helpers";
+import path from "node:path";
+
+const ignorePath = path.join(import.meta.dirname, ".gitignore");
+
+export default defineConfig([
+	includeIgnoreFile(ignorePath, {
+		gitignoreResolution: true,
+	}),
+	// ...
+]);
+```
+
+#### Options
+
+The second argument is an optional options object:
+
+- **`gitignoreResolution`** (`boolean`) : Controls how ignore patterns are interpreted.
+    - `false` (default) — patterns are resolved relative to the location of the configuration file.
+    - `true` — patterns are resolved relative to the location of the ignore file, matching the behavior of `.gitignore` files.
+- **`name`** (`string`): A custom name for the resulting config object.
+
+For backwards compatibility with `includeIgnoreFile()` from `@eslint/compat`, passing a string instead of an object as the second argument is treated as equivalent to providing a value for `name`.
+
+#### Multiple files
+
+You can also pass an array of absolute paths to include multiple ignore files at once. In this case an array of config objects is returned:
+
+```js
+// eslint.config.js
+
+import { defineConfig, includeIgnoreFile } from "@eslint/config-helpers";
+import path from "node:path";
+
+export default defineConfig([
+	includeIgnoreFile(
+		[
+			path.join(import.meta.dirname, ".gitignore"),
+			path.join(import.meta.dirname, "packages/lib/.gitignore"),
+		],
+		{ gitignoreResolution: true },
+	),
+	// ...
+]);
+```
+
 ## License
 
 Apache 2.0

@@ -33,7 +33,7 @@ This package exports the following functions in both ESM and CommonJS format:
 - `fixupRule(rule)` - wraps the given rule in a compatibility layer and returns the result
 - `fixupPluginRules(plugin)` - wraps each rule in the given plugin using `fixupRule()` and returns a new object that represents the plugin with the fixed-up rules
 - `fixupConfigRules(configs)` - wraps all plugins found in an array of config objects using `fixupPluginRules()`
-- `includeIgnoreFile(path)` - reads an ignore file (like `.gitignore`) and converts the patterns into the correct format for the config file
+- `includeIgnoreFile(path)` (deprecated) - reads an ignore file (like `.gitignore`) and converts the patterns into the correct format for the config file
 
 ### Fixing Rules
 
@@ -148,6 +148,8 @@ module.exports = defineConfig([
 ```
 
 ### Including Ignore Files
+
+**Deprecated**: The `includeIgnoreFile()` exported by this package has been deprecated ([eslint/rewrite#329](https://github.com/eslint/rewrite/issues/329)). Use the `includeIgnoreFile()` function exported by `@eslint/config-helpers` instead (also available at `eslint/config`). This section is only preserved for historical reference.
 
 If you were using an alternate ignore file in ESLint v8.x, such as using `--ignore-path .gitignore` on the command line, you can include those patterns programmatically in your config file using the `includeIgnoreFile()` function.
 
