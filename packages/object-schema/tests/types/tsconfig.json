@@ -1,12 +1,7 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../../../tsconfig.dist.json",
   "compilerOptions": {
-    "noEmit": true,
-    "rootDir": "../..",
-    "strict": true,
-    "exactOptionalPropertyTypes": true,
-    "noImplicitAny": false,
-    "useUnknownInCatchVariables": false
+    "rootDir": "../.."
   },
   "include": [".", "../../dist"]
 }
