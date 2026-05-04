@@ -98,7 +98,7 @@ export default defineConfig([
 
 The second argument is an optional options object:
 
-- **`gitignoreResolution`** (`boolean`) : Controls how ignore patterns are interpreted.
+- **`gitignoreResolution`** (`boolean`): Controls how ignore patterns are interpreted.
     - `false` (default) — patterns are resolved relative to the location of the configuration file.
     - `true` — patterns are resolved relative to the location of the ignore file, matching the behavior of `.gitignore` files.
 - **`name`** (`string`): A custom name for the resulting config object.
