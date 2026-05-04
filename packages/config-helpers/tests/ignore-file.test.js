@@ -163,7 +163,6 @@ describe("@eslint/config-helpers", () => {
 			]);
 		});
 
-		// convert above to for ... of loop
 		for (const value of [true, 1, 123n, [1, 2, 3]]) {
 			it(`should throw an error when the second argument is ${value}`, () => {
 				assert.throws(
