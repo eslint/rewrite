@@ -13,7 +13,7 @@ import { Legacy } from "@eslint/eslintrc";
 import camelCase from "camelcase";
 import pluginsNeedingCompat from "./compat-plugins.js";
 import configsNeedingCompat from "./compat-configs.js";
-import { convertIgnorePatternToMinimatch } from "@eslint/compat";
+import { convertIgnorePatternToMinimatch } from "@eslint/config-helpers";
 import * as espree from "espree";
 
 //-----------------------------------------------------------------------------

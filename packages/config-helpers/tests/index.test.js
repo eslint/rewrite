@@ -21,4 +21,15 @@ describe("index", () => {
 	it("should export globalIgnores()", () => {
 		assert.strictEqual(typeof api.globalIgnores, "function");
 	});
+
+	it("should export includeIgnoreFile()", () => {
+		assert.strictEqual(typeof api.includeIgnoreFile, "function");
+	});
+
+	it("should export convertIgnorePatternToMinimatch()", () => {
+		assert.strictEqual(
+			typeof api.convertIgnorePatternToMinimatch,
+			"function",
+		);
+	});
 });

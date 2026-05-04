@@ -40,14 +40,13 @@
   },
   "homepage": "https://github.com/eslint/rewrite/tree/main/packages/migrate-config#readme",
   "devDependencies": {
-    "@eslint/core": "^1.2.1",
-    "eslint": "^10.0.3"
+    "@eslint/core": "^1.2.1"
   },
   "engines": {
     "node": "^20.19.0 || ^22.13.0 || >=24"
   },
   "dependencies": {
-    "@eslint/compat": "^2.0.5",
+    "@eslint/config-helpers": "^0.5.5",
     "@eslint/eslintrc": "^3.3.5",
     "camelcase": "^8.0.0",
     "espree": "^11.2.0",
