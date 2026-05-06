@@ -96,6 +96,9 @@ jobs:
             - name: Check dist types compile (TypeScript 5.x)
               run: npm run test:types:5.x
 
+            - name: Check dist types compile (TypeScript 7 preview)
+              run: npm run test:types:7.x
+
     are-the-types-wrong:
         name: Are the types wrong?
         runs-on: ubuntu-latest
