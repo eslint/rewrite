@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/eslint/rewrite/compare/compat-v2.0.5...compat-v2.1.0) (2026-05-08)
+
+
+### Features
+
+* Add new `includeIgnoreFile()` to config-helpers ([#430](https://github.com/eslint/rewrite/issues/430)) ([9b51352](https://github.com/eslint/rewrite/commit/9b513529022834e72cccfa278ec7ba6e7f4e10c5))
+
 ## [2.0.5](https://github.com/eslint/rewrite/compare/compat-v2.0.4...compat-v2.0.5) (2026-04-08)
 
 

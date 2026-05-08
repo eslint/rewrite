@@ -1,6 +1,6 @@
 {
   "name": "@eslint/compat",
-  "version": "2.0.5",
+  "version": "2.1.0",
   "description": "Compatibility utilities for ESLint",
   "type": "module",
   "main": "dist/esm/index.js",
