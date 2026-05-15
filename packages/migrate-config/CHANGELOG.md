@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.1.0](https://github.com/eslint/rewrite/compare/migrate-config-v2.0.7...migrate-config-v2.1.0) (2026-05-08)
+
+
+### Features
+
+* Add new `includeIgnoreFile()` to config-helpers ([#430](https://github.com/eslint/rewrite/issues/430)) ([9b51352](https://github.com/eslint/rewrite/commit/9b513529022834e72cccfa278ec7ba6e7f4e10c5))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/config-helpers bumped from ^0.5.5 to ^0.6.0
+
 ## [2.0.7](https://github.com/eslint/rewrite/compare/migrate-config-v2.0.6...migrate-config-v2.0.7) (2026-05-01)
 
 

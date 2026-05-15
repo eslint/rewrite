@@ -40,7 +40,7 @@ jobs:
         strategy:
             matrix:
                 os: [windows-latest, macOS-latest, ubuntu-latest]
-                node-version: [25.x, 24.x, 22.x, 20.x, "20.19.0"]
+                node-version: [26.x, 25.x, 24.x, 22.x, 20.x, "20.19.0"]
 
         steps:
             - uses: actions/checkout@v6
@@ -96,6 +96,9 @@ jobs:
             - name: Check dist types compile (TypeScript 5.x)
               run: npm run test:types:5.x
 
+            - name: Check dist types compile (TypeScript 7 preview)
+              run: npm run test:types:7.x
+
     are-the-types-wrong:
         name: Are the types wrong?
         runs-on: ubuntu-latest
@@ -135,7 +138,7 @@ jobs:
         steps:
             - uses: actions/checkout@v6
 
-            - uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e # v6.0.3
+            - uses: pnpm/action-setup@8912a9102ac27614460f54aedde9e1e7f9aec20d # v6.0.5
               with:
                   version: latest
 

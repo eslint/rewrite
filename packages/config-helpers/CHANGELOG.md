@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/eslint/rewrite/compare/config-helpers-v0.5.5...config-helpers-v0.6.0) (2026-05-08)
+
+
+### Features
+
+* Add new `includeIgnoreFile()` to config-helpers ([#430](https://github.com/eslint/rewrite/issues/430)) ([9b51352](https://github.com/eslint/rewrite/commit/9b513529022834e72cccfa278ec7ba6e7f4e10c5))
+
 ## [0.5.5](https://github.com/eslint/rewrite/compare/config-helpers-v0.5.4...config-helpers-v0.5.5) (2026-04-08)
 
 
