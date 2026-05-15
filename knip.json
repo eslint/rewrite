@@ -1,10 +1,9 @@
 {
-  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "$schema": "https://unpkg.com/knip@6/schema.json",
   "ignore": ["templates/**/*"],
   "workspaces": {
     ".": { "entry": ["scripts/*.js", "tools/*.js", ".github/workflows/*.yml"] },
     "packages/compat": {
-      "ignoreDependencies": ["eslint"],
       "entry": ["tests/**/*.{cts,js,ts}"],
       "project": ["src/**/*.{cts,js,ts}", "tests/*.{cts,js,ts}"]
     },
