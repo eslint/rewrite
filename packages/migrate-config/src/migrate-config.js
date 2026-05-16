@@ -395,14 +395,14 @@ function convertGlobPattern(pattern) {
 function createGitignoreEntry(migration) {
 	migration.inits.push(getGitignoreInit());
 
-	if (!migration.imports.has("@eslint/compat")) {
-		migration.imports.set("@eslint/compat", {
+	if (!migration.imports.has("eslint/config")) {
+		migration.imports.set("eslint/config", {
 			bindings: ["includeIgnoreFile"],
 			added: true,
 		});
 	} else {
 		migration.imports
-			.get("@eslint/compat")
+			.get("eslint/config")
 			.bindings.push("includeIgnoreFile");
 	}
 
@@ -413,7 +413,7 @@ function createGitignoreEntry(migration) {
 		});
 	}
 
-	const code = `includeIgnoreFile(gitignorePath)`;
+	const code = `includeIgnoreFile(gitignorePath, { gitignoreResolution: true })`;
 
 	return recast.parse(code).program.body[0].expression;
 }
