@@ -1,14 +1,23 @@
 import eslintConfigESLint from "eslint-config-eslint";
-import { defineConfig } from "@eslint/config-helpers";
+import { defineConfig, includeIgnoreFile } from "@eslint/config-helpers";
 import tseslint from "typescript-eslint";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
 
 const eslintPluginJSDoc = eslintConfigESLint.find(
 	config => config.plugins?.jsdoc,
 ).plugins.jsdoc;
 
+const filename = fileURLToPath(import.meta.url);
+const dirname = path.dirname(filename);
+
 export default defineConfig([
+	includeIgnoreFile(path.join(dirname, ".gitignore"), {
+		gitignoreResolution: true,
+	}),
+
 	{
-		ignores: ["**/tests/fixtures/", "**/dist/", "**/coverage/"],
+		ignores: ["**/tests/fixtures/"],
 	},
 
 	{
