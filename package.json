@@ -58,6 +58,9 @@
   "overrides": {
     "eslint": {
       "@eslint/core": "file:packages/core"
+    },
+    "@arethetypeswrong/core": {
+      "fflate": "0.8.2"
     }
   }
 }
