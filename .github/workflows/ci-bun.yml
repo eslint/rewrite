@@ -11,6 +11,9 @@ on:
             - main
             - "release/*/v**"
 
+permissions:
+    contents: read
+
 jobs:
     ci-bun:
         uses: eslint/workflows/.github/workflows/ci-bun.yml@main
