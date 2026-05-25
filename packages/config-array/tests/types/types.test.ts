@@ -155,12 +155,16 @@ new ConfigArray([], {
 	},
 });
 new ConfigArray([], { normalized: true });
+new ConfigArray([], { matchExternal: true });
 
 // @ts-expect-error -- basePath must be a string
 new ConfigArray([], { basePath: 123 });
 
 // @ts-expect-error -- normalized must be a boolean
 new ConfigArray([], { normalized: "yes" });
+
+// @ts-expect-error -- matchExternal must be a boolean
+new ConfigArray([], { matchExternal: [true] });
 
 // @ts-expect-error -- Invalid extra config type
 new ConfigArray([], { basePath: "/", extraConfigTypes: ["object"] });

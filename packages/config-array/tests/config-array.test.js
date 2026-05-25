@@ -551,6 +551,21 @@ describe("ConfigArray", () => {
 			);
 		});
 
+		it("should throw an error when matchExternal is not a boolean", () => {
+			assert.throws(
+				() => {
+					void new ConfigArray([], {
+						basePath,
+						matchExternal: null,
+					});
+				},
+				{
+					constructor: TypeError,
+					message: "matchExternal must be a boolean",
+				},
+			);
+		});
+
 		it("should throw an error when extraConfigTypes has more than two items", () => {
 			assert.throws(
 				() => {
@@ -1175,6 +1190,133 @@ describe("ConfigArray", () => {
 					assert(Object.isFrozen(configWithStatus));
 					assert(config && typeof config === "object");
 					assert.strictEqual(configWithStatus.status, "matched");
+				});
+
+				describe("when matchExternal is true", () => {
+					it("for a file outside the base path", () => {
+						configs = new ConfigArray(
+							[
+								{
+									defs: {
+										universal: true,
+									},
+								},
+							],
+							{
+								basePath,
+								schema,
+								matchExternal: true,
+							},
+						);
+
+						configs.normalizeSync();
+
+						assert.deepStrictEqual(
+							configs.getConfigWithStatus("../foo.txt"),
+							{
+								status: "matched",
+								config: {
+									defs: {
+										universal: true,
+									},
+								},
+							},
+						);
+					});
+
+					it("for a file outside the base path when the matching config has ignores but no files", () => {
+						configs = new ConfigArray(
+							[
+								{
+									ignores: ["bar.js"],
+									defs: {
+										applies: true,
+									},
+								},
+							],
+							{
+								basePath,
+								schema,
+								matchExternal: true,
+							},
+						);
+
+						configs.normalizeSync();
+
+						assert.deepStrictEqual(
+							configs.getConfigWithStatus("../foo.txt"),
+							{
+								status: "matched",
+								config: {
+									defs: {
+										applies: true,
+									},
+								},
+							},
+						);
+					});
+
+					it("for a file outside the base path when a files pattern points outside the base path", () => {
+						configs = new ConfigArray(
+							[
+								{
+									files: ["../*.txt"],
+									defs: {
+										externalMatch: true,
+									},
+								},
+							],
+							{
+								basePath,
+								schema,
+								matchExternal: true,
+							},
+						);
+
+						configs.normalizeSync();
+
+						assert.deepStrictEqual(
+							configs.getConfigWithStatus("../foo.txt"),
+							{
+								status: "matched",
+								config: {
+									defs: {
+										externalMatch: true,
+									},
+								},
+							},
+						);
+					});
+
+					it("for a file outside the base path when an ignores pattern points outside the base path", () => {
+						configs = new ConfigArray(
+							[
+								{
+									ignores: ["../ignored.txt"],
+								},
+								{
+									files: ["../*.txt"],
+									defs: {
+										externalMatch: true,
+									},
+								},
+							],
+							{
+								basePath,
+								schema,
+								matchExternal: true,
+							},
+						);
+
+						configs.normalizeSync();
+
+						assert.deepStrictEqual(
+							configs.getConfigWithStatus("../ignored.txt"),
+							{
+								status: "ignored",
+							},
+						);
+					});
 				});
 			});
 		});
@@ -2410,6 +2552,20 @@ describe("ConfigArray", () => {
 				);
 			});
 
+			it('should return "matched" for parent-directory filename when matchExternal is true', () => {
+				configs = new ConfigArray([{}], {
+					basePath,
+					matchExternal: true,
+				});
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfigStatus("../foo.txt"),
+					"matched",
+				);
+			});
+
 			it('should return "matched" when passed HTML filename', () => {
 				const filename = "foo.html";
 
@@ -3576,6 +3732,40 @@ describe("ConfigArray", () => {
 					assert.strictEqual(
 						configs.getConfigStatus("/project/my/foo.js"),
 						"matched",
+					);
+				});
+
+				it(`should return "matched" for an external file matched only by a universal pattern in a config's base path when matchExternal is true`, () => {
+					configs = new ConfigArray(
+						[
+							{
+								basePath: "/project",
+								files: ["**/*"],
+								defs: {
+									withinProject: true,
+								},
+							},
+						],
+						{
+							basePath: "/project/my",
+							matchExternal: true,
+							schema,
+						},
+					);
+
+					configs.normalizeSync();
+
+					assert.strictEqual(
+						configs.getConfigStatus("/project/foo.js"),
+						"matched",
+					);
+					assert.deepStrictEqual(
+						configs.getConfig("/project/foo.js"),
+						{
+							defs: {
+								withinProject: true,
+							},
+						},
 					);
 				});
 

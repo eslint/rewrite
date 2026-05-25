@@ -693,6 +693,12 @@ const dataCache = new WeakMap();
  */
 export class ConfigArray extends Array {
 	/**
+	 * Indicates if files outside the base path should be matched.
+	 * @type {boolean}
+	 */
+	#matchExternal;
+
+	/**
 	 * The namespaced path of the config file directory.
 	 * @type {string}
 	 */
@@ -713,6 +719,8 @@ export class ConfigArray extends Array {
 	 * 		Defaults to `"/"`.
 	 * @param {boolean} [options.normalized=false] Flag indicating if the
 	 *      configs have already been normalized.
+	 * @param {boolean} [options.matchExternal=false] Flag indicating if files outside
+	 * 		of `basePath` should also be considered for matching.
 	 * @param {ObjectDefinition} [options.schema] The additional schema
 	 *      definitions to use for the ConfigArray schema.
 	 * @param {ReadonlyArray<ExtraConfigType>} [options.extraConfigTypes] List of config types supported.
@@ -723,6 +731,7 @@ export class ConfigArray extends Array {
 		{
 			basePath = "/",
 			normalized = false,
+			matchExternal = false,
 			schema: customSchema,
 			extraConfigTypes = [],
 		} = {},
@@ -750,6 +759,12 @@ export class ConfigArray extends Array {
 		if (!isString(basePath) || !basePath) {
 			throw new TypeError("basePath must be a non-empty string");
 		}
+
+		if (typeof matchExternal !== "boolean") {
+			throw new TypeError("matchExternal must be a boolean");
+		}
+
+		this.#matchExternal = matchExternal;
 
 		/**
 		 * The path of the config file that this array was loaded from.
@@ -1014,8 +1029,11 @@ export class ConfigArray extends Array {
 			this.#namespacedBasePath,
 			this.#path,
 		);
+		const isFileOutsideBasePath = EXTERNAL_PATH_REGEX.test(
+			relativeToBaseFilePath,
+		);
 
-		if (EXTERNAL_PATH_REGEX.test(relativeToBaseFilePath)) {
+		if (isFileOutsideBasePath && !this.#matchExternal) {
 			debug(`No config for file ${filePath} outside of base path`);
 
 			// cache and return result
@@ -1193,7 +1211,7 @@ export class ConfigArray extends Array {
 		});
 
 		// if matching both files and ignores, there will be no config to create
-		if (!matchFound) {
+		if (!isFileOutsideBasePath && !matchFound) {
 			debug(`No matching configs found for ${filePath}`);
 
 			// cache and return result
@@ -1305,7 +1323,7 @@ export class ConfigArray extends Array {
 		}
 
 		if (EXTERNAL_PATH_REGEX.test(relativeDirectoryPath)) {
-			return true;
+			return !this.#matchExternal;
 		}
 
 		// first check the cache
