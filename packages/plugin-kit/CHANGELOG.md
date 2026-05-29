@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.2](https://github.com/eslint/rewrite/compare/plugin-kit-v0.7.1...plugin-kit-v0.7.2) (2026-05-23)
+
+
+### Bug Fixes
+
+* add missing .d.cts files while building plugin-kit ([#445](https://github.com/eslint/rewrite/issues/445)) ([49e101b](https://github.com/eslint/rewrite/commit/49e101ba92bfe70f2cd7a830b4b6e8f6bbda73fb))
+
 ## [0.7.1](https://github.com/eslint/rewrite/compare/plugin-kit-v0.7.0...plugin-kit-v0.7.1) (2026-04-08)
 
 
