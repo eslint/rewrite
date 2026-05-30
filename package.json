@@ -39,7 +39,7 @@
     "node": "^22.13.0 || >=24"
   },
   "devDependencies": {
-    "@arethetypeswrong/cli": "^0.18.2",
+    "@arethetypeswrong/cli": "^0.18.3",
     "@eslint/config-helpers": "file:packages/config-helpers",
     "@types/mocha": "^10.0.7",
     "@types/node": "^24.9.1",
@@ -58,9 +58,6 @@
   "overrides": {
     "eslint": {
       "@eslint/core": "file:packages/core"
-    },
-    "@arethetypeswrong/core": {
-      "fflate": "0.8.2"
     }
   }
 }
