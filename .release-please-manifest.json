@@ -3,7 +3,7 @@
   "packages/config-array": "0.23.5",
   "packages/config-helpers": "0.6.0",
   "packages/core": "1.2.1",
-  "packages/mcp": "0.3.6",
+  "packages/mcp": "0.3.7",
   "packages/migrate-config": "2.1.0",
   "packages/object-schema": "3.0.5",
   "packages/plugin-kit": "0.7.2"
