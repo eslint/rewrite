@@ -506,12 +506,6 @@ describe("ConfigArray", () => {
 			}, /ConfigError: Config \(unnamed\): Unexpected null config./u);
 		});
 
-		it("should throw an error when basePath is a relative path", () => {
-			assert.throws(() => {
-				void new ConfigArray([{}], { basePath: "foo/bar" });
-			}, /Expected an absolute path/u);
-		});
-
 		it("should throw an error when basePath is an empty string", () => {
 			assert.throws(
 				() => {
@@ -581,6 +575,32 @@ describe("ConfigArray", () => {
 				},
 			);
 		});
+
+		it("should throw an error when defaultBasePath is an empty string", () => {
+			assert.throws(
+				() => {
+					void new ConfigArray([{}], { defaultBasePath: "" });
+				},
+				{
+					constructor: TypeError,
+					message: "defaultBasePath must be a non-empty string",
+				},
+			);
+		});
+
+		it("should throw an error when defaultBasePath is not a string", () => {
+			assert.throws(
+				() => {
+					void new ConfigArray([{}], {
+						defaultBasePath: ["/tmp/foo"],
+					});
+				},
+				{
+					constructor: TypeError,
+					message: "defaultBasePath must be a non-empty string",
+				},
+			);
+		});
 	});
 
 	describe("Config Pattern Normalization", () => {
@@ -610,6 +630,25 @@ describe("ConfigArray", () => {
 			await configs.normalize();
 
 			assert.notStrictEqual(configs[0], config);
+		});
+
+		it("should always set `basePath` when defaultBasePath is provided", () => {
+			const config = {
+				files: ["foo.js"],
+			};
+
+			configs = new ConfigArray([config], {
+				basePath: "/foo/bar",
+				defaultBasePath: "baz/qux",
+			});
+
+			configs.normalizeSync();
+
+			assert.notStrictEqual(configs[0], config);
+			assert.deepStrictEqual(configs[0], {
+				files: ["foo.js"],
+				basePath: "/foo/bar/baz/qux",
+			});
 		});
 	});
 
