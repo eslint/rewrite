@@ -93,6 +93,9 @@ const CONFIG_WITH_STATUS_UNCONFIGURED = Object.freeze({
 // Match two leading dots followed by a slash or the end of input.
 const EXTERNAL_PATH_REGEX = /^\.\.(?:\/|$)/u;
 
+// Symbol key to mark ESLint nativeconfig objects, so they don't get rebased during normalization.
+const IS_NATIVE_CONFIG_KEY = Symbol.for("isNativeConfig");
+
 /**
  * Wrapper error for config validation errors that adds a name to the front of the
  * error message.
@@ -282,11 +285,17 @@ function needsPatternNormalization(pattern) {
 /**
  * Normalizes `files` and `ignores` patterns in a config by removing "./" prefixes.
  * @param {Object} config The config object to normalize patterns in.
- * @param {string} namespacedBasePath The namespaced base path of the directory to which config base path is relative.
+ * @param {string} namespacedDefaultBasePath The namespaced directory path used to resolve relative base paths in config objects.
+ * @param {boolean} rebaseBasePath Whether to always recalculate `basePath` in config objects.
  * @param {PathImpl} path Path-handling implementation.
  * @returns {Object} The normalized config object.
  */
-function normalizeConfigPatterns(config, namespacedBasePath, path) {
+function normalizeConfigPatterns(
+	config,
+	namespacedDefaultBasePath,
+	rebaseBasePath,
+	path,
+) {
 	if (!config) {
 		return config;
 	}
@@ -313,6 +322,14 @@ function normalizeConfigPatterns(config, namespacedBasePath, path) {
 	}
 
 	if (!needsNormalization) {
+		if (rebaseBasePath && !config[IS_NATIVE_CONFIG_KEY]) {
+			const newConfig = {
+				...config,
+				basePath: namespacedDefaultBasePath,
+			};
+
+			return newConfig;
+		}
 		return config;
 	}
 
@@ -323,10 +340,12 @@ function normalizeConfigPatterns(config, namespacedBasePath, path) {
 			newConfig.basePath = path.toNamespacedPath(config.basePath);
 		} else {
 			newConfig.basePath = path.resolve(
-				namespacedBasePath,
+				namespacedDefaultBasePath,
 				config.basePath,
 			);
 		}
+	} else {
+		newConfig.basePath = namespacedDefaultBasePath;
 	}
 
 	if (Array.isArray(newConfig.files)) {
@@ -352,7 +371,8 @@ function normalizeConfigPatterns(config, namespacedBasePath, path) {
  * @param {Object} context The context object to pass into any function
  *      found.
  * @param {ReadonlyArray<ExtraConfigType>} extraConfigTypes The config types to check.
- * @param {string} namespacedBasePath The namespaced base path of the directory to which config base paths are relative.
+ * @param {string} namespacedDefaultBasePath The namespaced directory path used to resolve relative base paths in config objects.
+ * @param {boolean} rebaseBasePath  Whether to always recalculate `basePath` in config objects.
  * @param {PathImpl} path Path-handling implementation.
  * @returns {Promise<Array>} A flattened array containing only config objects.
  * @throws {TypeError} When a config function returns a function.
@@ -361,7 +381,8 @@ async function normalize(
 	items,
 	context,
 	extraConfigTypes,
-	namespacedBasePath,
+	namespacedDefaultBasePath,
+	rebaseBasePath,
 	path,
 ) {
 	const allowFunctions = extraConfigTypes.includes("function");
@@ -409,7 +430,14 @@ async function normalize(
 	const configs = [];
 
 	for await (const config of asyncIterable) {
-		configs.push(normalizeConfigPatterns(config, namespacedBasePath, path));
+		configs.push(
+			normalizeConfigPatterns(
+				config,
+				namespacedDefaultBasePath,
+				rebaseBasePath,
+				path,
+			),
+		);
 	}
 
 	return configs;
@@ -422,7 +450,8 @@ async function normalize(
  * @param {Object} context The context object to pass into any function
  *      found.
  * @param {ReadonlyArray<ExtraConfigType>} extraConfigTypes The config types to check.
- * @param {string} namespacedBasePath The namespaced base path of the directory to which config base paths are relative.
+ * @param {string} namespacedDefaultBasePath The namespaced directory path used to resolve relative base paths in config objects.
+ * @param {boolean} rebaseBasePath  Whether to always recalculate `basePath` in config objects.
  * @param {PathImpl} path Path-handling implementation
  * @returns {Array} A flattened array containing only config objects.
  * @throws {TypeError} When a config function returns a function.
@@ -431,7 +460,8 @@ function normalizeSync(
 	items,
 	context,
 	extraConfigTypes,
-	namespacedBasePath,
+	namespacedDefaultBasePath,
+	rebaseBasePath,
 	path,
 ) {
 	const allowFunctions = extraConfigTypes.includes("function");
@@ -477,7 +507,14 @@ function normalizeSync(
 	const configs = [];
 
 	for (const config of flatTraverse(items)) {
-		configs.push(normalizeConfigPatterns(config, namespacedBasePath, path));
+		configs.push(
+			normalizeConfigPatterns(
+				config,
+				namespacedDefaultBasePath,
+				rebaseBasePath,
+				path,
+			),
+		);
 	}
 
 	return configs;
@@ -711,7 +748,7 @@ const dataCache = new WeakMap();
  */
 export class ConfigArray extends Array {
 	/**
-	 * The namespaced path of the config file directory.
+	 * The namespaced path of the directory that contains the files being configured.
 	 * @type {string}
 	 */
 	#namespacedBasePath;
@@ -723,12 +760,20 @@ export class ConfigArray extends Array {
 	#path;
 
 	/**
+	 * Flag indicating whether to always recalculate `basePath` in config objects during normalization.
+	 * @type {boolean}
+	 */
+	#rebaseBasePath;
+
+	/**
 	 * Creates a new instance of ConfigArray.
 	 * @param {Iterable|Function|Object} configs An iterable yielding config
 	 *      objects, or a config function, or a config object.
 	 * @param {Object} options The options for the ConfigArray.
-	 * @param {string} [options.basePath="/"] The absolute path of the config file directory.
+	 * @param {string} [options.basePath="/"] The absolute path of the directory that contains the files being configured.
 	 * 		Defaults to `"/"`.
+	 * @param {string} [options.defaultBasePath="."] The directory that contains the config file this array was loaded from, or `cwd`.
+	 * 		Defaults to the same directory as `basePath`.
 	 * @param {boolean} [options.normalized=false] Flag indicating if the
 	 *      configs have already been normalized.
 	 * @param {ObjectDefinition} [options.schema] The additional schema
@@ -740,6 +785,7 @@ export class ConfigArray extends Array {
 		configs,
 		{
 			basePath = "/",
+			defaultBasePath,
 			normalized = false,
 			schema: customSchema,
 			extraConfigTypes = [],
@@ -767,8 +813,15 @@ export class ConfigArray extends Array {
 			throw new TypeError("basePath must be a non-empty string");
 		}
 
+		if (
+			defaultBasePath !== undefined &&
+			(!isString(defaultBasePath) || !defaultBasePath)
+		) {
+			throw new TypeError("defaultBasePath must be a non-empty string");
+		}
+
 		/**
-		 * The path of the config file that this array was loaded from.
+		 * The absolute path of the directory that contains the files being configured.
 		 * This is used to calculate filename matches.
 		 * @type {string}
 		 */
@@ -812,6 +865,18 @@ export class ConfigArray extends Array {
 		// The namespaced base path is useful to make sure that calculated relative paths are always relative.
 		// On Unix, it is identical to the base path.
 		this.#namespacedBasePath = this.#path.toNamespacedPath(basePath);
+
+		/**
+		 * The directory that contains the config file this array was loaded from, or `cwd`.
+		 * This is used to resolve relative base paths in config objects.
+		 * @type {string}
+		 */
+		this.defaultBasePath = this.#path.resolve(
+			basePath,
+			defaultBasePath ?? ".",
+		);
+
+		this.#rebaseBasePath = defaultBasePath !== undefined;
 	}
 
 	/**
@@ -924,7 +989,8 @@ export class ConfigArray extends Array {
 				this,
 				context,
 				this.extraConfigTypes,
-				this.#namespacedBasePath,
+				this.#path.toNamespacedPath(this.defaultBasePath),
+				this.#rebaseBasePath,
 				this.#path,
 			);
 			this.length = 0;
@@ -955,7 +1021,8 @@ export class ConfigArray extends Array {
 				this,
 				context,
 				this.extraConfigTypes,
-				this.#namespacedBasePath,
+				this.#path.toNamespacedPath(this.defaultBasePath),
+				this.#rebaseBasePath,
 				this.#path,
 			);
 			this.length = 0;
