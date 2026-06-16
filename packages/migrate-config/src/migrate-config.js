@@ -80,14 +80,14 @@ class Migration {
 
 	/**
 	 * The target version for the migration.
-	 * @type {"v9"|"v10"}
+	 * @type {"9"|"10"}
 	 */
 	targetVersion;
 
 	constructor(
 		/**
 		 * The target version for the migration.
-		 * @type {"v9"|"v10"}
+		 * @type {"9"|"10"}
 		 */
 		targetVersion,
 	) {
@@ -414,7 +414,7 @@ function createGitignoreEntry(migration) {
 	/** @type string */
 	let code;
 
-	if (migration.targetVersion === "v9") {
+	if (migration.targetVersion === "9") {
 		if (!migration.imports.has("@eslint/compat")) {
 			migration.imports.set("@eslint/compat", {
 				bindings: ["includeIgnoreFile"],
@@ -1448,7 +1448,7 @@ function convertLegacyConfigExpression(config, migration) {
  * @param {"module"|"commonjs"} [options.sourceType] The module type to output.
  * @param {string[]} [options.ignorePatterns] An array of glob patterns to ignore.
  * @param {boolean} [options.gitignore] `true` to include contents of a .gitignore file.
- * @param {"v9"|"v10"} [options.targetVersion] The target version of ESLint for the migration.
+ * @param {"9"|"10"} [options.targetVersion] The target version of ESLint for the migration.
  * @returns {{code:string,messages:Array<string>,imports:Map<string,MigrationImport>}} The migrated config and
  * any messages to display to the user.
  */
@@ -1585,7 +1585,7 @@ export function migrateConfig(
  * @param {Object} [options] Options for the migration.
  * @param {string[]} [options.ignorePatterns] An array of glob patterns to ignore.
  * @param {boolean} [options.gitignore] `true` to include contents of a .gitignore file.
- * @param {"v9"|"v10"} [options.targetVersion] The target version of ESLint for the migration.
+ * @param {"9"|"10"} [options.targetVersion] The target version of ESLint for the migration.
  * @returns {{code:string,messages:Array<string>,imports:Map<string,MigrationImport>}} The migrated config and
  * any messages to display to the user.
  */

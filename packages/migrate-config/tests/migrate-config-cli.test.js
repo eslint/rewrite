@@ -27,6 +27,7 @@ const filePaths = [
 	"overrides-extends/.eslintrc.json",
 	"plugins-dedupe/.eslintrc.yml",
 	"gitignore-simple/.eslintrc.json",
+	"gitignore-simple-v9/.eslintrc.json",
 	"gitignore-complex/.eslintrc.json",
 	"import-duplicate-js/.eslintrc.cjs",
 	"slash-package/.eslintrc.json",
@@ -85,7 +86,7 @@ describe("@eslint/migrate-config", async () => {
 				: "";
 
 			const targetVersionFlag = fixturePath.includes("v9")
-				? "--targetVersion v9"
+				? "--target-version 9"
 				: "";
 
 			// JS files must always use the format that matches the original file

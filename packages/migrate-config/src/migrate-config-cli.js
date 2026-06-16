@@ -42,16 +42,16 @@ const { values, positionals } = parseArgs({
 			type: "boolean",
 			default: false,
 		},
-		targetVersion: {
+		"target-version": {
 			type: "string",
-			default: "v9",
+			default: "10",
 		},
 	},
 	allowPositionals: true,
 });
 
 const [configFilePath] = positionals;
-const { commonjs, gitignore, targetVersion } = values;
+const { commonjs, gitignore, "target-version": targetVersion } = values;
 const { loadConfigFile } = Legacy;
 
 //-----------------------------------------------------------------------------
@@ -82,8 +82,8 @@ if (!configFilePath) {
 	console.error("Usage: migrate-config <config-file>");
 	process.exit(1);
 }
-if (!(targetVersion === "v9" || targetVersion === "v10")) {
-	console.error("Invalid target version. Must be 'v9' or 'v10'.");
+if (!(targetVersion === "9" || targetVersion === "10")) {
+	console.error("Invalid target version. Must be '9' or '10'.");
 	process.exit(1);
 }
 
@@ -118,6 +118,7 @@ if (isJS) {
 	result = migrateJSConfig(code, {
 		ignorePatterns,
 		gitignore,
+		targetVersion,
 	});
 } else {
 	const config = loadConfigFile(path.resolve(configFilePath));
@@ -125,6 +126,7 @@ if (isJS) {
 		sourceType: commonjs ? "commonjs" : "module",
 		ignorePatterns,
 		gitignore,
+		targetVersion,
 	});
 }
 
