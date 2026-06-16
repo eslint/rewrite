@@ -1444,22 +1444,17 @@ function convertLegacyConfigExpression(config, migration) {
 /**
  * Migrates an eslintrc config to flat config format.
  * @param {LegacyConfig} config The eslintrc config to migrate.
- * @param {Object} [options] Options for the migration.
- * @param {"module"|"commonjs"} [options.sourceType] The module type to output.
- * @param {string[]} [options.ignorePatterns] An array of glob patterns to ignore.
- * @param {boolean} [options.gitignore] `true` to include contents of a .gitignore file.
- * @param {"9"|"10"} [options.targetVersion] The target version of ESLint for the migration.
+ * @param {Object} options Options for the migration.
+ * @param {"module"|"commonjs"} options.sourceType The module type to output.
+ * @param {string[]} options.ignorePatterns An array of glob patterns to ignore.
+ * @param {boolean} options.gitignore `true` to include contents of a .gitignore file.
+ * @param {"9"|"10"} options.targetVersion The target version of ESLint for the migration.
  * @returns {{code:string,messages:Array<string>,imports:Map<string,MigrationImport>}} The migrated config and
  * any messages to display to the user.
  */
 export function migrateConfig(
 	config,
-	{
-		sourceType = "module",
-		ignorePatterns,
-		gitignore = false,
-		targetVersion,
-	} = {},
+	{ sourceType, ignorePatterns, gitignore, targetVersion },
 ) {
 	const migration = new Migration(targetVersion);
 	const body = [];
@@ -1582,16 +1577,16 @@ export function migrateConfig(
 /**
  * Migrates a JS config file to the flat config format.
  * @param {string} code The JS config file to migrate.
- * @param {Object} [options] Options for the migration.
- * @param {string[]} [options.ignorePatterns] An array of glob patterns to ignore.
- * @param {boolean} [options.gitignore] `true` to include contents of a .gitignore file.
- * @param {"9"|"10"} [options.targetVersion] The target version of ESLint for the migration.
+ * @param {Object} options Options for the migration.
+ * @param {string[]} options.ignorePatterns An array of glob patterns to ignore.
+ * @param {boolean} options.gitignore `true` to include contents of a .gitignore file.
+ * @param {"9"|"10"} options.targetVersion The target version of ESLint for the migration.
  * @returns {{code:string,messages:Array<string>,imports:Map<string,MigrationImport>}} The migrated config and
  * any messages to display to the user.
  */
 export function migrateJSConfig(
 	code,
-	{ ignorePatterns, gitignore = false, targetVersion } = {},
+	{ ignorePatterns, gitignore, targetVersion },
 ) {
 	// first parse the code
 	const ast = recast.parse(code, {
