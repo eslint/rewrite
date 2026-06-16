@@ -55,6 +55,16 @@ npx @eslint/migrate-config .eslintrc.json --gitignore
 bunx @eslint/migrate-config .eslintrc.json --gitignore
 ```
 
+### Targeting a specific ESLint version
+
+By default, this tool targets the latest ESLint version available (v10). You can target v9 by passing the `--targetVersion` option:
+
+```shell
+npx @eslint/migrate-config .eslintrc.json --targetVersion v9
+# or
+bunx @eslint/migrate-config .eslintrc.json --targetVersion v9
+```
+
 ## Followup Steps
 
 Once you have completed the migration, you may need to manually modify the resulting config file.

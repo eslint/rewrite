@@ -79,6 +79,22 @@ class Migration {
 	inits = [];
 
 	/**
+	 * The target version for the migration.
+	 * @type {"v9"|"v10"}
+	 */
+	targetVersion;
+
+	constructor(
+		/**
+		 * The target version for the migration.
+		 * @type {"v9"|"v10"}
+		 */
+		targetVersion,
+	) {
+		this.targetVersion = targetVersion;
+	}
+
+	/**
 	 * For `env`, we need the `globals` package if there are any environments
 	 * that aren't ECMAScript environments and also aren't from plugins
 	 * (the name contains a slash).
@@ -393,24 +409,39 @@ function convertGlobPattern(pattern) {
  * @returns {CallExpression} The AST for the gitignore entry.
  */
 function createGitignoreEntry(migration) {
-	migration.inits.push(getGitignoreInit());
-
-	if (!migration.imports.has("eslint/config")) {
-		migration.imports.set("eslint/config", {
-			bindings: ["includeIgnoreFile"],
-			added: true,
-		});
-	} else {
-		migration.imports
-			.get("eslint/config")
-			.bindings.push("includeIgnoreFile");
-	}
-
 	if (!migration.imports.has("node:path")) {
 		migration.imports.set("node:path", {
 			name: "path",
 			added: true,
 		});
+	}
+	migration.inits.push(getGitignoreInit());
+
+	if (migration.targetVersion === "v9") {
+		if (!migration.imports.has("@eslint/compat")) {
+			migration.imports.set("@eslint/compat", {
+				bindings: ["includeIgnoreFile"],
+				added: true,
+			});
+		} else {
+			migration.imports
+				.get("@eslint/compat")
+				.bindings.push("includeIgnoreFile");
+		}
+
+		const code = `includeIgnoreFile(gitignorePath)`;
+		return recast.parse(code).program.body[0].expression;
+	}
+
+	if (!migration.imports.has("@eslint/compat")) {
+		migration.imports.set("@eslint/compat", {
+			bindings: ["includeIgnoreFile"],
+			added: true,
+		});
+	} else {
+		migration.imports
+			.get("@eslint/compat")
+			.bindings.push("includeIgnoreFile");
 	}
 
 	const code = `includeIgnoreFile(gitignorePath, { gitignoreResolution: true })`;
@@ -1414,14 +1445,20 @@ function convertLegacyConfigExpression(config, migration) {
  * @param {"module"|"commonjs"} [options.sourceType] The module type to output.
  * @param {string[]} [options.ignorePatterns] An array of glob patterns to ignore.
  * @param {boolean} [options.gitignore] `true` to include contents of a .gitignore file.
+ * @param {"v9"|"v10"} [options.targetVersion] The target version of ESLint for the migration.
  * @returns {{code:string,messages:Array<string>,imports:Map<string,MigrationImport>}} The migrated config and
  * any messages to display to the user.
  */
 export function migrateConfig(
 	config,
-	{ sourceType = "module", ignorePatterns, gitignore = false } = {},
+	{
+		sourceType = "module",
+		ignorePatterns,
+		gitignore = false,
+		targetVersion,
+	} = {},
 ) {
-	const migration = new Migration();
+	const migration = new Migration(targetVersion);
 	const body = [];
 
 	// add ignore patterns from .eslintignore
@@ -1545,12 +1582,13 @@ export function migrateConfig(
  * @param {Object} [options] Options for the migration.
  * @param {string[]} [options.ignorePatterns] An array of glob patterns to ignore.
  * @param {boolean} [options.gitignore] `true` to include contents of a .gitignore file.
+ * @param {"v9"|"v10"} [options.targetVersion] The target version of ESLint for the migration.
  * @returns {{code:string,messages:Array<string>,imports:Map<string,MigrationImport>}} The migrated config and
  * any messages to display to the user.
  */
 export function migrateJSConfig(
 	code,
-	{ ignorePatterns, gitignore = false } = {},
+	{ ignorePatterns, gitignore = false, targetVersion } = {},
 ) {
 	// first parse the code
 	const ast = recast.parse(code, {
@@ -1568,7 +1606,7 @@ export function migrateJSConfig(
 	const isModule = !cjsExports;
 	const esmExport = isModule ? findDefaultExport(ast) : null;
 	const oldConfig = isModule ? esmExport.declaration : cjsExports.right;
-	const migration = new Migration();
+	const migration = new Migration(targetVersion);
 	const body = ast.program.body;
 
 	if (!oldConfig || oldConfig.type !== "ObjectExpression") {

@@ -25,15 +25,33 @@ import path from "node:path";
 import { migrateConfig, migrateJSConfig } from "./migrate-config.js";
 // @ts-ignore: No types available
 import { Legacy } from "@eslint/eslintrc";
+import { parseArgs } from "node:util";
 
 //-----------------------------------------------------------------------------
 // Data
 //-----------------------------------------------------------------------------
 
-const args = process.argv.slice(2);
-const configFilePath = args[0];
-const commonjs = args.includes("--commonjs");
-const gitignore = args.includes("--gitignore");
+const { values, positionals } = parseArgs({
+	args: process.argv.slice(2),
+	options: {
+		commonjs: {
+			type: "boolean",
+			default: false,
+		},
+		gitignore: {
+			type: "boolean",
+			default: false,
+		},
+		targetVersion: {
+			type: "string",
+			default: "v9",
+		},
+	},
+	allowPositionals: true,
+});
+
+const [configFilePath] = positionals;
+const { commonjs, gitignore, targetVersion } = values;
 const { loadConfigFile } = Legacy;
 
 //-----------------------------------------------------------------------------
@@ -62,6 +80,10 @@ async function loadIgnoreFile(filePath) {
 
 if (!configFilePath) {
 	console.error("Usage: migrate-config <config-file>");
+	process.exit(1);
+}
+if (!(targetVersion === "v9" || targetVersion === "v10")) {
+	console.error("Invalid target version. Must be 'v9' or 'v10'.");
 	process.exit(1);
 }
 

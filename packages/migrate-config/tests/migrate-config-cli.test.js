@@ -84,13 +84,17 @@ describe("@eslint/migrate-config", async () => {
 				? "--gitignore"
 				: "";
 
+			const targetVersionFlag = fixturePath.includes("v9")
+				? "--targetVersion v9"
+				: "";
+
 			// JS files must always use the format that matches the original file
 			if (fixturePath.endsWith("-js")) {
 				const resultPath = `${fixturePath}/eslint.config${path.extname(filePath)}`;
 				const expectedPath = `${fixturePath}/expected${path.extname(filePath)}`;
 
 				execSync(
-					`node src/migrate-config-cli.js ${filePath} ${gitignoreFlag}`,
+					`node src/migrate-config-cli.js ${filePath} ${gitignoreFlag} ${targetVersionFlag}`,
 					{ stdio: "inherit" },
 				);
 
@@ -101,7 +105,7 @@ describe("@eslint/migrate-config", async () => {
 
 			// run the migration for mjs
 			execSync(
-				`node src/migrate-config-cli.js ${filePath} ${gitignoreFlag}`,
+				`node src/migrate-config-cli.js ${filePath} ${gitignoreFlag} ${targetVersionFlag}`,
 				{ stdio: "inherit" },
 			);
 
@@ -110,7 +114,7 @@ describe("@eslint/migrate-config", async () => {
 
 			// run the migration for cjs
 			execSync(
-				`node src/migrate-config-cli.js ${filePath} --commonjs  ${gitignoreFlag}`,
+				`node src/migrate-config-cli.js ${filePath} --commonjs  ${gitignoreFlag} ${targetVersionFlag}`,
 			);
 
 			// check the cjs file
