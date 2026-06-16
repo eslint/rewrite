@@ -409,13 +409,10 @@ function convertGlobPattern(pattern) {
  * @returns {CallExpression} The AST for the gitignore entry.
  */
 function createGitignoreEntry(migration) {
-	if (!migration.imports.has("node:path")) {
-		migration.imports.set("node:path", {
-			name: "path",
-			added: true,
-		});
-	}
 	migration.inits.push(getGitignoreInit());
+
+	/** @type string */
+	let code;
 
 	if (migration.targetVersion === "v9") {
 		if (!migration.imports.has("@eslint/compat")) {
@@ -429,22 +426,28 @@ function createGitignoreEntry(migration) {
 				.bindings.push("includeIgnoreFile");
 		}
 
-		const code = `includeIgnoreFile(gitignorePath)`;
-		return recast.parse(code).program.body[0].expression;
+		code = `includeIgnoreFile(gitignorePath)`;
+	} else {
+		if (!migration.imports.has("eslint/config")) {
+			migration.imports.set("eslint/config", {
+				bindings: ["includeIgnoreFile"],
+				added: true,
+			});
+		} else {
+			migration.imports
+				.get("eslint/config")
+				.bindings.push("includeIgnoreFile");
+
+			code = `includeIgnoreFile(gitignorePath, { gitignoreResolution: true })`;
+		}
 	}
 
-	if (!migration.imports.has("eslint/config")) {
-		migration.imports.set("eslint/config", {
-			bindings: ["includeIgnoreFile"],
+	if (!migration.imports.has("node:path")) {
+		migration.imports.set("node:path", {
+			name: "path",
 			added: true,
 		});
-	} else {
-		migration.imports
-			.get("eslint/config")
-			.bindings.push("includeIgnoreFile");
 	}
-
-	const code = `includeIgnoreFile(gitignorePath, { gitignoreResolution: true })`;
 
 	return recast.parse(code).program.body[0].expression;
 }
