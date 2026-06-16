@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.3.7](https://github.com/eslint/rewrite/compare/mcp-v0.3.6...mcp-v0.3.7) (2026-06-12)
+
+
+### Bug Fixes
+
+* update dependency eslint to ^10.4.1 ([#462](https://github.com/eslint/rewrite/issues/462)) ([6e495a0](https://github.com/eslint/rewrite/commit/6e495a07829413aacf3b5fa0205b3b103cd10564))
+* update dependency eslint to ^10.5.0 ([#467](https://github.com/eslint/rewrite/issues/467)) ([c77944e](https://github.com/eslint/rewrite/commit/c77944e31fb6f23e8a053bf5415c567e1457b39e))
+
+## [0.3.6](https://github.com/eslint/rewrite/compare/mcp-v0.3.5...mcp-v0.3.6) (2026-05-23)
+
+
+### Bug Fixes
+
+* update dependency eslint to ^10.4.0 ([#453](https://github.com/eslint/rewrite/issues/453)) ([98d663d](https://github.com/eslint/rewrite/commit/98d663d2da34f69ae7ba574c5ea023b81449204e))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @eslint/plugin-kit bumped from ^0.7.1 to ^0.7.2
+
 ## [0.3.5](https://github.com/eslint/rewrite/compare/mcp-v0.3.4...mcp-v0.3.5) (2026-05-01)
 
 

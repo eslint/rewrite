@@ -9,6 +9,9 @@ on:
         branches:
             - main
 
+permissions:
+    contents: read
+
 jobs:
     ci-package-manager:
         # Skip on Release Please PRs and when that PR is merged to main.
