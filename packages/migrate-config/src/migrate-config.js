@@ -431,7 +431,6 @@ function createGitignoreEntry(migration) {
 		if (!migration.imports.has("eslint/config")) {
 			migration.imports.set("eslint/config", {
 				bindings: ["includeIgnoreFile"],
-				added: true,
 			});
 		} else {
 			migration.imports
