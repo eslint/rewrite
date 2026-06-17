@@ -436,9 +436,9 @@ function createGitignoreEntry(migration) {
 			migration.imports
 				.get("eslint/config")
 				.bindings.push("includeIgnoreFile");
-
-			code = `includeIgnoreFile(gitignorePath, { gitignoreResolution: true })`;
 		}
+
+		code = `includeIgnoreFile(gitignorePath, { gitignoreResolution: true })`;
 	}
 
 	if (!migration.imports.has("node:path")) {
