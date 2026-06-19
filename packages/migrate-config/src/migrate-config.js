@@ -80,17 +80,15 @@ class Migration {
 
 	/**
 	 * The target version for the migration.
-	 * @type {"9"|"10"}
+	 * @type {TargetVersion}
 	 */
 	targetVersion;
 
-	constructor(
-		/**
-		 * The target version for the migration.
-		 * @type {"9"|"10"}
-		 */
-		targetVersion,
-	) {
+    /**
+	 * Creates a migration object.
+	 * @param {"9"|"10"} targetVersion The target version for the migration.
+	 */
+	constructor(targetVersion) {
 		this.targetVersion = targetVersion;
 	}
 
