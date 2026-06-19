@@ -35,6 +35,7 @@ import * as espree from "espree";
 /** @typedef {import("recast").types.namedTypes.ExportDefaultDeclaration} ExportDefaultDeclaration */
 /** @typedef {import("recast").types.namedTypes.AssignmentExpression} AssignmentExpression */
 /** @typedef {import("./types.js").MigrationImport} MigrationImport */
+/** @typedef {import("./types.js").TargetVersion} TargetVersion */
 
 //-----------------------------------------------------------------------------
 // Data
@@ -84,9 +85,10 @@ class Migration {
 	 */
 	targetVersion;
 
-    /**
+	/**
 	 * Creates a migration object.
-	 * @param {"9"|"10"} targetVersion The target version for the migration.
+	 *
+	 * @param {TargetVersion} targetVersion The target version for the migration.
 	 */
 	constructor(targetVersion) {
 		this.targetVersion = targetVersion;
@@ -1445,7 +1447,7 @@ function convertLegacyConfigExpression(config, migration) {
  * @param {"module"|"commonjs"} options.sourceType The module type to output.
  * @param {string[]} options.ignorePatterns An array of glob patterns to ignore.
  * @param {boolean} options.gitignore `true` to include contents of a .gitignore file.
- * @param {"9"|"10"} options.targetVersion The target version of ESLint for the migration.
+ * @param {TargetVersion} options.targetVersion The target version of ESLint for the migration.
  * @returns {{code:string,messages:Array<string>,imports:Map<string,MigrationImport>}} The migrated config and
  * any messages to display to the user.
  */
@@ -1577,7 +1579,7 @@ export function migrateConfig(
  * @param {Object} options Options for the migration.
  * @param {string[]} options.ignorePatterns An array of glob patterns to ignore.
  * @param {boolean} options.gitignore `true` to include contents of a .gitignore file.
- * @param {"9"|"10"} options.targetVersion The target version of ESLint for the migration.
+ * @param {TargetVersion} options.targetVersion The target version of ESLint for the migration.
  * @returns {{code:string,messages:Array<string>,imports:Map<string,MigrationImport>}} The migrated config and
  * any messages to display to the user.
  */
