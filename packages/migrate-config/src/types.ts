@@ -18,3 +18,8 @@ export interface MigrationImport {
 	 */
 	added?: boolean;
 }
+
+/**
+ * The target ESLint version to migrate to.
+ */
+export type TargetVersion = "9" | "10";
