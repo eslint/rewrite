@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/eslint/rewrite/compare/migrate-config-v2.1.0...migrate-config-v3.0.0) (2026-06-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* migrate migrate-config to new includeIgnoreFile ([#457](https://github.com/eslint/rewrite/issues/457))
+
+### Features
+
+* migrate migrate-config to new includeIgnoreFile ([#457](https://github.com/eslint/rewrite/issues/457)) ([26b1b86](https://github.com/eslint/rewrite/commit/26b1b86736caa8387b237710f6f9f3a5d1403d79))
+
 ## [2.1.0](https://github.com/eslint/rewrite/compare/migrate-config-v2.0.7...migrate-config-v2.1.0) (2026-05-08)
 
 
