@@ -1,5 +1,42 @@
 # Changelog
 
+## [3.0.5](https://github.com/eslint/rewrite/compare/object-schema-v3.0.4...object-schema-v3.0.5) (2026-04-08)
+
+
+### Bug Fixes
+
+* revert re-export ESM types in CommonJS ([#427](https://github.com/eslint/rewrite/issues/427)) ([9b16fe1](https://github.com/eslint/rewrite/commit/9b16fe1af3432e92bdb193a5d1f6c89c4b0e3093))
+
+## [3.0.4](https://github.com/eslint/rewrite/compare/object-schema-v3.0.3...object-schema-v3.0.4) (2026-04-03)
+
+
+### Bug Fixes
+
+* avoid mutating object schema definitions during construction ([#412](https://github.com/eslint/rewrite/issues/412)) ([f0fd9a2](https://github.com/eslint/rewrite/commit/f0fd9a2ff756b9d40699239d9f9ba9a31dac8339))
+* correct ValidationStrategy parameter types ([#406](https://github.com/eslint/rewrite/issues/406)) ([42a30ea](https://github.com/eslint/rewrite/commit/42a30eaae5d42fae1a6b888c7f34f396469c52ae))
+* re-export ESM types in CommonJS ([#416](https://github.com/eslint/rewrite/issues/416)) ([ef16f80](https://github.com/eslint/rewrite/commit/ef16f80b9221c412992a1e9d54b35d155db1b4ed))
+
+## [3.0.3](https://github.com/eslint/rewrite/compare/object-schema-v3.0.2...object-schema-v3.0.3) (2026-03-06)
+
+
+### Bug Fixes
+
+* align `object-schema` `PropertyDefinition` types with runtime ([#372](https://github.com/eslint/rewrite/issues/372)) ([6182ebf](https://github.com/eslint/rewrite/commit/6182ebf7979c96d9d9d763204341b4856105c3ce))
+
+## [3.0.2](https://github.com/eslint/rewrite/compare/object-schema-v3.0.1...object-schema-v3.0.2) (2026-02-19)
+
+
+### Bug Fixes
+
+* tighten types of `MergeStrategy` in `object-schema` ([#348](https://github.com/eslint/rewrite/issues/348)) ([9266041](https://github.com/eslint/rewrite/commit/9266041ba46fe7f19788c0aac9bd13f1691b6ea7))
+
+## [3.0.1](https://github.com/eslint/rewrite/compare/object-schema-v3.0.0...object-schema-v3.0.1) (2026-02-06)
+
+
+### Bug Fixes
+
+* export BuiltInMergeStrategy and BuiltInValidationStrategy types ([#362](https://github.com/eslint/rewrite/issues/362)) ([d9646d6](https://github.com/eslint/rewrite/commit/d9646d69c516d69b551131b84d9503cefaaa5c63))
+
 ## [3.0.0](https://github.com/eslint/rewrite/compare/object-schema-v2.1.7...object-schema-v3.0.0) (2025-11-14)
 
 

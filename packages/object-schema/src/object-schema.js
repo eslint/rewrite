@@ -13,8 +13,14 @@ import { ValidationStrategy } from "./validation-strategy.js";
 // Types
 //-----------------------------------------------------------------------------
 
+/** @typedef {import("./types.ts").BuiltInMergeStrategy} BuiltInMergeStrategy */
+/** @typedef {import("./types.ts").BuiltInValidationStrategy} BuiltInValidationStrategy */
+/** @typedef {import("./types.ts").CustomMergeStrategy} CustomMergeStrategy */
+/** @typedef {import("./types.ts").CustomValidationStrategy} CustomValidationStrategy */
 /** @typedef {import("./types.ts").ObjectDefinition} ObjectDefinition */
 /** @typedef {import("./types.ts").PropertyDefinition} PropertyDefinition */
+/** @typedef {import("./types.ts").PropertyDefinitionWithSchema} PropertyDefinitionWithSchema */
+/** @typedef {import("./types.ts").PropertyDefinitionWithStrategies} PropertyDefinitionWithStrategies */
 
 //-----------------------------------------------------------------------------
 // Private
@@ -144,7 +150,7 @@ export class ObjectSchema {
 	#definitions = new Map();
 
 	/**
-	 * Separately track any keys that are required for faster validtion.
+	 * Separately track any keys that are required for faster validation.
 	 * @type {Map<string, PropertyDefinition>}
 	 */
 	#requiredKeys = new Map();
@@ -161,13 +167,17 @@ export class ObjectSchema {
 
 		// add in all strategies
 		for (const key of Object.keys(definitions)) {
-			validateDefinition(key, definitions[key]);
+			const definition = definitions[key];
+
+			validateDefinition(key, definition);
+
+			let normalizedDefinition = definition;
 
 			// normalize merge and validate methods if subschema is present
-			if (typeof definitions[key].schema === "object") {
-				const schema = new ObjectSchema(definitions[key].schema);
-				definitions[key] = {
-					...definitions[key],
+			if (typeof normalizedDefinition.schema === "object") {
+				const schema = new ObjectSchema(normalizedDefinition.schema);
+				normalizedDefinition = {
+					...normalizedDefinition,
 					merge(first = {}, second = {}) {
 						return schema.merge(first, second);
 					},
@@ -179,30 +189,25 @@ export class ObjectSchema {
 			}
 
 			// normalize the merge method in case there's a string
-			if (typeof definitions[key].merge === "string") {
-				definitions[key] = {
-					...definitions[key],
-					merge: MergeStrategy[
-						/** @type {string} */ (definitions[key].merge)
-					],
+			if (typeof normalizedDefinition.merge === "string") {
+				normalizedDefinition = {
+					...normalizedDefinition,
+					merge: MergeStrategy[normalizedDefinition.merge],
 				};
 			}
 
 			// normalize the validate method in case there's a string
-			if (typeof definitions[key].validate === "string") {
-				definitions[key] = {
-					...definitions[key],
-					validate:
-						ValidationStrategy[
-							/** @type {string} */ (definitions[key].validate)
-						],
+			if (typeof normalizedDefinition.validate === "string") {
+				normalizedDefinition = {
+					...normalizedDefinition,
+					validate: ValidationStrategy[normalizedDefinition.validate],
 				};
 			}
 
-			this.#definitions.set(key, definitions[key]);
+			this.#definitions.set(key, normalizedDefinition);
 
-			if (definitions[key].required) {
-				this.#requiredKeys.set(key, definitions[key]);
+			if (normalizedDefinition.required) {
+				this.#requiredKeys.set(key, normalizedDefinition);
 			}
 		}
 	}
@@ -277,7 +282,9 @@ export class ObjectSchema {
 			}
 
 			// validate existing keys
-			const definition = this.#definitions.get(key);
+			const definition = /** @type {PropertyDefinition} */ (
+				this.#definitions.get(key)
+			); // `definition` is guaranteed to exist since we check with `hasKey()` above.
 
 			// first check to see if any other keys are required
 			if (Array.isArray(definition.requires)) {

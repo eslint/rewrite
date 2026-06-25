@@ -1939,7 +1939,8 @@ describe("source-code", () => {
 				]);
 
 				/**
-				 * Test helper subclass that implements getParent() to exercise getAncestors().
+				 * Test helper subclass that overrides getParent() to exercise
+				 * getAncestors() with a parent map.
 				 */
 				class TextSourceCode extends TextSourceCodeBase {
 					// eslint-disable-next-line class-methods-use-this -- Testing purposes

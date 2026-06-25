@@ -62,7 +62,7 @@ const JSONLanguage = class {};
 
 /**
  * Creates a `ConfigArray` pre-populated with test fixtures.
- * @param {Object} [options] Options passed to the `ConfigArray` constructor.
+ * @param {Object} [options] Options to merge with the default `ConfigArray` constructor options.
  * @returns {ConfigArray} The created instance.
  */
 function createConfigArray(options) {
@@ -304,12 +304,12 @@ describe("ConfigArray", () => {
 
 	describe("Validation", () => {
 		/**
-		 * Helper to assert validation errors in both async and sync normalize flows.
+		 * Defines tests that assert validation errors in both async and sync normalize flows.
 		 * @param {Object} options Test options.
-		 * @param {boolean} [options.only=false] If true, run this test exclusively.
+		 * @param {boolean} [options.only=false] If true, run these tests exclusively.
 		 * @param {string} options.title Test title prefix.
-		 * @param {Iterable|Function|Object} options.configs Configs to test with.
-		 * @param {assert.AssertPredicate} options.expectedError Expected error matcher.
+		 * @param {Iterable|Function|Object} options.configs Configs to pass to the `ConfigArray` constructor.
+		 * @param {assert.AssertPredicate} options.expectedError Expected error matcher for `assert.rejects()` and `assert.throws()`.
 		 * @returns {void}
 		 */
 		function testValidationError({
@@ -546,6 +546,52 @@ describe("ConfigArray", () => {
 				{
 					constructor: TypeError,
 					message: "basePath must be a non-empty string",
+				},
+			);
+		});
+
+		it("should throw an error when extraConfigTypes is not an array", () => {
+			assert.throws(
+				() => {
+					void new ConfigArray([], {
+						basePath,
+						extraConfigTypes: "array",
+					});
+				},
+				{
+					constructor: TypeError,
+					message: "extraConfigTypes must be an array.",
+				},
+			);
+		});
+
+		it("should throw an error when extraConfigTypes has more than two items", () => {
+			assert.throws(
+				() => {
+					void new ConfigArray([], {
+						basePath,
+						extraConfigTypes: ["array", "function", "array"],
+					});
+				},
+				{
+					constructor: TypeError,
+					message: "extraConfigTypes must contain at most two items.",
+				},
+			);
+		});
+
+		it("should throw an error when extraConfigTypes contains an invalid item", () => {
+			assert.throws(
+				() => {
+					void new ConfigArray([], {
+						basePath,
+						extraConfigTypes: ["array", "object"],
+					});
+				},
+				{
+					constructor: TypeError,
+					message:
+						'Unexpected config type "object" in extraConfigTypes. Expected one of: "array", "function".',
 				},
 			);
 		});

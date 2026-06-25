@@ -1,5 +1,73 @@
 # Changelog
 
+## [0.23.5](https://github.com/eslint/rewrite/compare/config-array-v0.23.4...config-array-v0.23.5) (2026-04-08)
+
+
+### Bug Fixes
+
+* revert re-export ESM types in CommonJS ([#427](https://github.com/eslint/rewrite/issues/427)) ([9b16fe1](https://github.com/eslint/rewrite/commit/9b16fe1af3432e92bdb193a5d1f6c89c4b0e3093))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/object-schema bumped from ^3.0.4 to ^3.0.5
+
+## [0.23.4](https://github.com/eslint/rewrite/compare/config-array-v0.23.3...config-array-v0.23.4) (2026-04-03)
+
+
+### Bug Fixes
+
+* re-export ESM types in CommonJS ([#416](https://github.com/eslint/rewrite/issues/416)) ([ef16f80](https://github.com/eslint/rewrite/commit/ef16f80b9221c412992a1e9d54b35d155db1b4ed))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/object-schema bumped from ^3.0.3 to ^3.0.4
+
+## [0.23.3](https://github.com/eslint/rewrite/compare/config-array-v0.23.2...config-array-v0.23.3) (2026-03-06)
+
+
+### Bug Fixes
+
+* correct `config-array` matcher types ([#373](https://github.com/eslint/rewrite/issues/373)) ([7b89f2f](https://github.com/eslint/rewrite/commit/7b89f2f99379682148d03f6bb7ef03b0fce223d4))
+* correct extraConfigTypes validation error messages ([#388](https://github.com/eslint/rewrite/issues/388)) ([25aba34](https://github.com/eslint/rewrite/commit/25aba34b8f4ed13b3e01382302a5e6395e4302a1))
+* improve `extraConfigTypes` validation ([#390](https://github.com/eslint/rewrite/issues/390)) ([39f005c](https://github.com/eslint/rewrite/commit/39f005ccf79072de23d27ffbcb33a2359d3ca4d2))
+* update dependency minimatch to ^10.2.4 ([#387](https://github.com/eslint/rewrite/issues/387)) ([538c049](https://github.com/eslint/rewrite/commit/538c049d9e0956df85806400b498e7d92f4229aa))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/object-schema bumped from ^3.0.2 to ^3.0.3
+
+## [0.23.2](https://github.com/eslint/rewrite/compare/config-array-v0.23.1...config-array-v0.23.2) (2026-02-19)
+
+
+### Bug Fixes
+
+* update `minimatch` to `10.2.1` to address security vulnerabilities ([#376](https://github.com/eslint/rewrite/issues/376)) ([9a3dc87](https://github.com/eslint/rewrite/commit/9a3dc87340799eeeb2fd88fd943b55b6bcf4873a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/object-schema bumped from ^3.0.1 to ^3.0.2
+
+## [0.23.1](https://github.com/eslint/rewrite/compare/config-array-v0.23.0...config-array-v0.23.1) (2026-02-06)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/object-schema bumped from ^3.0.0 to ^3.0.1
+
 ## [0.23.0](https://github.com/eslint/rewrite/compare/config-array-v0.22.0...config-array-v0.23.0) (2025-11-17)
 
 

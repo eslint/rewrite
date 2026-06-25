@@ -24,9 +24,6 @@ if (!newFilename) {
 }
 
 const oldSourceText = await readFile(filename, "utf-8");
-const newSourceText = oldSourceText.replaceAll(
-	' from "./types.ts";\n',
-	' from "./types.cts";\n',
-);
+const newSourceText = oldSourceText.replaceAll('"./types.ts"', '"./types.cts"');
 
 await writeFile(newFilename, newSourceText);

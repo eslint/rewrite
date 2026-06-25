@@ -80,9 +80,10 @@ export function createBuildOrder(dependencies) {
 	const seen = new Set();
 
 	/**
-	 * Recursively visits a package and its dependencies to determine build order.
-	 * Visits all dependencies first (depth-first) before adding the current package
-	 * to ensure dependencies are built before their dependents.
+	 * Recursively visits a package's monorepo dependencies before adding the
+	 * package to the build order.
+	 * External dependencies are ignored because only packages in this monorepo
+	 * need to be built.
 	 * @param {string} name The package name to visit.
 	 * @returns {void}
 	 */

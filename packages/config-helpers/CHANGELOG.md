@@ -1,5 +1,72 @@
 # Changelog
 
+## [0.6.0](https://github.com/eslint/rewrite/compare/config-helpers-v0.5.5...config-helpers-v0.6.0) (2026-05-08)
+
+
+### Features
+
+* Add new `includeIgnoreFile()` to config-helpers ([#430](https://github.com/eslint/rewrite/issues/430)) ([9b51352](https://github.com/eslint/rewrite/commit/9b513529022834e72cccfa278ec7ba6e7f4e10c5))
+
+## [0.5.5](https://github.com/eslint/rewrite/compare/config-helpers-v0.5.4...config-helpers-v0.5.5) (2026-04-08)
+
+
+### Bug Fixes
+
+* revert re-export ESM types in CommonJS ([#427](https://github.com/eslint/rewrite/issues/427)) ([9b16fe1](https://github.com/eslint/rewrite/commit/9b16fe1af3432e92bdb193a5d1f6c89c4b0e3093))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^1.2.0 to ^1.2.1
+
+## [0.5.4](https://github.com/eslint/rewrite/compare/config-helpers-v0.5.3...config-helpers-v0.5.4) (2026-04-03)
+
+
+### Bug Fixes
+
+* re-export ESM types in CommonJS ([#416](https://github.com/eslint/rewrite/issues/416)) ([ef16f80](https://github.com/eslint/rewrite/commit/ef16f80b9221c412992a1e9d54b35d155db1b4ed))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^1.1.1 to ^1.2.0
+
+## [0.5.3](https://github.com/eslint/rewrite/compare/config-helpers-v0.5.2...config-helpers-v0.5.3) (2026-03-06)
+
+
+### Bug Fixes
+
+* tighten extends typing in config-helpers ([#385](https://github.com/eslint/rewrite/issues/385)) ([939bc32](https://github.com/eslint/rewrite/commit/939bc3272de8c5787800282eadec7fa9ae39638a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^1.1.0 to ^1.1.1
+
+## [0.5.2](https://github.com/eslint/rewrite/compare/config-helpers-v0.5.1...config-helpers-v0.5.2) (2026-01-29)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^1.0.1 to ^1.1.0
+
+## [0.5.1](https://github.com/eslint/rewrite/compare/config-helpers-v0.5.0...config-helpers-v0.5.1) (2026-01-08)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^1.0.0 to ^1.0.1
+
 ## [0.5.0](https://github.com/eslint/rewrite/compare/config-helpers-v0.4.2...config-helpers-v0.5.0) (2025-11-14)
 
 

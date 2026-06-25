@@ -3,9 +3,9 @@
 	extends: ["github>eslint/workflows//.github/renovate/eslint-base.json5"],
 	packageRules: [
 		{
-			description: "Update `eslint` in dependencies",
+			description: "Update `eslint` and `espree` in dependencies",
 			matchDepTypes: ["dependencies"],
-			matchPackageNames: ["eslint"],
+			matchPackageNames: ["eslint", "espree"],
 			minimumReleaseAge: null, // Don't wait for these packages
 			rangeStrategy: "bump",
 		},

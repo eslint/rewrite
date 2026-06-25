@@ -12,7 +12,7 @@
 export class ValidationStrategy {
 	/**
 	 * Validates that a value is an array.
-	 * @param {any} value The value to validate.
+	 * @param {unknown} value The value to validate.
 	 * @returns {void}
 	 * @throws {TypeError} If the value is invalid.
 	 */
@@ -24,19 +24,19 @@ export class ValidationStrategy {
 
 	/**
 	 * Validates that a value is a boolean.
-	 * @param {any} value The value to validate.
+	 * @param {unknown} value The value to validate.
 	 * @returns {void}
 	 * @throws {TypeError} If the value is invalid.
 	 */
 	static boolean(value) {
 		if (typeof value !== "boolean") {
-			throw new TypeError("Expected a Boolean.");
+			throw new TypeError("Expected a boolean.");
 		}
 	}
 
 	/**
 	 * Validates that a value is a number.
-	 * @param {any} value The value to validate.
+	 * @param {unknown} value The value to validate.
 	 * @returns {void}
 	 * @throws {TypeError} If the value is invalid.
 	 */
@@ -47,8 +47,8 @@ export class ValidationStrategy {
 	}
 
 	/**
-	 * Validates that a value is a object.
-	 * @param {any} value The value to validate.
+	 * Validates that a value is an object.
+	 * @param {unknown} value The value to validate.
 	 * @returns {void}
 	 * @throws {TypeError} If the value is invalid.
 	 */
@@ -59,8 +59,8 @@ export class ValidationStrategy {
 	}
 
 	/**
-	 * Validates that a value is a object or null.
-	 * @param {any} value The value to validate.
+	 * Validates that a value is an object or null.
+	 * @param {unknown} value The value to validate.
 	 * @returns {void}
 	 * @throws {TypeError} If the value is invalid.
 	 */
@@ -72,7 +72,7 @@ export class ValidationStrategy {
 
 	/**
 	 * Validates that a value is a string.
-	 * @param {any} value The value to validate.
+	 * @param {unknown} value The value to validate.
 	 * @returns {void}
 	 * @throws {TypeError} If the value is invalid.
 	 */
@@ -84,7 +84,7 @@ export class ValidationStrategy {
 
 	/**
 	 * Validates that a value is a non-empty string.
-	 * @param {any} value The value to validate.
+	 * @param {unknown} value The value to validate.
 	 * @returns {void}
 	 * @throws {TypeError} If the value is invalid.
 	 */

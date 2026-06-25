@@ -1,17 +1,33 @@
 import eslintConfigESLint from "eslint-config-eslint";
 import globals from "globals";
-import { defineConfig, globalIgnores } from "@eslint/config-helpers";
+import {
+	defineConfig,
+	globalIgnores,
+	includeIgnoreFile,
+} from "@eslint/config-helpers";
 import tseslint from "typescript-eslint";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
+
+const filename = fileURLToPath(import.meta.url);
+const dirname = path.dirname(filename);
 
 export default defineConfig([
-	globalIgnores(
-		["**/tests/fixtures/", "**/dist/", "**/coverage/"],
-		"rewrite/global-ignores",
-	),
+	includeIgnoreFile(path.join(dirname, ".gitignore"), {
+		gitignoreResolution: true,
+	}),
+	globalIgnores(["**/tests/fixtures/"], "rewrite/global-ignores"),
 	{
 		name: "rewrite/js",
 		files: ["**/*.js"],
 		extends: [eslintConfigESLint],
+		settings: {
+			jsdoc: {
+				preferredTypes: {
+					object: "object",
+				},
+			},
+		},
 		rules: {
 			// disable rules we don't want to use from eslint-config-eslint
 			"no-undefined": "off",

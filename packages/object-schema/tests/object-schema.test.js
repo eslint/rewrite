@@ -28,6 +28,32 @@ describe("ObjectSchema", () => {
 			assert.strictEqual(schema.hasKey("foo"), true);
 		});
 
+		it("should not modify the original definitions object", () => {
+			const definitions = {
+				foo: {
+					merge: "replace",
+					validate: "string",
+				},
+				bar: {
+					schema: {
+						baz: {
+							merge: "replace",
+							validate: "number",
+						},
+					},
+				},
+			};
+
+			schema = new ObjectSchema(definitions);
+
+			assert.strictEqual(definitions.foo.merge, "replace");
+			assert.strictEqual(definitions.foo.validate, "string");
+			assert.strictEqual(definitions.bar.merge, undefined);
+			assert.strictEqual(definitions.bar.validate, undefined);
+			assert.strictEqual(definitions.bar.schema.baz.merge, "replace");
+			assert.strictEqual(definitions.bar.schema.baz.validate, "number");
+		});
+
 		it("should throw an error when a strategy is missing a merge() method", () => {
 			assert.throws(() => {
 				schema = new ObjectSchema({

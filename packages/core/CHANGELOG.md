@@ -1,5 +1,48 @@
 # Changelog
 
+## [1.2.1](https://github.com/eslint/rewrite/compare/core-v1.2.0...core-v1.2.1) (2026-04-08)
+
+
+### Bug Fixes
+
+* revert re-export ESM types in CommonJS ([#427](https://github.com/eslint/rewrite/issues/427)) ([9b16fe1](https://github.com/eslint/rewrite/commit/9b16fe1af3432e92bdb193a5d1f6c89c4b0e3093))
+
+## [1.2.0](https://github.com/eslint/rewrite/compare/core-v1.1.1...core-v1.2.0) (2026-04-03)
+
+
+### Features
+
+* add `languages` and `docs.dialects` to rule `meta` types ([#421](https://github.com/eslint/rewrite/issues/421)) ([7680f69](https://github.com/eslint/rewrite/commit/7680f692119a094abb1c8317aba713168563c07c))
+
+
+### Bug Fixes
+
+* re-export ESM types in CommonJS ([#416](https://github.com/eslint/rewrite/issues/416)) ([ef16f80](https://github.com/eslint/rewrite/commit/ef16f80b9221c412992a1e9d54b35d155db1b4ed))
+* type-check defaultLanguageOptions against LangOptions ([#420](https://github.com/eslint/rewrite/issues/420)) ([7bf5704](https://github.com/eslint/rewrite/commit/7bf57046b8df02855dde132dc970f89cd5f8437e))
+
+## [1.1.1](https://github.com/eslint/rewrite/compare/core-v1.1.0...core-v1.1.1) (2026-03-06)
+
+
+### Bug Fixes
+
+* type-check suggestion messageId against MessageIds ([#392](https://github.com/eslint/rewrite/issues/392)) ([76c2196](https://github.com/eslint/rewrite/commit/76c2196107d361661907a29e31b6032dd2d044f2))
+
+## [1.1.0](https://github.com/eslint/rewrite/compare/core-v1.0.1...core-v1.1.0) (2026-01-29)
+
+
+### Features
+
+* Add custom rule type helpers to `@eslint/plugin-kit` ([#355](https://github.com/eslint/rewrite/issues/355)) ([8ac8530](https://github.com/eslint/rewrite/commit/8ac853046aa1d4288d06d639be234c09988ade5e))
+
+## [1.0.1](https://github.com/eslint/rewrite/compare/core-v1.0.0...core-v1.0.1) (2026-01-08)
+
+
+### Bug Fixes
+
+* make `data` property stricter ([#327](https://github.com/eslint/rewrite/issues/327)) ([26e6a50](https://github.com/eslint/rewrite/commit/26e6a50b85bb07b24244095e38e649f746508765))
+* remove `category` property from `RulesMetaDocs` interface ([#345](https://github.com/eslint/rewrite/issues/345)) ([b197f00](https://github.com/eslint/rewrite/commit/b197f00f30f96fce72aca4537c2863eaefd83d43))
+* remove `experimentalObjectRestSpread` option from types ([#343](https://github.com/eslint/rewrite/issues/343)) ([e3533bc](https://github.com/eslint/rewrite/commit/e3533bcf06a9bc36502fff260f827a289b9c2059))
+
 ## [1.0.0](https://github.com/eslint/rewrite/compare/core-v0.17.0...core-v1.0.0) (2025-11-14)
 
 

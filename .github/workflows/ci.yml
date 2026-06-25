@@ -4,9 +4,15 @@ on:
     push:
         branches:
             - main
+            - "release/*/v**"
+
     pull_request:
         branches:
             - main
+            - "release/*/v**"
+
+permissions:
+    contents: read
 
 jobs:
     verify_files:
@@ -37,7 +43,7 @@ jobs:
         strategy:
             matrix:
                 os: [windows-latest, macOS-latest, ubuntu-latest]
-                node-version: [25.x, 24.x, 22.x, 20.x, "20.19.0"]
+                node-version: [26.x, 25.x, 24.x, 22.x, 20.x, "20.19.0"]
 
         steps:
             - uses: actions/checkout@v6
@@ -50,13 +56,14 @@ jobs:
             - name: npm install and test
               run: |
                   npm install
-                  npm test
+                  npm run test:unit
               env:
                   CI: true
 
     test_types:
         name: Test Types
         runs-on: ubuntu-latest
+
         steps:
             - uses: actions/checkout@v6
 
@@ -71,30 +78,29 @@ jobs:
             - name: Run TypeScript Compiler
               run: npx tsc
 
-            - name: Test types (core)
-              working-directory: packages/core
-              run: |
-                  npm run test:types
-
-            - name: Test types (object-schema)
-              working-directory: packages/object-schema
-              run: |
-                  npm run test:types
-
             - name: Test types (config-array)
-              working-directory: packages/config-array
-              run: |
-                  npm run test:types
+              run: npm run test:types -w packages/config-array
 
             - name: Test types (config-helpers)
-              working-directory: packages/config-helpers
-              run: |
-                  npm run test:types
+              run: npm run test:types -w packages/config-helpers
+
+            - name: Test types (core)
+              run: npm run test:types -w packages/core
+
+            - name: Test types (object-schema)
+              run: npm run test:types -w packages/object-schema
 
             - name: Test types (plugin-kit)
-              working-directory: packages/plugin-kit
-              run: |
-                  npm run test:types
+              run: npm run test:types -w packages/plugin-kit
+
+            - name: Check dist types compile (TypeScript 5.3)
+              run: npm run test:types:5.3
+
+            - name: Check dist types compile (TypeScript 5.x)
+              run: npm run test:types:5.x
+
+            - name: Check dist types compile (TypeScript 7 preview)
+              run: npm run test:types:7.x
 
     are-the-types-wrong:
         name: Are the types wrong?
@@ -135,7 +141,7 @@ jobs:
         steps:
             - uses: actions/checkout@v6
 
-            - uses: pnpm/action-setup@v4
+            - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
               with:
                   version: latest
 

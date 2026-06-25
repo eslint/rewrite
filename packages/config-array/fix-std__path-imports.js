@@ -13,9 +13,9 @@
 import { readFile, writeFile } from "node:fs/promises";
 
 /**
- * Replaces all occurrences of a pattern in a file with a replacement string.
+ * Replaces matches of a pattern in a file with a replacement string.
  * @param {string} file The file path to modify.
- * @param {RegExp} search The regular expression to search for.
+ * @param {RegExp} search The regular expression to match.
  * @param {string} replacement The replacement string.
  * @returns {Promise<void>} Resolves when the file has been written.
  */

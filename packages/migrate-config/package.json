@@ -1,6 +1,6 @@
 {
   "name": "@eslint/migrate-config",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Configuration migration for ESLint",
   "type": "module",
   "bin": {
@@ -9,6 +9,7 @@
   "files": [
     "src"
   ],
+  "exports": {},
   "publishConfig": {
     "access": "public"
   },
@@ -16,8 +17,9 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "mocha \"tests/**/*.test.js\"",
-    "test:coverage": "c8 npm test"
+    "test": "npm run test:unit",
+    "test:coverage": "c8 npm run test:unit",
+    "test:unit": "mocha \"tests/**/*.test.js\""
   },
   "repository": {
     "type": "git",
@@ -39,17 +41,16 @@
   },
   "homepage": "https://github.com/eslint/rewrite/tree/main/packages/migrate-config#readme",
   "devDependencies": {
-    "@eslint/core": "^1.0.0",
-    "eslint": "^9.27.0"
+    "@eslint/core": "^1.2.1"
   },
   "engines": {
     "node": "^20.19.0 || ^22.13.0 || >=24"
   },
   "dependencies": {
-    "@eslint/compat": "^2.0.0",
-    "@eslint/eslintrc": "^3.3.3",
+    "@eslint/config-helpers": "^0.6.0",
+    "@eslint/eslintrc": "^3.3.5",
     "camelcase": "^8.0.0",
-    "espree": "^10.4.0",
+    "espree": "^11.2.0",
     "recast": "^0.23.7"
   }
 }

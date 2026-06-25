@@ -120,12 +120,6 @@ export interface RulesMetaDocs {
 	url?: string | undefined;
 
 	/**
-	 * The category the rule falls under.
-	 * @deprecated No longer used.
-	 */
-	category?: string | undefined;
-
-	/**
 	 * Indicates if the rule is generally recommended for all users.
 	 *
 	 * Note - this will always be a boolean for core rules, but may be used in any way by plugins.
@@ -136,6 +130,13 @@ export interface RulesMetaDocs {
 	 * Indicates if the rule is frozen (no longer accepting feature requests).
 	 */
 	frozen?: boolean | undefined;
+
+	/**
+	 * The dialects of the languages that the rule is intended to lint.
+	 * @example
+	 * ["JavaScript", "TypeScript"]
+	 */
+	dialects?: string[] | undefined;
 }
 
 /**
@@ -194,13 +195,23 @@ export interface RulesMeta<
 
 	/**
 	 * The language the rule is intended to lint.
+	 * @deprecated Use `languages` instead.
 	 */
 	language?: string;
 
 	/**
 	 * The dialects of `language` that the rule is intended to lint.
+	 * @deprecated Use `docs.dialects` instead.
 	 */
 	dialects?: string[];
+
+	/**
+	 * Languages supported by this rule in the format `"plugin/language"`.
+	 * Use `"*"` for any language or `"plugin/*"` for any language from a specific plugin.
+	 * @example
+	 * ["js/js", "markdown/gfm", "json/jsonc", "css/css"]
+	 */
+	languages?: string[] | undefined;
 }
 
 /**
@@ -455,7 +466,7 @@ export type MessagePlaceholderData = Record<
 	string | number | boolean | bigint | null | undefined
 >;
 
-export interface ViolationReportBase {
+export interface ViolationReportBase<MessageIds extends string = string> {
 	/**
 	 * The data to insert into the message.
 	 */
@@ -470,10 +481,10 @@ export interface ViolationReportBase {
 	 * An array of suggested fixes for the problem. These fixes may change the
 	 * behavior of the code, so they are not applied automatically.
 	 */
-	suggest?: SuggestedEdit[] | null | undefined;
+	suggest?: SuggestedEdit<MessageIds>[] | null | undefined;
 }
 
-export type ViolationMessage<MessageIds = string> =
+export type ViolationMessage<MessageIds extends string = string> =
 	| { message: string }
 	| { messageId: MessageIds };
 export type ViolationLocation<Node> =
@@ -482,8 +493,8 @@ export type ViolationLocation<Node> =
 
 export type ViolationReport<
 	Node = unknown,
-	MessageIds = string,
-> = ViolationReportBase &
+	MessageIds extends string = string,
+> = ViolationReportBase<MessageIds> &
 	ViolationMessage<MessageIds> &
 	ViolationLocation<Node>;
 
@@ -501,12 +512,15 @@ export interface SuggestedEditBase {
 	fix: RuleFixer;
 }
 
-export type SuggestionMessage = { desc: string } | { messageId: string };
+export type SuggestionMessage<MessageIds extends string = string> =
+	| { desc: string }
+	| { messageId: MessageIds };
 
 /**
  * A suggested edit for a rule violation.
  */
-export type SuggestedEdit = SuggestedEditBase & SuggestionMessage;
+export type SuggestedEdit<MessageIds extends string = string> =
+	SuggestedEditBase & SuggestionMessage<MessageIds>;
 
 /**
  * The normalized version of a lint suggestion.
@@ -608,6 +622,7 @@ export interface RuleDefinition<
 
 /**
  * Defaults for non-language-related `RuleDefinition` options.
+ * @deprecated Use the same type from `@eslint/plugin-kit` instead.
  */
 export interface CustomRuleTypeDefinitions {
 	RuleOptions: unknown[];
@@ -617,6 +632,7 @@ export interface CustomRuleTypeDefinitions {
 
 /**
  * A helper type to define language specific specializations of the `RuleDefinition` type.
+ * @deprecated Use the same type from `@eslint/plugin-kit` instead.
  *
  * @example
  * ```ts
@@ -921,7 +937,6 @@ export interface JavaScriptParserOptionsConfig {
 				globalReturn?: boolean | undefined;
 				impliedStrict?: boolean | undefined;
 				jsx?: boolean | undefined;
-				experimentalObjectRestSpread?: boolean | undefined;
 				[key: string]: any;
 		  }
 		| undefined;
@@ -1177,7 +1192,7 @@ export interface Language<
 	/**
 	 * Default language options. User-defined options are merged with this object.
 	 */
-	defaultLanguageOptions?: LanguageOptions;
+	defaultLanguageOptions?: Options["LangOptions"];
 
 	/**
 	 * Validates languageOptions for this language.

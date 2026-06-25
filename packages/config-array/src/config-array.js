@@ -21,6 +21,10 @@ import { filesAndIgnoresSchema } from "./files-and-ignores-schema.js";
 //------------------------------------------------------------------------------
 
 /** @typedef {import("./types.ts").ConfigObject} ConfigObject */
+/** @typedef {import("./types.ts").FileMatcher} FileMatcher */
+/** @typedef {import("./types.ts").FilesMatcher} FilesMatcher */
+/** @typedef {import("./types.ts").ExtraConfigType} ExtraConfigType */
+/** @typedef {import("@eslint/object-schema").ObjectDefinition} ObjectDefinition */
 /** @typedef {import("minimatch").MinimatchOptions} MinimatchOptions */
 /** @import * as PathImpl from "@jsr/std__path" */
 
@@ -62,7 +66,7 @@ const MINIMATCH_OPTIONS = {
 
 /**
  * The types of config objects that are supported.
- * @type {Set<string>}
+ * @type {Set<ExtraConfigType>}
  */
 const CONFIG_TYPES = new Set(["array", "function"]);
 
@@ -222,7 +226,7 @@ function assertValidBaseConfig(config, index) {
  * @param {string} filepath The file path to match.
  * @param {string} pattern The glob pattern to match against.
  * @param {MinimatchOptions} options The minimatch options to use.
- * @returns {boolean} True if the filepath matches the pattern.
+ * @returns {boolean} True if the file path matches, false if not.
  */
 function doMatch(filepath, pattern, options = {}) {
 	let cache = minimatchCache;
@@ -246,8 +250,8 @@ function doMatch(filepath, pattern, options = {}) {
 
 /**
  * Normalizes a pattern by removing the leading "./" if present.
- * @param {string} pattern The pattern to normalize.
- * @returns {string} The normalized pattern.
+ * @param {FileMatcher} pattern The pattern to normalize.
+ * @returns {FileMatcher} The normalized pattern.
  */
 function normalizePattern(pattern) {
 	if (isString(pattern)) {
@@ -347,7 +351,7 @@ function normalizeConfigPatterns(config, namespacedBasePath, path) {
  * @param {Array} items The items in a `ConfigArray`.
  * @param {Object} context The context object to pass into any function
  *      found.
- * @param {Array<string>} extraConfigTypes The config types to check.
+ * @param {ReadonlyArray<ExtraConfigType>} extraConfigTypes The config types to check.
  * @param {string} namespacedBasePath The namespaced base path of the directory to which config base paths are relative.
  * @param {PathImpl} path Path-handling implementation.
  * @returns {Promise<Array>} A flattened array containing only config objects.
@@ -364,10 +368,10 @@ async function normalize(
 	const allowArrays = extraConfigTypes.includes("array");
 
 	/**
-	 * Recursively flattens and resolves items in the array into config objects.
+	 * Recursively flattens items and resolves config functions into config objects.
 	 * @param {Array} array The array to traverse.
 	 * @returns {AsyncGenerator<Object, void, void>} Async generator yielding config objects.
-	 * @throws {TypeError} If an unexpected function or array is encountered.
+	 * @throws {TypeError} If functions or arrays are not allowed, or if a config function returns another function.
 	 */
 	async function* flatTraverse(array) {
 		for (let item of array) {
@@ -417,7 +421,7 @@ async function normalize(
  * @param {Array} items The items in a `ConfigArray`.
  * @param {Object} context The context object to pass into any function
  *      found.
- * @param {Array<string>} extraConfigTypes The config types to check.
+ * @param {ReadonlyArray<ExtraConfigType>} extraConfigTypes The config types to check.
  * @param {string} namespacedBasePath The namespaced base path of the directory to which config base paths are relative.
  * @param {PathImpl} path Path-handling implementation
  * @returns {Array} A flattened array containing only config objects.
@@ -434,10 +438,10 @@ function normalizeSync(
 	const allowArrays = extraConfigTypes.includes("array");
 
 	/**
-	 * Recursively flattens and resolves items in the array into config objects.
+	 * Recursively flattens items and resolves config functions into config objects.
 	 * @param {Array} array The array to traverse.
 	 * @returns {Generator<Object, void, void>} Generator yielding config objects.
-	 * @throws {TypeError} If an unexpected function, array, or async function is encountered.
+	 * @throws {TypeError} If functions or arrays are not allowed, if a config function returns another function, or if it returns a promise.
 	 */
 	function* flatTraverse(array) {
 		for (let item of array) {
@@ -496,7 +500,7 @@ function toRelativePath(fileOrDirPath, namespacedBasePath, path) {
 /**
  * Determines if a given file path should be ignored based on the given
  * matcher.
- * @param {Array<{ basePath?: string, ignores: Array<string|((filePath: string) => boolean)>}>} configs Configuration objects containing `ignores`.
+ * @param {Array<{ basePath?: string, ignores: FileMatcher[] }>} configs Configuration objects containing `ignores`.
  * @param {string} filePath The unprocessed file path to check.
  * @param {string} relativeFilePath The path of the file to check relative to the base path,
  * 		using forward slash (`"/"`) as a separator.
@@ -571,17 +575,17 @@ function shouldIgnorePath(
  * @param {string} filePath The unprocessed file path to check.
  * @param {string} relativeFilePath The path of the file to check relative to the base path,
  * 		using forward slash (`"/"`) as a separator.
- * @param {Object} config The config object to check.
+ * @param {ConfigObject & { files: FilesMatcher[] }} config The config object to check.
  * @returns {boolean} True if the file path is matched by the config,
  *      false if not.
  */
 function pathMatches(filePath, relativeFilePath, config) {
 	// match both strings and functions
 	/**
-	 * Matches a pattern against the provided file path.
-	 * @param {string|((filePath: string) => boolean)} pattern The matcher pattern or function.
-	 * @returns {boolean} True if the pattern matches, false otherwise.
-	 * @throws {TypeError} When the matcher type is unexpected.
+	 * Matches a file matcher against the provided file path.
+	 * @param {FileMatcher} pattern The matcher pattern or function.
+	 * @returns {boolean} True if the string pattern matches `relativeFilePath` or the matcher function returns true for `filePath`, false otherwise.
+	 * @throws {TypeError} If the matcher is not a string or function.
 	 */
 	function match(pattern) {
 		if (isString(pattern)) {
@@ -640,21 +644,23 @@ function assertNormalized(configArray) {
 
 /**
  * Ensures that config types are valid.
- * @param {Array<string>} extraConfigTypes The config types to check.
+ * @param {ReadonlyArray<ExtraConfigType>} extraConfigTypes The config types to check.
  * @returns {void}
  * @throws {TypeError} When the config types array is invalid.
  */
 function assertExtraConfigTypes(extraConfigTypes) {
+	if (!Array.isArray(extraConfigTypes)) {
+		throw new TypeError("extraConfigTypes must be an array.");
+	}
+
 	if (extraConfigTypes.length > 2) {
-		throw new TypeError(
-			"configTypes must be an array with at most two items.",
-		);
+		throw new TypeError("extraConfigTypes must contain at most two items.");
 	}
 
 	for (const configType of extraConfigTypes) {
 		if (!CONFIG_TYPES.has(configType)) {
 			throw new TypeError(
-				`Unexpected config type "${configType}" found. Expected one of: "object", "array", "function".`,
+				`Unexpected config type "${configType}" in extraConfigTypes. Expected one of: "array", "function".`,
 			);
 		}
 	}
@@ -725,9 +731,9 @@ export class ConfigArray extends Array {
 	 * 		Defaults to `"/"`.
 	 * @param {boolean} [options.normalized=false] Flag indicating if the
 	 *      configs have already been normalized.
-	 * @param {Object} [options.schema] The additional schema
+	 * @param {ObjectDefinition} [options.schema] The additional schema
 	 *      definitions to use for the ConfigArray schema.
-	 * @param {Array<string>} [options.extraConfigTypes] List of config types supported.
+	 * @param {ReadonlyArray<ExtraConfigType>} [options.extraConfigTypes] List of config types supported.
 	 * @throws {TypeError} When the `basePath` is not a non-empty string,
 	 */
 	constructor(
@@ -772,7 +778,7 @@ export class ConfigArray extends Array {
 
 		/**
 		 * The supported config types.
-		 * @type {Array<string>}
+		 * @type {ReadonlyArray<ExtraConfigType>}
 		 */
 		this.extraConfigTypes = [...extraConfigTypes];
 		Object.freeze(this.extraConfigTypes);
@@ -824,7 +830,7 @@ export class ConfigArray extends Array {
 	 * This can be used to determine which files will be matched by a
 	 * config array or to use as a glob pattern when no patterns are provided
 	 * for a command line interface.
-	 * @returns {Array<string|Function>} An array of matchers.
+	 * @returns {Array<FilesMatcher>} An array of matchers.
 	 */
 	get files() {
 		assertNormalized(this);
@@ -860,7 +866,7 @@ export class ConfigArray extends Array {
 	 * the matching `files` fields in any configs. This is necessary to mimic
 	 * the behavior of things like .gitignore and .eslintignore, allowing a
 	 * globbing operation to be faster.
-	 * @returns {Object[]} An array of config objects representing global ignores.
+	 * @returns {Array<{ basePath?: string, name?: string, ignores: FileMatcher[] }>} An array of config objects representing global ignores.
 	 */
 	get ignores() {
 		assertNormalized(this);
@@ -879,7 +885,7 @@ export class ConfigArray extends Array {
 		for (const config of this) {
 			/*
 			 * We only count ignores if there are no other keys in the object.
-			 * In this case, it acts list a globally ignored pattern. If there
+			 * In this case, it acts like a globally ignored pattern. If there
 			 * are additional keys, then ignores act like exclusions.
 			 */
 			if (

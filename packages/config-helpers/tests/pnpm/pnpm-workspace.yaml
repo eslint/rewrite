@@ -1,0 +1,3 @@
+overrides:
+    # Prevents an ERR_PNPM_NO_MATCHING_VERSION error when @eslint/core is bumped to a yet unpublished version.
+    "@eslint/core": file:../../../core

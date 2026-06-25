@@ -177,7 +177,7 @@ describe("@eslint/compat", () => {
 
 		it("should return a rule object when a function-style rule is passed to fixupRule", () => {
 			/**
-			 * Test fixture simulating a legacy function-style rule.
+			 * Legacy function-style rule fixture without metadata.
 			 * @type {LegacyRuleDefinition}
 			 */
 			function rule(context) {
@@ -219,7 +219,7 @@ describe("@eslint/compat", () => {
 
 		it("should return a rule object with `meta.schema` when a function-style rule with schema is passed to fixupRule", () => {
 			/**
-			 * Test fixture simulating a legacy function-style rule.
+			 * Legacy function-style rule fixture with a top-level schema.
 			 * @type {LegacyRuleDefinition}
 			 */
 			function rule(context) {

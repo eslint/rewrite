@@ -19,8 +19,19 @@
 /** @typedef {import("@eslint/core").DirectiveType} DirectiveType */
 /** @typedef {import("@eslint/core").SourceCodeBaseTypeOptions} SourceCodeBaseTypeOptions */
 /**
- * @typedef {import("@eslint/core").TextSourceCode<Options>} TextSourceCode<Options>
+ * @typedef {import("@eslint/core").TextSourceCode<Options>} TextSourceCode
  * @template {SourceCodeBaseTypeOptions} [Options=SourceCodeBaseTypeOptions]
+ */
+/** @typedef {import("@eslint/core").RuleVisitor} RuleVisitor */
+/**
+ * @typedef {import("./types.ts").CustomRuleVisitorWithExit<RuleVisitorType>} CustomRuleVisitorWithExit
+ * @template {RuleVisitor} RuleVisitorType
+ */
+/** @typedef {import("./types.ts").CustomRuleTypeDefinitions} CustomRuleTypeDefinitions */
+/**
+ * @typedef {import("./types.ts").CustomRuleDefinitionType<LanguageSpecificOptions, Options>} CustomRuleDefinitionType
+ * @template {Omit<import("@eslint/core").RuleDefinitionTypeOptions, keyof CustomRuleTypeDefinitions>} LanguageSpecificOptions
+ * @template {Partial<CustomRuleTypeDefinitions>} Options
  */
 
 //-----------------------------------------------------------------------------
@@ -29,7 +40,7 @@
 
 /**
  * Determines if a node has ESTree-style loc information.
- * @param {Object} node The node to check.
+ * @param {object} node The node to check.
  * @returns {node is {loc:SourceLocation}} `true` if the node has ESTree-style loc information, `false` if not.
  */
 function hasESTreeStyleLoc(node) {
@@ -38,7 +49,7 @@ function hasESTreeStyleLoc(node) {
 
 /**
  * Determines if a node has position-style loc information.
- * @param {Object} node The node to check.
+ * @param {object} node The node to check.
  * @returns {node is {position:SourceLocation}} `true` if the node has position-style range information, `false` if not.
  */
 function hasPosStyleLoc(node) {
@@ -47,7 +58,7 @@ function hasPosStyleLoc(node) {
 
 /**
  * Determines if a node has ESTree-style range information.
- * @param {Object} node The node to check.
+ * @param {object} node The node to check.
  * @returns {node is {range:SourceRange}} `true` if the node has ESTree-style range information, `false` if not.
  */
 function hasESTreeStyleRange(node) {
@@ -56,7 +67,7 @@ function hasESTreeStyleRange(node) {
 
 /**
  * Determines if a node has position-style range information.
- * @param {Object} node The node to check.
+ * @param {object} node The node to check.
  * @returns {node is {position:SourceLocationWithOffset}} `true` if the node has position-style range information, `false` if not.
  */
 function hasPosStyleRange(node) {
@@ -115,7 +126,7 @@ export class VisitNodeStep {
 
 	/**
 	 * The target of the step.
-	 * @type {Object}
+	 * @type {object}
 	 */
 	target;
 
@@ -134,7 +145,7 @@ export class VisitNodeStep {
 	/**
 	 * Creates a new instance.
 	 * @param {Object} options The options for the step.
-	 * @param {Object} options.target The target of the step.
+	 * @param {object} options.target The target of the step.
 	 * @param {1|2} options.phase The phase of the step.
 	 * @param {Array<any>} options.args The arguments of the step.
 	 */

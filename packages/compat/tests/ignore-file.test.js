@@ -1,5 +1,6 @@
 /**
- * @fileoverview Fixup tests
+ * @fileoverview Tests for `includeIgnoreFile()` and `convertIgnorePatternToMinimatch()`
+ * @author Nicholas C. Zakas
  */
 
 //-----------------------------------------------------------------------------

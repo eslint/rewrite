@@ -1,5 +1,78 @@
 # Changelog
 
+## [0.7.2](https://github.com/eslint/rewrite/compare/plugin-kit-v0.7.1...plugin-kit-v0.7.2) (2026-05-23)
+
+
+### Bug Fixes
+
+* add missing .d.cts files while building plugin-kit ([#445](https://github.com/eslint/rewrite/issues/445)) ([49e101b](https://github.com/eslint/rewrite/commit/49e101ba92bfe70f2cd7a830b4b6e8f6bbda73fb))
+
+## [0.7.1](https://github.com/eslint/rewrite/compare/plugin-kit-v0.7.0...plugin-kit-v0.7.1) (2026-04-08)
+
+
+### Bug Fixes
+
+* revert re-export ESM types in CommonJS ([#427](https://github.com/eslint/rewrite/issues/427)) ([9b16fe1](https://github.com/eslint/rewrite/commit/9b16fe1af3432e92bdb193a5d1f6c89c4b0e3093))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^1.2.0 to ^1.2.1
+
+## [0.7.0](https://github.com/eslint/rewrite/compare/plugin-kit-v0.6.1...plugin-kit-v0.7.0) (2026-04-03)
+
+
+### Features
+
+* add `languages` and `docs.dialects` to rule `meta` types ([#421](https://github.com/eslint/rewrite/issues/421)) ([7680f69](https://github.com/eslint/rewrite/commit/7680f692119a094abb1c8317aba713168563c07c))
+
+
+### Bug Fixes
+
+* re-export ESM types in CommonJS ([#416](https://github.com/eslint/rewrite/issues/416)) ([ef16f80](https://github.com/eslint/rewrite/commit/ef16f80b9221c412992a1e9d54b35d155db1b4ed))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^1.1.1 to ^1.2.0
+
+## [0.6.1](https://github.com/eslint/rewrite/compare/plugin-kit-v0.6.0...plugin-kit-v0.6.1) (2026-03-06)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^1.1.0 to ^1.1.1
+
+## [0.6.0](https://github.com/eslint/rewrite/compare/plugin-kit-v0.5.1...plugin-kit-v0.6.0) (2026-01-29)
+
+
+### Features
+
+* add `CustomRuleVisitorWithExit` type to `@eslint/plugin-kit` ([#351](https://github.com/eslint/rewrite/issues/351)) ([e7d1be4](https://github.com/eslint/rewrite/commit/e7d1be4066b38142b38e21e7877bf9b530b65ec9))
+* Add custom rule type helpers to `@eslint/plugin-kit` ([#355](https://github.com/eslint/rewrite/issues/355)) ([8ac8530](https://github.com/eslint/rewrite/commit/8ac853046aa1d4288d06d639be234c09988ade5e))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^1.0.1 to ^1.1.0
+
+## [0.5.1](https://github.com/eslint/rewrite/compare/plugin-kit-v0.5.0...plugin-kit-v0.5.1) (2026-01-08)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/core bumped from ^1.0.0 to ^1.0.1
+
 ## [0.5.0](https://github.com/eslint/rewrite/compare/plugin-kit-v0.4.1...plugin-kit-v0.5.0) (2025-11-14)
 
 
