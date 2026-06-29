@@ -308,7 +308,7 @@ describe("ConfigArray", () => {
 		 * @param {Object} options Test options.
 		 * @param {boolean} [options.only=false] If true, run these tests exclusively.
 		 * @param {string} options.title Test title prefix.
-		 * @param {Iterable|Function|Object} options.configs Configs to pass to the `ConfigArray` constructor.
+		 * @param {Iterable<Function|Object>|Function|Object} options.configs Configs to pass to the `ConfigArray` constructor.
 		 * @param {assert.AssertPredicate} options.expectedError Expected error matcher for `assert.rejects()` and `assert.throws()`.
 		 * @returns {void}
 		 */
