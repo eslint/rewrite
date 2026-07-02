@@ -87,7 +87,6 @@ class Migration {
 
 	/**
 	 * Creates a migration object.
-	 *
 	 * @param {TargetVersion} targetVersion The target version for the migration.
 	 */
 	constructor(targetVersion) {
@@ -411,7 +410,7 @@ function convertGlobPattern(pattern) {
 function createGitignoreEntry(migration) {
 	migration.inits.push(getGitignoreInit());
 
-	/** @type string */
+	/** @type {string} */
 	let code;
 
 	if (migration.targetVersion === "9") {
@@ -642,6 +641,7 @@ function createFilesArray(patterns) {
  * Creates an array expression from a node representing files.
  * @param {ArrayExpression|Literal} files The node to convert.
  * @returns {ArrayExpression} The AST for the array expression.
+ * @throws {TypeError} If `files` is neither an array expression nor a string literal.
  */
 function createFilesArrayFromNode(files) {
 	if (files.type === "ArrayExpression") {
@@ -1132,6 +1132,10 @@ function convertLegacyConfigExpression(config, migration) {
 	/** @type {ObjectExpression} */
 	let globals;
 
+	/**
+	 * Adds the languageOptions property to the output config object if it hasn't been created yet.
+	 * @returns {void}
+	 */
 	function createLanguageOptionsNode() {
 		if (languageOptionsProperties.length === 0) {
 			newProperties.push(
@@ -1144,6 +1148,10 @@ function convertLegacyConfigExpression(config, migration) {
 		}
 	}
 
+	/**
+	 * Adds the globals property to the languageOptions object when globals are available.
+	 * @returns {void}
+	 */
 	function createGlobalsNode() {
 		if (globals) {
 			languageOptionsProperties.push(
@@ -1582,6 +1590,7 @@ export function migrateConfig(
  * @param {TargetVersion} options.targetVersion The target version of ESLint for the migration.
  * @returns {{code:string,messages:Array<string>,imports:Map<string,MigrationImport>}} The migrated config and
  * any messages to display to the user.
+ * @throws {TypeError} If the config file does not export a supported object expression.
  */
 export function migrateJSConfig(
 	code,
