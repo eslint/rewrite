@@ -295,20 +295,14 @@ configArray.ignores satisfies Array<{
 configArray.extraConfigTypes satisfies ReadonlyArray<ExtraConfigType>;
 
 configArray.getConfigStatus("/foo.js") satisfies
-	| "ignored"
-	| "external"
-	| "unconfigured"
-	| "matched";
+	"ignored" | "external" | "unconfigured" | "matched";
 
 // @ts-expect-error -- Invalid status
 const invalidConfigStatus: "invalid" = configArray.getConfigStatus("/foo.js");
 
 const configWithStatus = configArray.getConfigWithStatus("/foo.js");
 configWithStatus.status satisfies
-	| "ignored"
-	| "external"
-	| "unconfigured"
-	| "matched";
+	"ignored" | "external" | "unconfigured" | "matched";
 
 // @ts-expect-error -- filePath must be a string
 configArray.getConfigWithStatus(123);

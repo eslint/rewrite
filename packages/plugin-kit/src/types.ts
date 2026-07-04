@@ -65,9 +65,9 @@ export type CustomRuleDefinitionType<
  * Adds matching `:exit` selector properties for each key of a `RuleVisitor`.
  */
 export type CustomRuleVisitorWithExit<RuleVisitorType extends RuleVisitor> = {
-	[Key in keyof RuleVisitorType as
-		| Key
-		| `${Key & string}:exit`]: RuleVisitorType[Key];
+	[
+		Key in keyof RuleVisitorType as Key | `${Key & string}:exit`
+	]: RuleVisitorType[Key];
 };
 
 /**
