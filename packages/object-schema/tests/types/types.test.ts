@@ -189,11 +189,9 @@ const propertyWithRequired: PropertyDefinition = {
 };
 
 propertyWithBuiltInStrategies.merge satisfies
-	| BuiltInMergeStrategy
-	| CustomMergeStrategy;
+	BuiltInMergeStrategy | CustomMergeStrategy;
 propertyWithBuiltInStrategies.validate satisfies
-	| BuiltInValidationStrategy
-	| CustomValidationStrategy;
+	BuiltInValidationStrategy | CustomValidationStrategy;
 propertyWithRequired.required satisfies boolean | undefined;
 
 // PropertyDefinition with custom functions
@@ -296,13 +294,9 @@ const propertyDefinitionWithSchemaAndStrategies: PropertyDefinitionWithSchema =
 
 propertyDefinitionWithSchemaAndStrategies.schema satisfies ObjectDefinition;
 propertyDefinitionWithSchemaAndStrategies.merge satisfies
-	| BuiltInMergeStrategy
-	| CustomMergeStrategy
-	| undefined;
+	BuiltInMergeStrategy | CustomMergeStrategy | undefined;
 propertyDefinitionWithSchemaAndStrategies.validate satisfies
-	| BuiltInValidationStrategy
-	| CustomValidationStrategy
-	| undefined;
+	BuiltInValidationStrategy | CustomValidationStrategy | undefined;
 
 // #endregion PropertyDefinitionWithStrategies and PropertyDefinitionWithSchema
 

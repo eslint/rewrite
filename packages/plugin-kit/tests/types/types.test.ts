@@ -44,8 +44,7 @@ step2.type satisfies "call";
 // ConfigCommentParser
 const configCommentParser = new ConfigCommentParser();
 configCommentParser.parseDirective("foo") satisfies
-	| { label: string; value: string; justification: string }
-	| undefined;
+	{ label: string; value: string; justification: string } | undefined;
 const jsonLikeConfig = configCommentParser.parseJSONLikeConfig("bar");
 if (jsonLikeConfig.ok) {
 	jsonLikeConfig.config satisfies RulesConfig;
@@ -153,8 +152,8 @@ sourceCodeWithOptions.getLocFromIndex(0) satisfies {
 };
 sourceCodeWithOptions.getIndexFromLoc({ line: 1, column: 0 }) satisfies number;
 sourceCodeWithOptions.getParent({ value: "" }) satisfies
-	| { value: string }
-	| undefined satisfies CustomOptions["SyntaxElementWithLoc"] | undefined;
+	{ value: string } | undefined satisfies
+	CustomOptions["SyntaxElementWithLoc"] | undefined;
 sourceCodeWithOptions.getRange({ value: "" }) satisfies SourceRange;
 sourceCodeWithOptions.getText() satisfies string;
 sourceCodeWithOptions.getText({ value: "" }, 0, 1) satisfies string;
