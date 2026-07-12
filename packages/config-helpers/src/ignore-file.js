@@ -17,7 +17,7 @@ import path from "node:path";
 // Types
 //-----------------------------------------------------------------------------
 
-/** @typedef {import("@eslint/core").ConfigObject} Config */
+/** @typedef {import("@eslint/core").ConfigObject} ConfigObject */
 
 /**
  * @typedef {object} IncludeIgnoreFileOptionsObject
@@ -141,7 +141,7 @@ function parseOptions(options) {
  *
  * @param {string[]} ignoreFilePathArg The paths of ignore files to include.
  * @param {IncludeIgnoreFileOptions} [options]
- * @returns {Config[]}
+ * @returns {ConfigObject[]}
  */
 
 /**
@@ -151,7 +151,7 @@ function parseOptions(options) {
  *
  * @param {string} ignoreFilePathArg The path of the ignore file to include.
  * @param {IncludeIgnoreFileOptions} [options]
- * @returns {Config}
+ * @returns {ConfigObject}
  */
 
 /**
@@ -161,7 +161,7 @@ function parseOptions(options) {
  *
  * @param {string[] | string} ignoreFilePathArg The path(s) of the ignore file(s) to include.
  * @param {IncludeIgnoreFileOptions} [options]
- * @returns {Config[] | Config}
+ * @returns {ConfigObject[] | ConfigObject}
  */
 
 /**
@@ -169,7 +169,7 @@ function parseOptions(options) {
  *
  * @param {string[] | string} ignoreFilePathArg The path(s) of the ignore file(s) to include.
  * @param {IncludeIgnoreFileOptions} [options]
- * @returns {Config[] | Config}
+ * @returns {ConfigObject[] | ConfigObject}
  */
 export function includeIgnoreFile(ignoreFilePathArg, options) {
 	const returnSingleObject = !Array.isArray(ignoreFilePathArg);

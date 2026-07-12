@@ -7,7 +7,7 @@
 // Type Definitions
 //-----------------------------------------------------------------------------
 
-/** @typedef {import("@eslint/core").ConfigObject} Config */
+/** @typedef {import("@eslint/core").ConfigObject} ConfigObject */
 
 //-----------------------------------------------------------------------------
 // Helpers
@@ -23,7 +23,7 @@ let globalIgnoreCount = 0;
  * Creates a global ignores config with the given patterns.
  * @param {string[]} ignorePatterns The ignore patterns.
  * @param {string} [name] The name of the global ignores config.
- * @returns {Config} The global ignores config.
+ * @returns {ConfigObject} The global ignores config.
  * @throws {TypeError} If ignorePatterns is not an array or if it is empty.
  */
 export function globalIgnores(ignorePatterns, name) {

@@ -4,6 +4,9 @@
 
 import type { ConfigObject } from "@eslint/core";
 
+/** @deprecated Use `ConfigObject` instead. */
+export type Config = ConfigObject;
+
 /**
  * Infinite array type.
  */

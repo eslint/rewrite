@@ -7,15 +7,16 @@
 // Type Definitions
 //-----------------------------------------------------------------------------
 
-/** @typedef {import("@eslint/core").ConfigObject} Config */
+/** @typedef {import("@eslint/core").ConfigObject} ConfigObject */
 /** @typedef {import("@eslint/core").LegacyConfigObject} LegacyConfig */
 /** @typedef {import("@eslint/core").Plugin} Plugin */
 /** @typedef {import("@eslint/core").RuleConfig} RuleConfig */
+/** @typedef {import("./types.ts").Config} Config */
 /** @typedef {import("./types.ts").ExtendsElement} ExtendsElement */
 /** @typedef {import("./types.ts").ExtensionConfigObject} ExtensionConfigObject */
 /** @typedef {import("./types.ts").SimpleExtendsElement} SimpleExtendsElement */
 /** @typedef {import("./types.ts").ConfigWithExtends} ConfigWithExtends */
-/** @typedef {import("./types.ts").InfiniteArray<Config>} InfiniteConfigArray */
+/** @typedef {import("./types.ts").InfiniteArray<ConfigObject>} InfiniteConfigArray */
 /** @typedef {import("./types.ts").ConfigWithExtendsArray} ConfigWithExtendsArray */
 
 //-----------------------------------------------------------------------------
@@ -39,7 +40,7 @@ const allowedGlobalIgnoreKeys = new Set(["basePath", "ignores", "name"]);
 
 /**
  * Gets the name of a config object.
- * @param {Config} config The config object.
+ * @param {ConfigObject} config The config object.
  * @param {string} indexPath The index path of the config object.
  * @return {string} The name of the config object.
  */
@@ -71,7 +72,7 @@ function getExtensionName(extension, indexPath) {
 
 /**
  * Determines if a config object is a legacy config.
- * @param {Config|LegacyConfig} config The config object to check.
+ * @param {ConfigObject|LegacyConfig} config The config object to check.
  * @return {config is LegacyConfig} `true` if the config object is a legacy config.
  */
 function isLegacyConfig(config) {
@@ -91,7 +92,7 @@ function isLegacyConfig(config) {
 
 /**
  * Determines if a config object is a global ignores config.
- * @param {Config} config The config object to check.
+ * @param {ConfigObject} config The config object to check.
  * @return {boolean} `true` if the config object is a global ignores config.
  */
 function isGlobalIgnores(config) {
@@ -138,8 +139,8 @@ function getPluginMember(id) {
  * Normalizes the plugin config by replacing the namespace with the plugin namespace.
  * @param {string} userNamespace The namespace of the plugin.
  * @param {Plugin} plugin The plugin config object.
- * @param {Config} config The config object to normalize.
- * @return {Config} The normalized config object.
+ * @param {ConfigObject} config The config object to normalize.
+ * @return {ConfigObject} The normalized config object.
  */
 function normalizePluginConfig(userNamespace, plugin, config) {
 	const pluginNamespace = plugin.meta?.namespace;
@@ -207,7 +208,7 @@ function normalizePluginConfig(userNamespace, plugin, config) {
  * Deeply normalizes a plugin config, traversing recursively into an arrays.
  * @param {string} userPluginNamespace The namespace of the plugin.
  * @param {Plugin} plugin The plugin object.
- * @param {Config|LegacyConfig|(Config|LegacyConfig)[]} pluginConfig The plugin config to normalize.
+ * @param {ConfigObject|LegacyConfig|(ConfigObject|LegacyConfig)[]} pluginConfig The plugin config to normalize.
  * @param {string} pluginConfigName The name of the plugin config.
  * @return {InfiniteConfigArray} The normalized plugin config.
  * @throws {TypeError} If the plugin config is a legacy config.
@@ -242,7 +243,7 @@ function deepNormalizePluginConfig(
 
 /**
  * Finds a plugin config by name in the given config.
- * @param {Config} config The config object.
+ * @param {ConfigObject} config The config object.
  * @param {string} pluginConfigName The name of the plugin config.
  * @return {InfiniteConfigArray} The plugin config.
  * @throws {TypeError} If the plugin config is not found or is a legacy config.
@@ -362,11 +363,11 @@ function extendConfigFiles(baseFiles = [], extensionFiles = []) {
 
 /**
  * Extends a config object with another config object.
- * @param {Config} baseConfig The base config object.
+ * @param {ConfigObject} baseConfig The base config object.
  * @param {string} baseConfigName The name of the base config object.
- * @param {Config} extension The extension config object.
+ * @param {ConfigObject} extension The extension config object.
  * @param {string} extensionName The index of the extension config object.
- * @return {Config} The extended config object.
+ * @return {ConfigObject} The extended config object.
  */
 function extendConfig(baseConfig, baseConfigName, extension, extensionName) {
 	const result = { ...extension };
@@ -396,8 +397,8 @@ function extendConfig(baseConfig, baseConfigName, extension, extensionName) {
 /**
  * Processes a list of extends elements.
  * @param {ConfigWithExtends} config The config object.
- * @param {WeakMap<Config, string>} configNames The map of config objects to their names.
- * @return {Config[]} The flattened list of config objects.
+ * @param {WeakMap<ConfigObject, string>} configNames The map of config objects to their names.
+ * @return {ConfigObject[]} The flattened list of config objects.
  * @throws {TypeError} If the `extends` property is not an array or if nested `extends` is found.
  */
 function processExtends(config, configNames) {
@@ -439,7 +440,7 @@ function processExtends(config, configNames) {
 			return pluginConfig;
 		}
 
-		return /** @type {Config} */ (extendsElement);
+		return /** @type {ConfigObject} */ (extendsElement);
 	});
 
 	const result = [];
@@ -447,7 +448,7 @@ function processExtends(config, configNames) {
 	for (const { indexPath, value: extendsElement } of flatTraverse(
 		objectExtends,
 	)) {
-		const extension = /** @type {Config} */ (extendsElement);
+		const extension = /** @type {ConfigObject} */ (extendsElement);
 
 		if ("basePath" in extension) {
 			throw new TypeError("'basePath' in `extends` is not allowed.");
@@ -492,8 +493,8 @@ function processExtends(config, configNames) {
 /**
  * Processes a list of config objects and arrays.
  * @param {ConfigWithExtends[]} configList The list of config objects and arrays.
- * @param {WeakMap<Config, string>} configNames The map of config objects to their names.
- * @return {Config[]} The flattened list of config objects.
+ * @param {WeakMap<ConfigObject, string>} configNames The map of config objects to their names.
+ * @return {ConfigObject[]} The flattened list of config objects.
  */
 function processConfigList(configList, configNames) {
 	return configList.flatMap(config => processExtends(config, configNames));
@@ -506,7 +507,7 @@ function processConfigList(configList, configNames) {
 /**
  * Helper function to define a config array.
  * @param {ConfigWithExtendsArray} args The arguments to the function.
- * @returns {Config[]} The config array.
+ * @returns {ConfigObject[]} The config array.
  * @throws {TypeError} If no arguments are provided or if an argument is not an object.
  */
 export function defineConfig(...args) {
