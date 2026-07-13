@@ -411,10 +411,10 @@ function processExtends(config, configNames) {
 	}
 
 	const {
-		/** @type {Config[]} */
+		/** @type {ConfigObject[]} */
 		extends: extendsList,
 
-		/** @type {Config} */
+		/** @type {ConfigObject} */
 		...configObject
 	} = config;
 
