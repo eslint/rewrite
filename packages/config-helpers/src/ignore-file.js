@@ -17,7 +17,7 @@ import path from "node:path";
 // Types
 //-----------------------------------------------------------------------------
 
-/** @typedef {import("@eslint/core").ConfigObject} Config */
+/** @typedef {import("@eslint/core").ConfigObject} ConfigObject */
 
 /**
  * @typedef {Object} IncludeIgnoreFileOptionsObject
@@ -139,28 +139,28 @@ function parseOptions(options) {
  * @overload
  * @param {string[]} ignoreFilePathArg The paths of ignore files to include.
  * @param {IncludeIgnoreFileOptions} [options]
- * @returns {Config[]}
+ * @returns {ConfigObject[]}
  */
 
 /**
  * @overload
  * @param {string} ignoreFilePathArg The path of the ignore file to include.
  * @param {IncludeIgnoreFileOptions} [options]
- * @returns {Config}
+ * @returns {ConfigObject}
  */
 
 /**
  * @overload
  * @param {string[] | string} ignoreFilePathArg The path(s) of the ignore file(s) to include.
  * @param {IncludeIgnoreFileOptions} [options]
- * @returns {Config[] | Config}
+ * @returns {ConfigObject[] | ConfigObject}
  */
 
 /**
  * Reads an ignore file(s) and returns an object(s) with the ignore patterns.
  * @param {string[] | string} ignoreFilePathArg The path(s) of the ignore file(s) to include.
  * @param {IncludeIgnoreFileOptions} [options] The options for including the ignore file(s).
- * @returns {Config[] | Config} The config object(s) with the ignore patterns.
+ * @returns {ConfigObject[] | ConfigObject} The config object(s) with the ignore patterns.
  * @throws {TypeError} If the ignore file path argument contains a non-string value or if options are invalid.
  * @throws {Error} If an ignore file path is not absolute.
  */

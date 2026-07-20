@@ -4,6 +4,9 @@
 
 import type { ConfigObject } from "@eslint/core";
 
+/** @deprecated Use `ConfigObject` instead. */
+export type Config = ConfigObject;
+
 /**
  * Infinite array type.
  */
@@ -26,8 +29,7 @@ export type SimpleExtendsElement = string | ExtensionConfigObject;
  * The type of array element in the `extends` property before flattening.
  */
 export type ExtendsElement =
-	| SimpleExtendsElement
-	| InfiniteArray<ExtensionConfigObject>;
+	SimpleExtendsElement | InfiniteArray<ExtensionConfigObject>;
 
 /**
  * Config with extends. Valid only inside of `defineConfig()`.

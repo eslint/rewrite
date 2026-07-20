@@ -256,8 +256,7 @@ const testLanguage2: Language<{
 };
 
 testLanguage2.defaultLanguageOptions satisfies
-	| { howMuch: boolean; howMany: number }
-	| undefined;
+	{ howMuch: boolean; howMany: number } | undefined;
 
 //-----------------------------------------------------------------------------
 // Tests for rule-related types

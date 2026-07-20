@@ -10,6 +10,7 @@
 import {
 	defineConfig,
 	type Config,
+	type ConfigObject,
 	type ConfigWithExtends,
 	type ExtensionConfigObject,
 	globalIgnores,
@@ -74,7 +75,7 @@ defineConfig([], {});
 defineConfig([{}]);
 defineConfig([globalIgnores(["node_modules"])], []);
 
-declare const recommendedConfigs: Config[];
+declare const recommendedConfigs: ConfigObject[];
 
 defineConfig(...recommendedConfigs, {
 	linterOptions: { noInlineConfig: true },

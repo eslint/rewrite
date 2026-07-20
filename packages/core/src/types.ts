@@ -485,11 +485,9 @@ export interface ViolationReportBase<MessageIds extends string = string> {
 }
 
 export type ViolationMessage<MessageIds extends string = string> =
-	| { message: string }
-	| { messageId: MessageIds };
+	{ message: string } | { messageId: MessageIds };
 export type ViolationLocation<Node> =
-	| { loc: SourceLocation | Position }
-	| { node: Node };
+	{ loc: SourceLocation | Position } | { node: Node };
 
 export type ViolationReport<
 	Node = unknown,
@@ -513,8 +511,7 @@ export interface SuggestedEditBase {
 }
 
 export type SuggestionMessage<MessageIds extends string = string> =
-	| { desc: string }
-	| { messageId: MessageIds };
+	{ desc: string } | { messageId: MessageIds };
 
 /**
  * A suggested edit for a rule violation.
@@ -734,8 +731,7 @@ export interface LinterOptionsConfig {
  * The configuration for a rule.
  */
 export type RuleConfig<RuleOptions extends unknown[] = unknown[]> =
-	| Severity
-	| [Severity, ...Partial<RuleOptions>];
+	Severity | [Severity, ...Partial<RuleOptions>];
 
 /* eslint-disable @typescript-eslint/consistent-indexed-object-style -- needed to allow extension */
 /**
@@ -837,12 +833,7 @@ export interface ConfigObject<Rules extends RulesConfig = RulesConfig> {
 
 /** @deprecated Only supported in legacy eslintrc config format. */
 export type GlobalAccess =
-	| boolean
-	| "off"
-	| "readable"
-	| "readonly"
-	| "writable"
-	| "writeable";
+	boolean | "off" | "readable" | "readonly" | "writable" | "writeable";
 
 /** @deprecated Only supported in legacy eslintrc config format. */
 export interface GlobalsConfig {
@@ -1328,8 +1319,7 @@ export interface NotOkParseResult {
 }
 
 export type ParseResult<RootNode = unknown> =
-	| OkParseResult<RootNode>
-	| NotOkParseResult;
+	OkParseResult<RootNode> | NotOkParseResult;
 
 /**
  * Represents inline configuration found in the source code.
@@ -1507,10 +1497,7 @@ export type TraversalStep = VisitTraversalStep | CallTraversalStep;
  * The type of disable directive. This determines how ESLint will disable rules.
  */
 export type DirectiveType =
-	| "disable"
-	| "enable"
-	| "disable-line"
-	| "disable-next-line";
+	"disable" | "enable" | "disable-line" | "disable-next-line";
 
 /**
  * Represents a disable directive.

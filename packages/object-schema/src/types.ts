@@ -89,8 +89,7 @@ export interface PropertyDefinitionWithSchema extends BasePropertyDefinition {
  * Property definition.
  */
 export type PropertyDefinition =
-	| PropertyDefinitionWithStrategies
-	| PropertyDefinitionWithSchema;
+	PropertyDefinitionWithStrategies | PropertyDefinitionWithSchema;
 
 /**
  * Object definition.
