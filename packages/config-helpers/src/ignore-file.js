@@ -20,7 +20,7 @@ import path from "node:path";
 /** @typedef {import("@eslint/core").ConfigObject} ConfigObject */
 
 /**
- * @typedef {object} IncludeIgnoreFileOptionsObject
+ * @typedef {Object} IncludeIgnoreFileOptionsObject
  * @property {boolean} [gitignoreResolution] Whether to interpret the contents of an ignore file relative to the config file or the ignore file.
  * - gitignoreResolution: false (default): Interprets ignore patterns relative to the config file
  * - gitignoreResolution: true: Interprets the ignore patterns in a file relative to the ignore file
@@ -85,8 +85,9 @@ export function convertIgnorePatternToMinimatch(pattern) {
 }
 
 /**
- * @param {string} ignoreFilePath
- * @returns {string[]}
+ * Reads an ignore file and converts its entries to minimatch patterns.
+ * @param {string} ignoreFilePath The absolute path to the ignore file.
+ * @returns {string[]} The minimatch patterns from the ignore file.
  */
 function ignoreFilePathToPatterns(ignoreFilePath) {
 	const ignoreFile = fs.readFileSync(ignoreFilePath, "utf8");
@@ -100,9 +101,9 @@ function ignoreFilePathToPatterns(ignoreFilePath) {
 
 /**
  * Helper to parse and validate the options to `includeIgnoreFile()`
- *
- * @param {string | { gitignoreResolution?: unknown, name?: unknown } | undefined} options
- * @returns {{ gitignoreResolution: boolean, name: string }}
+ * @param {string | { gitignoreResolution?: unknown, name?: unknown } | undefined} options The options to parse.
+ * @returns {{ gitignoreResolution: boolean, name: string }} The normalized options.
+ * @throws {TypeError} If options is not an object or string, or if an option has an invalid type.
  */
 function parseOptions(options) {
 	// legacy compatibility with @eslint/compat's `includeIgnoreFile`
@@ -136,9 +137,6 @@ function parseOptions(options) {
 
 /**
  * @overload
- *
- * Reads ignore files and returns objects with the ignore patterns.
- *
  * @param {string[]} ignoreFilePathArg The paths of ignore files to include.
  * @param {IncludeIgnoreFileOptions} [options]
  * @returns {ConfigObject[]}
@@ -146,9 +144,6 @@ function parseOptions(options) {
 
 /**
  * @overload
- *
- * Reads an ignore file and returns an object with the ignore patterns.
- *
  * @param {string} ignoreFilePathArg The path of the ignore file to include.
  * @param {IncludeIgnoreFileOptions} [options]
  * @returns {ConfigObject}
@@ -156,9 +151,6 @@ function parseOptions(options) {
 
 /**
  * @overload
- *
- * Reads an ignore file(s) and returns an object(s) with the ignore patterns.
- *
  * @param {string[] | string} ignoreFilePathArg The path(s) of the ignore file(s) to include.
  * @param {IncludeIgnoreFileOptions} [options]
  * @returns {ConfigObject[] | ConfigObject}
@@ -166,10 +158,11 @@ function parseOptions(options) {
 
 /**
  * Reads an ignore file(s) and returns an object(s) with the ignore patterns.
- *
  * @param {string[] | string} ignoreFilePathArg The path(s) of the ignore file(s) to include.
- * @param {IncludeIgnoreFileOptions} [options]
- * @returns {ConfigObject[] | ConfigObject}
+ * @param {IncludeIgnoreFileOptions} [options] The options for including the ignore file(s).
+ * @returns {ConfigObject[] | ConfigObject} The config object(s) with the ignore patterns.
+ * @throws {TypeError} If the ignore file path argument contains a non-string value or if options are invalid.
+ * @throws {Error} If an ignore file path is not absolute.
  */
 export function includeIgnoreFile(ignoreFilePathArg, options) {
 	const returnSingleObject = !Array.isArray(ignoreFilePathArg);

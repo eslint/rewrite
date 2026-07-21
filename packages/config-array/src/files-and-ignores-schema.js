@@ -9,6 +9,7 @@
 
 /** @typedef {import("@eslint/object-schema").PropertyDefinition} PropertyDefinition */
 /** @typedef {import("@eslint/object-schema").ObjectDefinition} ObjectDefinition */
+/** @typedef {import("./types.ts").FileMatcher} FileMatcher */
 
 //------------------------------------------------------------------------------
 // Helpers
@@ -16,8 +17,8 @@
 
 /**
  * Asserts that a given value is an array.
- * @param {*} value The value to check.
- * @returns {void}
+ * @param {unknown} value The value to check.
+ * @returns {asserts value is unknown[]} Asserts that the value is an array.
  * @throws {TypeError} When the value is not an array.
  */
 function assertIsArray(value) {
@@ -28,8 +29,8 @@ function assertIsArray(value) {
 
 /**
  * Asserts that a given value is an array containing only strings and functions.
- * @param {*} value The value to check.
- * @returns {void}
+ * @param {unknown} value The value to check.
+ * @returns {asserts value is FileMatcher[]} Asserts that the value is an array of file matchers.
  * @throws {TypeError} When the value is not an array of strings and functions.
  */
 function assertIsArrayOfStringsAndFunctions(value) {
@@ -48,8 +49,8 @@ function assertIsArrayOfStringsAndFunctions(value) {
 
 /**
  * Asserts that a given value is a non-empty array.
- * @param {*} value The value to check.
- * @returns {void}
+ * @param {unknown} value The value to check.
+ * @returns {asserts value is unknown[]} Asserts that the value is a non-empty array.
  * @throws {TypeError} When the value is not an array or an empty array.
  */
 function assertIsNonEmptyArray(value) {

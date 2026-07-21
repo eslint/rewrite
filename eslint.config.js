@@ -1,12 +1,13 @@
 import eslintConfigESLint from "eslint-config-eslint";
-import { defineConfig, includeIgnoreFile } from "@eslint/config-helpers";
+import globals from "globals";
+import {
+	defineConfig,
+	globalIgnores,
+	includeIgnoreFile,
+} from "@eslint/config-helpers";
 import tseslint from "typescript-eslint";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-
-const eslintPluginJSDoc = eslintConfigESLint.find(
-	config => config.plugins?.jsdoc,
-).plugins.jsdoc;
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -15,29 +16,25 @@ export default defineConfig([
 	includeIgnoreFile(path.join(dirname, ".gitignore"), {
 		gitignoreResolution: true,
 	}),
-
+	globalIgnores(["**/tests/fixtures/"], "rewrite/global-ignores"),
 	{
-		ignores: ["**/tests/fixtures/"],
-	},
-
-	{
+		name: "rewrite/js",
+		files: ["**/*.js"],
 		extends: [eslintConfigESLint],
+		settings: {
+			jsdoc: {
+				preferredTypes: {
+					object: "object",
+				},
+			},
+		},
 		rules: {
 			// disable rules we don't want to use from eslint-config-eslint
 			"no-undefined": "off",
-
-			// TODO: re-enable eslint-plugin-jsdoc rules
-			...Object.fromEntries(
-				Object.keys(eslintPluginJSDoc.rules).map(name => [
-					`jsdoc/${name}`,
-					"off",
-				]),
-			),
 		},
 	},
-
-	// Tools and CLI
 	{
+		name: "rewrite/tools",
 		files: [
 			"scripts/**",
 			"tools/**",
@@ -48,30 +45,22 @@ export default defineConfig([
 			"n/no-process-exit": "off",
 		},
 	},
-
 	{
+		name: "rewrite/tests",
 		files: ["**/tests/**"],
 		languageOptions: {
 			globals: {
-				describe: "readonly",
-				xdescribe: "readonly",
-				it: "readonly",
-				xit: "readonly",
-				beforeEach: "readonly",
-				afterEach: "readonly",
-				before: "readonly",
-				after: "readonly",
+				...globals.mocha,
 			},
 		},
 	},
-
-	// TypeScript
-	...tseslint.config({
+	{
+		name: "rewrite/ts",
 		files: ["**/*.ts"],
 		ignores: ["**/tests/**/*.ts"],
-		extends: [...tseslint.configs.strict, ...tseslint.configs.stylistic],
+		extends: [tseslint.configs.strict, tseslint.configs.stylistic],
 		rules: {
 			"no-use-before-define": "off",
 		},
-	}),
+	},
 ]);

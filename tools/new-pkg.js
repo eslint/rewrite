@@ -20,7 +20,7 @@ import { parseArgs } from "node:util";
 /**
  * Recursively gets all files in a directory.
  * @param {string} dir The directory to search.
- * @param {string[]} fileList The list of files found so far.
+ * @returns {string[]} The list of files found so far.
  */
 function getAllFiles(dir) {
 	const fileList = [];
