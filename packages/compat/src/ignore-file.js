@@ -24,7 +24,6 @@ import path from "node:path";
  * Converts an ESLint ignore pattern to a minimatch pattern.
  * @param {string} pattern The .eslintignore or .gitignore pattern to convert.
  * @returns {string} The converted pattern.
- *
  * @deprecated Use the `convertIgnorePatternToMinimatch()` function exported by
  * `@eslint/config-helpers` instead.
  */
@@ -75,7 +74,6 @@ export function convertIgnorePatternToMinimatch(pattern) {
  * @param {string} [name] The name of the ignore file config.
  * @returns {FlatConfig} An object with an `ignores` property that is an array of ignore patterns.
  * @throws {Error} If the ignore file path is not an absolute path.
- *
  * @deprecated Use the `includeIgnoreFile()` function exported by
  * `@eslint/config-helpers` instead (also available at `eslint/config`).
  */

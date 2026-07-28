@@ -154,6 +154,7 @@ function getConfigName(config) {
  * @param {ConfigObject} config The config object to get the name of.
  * @param {number} index The index of the config object in the array.
  * @param {Error} error The error to rethrow.
+ * @returns {void}
  * @throws {ConfigError} When the error is rethrown for a config.
  */
 function rethrowConfigError(config, index, error) {
@@ -270,7 +271,6 @@ function normalizePattern(pattern) {
  * Checks if a given pattern requires normalization.
  * @param {any} pattern The pattern to check.
  * @returns {boolean} True if the pattern needs normalization, false otherwise.
- *
  */
 function needsPatternNormalization(pattern) {
 	return (
@@ -367,6 +367,12 @@ async function normalize(
 	const allowFunctions = extraConfigTypes.includes("function");
 	const allowArrays = extraConfigTypes.includes("array");
 
+	/**
+	 * Recursively flattens items and resolves config functions into config objects.
+	 * @param {Array} array The array to traverse.
+	 * @returns {AsyncGenerator<Object, void, void>} Async generator yielding config objects.
+	 * @throws {TypeError} If functions or arrays are not allowed, or if a config function returns another function.
+	 */
 	async function* flatTraverse(array) {
 		for (let item of array) {
 			if (typeof item === "function") {
@@ -431,6 +437,12 @@ function normalizeSync(
 	const allowFunctions = extraConfigTypes.includes("function");
 	const allowArrays = extraConfigTypes.includes("array");
 
+	/**
+	 * Recursively flattens items and resolves config functions into config objects.
+	 * @param {Array} array The array to traverse.
+	 * @returns {Generator<Object, void, void>} Generator yielding config objects.
+	 * @throws {TypeError} If functions or arrays are not allowed, if a config function returns another function, or if it returns a promise.
+	 */
 	function* flatTraverse(array) {
 		for (let item of array) {
 			if (typeof item === "function") {
@@ -569,6 +581,12 @@ function shouldIgnorePath(
  */
 function pathMatches(filePath, relativeFilePath, config) {
 	// match both strings and functions
+	/**
+	 * Matches a file matcher against the provided file path.
+	 * @param {FileMatcher} pattern The matcher pattern or function.
+	 * @returns {boolean} True if the string pattern matches `relativeFilePath` or the matcher function returns true for `filePath`, false otherwise.
+	 * @throws {TypeError} If the matcher is not a string or function.
+	 */
 	function match(pattern) {
 		if (isString(pattern)) {
 			return doMatch(relativeFilePath, pattern);
@@ -731,7 +749,6 @@ export class ConfigArray extends Array {
 
 		/**
 		 * Tracks if the array has been normalized.
-		 * @property isNormalized
 		 * @type {boolean}
 		 * @private
 		 */
@@ -739,7 +756,6 @@ export class ConfigArray extends Array {
 
 		/**
 		 * The schema used for validating and merging configs.
-		 * @property schema
 		 * @type {ObjectSchemaInstance}
 		 * @private
 		 */
@@ -754,7 +770,6 @@ export class ConfigArray extends Array {
 		/**
 		 * The path of the config file that this array was loaded from.
 		 * This is used to calculate filename matches.
-		 * @property basePath
 		 * @type {string}
 		 */
 		this.basePath = basePath;
@@ -770,7 +785,6 @@ export class ConfigArray extends Array {
 
 		/**
 		 * A cache to store calculated configs for faster repeat lookup.
-		 * @property configCache
 		 * @type {Map<string, Object>}
 		 * @private
 		 */

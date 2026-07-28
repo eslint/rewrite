@@ -1938,6 +1938,10 @@ describe("source-code", () => {
 					[node1, undefined],
 				]);
 
+				/**
+				 * Test helper subclass that overrides getParent() to exercise
+				 * getAncestors() with a parent map.
+				 */
 				class TextSourceCode extends TextSourceCodeBase {
 					// eslint-disable-next-line class-methods-use-this -- Testing purposes
 					getParent(node) {

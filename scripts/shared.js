@@ -79,6 +79,14 @@ export function createBuildOrder(dependencies) {
 	const buildOrder = [];
 	const seen = new Set();
 
+	/**
+	 * Recursively visits a package's monorepo dependencies before adding the
+	 * package to the build order.
+	 * External dependencies are ignored because only packages in this monorepo
+	 * need to be built.
+	 * @param {string} name The package name to visit.
+	 * @returns {void}
+	 */
 	function visit(name) {
 		if (!seen.has(name)) {
 			seen.add(name);

@@ -19,8 +19,9 @@ const forkedProcesses = new Set();
 const EXECUTABLE_PATH = path.resolve("./src/mcp-cli.js");
 
 /**
- * Forks the process to run an instance of ESLint.
- * @returns {childProcess.ChildProcess} The resulting child process
+ * Forks the process to run an instance of the MCP server.
+ * @param {childProcess.ForkOptions} [options] Options to merge with the defaults passed to `childProcess.fork()`.
+ * @returns {childProcess.ChildProcess} The resulting child process.
  */
 function runServer(options) {
 	const newProcess = childProcess.fork(

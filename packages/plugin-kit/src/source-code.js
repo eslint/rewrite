@@ -568,6 +568,7 @@ export class TextSourceCodeBase {
 	/* eslint-disable no-unused-vars -- Required to complete interface. */
 	/**
 	 * Returns the parent of the given node.
+	 * @abstract
 	 * @param {Options['SyntaxElementWithLoc']} node The node to get the parent of.
 	 * @returns {Options['SyntaxElementWithLoc']|undefined} The parent of the node.
 	 * @throws {Error} If the method is not implemented in the subclass.
@@ -634,6 +635,7 @@ export class TextSourceCodeBase {
 
 	/**
 	 * Traverse the source code and return the steps that were taken.
+	 * @abstract
 	 * @returns {Iterable<TraversalStep>} The steps that were taken while traversing the source code.
 	 */
 	traverse() {

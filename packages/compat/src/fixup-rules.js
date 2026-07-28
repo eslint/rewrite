@@ -151,6 +151,11 @@ export function fixupRule(ruleDefinition) {
 		? ruleDefinition
 		: ruleDefinition.create.bind(ruleDefinition);
 
+	/**
+	 * Compatibility rule creator that adds missing methods to context and sourceCode objects.
+	 * @param {object} context The rule context.
+	 * @returns {object} The rule visitor.
+	 */
 	function ruleCreate(context) {
 		const sourceCode = context.sourceCode;
 

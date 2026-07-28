@@ -60,6 +60,11 @@ const CSSLanguage = class {};
 const MarkdownLanguage = class {};
 const JSONLanguage = class {};
 
+/**
+ * Creates a `ConfigArray` pre-populated with test fixtures.
+ * @param {Object} [options] Options to merge with the default `ConfigArray` constructor options.
+ * @returns {ConfigArray} The created instance.
+ */
 function createConfigArray(options) {
 	return new ConfigArray(
 		[
@@ -298,6 +303,15 @@ describe("ConfigArray", () => {
 	});
 
 	describe("Validation", () => {
+		/**
+		 * Defines tests that assert validation errors in both async and sync normalize flows.
+		 * @param {Object} options Test options.
+		 * @param {boolean} [options.only=false] If true, run these tests exclusively.
+		 * @param {string} options.title Test title prefix.
+		 * @param {Iterable<Function|Object>|Function|Object} options.configs Configs to pass to the `ConfigArray` constructor.
+		 * @param {assert.AssertPredicate} options.expectedError Expected error matcher for `assert.rejects()` and `assert.throws()`.
+		 * @returns {void}
+		 */
 		function testValidationError({
 			only = false,
 			title,
