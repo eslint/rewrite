@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.0.2](https://github.com/eslint/rewrite/compare/migrate-config-v3.0.1...migrate-config-v3.0.2) (2026-07-21)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @eslint/config-helpers bumped from ^0.6.0 to ^0.7.0
+
 ## [3.0.1](https://github.com/eslint/rewrite/compare/migrate-config-v3.0.0...migrate-config-v3.0.1) (2026-07-12)
 
 

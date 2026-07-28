@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/eslint/rewrite/compare/config-helpers-v0.6.0...config-helpers-v0.7.0) (2026-07-21)
+
+
+### Features
+
+* alias `Config` to `ConfigObject` ([#485](https://github.com/eslint/rewrite/issues/485)) ([9bba960](https://github.com/eslint/rewrite/commit/9bba9609dddd533e86162b82a1f8bc45abac9763))
+
 ## [0.6.0](https://github.com/eslint/rewrite/compare/config-helpers-v0.5.5...config-helpers-v0.6.0) (2026-05-08)
 
 

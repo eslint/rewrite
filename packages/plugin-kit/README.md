@@ -232,7 +232,7 @@ export class MySourceCode extends TextSourceCodeBase {
 
 		for (const { node, parent, phase } of iterator(this.ast)) {
 			//save the parent information
-			this.#parent.set(node, parent);
+			this.#parents.set(node, parent);
 
 			steps.push(
 				new VisitNodeStep({
@@ -248,7 +248,7 @@ export class MySourceCode extends TextSourceCodeBase {
 }
 ```
 
-In general, it's safe to collect the parent information during the `traverse()` method as `getParent()` and `getAncestor()` will only be called from rules once the AST has been traversed at least once.
+In general, it's safe to collect the parent information during the `traverse()` method as `getParent()` and `getAncestors()` will only be called from rules once the AST has been traversed at least once.
 
 ## License
 
