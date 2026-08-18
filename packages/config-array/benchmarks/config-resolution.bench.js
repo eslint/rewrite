@@ -28,9 +28,27 @@ import { ConfigArray } from "../src/index.js";
 // Options
 //------------------------------------------------------------------------------
 
+/**
+ * Parses the value of the `--runs` option.
+ * @param {string} value The raw option value.
+ * @returns {number} The number of runs to perform.
+ * @throws {Error} When the value is not a positive integer.
+ */
+function parseRuns(value) {
+	const runs = Number(value);
+
+	if (!Number.isInteger(runs) || runs < 1) {
+		throw new Error(
+			`Invalid --runs value ${JSON.stringify(value)}: expected a positive integer.`,
+		);
+	}
+
+	return runs;
+}
+
 const useWindowsPaths = process.argv.includes("--windows");
 const runsArg = process.argv.find(arg => arg.startsWith("--runs="));
-const RUNS = runsArg ? Number(runsArg.slice("--runs=".length)) : 100;
+const RUNS = runsArg ? parseRuns(runsArg.slice("--runs=".length)) : 100;
 const WARMUP_RUNS = 10;
 const FILE_COUNT = 1500;
 const DIRECTORY_CHECK_COUNT = 50;

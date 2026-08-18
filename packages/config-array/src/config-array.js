@@ -251,6 +251,43 @@ function assertValidBaseConfig(config, index) {
 }
 
 /**
+ * Determines if a parsed minimatch pattern can be safely compiled to a
+ * regular expression with `makeRe()`.
+ *
+ * `makeRe()` is lossy for patterns containing more than one globstar after
+ * the first path segment: all but the first such globstar are dropped. For
+ * example, a pattern made up of `a`, globstar, `b`, globstar, `c` compiles
+ * to a regular expression that has lost the second globstar, and so stops
+ * matching `"a/b/x/c"`. A leading globstar and a single non-leading
+ * globstar both compile correctly, which covers the common patterns such as
+ * `"src/**"` and those starting with a globstar.
+ *
+ * Excluding multi-globstar patterns additionally keeps them subject to
+ * minimatch's `maxGlobstarRecursion` bound, which a whole-path regular
+ * expression has no equivalent of.
+ * @param {Array<Array<any>>} set The parsed pattern set from a `Minimatch` instance.
+ * @returns {boolean} True if the pattern can be compiled to a regular
+ * 		expression, false if `match()` must be used.
+ */
+function canCompileToRegExp(set) {
+	for (const alternative of set) {
+		let nonLeadingGlobstars = 0;
+
+		for (let i = 1; i < alternative.length; i++) {
+			if (alternative[i] === GLOBSTAR) {
+				nonLeadingGlobstars++;
+
+				if (nonLeadingGlobstars > 1) {
+					return false;
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
+/**
  * Wrapper around minimatch that caches compiled patterns for
  * faster matching speed over multiple file path evaluations.
  *
@@ -259,6 +296,8 @@ function assertValidBaseConfig(config, index) {
  * because it doesn't need to split the file path into segments on
  * every call. This is safe because all paths passed here have already
  * been normalized to use forward slashes with no repeated slashes.
+ * Patterns that `makeRe()` cannot represent exactly fall back to
+ * `Minimatch#match()`; see `canCompileToRegExp()`.
  * @param {string} filepath The file path to match.
  * @param {string} pattern The glob pattern to match against.
  * @param {boolean} flipNegate If true, negated patterns return true on a
@@ -304,18 +343,17 @@ function doMatch(filepath, pattern, flipNegate = false) {
 		 * For rare patterns where this rewrite doesn't apply (e.g. brace
 		 * expansions with a trailing globstar), fall back to `match()`.
 		 */
-		let regexp;
-		const hasTrailingGlobstar = rawMatcher.set.some(
-			alternative =>
-				alternative.length > 1 && alternative.at(-1) === GLOBSTAR,
-		);
+		let regexp = null;
 
-		if (!hasTrailingGlobstar) {
-			regexp = rawMatcher.makeRe() || null;
-		} else {
-			regexp = null;
+		if (canCompileToRegExp(rawMatcher.set)) {
+			const hasTrailingGlobstar = rawMatcher.set.some(
+				alternative =>
+					alternative.length > 1 && alternative.at(-1) === GLOBSTAR,
+			);
 
-			if (rawMatcher.set.length === 1) {
+			if (!hasTrailingGlobstar) {
+				regexp = rawMatcher.makeRe() || null;
+			} else if (rawMatcher.set.length === 1) {
 				const compiled = rawMatcher.makeRe();
 
 				if (compiled && compiled.source.endsWith(")?$")) {
