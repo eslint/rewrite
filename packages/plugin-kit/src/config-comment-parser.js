@@ -96,7 +96,7 @@ export class ConfigCommentParser {
 	 * @returns {StringConfig} Result map object of names and string values, or null values if no value was provided.
 	 */
 	parseStringConfig(string) {
-		const items = /** @type {StringConfig} */ ({});
+		const items = /** @type {StringConfig} */ (Object.create(null));
 
 		// Collapse whitespace around `:` and `,` to make parsing easier
 		const trimmedString = string
@@ -183,7 +183,7 @@ export class ConfigCommentParser {
 	 * @returns {BooleanConfig} Result map of values and true values
 	 */
 	parseListConfig(string) {
-		const items = /** @type {BooleanConfig} */ ({});
+		const items = /** @type {BooleanConfig} */ (Object.create(null));
 
 		string.split(",").forEach(name => {
 			const trimmedName = name
