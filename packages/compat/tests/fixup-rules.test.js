@@ -340,6 +340,42 @@ describe("@eslint/compat", () => {
 			);
 		});
 
+
+		it("should preserve the return value from context.markVariableAsUsed()", () => {
+			const results = [];
+			const rule = {
+				create(context) {
+					return {
+						Program() {
+							results.push(context.markVariableAsUsed("existing"));
+							results.push(context.markVariableAsUsed("missing"));
+						},
+					};
+				},
+			};
+
+			const config = {
+				languageOptions: {
+					sourceType: "script",
+				},
+				plugins: {
+					test: {
+						rules: {
+							"test-rule": fixupRule(rule),
+						},
+					},
+				},
+				rules: {
+					"test/test-rule": "error",
+				},
+			};
+
+			const linter = new Linter();
+			linter.verify("var existing;", config);
+
+			assert.deepStrictEqual(results, [true, false]);
+		});
+
 		REPLACEMENT_METHODS.forEach(method => {
 			it(`should create a rule where context.${method}() returns the same value as sourceCode.${method}(node) in visitor methods`, () => {
 				const rule = {
