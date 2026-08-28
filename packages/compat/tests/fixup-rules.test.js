@@ -340,7 +340,6 @@ describe("@eslint/compat", () => {
 			);
 		});
 
-
 		it("should preserve the return value from context.markVariableAsUsed()", () => {
 			const results = [];
 			const rule = {
