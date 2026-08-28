@@ -346,7 +346,9 @@ describe("@eslint/compat", () => {
 				create(context) {
 					return {
 						Program() {
-							results.push(context.markVariableAsUsed("existing"));
+							results.push(
+								context.markVariableAsUsed("existing"),
+							);
 							results.push(context.markVariableAsUsed("missing"));
 						},
 					};
