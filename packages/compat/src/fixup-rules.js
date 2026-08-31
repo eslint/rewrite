@@ -295,7 +295,10 @@ export function fixupRule(ruleDefinition) {
 			},
 
 			markVariableAsUsed(variable) {
-				compatSourceCode.markVariableAsUsed(variable, currentNode);
+				return compatSourceCode.markVariableAsUsed(
+					variable,
+					currentNode,
+				);
 			},
 		});
 
