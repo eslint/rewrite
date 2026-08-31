@@ -605,7 +605,7 @@ export class TextSourceCodeBase {
 
 	/**
 	 * Gets the source code for the given node.
-	 * @param {Options['SyntaxElementWithLoc']} [node] The AST node to get the text for.
+	 * @param {Options['SyntaxElementWithLoc']} [node] The AST node to get the text for. If `undefined` or omitted, the entire source text is returned.
 	 * @param {number} [beforeCount] The number of characters before the node to retrieve.
 	 * @param {number} [afterCount] The number of characters after the node to retrieve.
 	 * @returns {string} The text representing the AST node.
