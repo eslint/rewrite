@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.3.12](https://github.com/eslint/rewrite/compare/mcp-v0.3.11...mcp-v0.3.12) (2026-09-01)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @eslint/plugin-kit bumped from ^0.7.2 to ^0.7.3
+
 ## [0.3.11](https://github.com/eslint/rewrite/compare/mcp-v0.3.10...mcp-v0.3.11) (2026-08-28)
 
 

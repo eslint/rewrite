@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.3](https://github.com/eslint/rewrite/compare/plugin-kit-v0.7.2...plugin-kit-v0.7.3) (2026-09-01)
+
+
+### Bug Fixes
+
+* preserve `__proto__` in `ConfigCommentParser` results ([#501](https://github.com/eslint/rewrite/issues/501)) ([18773d9](https://github.com/eslint/rewrite/commit/18773d9e415604b1adf38c12440cafeeedaef5a1))
+
 ## [0.7.2](https://github.com/eslint/rewrite/compare/plugin-kit-v0.7.1...plugin-kit-v0.7.2) (2026-05-23)
 
 
