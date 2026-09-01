@@ -1,6 +1,6 @@
 {
   "name": "@eslint/mcp",
-  "version": "0.3.10",
+  "version": "0.3.11",
   "description": "MCP server for ESLint",
   "type": "module",
   "bin": "./src/mcp-cli.js",
@@ -39,7 +39,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.26.0",
-    "eslint": "^10.8.0",
+    "eslint": "^10.9.1",
     "zod": "^4.1.13"
   },
   "devDependencies": {
