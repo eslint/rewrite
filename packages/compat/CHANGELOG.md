@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.1](https://github.com/eslint/rewrite/compare/compat-v2.1.0...compat-v2.1.1) (2026-09-01)
+
+
+### Bug Fixes
+
+* preserve markVariableAsUsed return value in compat context ([#503](https://github.com/eslint/rewrite/issues/503)) ([66d9790](https://github.com/eslint/rewrite/commit/66d97901b70918438deb4355b730079e4d087889))
+
 ## [2.1.0](https://github.com/eslint/rewrite/compare/compat-v2.0.5...compat-v2.1.0) (2026-05-08)
 
 
