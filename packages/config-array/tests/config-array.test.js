@@ -3753,6 +3753,120 @@ describe("ConfigArray", () => {
 		});
 
 		describe("isFileIgnored()", () => {
+			describe("patterns with multiple globstars", () => {
+				it("should match paths with segments between each globstar", () => {
+					const patternConfigs = new ConfigArray(
+						[{ ignores: ["a/**/b/**/c"] }],
+						{ basePath },
+					);
+
+					patternConfigs.normalizeSync();
+
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("a/b/c"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("a/x/b/c"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("a/b/x/c"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("a/x/b/y/c"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("a/x/y/b/z/w/c"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("a/b/d"),
+						false,
+					);
+				});
+
+				it("should match paths for a pattern with three globstars", () => {
+					const patternConfigs = new ConfigArray(
+						[{ ignores: ["a/**/b/**/c/**/d"] }],
+						{ basePath },
+					);
+
+					patternConfigs.normalizeSync();
+
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("a/b/c/d"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("a/x/b/y/c/z/d"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("a/b/x/c/d"),
+						true,
+					);
+				});
+
+				it("should match paths when globstars surround an extension pattern", () => {
+					const patternConfigs = new ConfigArray(
+						[{ ignores: ["src/**/test/**/*.js"] }],
+						{ basePath },
+					);
+
+					patternConfigs.normalizeSync();
+
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("src/test/a.js"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("src/x/test/a.js"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("src/test/x/a.js"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("src/x/test/y/a.js"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("src/test/a.ts"),
+						false,
+					);
+				});
+
+				it("should match paths for a leading globstar followed by an internal globstar", () => {
+					const patternConfigs = new ConfigArray(
+						[{ ignores: ["**/a/**/b"] }],
+						{ basePath },
+					);
+
+					patternConfigs.normalizeSync();
+
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("a/b"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("x/a/b"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("a/x/b"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("x/a/y/b"),
+						true,
+					);
+				});
+			});
+
 			it("should throw an error when not normalized", () => {
 				const filename = "foo.js";
 				assert.throws(() => {
