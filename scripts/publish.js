@@ -220,7 +220,7 @@ function postResultToSocialMedia(npmPublishResults) {
 		console.log(message);
 
 		exec(
-			`npx @humanwhocodes/crosspost -t -b -m ${JSON.stringify(message)}`,
+			`npx @humanwhocodes/crosspost -b -m ${JSON.stringify(message)}`,
 			{
 				stdio: "inherit",
 				env: process.env,
