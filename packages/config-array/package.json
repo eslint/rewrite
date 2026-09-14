@@ -35,6 +35,7 @@
     "build:dedupe-types": "node ../../tools/dedupe-types.js dist/cjs/index.cjs dist/esm/index.js",
     "build:cts": "node ../../tools/build-cts.js dist/esm/index.d.ts dist/cjs/index.d.cts",
     "build:std__path": "rollup -c rollup.std__path-config.js && node fix-std__path-imports",
+    "bench": "node benchmarks/config-resolution.bench.js",
     "build": "rollup -c && npm run build:dedupe-types && tsc -p tsconfig.esm.json && npm run build:cts && npm run build:std__path",
     "lint:types": "attw --pack",
     "pretest": "npm run build",
