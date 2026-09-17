@@ -4,6 +4,7 @@
   "bump-minor-pre-major": true,
   "extra-label": "triage:no",
   "pull-request-title-pattern": "chore: release${component} ${version}",
+  "pull-request-footer": "This PR was generated with [Release Please](https://github.com/googleapis/release-please). See [documentation](https://github.com/googleapis/release-please#release-please).\n\n<!-- @coderabbitai ignore -->",
   "packages": {
     "packages/compat": {
       "release-type": "node",
