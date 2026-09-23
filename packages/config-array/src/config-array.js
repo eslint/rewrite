@@ -1499,9 +1499,7 @@ export class ConfigArray extends Array {
 		);
 
 		if (EXTERNAL_PATH_REGEX.test(relativeToBaseFilePath)) {
-			if (debug.enabled) {
-				debug(`No config for file ${filePath} outside of base path`);
-			}
+			debug("No config for file %s outside of base path", filePath);
 
 			// cache and return result
 			cache.set(filePath, CONFIG_WITH_STATUS_EXTERNAL);
