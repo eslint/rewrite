@@ -1510,9 +1510,7 @@ export class ConfigArray extends Array {
 
 		// check if this should be ignored due to its directory
 		if (this.isDirectoryIgnored(this.#path.dirname(filePath))) {
-			if (debug.enabled) {
-				debug(`Ignoring ${filePath} based on directory pattern`);
-			}
+			debug("Ignoring %s based on directory pattern", filePath);
 
 			// cache and return result
 			cache.set(filePath, CONFIG_WITH_STATUS_IGNORED);
