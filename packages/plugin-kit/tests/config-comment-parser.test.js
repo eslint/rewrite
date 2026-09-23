@@ -25,31 +25,32 @@ describe("ConfigCommentParser", () => {
 	});
 
 	describe("parseStringConfig", () => {
-		const comment = {};
-
 		it("should parse String config with one item", () => {
 			const code = "a: true";
-			const result = commentParser.parseStringConfig(code, comment);
+			const result = commentParser.parseStringConfig(code);
 
 			assert.deepStrictEqual(result, {
+				__proto__: null,
 				a: "true",
 			});
 		});
 
 		it("should parse String config with one item and no value", () => {
 			const code = "a";
-			const result = commentParser.parseStringConfig(code, comment);
+			const result = commentParser.parseStringConfig(code);
 
 			assert.deepStrictEqual(result, {
+				__proto__: null,
 				a: null,
 			});
 		});
 
 		it("should parse String config with two items", () => {
 			const code = "a: five b:three";
-			const result = commentParser.parseStringConfig(code, comment);
+			const result = commentParser.parseStringConfig(code);
 
 			assert.deepStrictEqual(result, {
+				__proto__: null,
 				a: "five",
 				b: "three",
 			});
@@ -57,9 +58,10 @@ describe("ConfigCommentParser", () => {
 
 		it("should parse String config with two comma-separated items", () => {
 			const code = "a: seventy, b:ELEVENTEEN";
-			const result = commentParser.parseStringConfig(code, comment);
+			const result = commentParser.parseStringConfig(code);
 
 			assert.deepStrictEqual(result, {
+				__proto__: null,
 				a: "seventy",
 				b: "ELEVENTEEN",
 			});
@@ -67,9 +69,10 @@ describe("ConfigCommentParser", () => {
 
 		it("should parse String config with two comma-separated items and no values", () => {
 			const code = "a , b";
-			const result = commentParser.parseStringConfig(code, comment);
+			const result = commentParser.parseStringConfig(code);
 
 			assert.deepStrictEqual(result, {
+				__proto__: null,
 				a: null,
 				b: null,
 			});
@@ -77,34 +80,37 @@ describe("ConfigCommentParser", () => {
 
 		it("should return an empty object for an empty string", () => {
 			const code = "";
-			const result = commentParser.parseStringConfig(code, comment);
+			const result = commentParser.parseStringConfig(code);
 
-			assert.deepStrictEqual(result, {});
+			assert.deepStrictEqual(result, { __proto__: null });
 		});
 
 		it("should parse string config with one item, no value, and leading whitespace", () => {
 			const code = `${" ".repeat(100000)}a`;
-			const result = commentParser.parseStringConfig(code, comment);
+			const result = commentParser.parseStringConfig(code);
 
 			assert.deepStrictEqual(result, {
+				__proto__: null,
 				a: null,
 			});
 		});
 
 		it("should parse string config with one item, no value, and trailing whitespace", () => {
 			const code = `a${" ".repeat(100000)}`;
-			const result = commentParser.parseStringConfig(code, comment);
+			const result = commentParser.parseStringConfig(code);
 
 			assert.deepStrictEqual(result, {
+				__proto__: null,
 				a: null,
 			});
 		});
 
 		it("should parse string config with two items, no values, and whitespace in the middle", () => {
 			const code = `a${" ".repeat(100000)}b`;
-			const result = commentParser.parseStringConfig(code, comment);
+			const result = commentParser.parseStringConfig(code);
 
 			assert.deepStrictEqual(result, {
+				__proto__: null,
 				a: null,
 				b: null,
 			});
@@ -113,13 +119,34 @@ describe("ConfigCommentParser", () => {
 		it("should parse string config with multiple items with values separated by commas and lots of whitespace", () => {
 			const whitespace = " ".repeat(100000);
 			const code = `a: 1${whitespace},${whitespace}b: 2${whitespace},${whitespace}c: 3${whitespace},${whitespace}d: 4`;
-			const result = commentParser.parseStringConfig(code, comment);
+			const result = commentParser.parseStringConfig(code);
 
 			assert.deepStrictEqual(result, {
+				__proto__: null,
 				a: "1",
 				b: "2",
 				c: "3",
 				d: "4",
+			});
+		});
+
+		it("should parse string config with an item named __proto__", () => {
+			const code = "__proto__";
+			const result = commentParser.parseStringConfig(code);
+
+			assert.deepStrictEqual(result, {
+				__proto__: null,
+				["__proto__"]: null,
+			});
+		});
+
+		it("should parse string config with an item named __proto__ and a value", () => {
+			const code = "__proto__: writable";
+			const result = commentParser.parseStringConfig(code);
+
+			assert.deepStrictEqual(result, {
+				__proto__: null,
+				["__proto__"]: "writable",
 			});
 		});
 	});
@@ -130,6 +157,7 @@ describe("ConfigCommentParser", () => {
 			const result = commentParser.parseListConfig(code);
 
 			assert.deepStrictEqual(result, {
+				__proto__: null,
 				a: true,
 			});
 		});
@@ -139,6 +167,7 @@ describe("ConfigCommentParser", () => {
 			const result = commentParser.parseListConfig(code);
 
 			assert.deepStrictEqual(result, {
+				__proto__: null,
 				a: true,
 				b: true,
 			});
@@ -149,6 +178,7 @@ describe("ConfigCommentParser", () => {
 			const result = commentParser.parseListConfig(code);
 
 			assert.deepStrictEqual(result, {
+				__proto__: null,
 				a: true,
 				b: true,
 			});
@@ -159,6 +189,7 @@ describe("ConfigCommentParser", () => {
 			const result = commentParser.parseListConfig(code);
 
 			assert.deepStrictEqual(result, {
+				__proto__: null,
 				a: true,
 				b: true,
 				"\"d'": true, // This result is correct because used mismatched quotes.
@@ -170,9 +201,32 @@ describe("ConfigCommentParser", () => {
 			const result = commentParser.parseListConfig(code);
 
 			assert.deepStrictEqual(result, {
+				__proto__: null,
 				"a b": true,
 				"c d": true,
 				"e f": true,
+			});
+		});
+
+		it("should parse list config with an item named __proto__", () => {
+			const code = "__proto__";
+			const result = commentParser.parseListConfig(code);
+
+			assert.deepStrictEqual(result, {
+				__proto__: null,
+				["__proto__"]: true,
+			});
+		});
+
+		it("should parse list config with an item named __proto__ among other items", () => {
+			const code = "a, __proto__, b";
+			const result = commentParser.parseListConfig(code);
+
+			assert.deepStrictEqual(result, {
+				__proto__: null,
+				a: true,
+				["__proto__"]: true,
+				b: true,
 			});
 		});
 	});

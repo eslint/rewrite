@@ -219,13 +219,10 @@ function postResultToSocialMedia(npmPublishResults) {
 
 		console.log(message);
 
-		exec(
-			`npx @humanwhocodes/crosspost -t -b -m ${JSON.stringify(message)}`,
-			{
-				stdio: "inherit",
-				env: process.env,
-			},
-		);
+		exec(`npx @humanwhocodes/crosspost -b -m ${JSON.stringify(message)}`, {
+			stdio: "inherit",
+			env: process.env,
+		});
 	}
 
 	console.log("Posted to social media.");

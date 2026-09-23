@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.3.13](https://github.com/eslint/rewrite/compare/mcp-v0.3.12...mcp-v0.3.13) (2026-09-19)
+
+
+### Bug Fixes
+
+* update dependency eslint to ^10.10.0 ([#507](https://github.com/eslint/rewrite/issues/507)) ([d7df9fc](https://github.com/eslint/rewrite/commit/d7df9fcaec195b27e46451c6fa1a0f3e4d6833a1))
+* update dependency eslint to ^10.11.0 ([#513](https://github.com/eslint/rewrite/issues/513)) ([4d821b1](https://github.com/eslint/rewrite/commit/4d821b17b26f4cf85701538070624cc2b8a6228b))
+
+## [0.3.12](https://github.com/eslint/rewrite/compare/mcp-v0.3.11...mcp-v0.3.12) (2026-09-01)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @eslint/plugin-kit bumped from ^0.7.2 to ^0.7.3
+
+## [0.3.11](https://github.com/eslint/rewrite/compare/mcp-v0.3.10...mcp-v0.3.11) (2026-08-28)
+
+
+### Bug Fixes
+
+* update dependency eslint to ^10.8.1 ([#494](https://github.com/eslint/rewrite/issues/494)) ([cc71fb5](https://github.com/eslint/rewrite/commit/cc71fb5bfdec53ef9d4dc8560434ab48453e4085))
+* update dependency eslint to ^10.9.1 ([#499](https://github.com/eslint/rewrite/issues/499)) ([7a22a36](https://github.com/eslint/rewrite/commit/7a22a36df0402026567cb92efb00e008a4c278d8))
+
 ## [0.3.10](https://github.com/eslint/rewrite/compare/mcp-v0.3.9...mcp-v0.3.10) (2026-07-25)
 
 
