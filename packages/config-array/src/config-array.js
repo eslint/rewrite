@@ -640,80 +640,54 @@ function normalizeSync(
 const POSIX_UNSAFE_SEGMENT_REGEX = /\/\/|\/\.{1,2}(?:\/|$)/u;
 
 /**
- * Computes the posix relative path between two already-resolved absolute
- * paths. This is a port of the `relative()` implementation from
- * `@jsr/std__path/posix` without the redundant `resolve()` calls, for use
- * when both paths are known to be normalized absolute paths.
- * @param {string} from The resolved path to start from.
- * @param {string} to The resolved path to reach.
+ * Computes the posix relative path from a base path to a path outside of it.
+ * Both paths must already be normalized absolute paths without trailing
+ * slashes (though `to` may be the root `"/"`), `from` must not be the
+ * root, and `to` must not be equal to or inside of `from`. Under those
+ * conditions the result always starts with `".."`, which lets this skip the
+ * `resolve()` calls and general-case branches of `path.relative()`.
+ * @param {string} from The base path.
+ * @param {string} to The path outside of the base path.
  * @returns {string} The relative path.
  */
-function posixRelativeResolved(from, to) {
-	if (from === to) {
-		return "";
-	}
+function posixRelativeOutside(from, to) {
+	const fromLength = from.length;
+	const toLength = to.length;
+	const length = fromLength < toLength ? fromLength : toLength;
 
-	const fromEnd = from.length;
-	const fromLen = fromEnd - 1;
-	const toEnd = to.length;
-	const toLen = toEnd - 1;
+	// index of the slash that ends the deepest common ancestor directory
+	let commonSlash = 0;
+	let i = 1;
 
-	// Compare paths to find the longest common path from root
-	const length = fromLen < toLen ? fromLen : toLen;
-	let lastCommonSep = -1;
-	let i = 0;
-	for (; i <= length; ++i) {
-		if (i === length) {
-			if (toLen > length) {
-				if (to.charCodeAt(1 + i) === SLASH_CHAR_CODE) {
-					// `from` is the exact base path for `to`
-					return to.slice(2 + i);
-				}
+	for (; i < length; i++) {
+		const code = from.charCodeAt(i);
 
-				if (i === 0) {
-					// `from` is the root
-					return to.slice(1 + i);
-				}
-			} else if (fromLen > length) {
-				if (from.charCodeAt(1 + i) === SLASH_CHAR_CODE) {
-					// `to` is the exact base path for `from`
-					lastCommonSep = i;
-				} else if (i === 0) {
-					// `to` is the root
-					lastCommonSep = 0;
-				}
-			}
+		if (code !== to.charCodeAt(i)) {
 			break;
 		}
-		const fromCode = from.charCodeAt(1 + i);
-		if (fromCode !== to.charCodeAt(1 + i)) {
-			break;
-		} else if (fromCode === SLASH_CHAR_CODE) {
-			lastCommonSep = i;
+
+		if (code === SLASH_CHAR_CODE) {
+			commonSlash = i;
 		}
 	}
 
-	let out = "";
+	// `to` is an ancestor of `from`, e.g. from "/a/b" to "/a"
+	if (i === toLength && from.charCodeAt(i) === SLASH_CHAR_CODE) {
+		commonSlash = i;
+	}
 
-	// Generate the relative path based on the path difference between
-	// `to` and `from`
-	for (i = 2 + lastCommonSep; i <= fromEnd; ++i) {
-		if (i === fromEnd || from.charCodeAt(i) === SLASH_CHAR_CODE) {
-			out += out.length === 0 ? ".." : "/..";
+	// one ".." for each segment of `from` after the common ancestor
+	let result = "..";
+
+	for (let j = commonSlash + 1; j < fromLength; j++) {
+		if (from.charCodeAt(j) === SLASH_CHAR_CODE) {
+			result += "/..";
 		}
 	}
 
-	// Lastly, append the rest of the destination (`to`) path that comes
-	// after the common path parts
-	if (out.length > 0) {
-		return out + to.slice(1 + lastCommonSep);
-	}
-
-	let toStart = 1 + lastCommonSep;
-	if (to.charCodeAt(toStart) === SLASH_CHAR_CODE) {
-		++toStart;
-	}
-	return to.slice(toStart);
+	return commonSlash + 1 < toLength
+		? `${result}/${to.slice(commonSlash + 1)}`
+		: result;
 }
 
 /**
@@ -744,8 +718,8 @@ function fastPosixRelative(filePath, basePath) {
 
 	const baseLength = basePath.length;
 
+	// base paths always start with a slash in posix mode
 	if (
-		basePath.charCodeAt(0) !== SLASH_CHAR_CODE ||
 		basePath.charCodeAt(baseLength - 1) === SLASH_CHAR_CODE ||
 		POSIX_UNSAFE_SEGMENT_REGEX.test(basePath)
 	) {
@@ -763,8 +737,8 @@ function fastPosixRelative(filePath, basePath) {
 		}
 	}
 
-	// both paths are normalized absolute paths at this point
-	return posixRelativeResolved(
+	// the path is outside of the base path
+	return posixRelativeOutside(
 		basePath,
 		end === filePath.length ? filePath : filePath.slice(0, end),
 	);
@@ -1083,11 +1057,6 @@ function calculateConfigMetadata(config) {
  * @returns {ConfigMetadata} The metadata for the config object.
  */
 function getConfigMetadata(config) {
-	// non-object configs cannot be used as WeakMap keys
-	if (typeof config !== "object" || config === null) {
-		return calculateConfigMetadata(Object(config));
-	}
-
 	let metadata = configMetadataCache.get(config);
 
 	if (metadata === undefined) {
@@ -1523,9 +1492,7 @@ export class ConfigArray extends Array {
 				path: this.#path,
 			})
 		) {
-			if (debug.enabled) {
-				debug(`Ignoring ${filePath} based on file pattern`);
-			}
+			debug("Ignoring %s based on file pattern", filePath);
 
 			// cache and return result
 			cache.set(filePath, CONFIG_WITH_STATUS_IGNORED);
@@ -1536,7 +1503,6 @@ export class ConfigArray extends Array {
 
 		const matchingConfigIndices = [];
 		let matchFound = false;
-		const debugEnabled = debug.enabled;
 
 		// lazily computed absolute version of `filePath`
 		let fullFilePath = null;
@@ -1570,32 +1536,27 @@ export class ConfigArray extends Array {
 				);
 
 				if (EXTERNAL_PATH_REGEX.test(relativeFilePath)) {
-					if (debugEnabled) {
-						debug(
-							`Skipped config found for ${filePath} (based on config's base path: ${config.basePath}`,
-						);
-					}
+					debug(
+						"Skipped config found for %s (based on config's base path: %s)",
+						filePath,
+						config.basePath,
+					);
 					continue;
 				}
 			}
 
-			const metadata = getConfigMetadata(config);
-
 			if (!config.files) {
 				if (!config.ignores) {
-					if (debugEnabled) {
-						debug(`Universal config found for ${filePath}`);
-					}
+					debug("Universal config found for %s", filePath);
 					matchingConfigIndices.push(index);
 					continue;
 				}
 
-				if (metadata.isGlobalIgnores) {
-					if (debugEnabled) {
-						debug(
-							`Skipped config found for ${filePath} (global ignores)`,
-						);
-					}
+				if (getConfigMetadata(config).isGlobalIgnores) {
+					debug(
+						"Skipped config found for %s (global ignores)",
+						filePath,
+					);
 					continue;
 				}
 
@@ -1611,32 +1572,29 @@ export class ConfigArray extends Array {
 						false,
 					)
 				) {
-					if (debugEnabled) {
-						debug(
-							`Skipped config found for ${filePath} (based on ignores: ${config.ignores})`,
-						);
-					}
+					debug(
+						"Skipped config found for %s (based on ignores: %s)",
+						filePath,
+						config.ignores,
+					);
 					continue;
 				}
 
-				if (debugEnabled) {
-					debug(
-						`Matching config found for ${filePath} (based on ignores: ${config.ignores})`,
-					);
-				}
+				debug(
+					"Matching config found for %s (based on ignores: %s)",
+					filePath,
+					config.ignores,
+				);
 				matchingConfigIndices.push(index);
 				continue;
 			}
 
-			const { universalFiles, nonUniversalFiles } = metadata;
+			const { universalFiles, nonUniversalFiles } =
+				getConfigMetadata(config);
 
 			// universal patterns were found so we need to check the config twice
 			if (universalFiles.length) {
-				if (debugEnabled) {
-					debug(
-						"Universal files patterns found. Checking carefully.",
-					);
-				}
+				debug("Universal files patterns found. Checking carefully.");
 
 				// check that the config matches without the non-universal files first
 				if (
@@ -1648,9 +1606,7 @@ export class ConfigArray extends Array {
 						config.ignores,
 					)
 				) {
-					if (debugEnabled) {
-						debug(`Matching config found for ${filePath}`);
-					}
+					debug("Matching config found for %s", filePath);
 					matchingConfigIndices.push(index);
 					matchFound = true;
 					continue;
@@ -1665,9 +1621,7 @@ export class ConfigArray extends Array {
 						config.ignores,
 					)
 				) {
-					if (debugEnabled) {
-						debug(`Matching config found for ${filePath}`);
-					}
+					debug("Matching config found for %s", filePath);
 					matchingConfigIndices.push(index);
 					continue;
 				}
@@ -1685,9 +1639,7 @@ export class ConfigArray extends Array {
 					config.ignores,
 				)
 			) {
-				if (debugEnabled) {
-					debug(`Matching config found for ${filePath}`);
-				}
+				debug("Matching config found for %s", filePath);
 				matchingConfigIndices.push(index);
 				matchFound = true;
 			}
@@ -1695,7 +1647,7 @@ export class ConfigArray extends Array {
 
 		// if matching both files and ignores, there will be no config to create
 		if (!matchFound) {
-			debug(`No matching configs found for ${filePath}`);
+			debug("No matching configs found for %s", filePath);
 
 			// cache and return result
 			cache.set(filePath, CONFIG_WITH_STATUS_UNCONFIGURED);
