@@ -61,14 +61,24 @@ behavior, not just performance. The second line reports timing statistics
 
 ## Comparing changes
 
-To compare against another revision, run the benchmark on both and compare
-the medians. For example:
+To compare uncommitted changes against the current `HEAD`, run the benchmark
+before and after stashing those changes, then compare the medians. For example:
 
 ```shell
 node benchmarks/config-resolution.bench.js
 git stash
 node benchmarks/config-resolution.bench.js
 git stash pop
+```
+
+To compare committed revisions, benchmark the current commit, switch to the
+second commit, and benchmark it as well:
+
+```shell
+node benchmarks/config-resolution.bench.js
+git switch --detach <second-commit>
+node benchmarks/config-resolution.bench.js
+git switch -
 ```
 
 Run each configuration a few times and expect a few percent of noise between
