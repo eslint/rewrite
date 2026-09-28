@@ -37,12 +37,6 @@ import { filesAndIgnoresSchema } from "./files-and-ignores-schema.js";
  */
 /** @typedef {ObjectSchema} ObjectSchemaInstance */
 
-//------------------------------------------------------------------------------
-// Helpers
-//------------------------------------------------------------------------------
-
-const debug = createDebug("@eslint/config-array");
-
 /**
  * A compiled pattern matcher entry. The regular expression is compiled from
  * the minimatch pattern via `makeRe()` so that repeated matches don't need
@@ -56,6 +50,25 @@ const debug = createDebug("@eslint/config-array");
  * @property {boolean} negate True if the regular expression's raw result
  * 		should be negated to produce the match result.
  */
+
+/**
+ * Derived information about a config object that is expensive to compute
+ * on every file path lookup, so it's computed once per config object and
+ * cached.
+ * @typedef {Object} ConfigMetadata
+ * @property {boolean} isGlobalIgnores True if the config object only has
+ * 		`ignores` (aside from meta fields) and therefore acts as global ignores.
+ * @property {FilesMatcher[]|null} universalFiles The universal patterns found
+ * 		in `files`, or `null` if the config has no `files`.
+ * @property {FilesMatcher[]|null} nonUniversalFiles The non-universal patterns
+ * 		found in `files`, or `null` if the config has no `files`.
+ */
+
+//------------------------------------------------------------------------------
+// Helpers
+//------------------------------------------------------------------------------
+
+const debug = createDebug("@eslint/config-array");
 
 /**
  * A cache for pattern matchers.
@@ -122,6 +135,21 @@ const CONFIG_WITH_STATUS_UNCONFIGURED = Object.freeze({
 
 // Match two leading dots followed by a slash or the end of input.
 const EXTERNAL_PATH_REGEX = /^\.\.(?:\/|$)/u;
+
+// Detects repeated slashes or `.`/`..` segments in an absolute posix path.
+const POSIX_UNSAFE_SEGMENT_REGEX = /\/\/|\/\.{1,2}(?:\/|$)/u;
+
+/*
+ * Pattern to detect universal file patterns: `*`, patterns starting with
+ * `!`, or patterns ending with `/*` or `/**`.
+ */
+const UNIVERSAL_PATTERN_REGEX = /^\*$|^!|\/\*{1,2}$/u;
+
+/**
+ * A cache for config object metadata.
+ * @type {WeakMap<Object, ConfigMetadata>}
+ */
+const configMetadataCache = new WeakMap();
 
 /**
  * Wrapper error for config validation errors that adds a name to the front of the
@@ -375,11 +403,7 @@ function doMatch(filepath, pattern, flipNegate = false) {
 
 	const { regexp } = entry;
 
-	/*
-	 * The empty string requires `Minimatch#match()`'s segment-based
-	 * handling, so defer to it in that case.
-	 */
-	if (regexp !== null && filepath !== "") {
+	if (regexp !== null) {
 		let matched = regexp.test(filepath);
 
 		/*
@@ -635,9 +659,6 @@ function normalizeSync(
 
 	return configs;
 }
-
-// Detects repeated slashes or `.`/`..` segments in an absolute posix path.
-const POSIX_UNSAFE_SEGMENT_REGEX = /\/\/|\/\.{1,2}(?:\/|$)/u;
 
 /**
  * Computes the posix relative path from a base path to a path outside of it.
@@ -952,31 +973,6 @@ function pathMatchesFiles(filePath, relativeFilePath, files, ignores) {
 
 	return filePathMatchesPattern;
 }
-
-/*
- * Pattern to detect universal file patterns: `*`, patterns starting with
- * `!`, or patterns ending with `/*` or `/**`.
- */
-const UNIVERSAL_PATTERN_REGEX = /^\*$|^!|\/\*{1,2}$/u;
-
-/**
- * Derived information about a config object that is expensive to compute
- * on every file path lookup, so it's computed once per config object and
- * cached.
- * @typedef {Object} ConfigMetadata
- * @property {boolean} isGlobalIgnores True if the config object only has
- * 		`ignores` (aside from meta fields) and therefore acts as global ignores.
- * @property {FilesMatcher[]|null} universalFiles The universal patterns found
- * 		in `files`, or `null` if the config has no `files`.
- * @property {FilesMatcher[]|null} nonUniversalFiles The non-universal patterns
- * 		found in `files`, or `null` if the config has no `files`.
- */
-
-/**
- * A cache for config object metadata.
- * @type {WeakMap<Object, ConfigMetadata>}
- */
-const configMetadataCache = new WeakMap();
 
 /**
  * Calculates derived information about a config object.
