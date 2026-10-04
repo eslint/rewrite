@@ -38,7 +38,7 @@ export function globalIgnores(ignorePatterns, name) {
 	const id = globalIgnoreCount++;
 
 	return {
-		name: name || `globalIgnores ${id}`,
+		name: name ?? `globalIgnores ${id}`,
 		ignores: ignorePatterns,
 	};
 }

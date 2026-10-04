@@ -23,6 +23,14 @@ describe("globalIgnores", () => {
 		});
 	});
 
+	it("should keep an empty custom name", () => {
+		const result = globalIgnores(["*.test.js"], "");
+		assert.deepStrictEqual(result, {
+			name: "",
+			ignores: ["*.test.js"],
+		});
+	});
+
 	it("should create config with auto-generated name", () => {
 		const result = globalIgnores(["*.test.js"]);
 		assert.strictEqual(result.name.startsWith("globalIgnores "), true);
