@@ -20,7 +20,7 @@ describe("package exports", () => {
 				import.meta
 					.resolve("@eslint/migrate-config/src/migrate-config.js"),
 			{
-				code: process.version.bun
+				code: process.versions.bun
 					? "ERR_MODULE_NOT_FOUND"
 					: "ERR_PACKAGE_PATH_NOT_EXPORTED",
 			},
