@@ -917,6 +917,226 @@ describe("ConfigArray", () => {
 		});
 	});
 
+	describe("Path handling with explicit base paths", () => {
+		/*
+		 * These tests use explicit posix and Windows base paths so that both
+		 * path implementations are exercised regardless of the platform
+		 * running the tests.
+		 */
+		const pathStyles = [
+			{
+				name: "posix",
+				base: "/project",
+				toPath: (...parts) => ["/project", ...parts].join("/"),
+			},
+			{
+				name: "windows",
+				base: "C:\\project",
+				toPath: (...parts) => ["C:\\project", ...parts].join("\\"),
+			},
+		];
+
+		for (const { name, base, toPath } of pathStyles) {
+			describe(`${name} paths`, () => {
+				it("should only apply a config with `basePath` to files inside of it", () => {
+					const pathConfigs = new ConfigArray(
+						[
+							{ files: ["**/*.js"], defs: { js: true } },
+							{
+								basePath: "packages/lib",
+								files: ["**/*.js"],
+								defs: { lib: true },
+							},
+						],
+						{ basePath: base, schema },
+					);
+
+					pathConfigs.normalizeSync();
+
+					assert.deepStrictEqual(
+						pathConfigs.getConfig(
+							toPath("packages", "lib", "src", "a.js"),
+						).defs,
+						{ js: true, lib: true },
+					);
+
+					// shares a partial segment with the config's base path
+					assert.deepStrictEqual(
+						pathConfigs.getConfig(
+							toPath("packages", "libx", "a.js"),
+						).defs,
+						{ js: true },
+					);
+
+					// outside of the config's base path
+					assert.deepStrictEqual(
+						pathConfigs.getConfig(toPath("a.js")).defs,
+						{ js: true },
+					);
+				});
+
+				it("should only apply global ignores with `basePath` inside of it", () => {
+					const pathConfigs = new ConfigArray(
+						[
+							{ files: ["**/*.js"] },
+							{ basePath: "packages/lib", ignores: ["**/tmp/"] },
+						],
+						{ basePath: base },
+					);
+
+					pathConfigs.normalizeSync();
+
+					assert.strictEqual(
+						pathConfigs.isDirectoryIgnored(
+							toPath("packages", "lib", "tmp"),
+						),
+						true,
+					);
+
+					// an ancestor of the config's base path
+					assert.strictEqual(
+						pathConfigs.isDirectoryIgnored(toPath("packages")),
+						false,
+					);
+
+					assert.strictEqual(
+						pathConfigs.isDirectoryIgnored(toPath("tmp")),
+						false,
+					);
+
+					assert.strictEqual(
+						pathConfigs.getConfigStatus(
+							toPath("packages", "lib", "tmp", "a.js"),
+						),
+						"ignored",
+					);
+
+					assert.strictEqual(
+						pathConfigs.getConfigStatus(toPath("tmp", "a.js")),
+						"matched",
+					);
+				});
+
+				it("should never match a comment pattern", () => {
+					const pathConfigs = new ConfigArray([{ files: ["#foo"] }], {
+						basePath: base,
+					});
+
+					pathConfigs.normalizeSync();
+
+					assert.strictEqual(
+						pathConfigs.getConfigStatus(toPath("#foo")),
+						"unconfigured",
+					);
+				});
+			});
+		}
+
+		describe("posix paths", () => {
+			it("should apply configs with `basePath` when the base path is the root", () => {
+				const pathConfigs = new ConfigArray(
+					[
+						{ basePath: "project", ignores: ["dist/"] },
+						{
+							basePath: "project/lib",
+							files: ["**/*.js"],
+							defs: { lib: true },
+						},
+						{ files: ["**/*.js"], defs: { js: true } },
+					],
+					{ basePath: "/", schema },
+				);
+
+				pathConfigs.normalizeSync();
+
+				assert.deepStrictEqual(
+					pathConfigs.getConfig("/project/lib/a.js").defs,
+					{ lib: true, js: true },
+				);
+				assert.strictEqual(
+					pathConfigs.getConfigStatus("/project/dist/a.js"),
+					"ignored",
+				);
+				assert.deepStrictEqual(
+					pathConfigs.getConfig("/other/a.js").defs,
+					{
+						js: true,
+					},
+				);
+			});
+
+			it("should resolve paths when the base path has a trailing slash", () => {
+				const pathConfigs = new ConfigArray([{ files: ["src/*.js"] }], {
+					basePath: "/project/",
+				});
+
+				pathConfigs.normalizeSync();
+
+				assert.strictEqual(
+					pathConfigs.getConfigStatus("/project/src/a.js"),
+					"matched",
+				);
+				assert.strictEqual(
+					pathConfigs.getConfigStatus("/project/lib/a.js"),
+					"unconfigured",
+				);
+			});
+
+			it("should resolve file paths containing `..` segments", () => {
+				const pathConfigs = new ConfigArray([{ files: ["src/*.js"] }], {
+					basePath: "/project",
+				});
+
+				pathConfigs.normalizeSync();
+
+				assert.strictEqual(
+					pathConfigs.getConfigStatus("/project/lib/../src/a.js"),
+					"matched",
+				);
+				assert.strictEqual(
+					pathConfigs.getConfigStatus("/project/src/../lib/a.js"),
+					"unconfigured",
+				);
+			});
+
+			it("should handle directory paths with a trailing slash", () => {
+				const pathConfigs = new ConfigArray(
+					[{ ignores: ["**/node_modules/"] }],
+					{ basePath: "/project" },
+				);
+
+				pathConfigs.normalizeSync();
+
+				assert.strictEqual(
+					pathConfigs.isDirectoryIgnored("/project/node_modules/"),
+					true,
+				);
+				assert.strictEqual(
+					pathConfigs.isDirectoryIgnored("/project/src/"),
+					false,
+				);
+				assert.strictEqual(
+					pathConfigs.isDirectoryIgnored("/project/"),
+					false,
+				);
+			});
+
+			it("should consider the root directory outside of a non-root base path", () => {
+				const pathConfigs = new ConfigArray([{ files: ["**/*.js"] }], {
+					basePath: "/project",
+				});
+
+				pathConfigs.normalizeSync();
+
+				assert.strictEqual(pathConfigs.isDirectoryIgnored("/"), true);
+				assert.strictEqual(
+					pathConfigs.getConfigStatus("/a.js"),
+					"external",
+				);
+			});
+		});
+	});
+
 	describe("ConfigArray members", () => {
 		beforeEach(() => {
 			configs = createConfigArray();
@@ -3753,6 +3973,120 @@ describe("ConfigArray", () => {
 		});
 
 		describe("isFileIgnored()", () => {
+			describe("patterns with multiple globstars", () => {
+				it("should match paths with segments between each globstar", () => {
+					const patternConfigs = new ConfigArray(
+						[{ ignores: ["a/**/b/**/c"] }],
+						{ basePath },
+					);
+
+					patternConfigs.normalizeSync();
+
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("a/b/c"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("a/x/b/c"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("a/b/x/c"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("a/x/b/y/c"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("a/x/y/b/z/w/c"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("a/b/d"),
+						false,
+					);
+				});
+
+				it("should match paths for a pattern with three globstars", () => {
+					const patternConfigs = new ConfigArray(
+						[{ ignores: ["a/**/b/**/c/**/d"] }],
+						{ basePath },
+					);
+
+					patternConfigs.normalizeSync();
+
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("a/b/c/d"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("a/x/b/y/c/z/d"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("a/b/x/c/d"),
+						true,
+					);
+				});
+
+				it("should match paths when globstars surround an extension pattern", () => {
+					const patternConfigs = new ConfigArray(
+						[{ ignores: ["src/**/test/**/*.js"] }],
+						{ basePath },
+					);
+
+					patternConfigs.normalizeSync();
+
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("src/test/a.js"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("src/x/test/a.js"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("src/test/x/a.js"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("src/x/test/y/a.js"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("src/test/a.ts"),
+						false,
+					);
+				});
+
+				it("should match paths for a leading globstar followed by an internal globstar", () => {
+					const patternConfigs = new ConfigArray(
+						[{ ignores: ["**/a/**/b"] }],
+						{ basePath },
+					);
+
+					patternConfigs.normalizeSync();
+
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("a/b"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("x/a/b"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("a/x/b"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("x/a/y/b"),
+						true,
+					);
+				});
+			});
+
 			it("should throw an error when not normalized", () => {
 				const filename = "foo.js";
 				assert.throws(() => {
