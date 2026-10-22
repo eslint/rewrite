@@ -9,7 +9,7 @@
 
 import * as posixPath from "@jsr/std__path/posix";
 import * as windowsPath from "@jsr/std__path/windows";
-import { GLOBSTAR, Minimatch } from "minimatch";
+import { Minimatch } from "minimatch";
 import createDebug from "debug";
 
 import { ObjectSchema } from "@eslint/object-schema";
@@ -38,17 +38,17 @@ import { filesAndIgnoresSchema } from "./files-and-ignores-schema.js";
 /** @typedef {ObjectSchema} ObjectSchemaInstance */
 
 /**
- * A compiled pattern matcher entry. The regular expression is compiled from
- * the minimatch pattern via `makeRe()` so that repeated matches don't need
- * to re-split the file path the way `Minimatch#match()` does. When a pattern
- * cannot be compiled to a regular expression (comments, empty patterns,
- * syntax errors), `regexp` is `null` and the `Minimatch` instance is used
- * directly.
+ * A cached pattern matcher entry. In addition to the `Minimatch` instance,
+ * it holds literal text that any matching path must contain, which allows
+ * most non-matching paths to be rejected without calling minimatch.
  * @typedef {Object} MatcherEntry
  * @property {Minimatch} matcher The minimatch instance for the pattern.
- * @property {RegExp|null} regexp The compiled regular expression, if available.
- * @property {boolean} negate True if the regular expression's raw result
- * 		should be negated to produce the match result.
+ * @property {string|null} prefix The literal leading path segments, each
+ * 		followed by a slash, that a matching path must start with, or `null`
+ * 		if there is no such prefix.
+ * @property {string|null} suffix The literal text that the last segment
+ * 		of a matching path must end with, or `null` if there is no such
+ * 		suffix.
  */
 
 /**
@@ -106,6 +106,12 @@ const EXCLAMATION_POINT_CHAR_CODE = 33;
 
 // The character code for `/` (forward slash).
 const SLASH_CHAR_CODE = 47;
+
+// Matches a pattern segment that contains no glob syntax.
+const LITERAL_SEGMENT_REGEX = /^[\w.-]+$/u;
+
+// Matches a pattern segment made of a single `*` followed by literal text.
+const LITERAL_SUFFIX_SEGMENT_REGEX = /^\*([\w.-]+)$/u;
 
 /**
  * The types of config objects that are supported.
@@ -279,53 +285,111 @@ function assertValidBaseConfig(config, index) {
 }
 
 /**
- * Determines if a parsed minimatch pattern can be safely compiled to a
- * regular expression with `makeRe()`.
+ * Creates a cache entry for a pattern, extracting the literal text that
+ * any matching path must contain.
  *
- * `makeRe()` is lossy for patterns containing more than one globstar after
- * the first path segment: all but the first such globstar are dropped. For
- * example, a pattern made up of `a`, globstar, `b`, globstar, `c` compiles
- * to a regular expression that has lost the second globstar, and so stops
- * matching `"a/b/x/c"`. A leading globstar and a single non-leading
- * globstar both compile correctly, which covers the common patterns such as
- * `"src/**"` and those starting with a globstar.
- *
- * Excluding multi-globstar patterns additionally keeps them subject to
- * minimatch's `maxGlobstarRecursion` bound, which a whole-path regular
- * expression has no equivalent of.
- * @param {Array<Array<any>>} set The parsed pattern set from a `Minimatch` instance.
- * @returns {boolean} True if the pattern can be compiled to a regular
- * 		expression, false if `match()` must be used.
+ * The extracted text depends only on general glob semantics, not on how
+ * minimatch implements them: a literal pattern segment only matches an
+ * identical path segment, and a final segment like `*.js` only matches a
+ * path segment ending in `.js`. Negated, comment, and empty patterns get
+ * no literal text, nor do patterns with `.` or `..` segments, because
+ * minimatch may rewrite those (e.g., `a/../b` is treated as `b`).
+ * @param {Minimatch} matcher The minimatch instance for the pattern.
+ * @returns {MatcherEntry} The cache entry.
  */
-function canCompileToRegExp(set) {
-	for (const alternative of set) {
-		let nonLeadingGlobstars = 0;
+function createMatcherEntry(matcher) {
+	const entry = { matcher, prefix: null, suffix: null };
 
-		for (let i = 1; i < alternative.length; i++) {
-			if (alternative[i] === GLOBSTAR) {
-				nonLeadingGlobstars++;
+	if (matcher.negate || matcher.comment || matcher.empty) {
+		return entry;
+	}
 
-				if (nonLeadingGlobstars > 1) {
-					return false;
-				}
-			}
+	const segments = matcher.pattern.split("/");
+
+	// a trailing slash in the pattern doesn't add a segment to match
+	if (segments.length > 1 && segments.at(-1) === "") {
+		segments.pop();
+	}
+
+	if (segments.some(segment => segment === "." || segment === "..")) {
+		return entry;
+	}
+
+	let prefix = "";
+	let i = 0;
+
+	while (i < segments.length && LITERAL_SEGMENT_REGEX.test(segments[i])) {
+		prefix += `${segments[i]}/`;
+		i++;
+	}
+
+	if (prefix !== "") {
+		entry.prefix = prefix;
+	}
+
+	if (i < segments.length) {
+		const suffixMatch = LITERAL_SUFFIX_SEGMENT_REGEX.exec(segments.at(-1));
+
+		if (suffixMatch) {
+			entry.suffix = suffixMatch[1];
 		}
+	}
+
+	return entry;
+}
+
+/**
+ * Determines if a file path contains the literal text required by a
+ * matcher entry. A `false` result means the path cannot match the pattern;
+ * a `true` result means minimatch must decide.
+ * @param {MatcherEntry} entry The matcher entry.
+ * @param {string} filepath The file path to check.
+ * @returns {boolean} True if the path may match, false if it can't.
+ */
+function mayMatch(entry, filepath) {
+	const { prefix, suffix } = entry;
+
+	// the prefix ends with a slash, which a matching path may omit
+	if (
+		prefix !== null &&
+		!filepath.startsWith(prefix) &&
+		(filepath.length !== prefix.length - 1 || !prefix.startsWith(filepath))
+	) {
+		return false;
+	}
+
+	if (suffix !== null && !filepath.endsWith(suffix)) {
+		// a path with a trailing slash can match a pattern without one
+		return (
+			filepath.charCodeAt(filepath.length - 1) === SLASH_CHAR_CODE &&
+			filepath.endsWith(suffix, filepath.length - 1)
+		);
 	}
 
 	return true;
 }
 
 /**
+ * The most recently split file path and its segments. Each file path is
+ * matched against many patterns in a row, so caching the last split avoids
+ * splitting the same path once per pattern.
+ */
+let lastSplitPath = null;
+let lastSplitSegments = null;
+
+/**
  * Wrapper around minimatch that caches compiled patterns for
  * faster matching speed over multiple file path evaluations.
  *
- * Patterns are compiled to regular expressions via `Minimatch#makeRe()`,
- * which is significantly faster to evaluate than `Minimatch#match()`
- * because it doesn't need to split the file path into segments on
- * every call. This is safe because all paths passed here have already
- * been normalized to use forward slashes with no repeated slashes.
- * Patterns that `makeRe()` cannot represent exactly fall back to
- * `Minimatch#match()`; see `canCompileToRegExp()`.
+ * Paths that can't match a pattern based on its literal text are rejected
+ * without calling minimatch. Otherwise, this does the same thing as
+ * `Minimatch#match()` but splits the file path into segments only once
+ * across patterns, then uses `Minimatch#matchOne()` to match the segments
+ * against each alternative in the parsed pattern set. This is safe because
+ * all paths passed here have already been normalized to use forward slashes
+ * with no repeated slashes, so splitting on `/` gives the same segments
+ * minimatch would. Paths containing backslashes are passed to `match()`
+ * because minimatch converts backslashes to slashes on Windows.
  * @param {string} filepath The file path to match.
  * @param {string} pattern The glob pattern to match against.
  * @param {boolean} flipNegate If true, negated patterns return true on a
@@ -338,91 +402,37 @@ function doMatch(filepath, pattern, flipNegate = false) {
 	let entry = cache.get(pattern);
 
 	if (entry === undefined) {
-		const matcher = new Minimatch(
-			pattern,
-			flipNegate ? NEGATED_MINIMATCH_OPTIONS : MINIMATCH_OPTIONS,
+		entry = createMatcherEntry(
+			new Minimatch(
+				pattern,
+				flipNegate ? NEGATED_MINIMATCH_OPTIONS : MINIMATCH_OPTIONS,
+			),
 		);
-
-		/*
-		 * `makeRe()` bakes negation into the regular expression, but the
-		 * raw match result of the un-negated pattern is needed so that
-		 * both negation and trailing-slash semantics can be applied
-		 * afterward, so compile the pattern without its leading `!`
-		 * characters.
-		 */
-		let start = 0;
-		while (pattern.charCodeAt(start) === EXCLAMATION_POINT_CHAR_CODE) {
-			start++;
-		}
-
-		const rawPattern = start === 0 ? pattern : pattern.slice(start);
-		const rawMatcher =
-			start === 0
-				? matcher
-				: new Minimatch(rawPattern, MINIMATCH_OPTIONS);
-
-		/*
-		 * For a pattern ending with a trailing globstar, `Minimatch#match()`
-		 * requires at least one path segment after the head (`"a/**"` doesn't
-		 * match `"a"`, though it does match `"a/"`), but `makeRe()` makes the
-		 * trailing globstar optional. In that case the compiled regular
-		 * expression ends with the optional globstar group (`)?$`), so
-		 * making the group required restores the exact `match()` semantics.
-		 * For rare patterns where this rewrite doesn't apply (e.g. brace
-		 * expansions with a trailing globstar), fall back to `match()`.
-		 */
-		let regexp = null;
-
-		if (canCompileToRegExp(rawMatcher.set)) {
-			const hasTrailingGlobstar = rawMatcher.set.some(
-				alternative =>
-					alternative.length > 1 && alternative.at(-1) === GLOBSTAR,
-			);
-
-			if (!hasTrailingGlobstar) {
-				regexp = rawMatcher.makeRe() || null;
-			} else if (rawMatcher.set.length === 1) {
-				const compiled = rawMatcher.makeRe();
-
-				if (compiled && compiled.source.endsWith(")?$")) {
-					regexp = new RegExp(
-						`${compiled.source.slice(0, -2)}$`,
-						compiled.flags,
-					);
-				}
-			}
-		}
-
-		entry = {
-			matcher,
-			regexp,
-			negate: !flipNegate && matcher.negate,
-		};
 		cache.set(pattern, entry);
 	}
 
-	const { regexp } = entry;
-
-	if (regexp !== null) {
-		let matched = regexp.test(filepath);
-
-		/*
-		 * `Minimatch#match()` allows a path with a trailing slash to match
-		 * a pattern without one because the trailing empty segment is
-		 * ignored when the pattern runs out, so retry without the
-		 * trailing slash.
-		 */
-		if (
-			!matched &&
-			filepath.charCodeAt(filepath.length - 1) === SLASH_CHAR_CODE
-		) {
-			matched = regexp.test(filepath.slice(0, -1));
-		}
-
-		return entry.negate ? !matched : matched;
+	if (!mayMatch(entry, filepath)) {
+		return false;
 	}
 
-	return entry.matcher.match(filepath);
+	const { matcher } = entry;
+
+	if (matcher.comment || matcher.empty || filepath.includes("\\")) {
+		return matcher.match(filepath);
+	}
+
+	if (filepath !== lastSplitPath) {
+		lastSplitPath = filepath;
+		lastSplitSegments = filepath.split("/");
+	}
+
+	for (const alternative of matcher.set) {
+		if (matcher.matchOne(lastSplitSegments, alternative, false)) {
+			return flipNegate || !matcher.negate;
+		}
+	}
+
+	return !flipNegate && matcher.negate;
 }
 
 /**

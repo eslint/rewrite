@@ -4087,6 +4087,118 @@ describe("ConfigArray", () => {
 				});
 			});
 
+			describe("patterns with literal text", () => {
+				it("should only match paths starting with the pattern's literal segments", () => {
+					const patternConfigs = new ConfigArray(
+						[{ ignores: ["dist/lib/**"] }],
+						{ basePath },
+					);
+
+					patternConfigs.normalizeSync();
+
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("dist/lib/a.js"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("dist/libx/a.js"),
+						false,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("dist/a.js"),
+						false,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("src/dist/lib/a.js"),
+						false,
+					);
+				});
+
+				it("should match a path equal to a pattern without glob syntax", () => {
+					const patternConfigs = new ConfigArray(
+						[{ ignores: ["dist/keep.js"] }],
+						{ basePath },
+					);
+
+					patternConfigs.normalizeSync();
+
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("dist/keep.js"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("dist/keep.jsx"),
+						false,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("dist/keep.js/a.js"),
+						true,
+					);
+				});
+
+				it("should only match paths ending with the pattern's literal suffix", () => {
+					const patternConfigs = new ConfigArray(
+						[{ ignores: ["**/*.tmp"] }],
+						{ basePath },
+					);
+
+					patternConfigs.normalizeSync();
+
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("a/b.tmp"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("a/b.tmpx"),
+						false,
+					);
+					assert.strictEqual(
+						patternConfigs.isDirectoryIgnored("cache.tmp"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isDirectoryIgnored("cache.tmpx"),
+						false,
+					);
+				});
+
+				it("should match paths using both a literal prefix and suffix", () => {
+					const patternConfigs = new ConfigArray(
+						[{ ignores: ["src/**/*.ts"] }],
+						{ basePath },
+					);
+
+					patternConfigs.normalizeSync();
+
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("src/a/b.ts"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("src/a/b.js"),
+						false,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("lib/a/b.ts"),
+						false,
+					);
+				});
+
+				it("should match paths for a pattern with `..` segments", () => {
+					const patternConfigs = new ConfigArray(
+						[{ ignores: ["a/../b/*.js"] }],
+						{ basePath },
+					);
+
+					patternConfigs.normalizeSync();
+
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("b/x.js"),
+						true,
+					);
+				});
+			});
+
 			it("should throw an error when not normalized", () => {
 				const filename = "foo.js";
 				assert.throws(() => {
