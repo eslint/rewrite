@@ -37,6 +37,33 @@ import { filesAndIgnoresSchema } from "./files-and-ignores-schema.js";
  */
 /** @typedef {ObjectSchema} ObjectSchemaInstance */
 
+/**
+ * A cached pattern matcher entry. In addition to the `Minimatch` instance,
+ * it holds literal text that any matching path must contain, which allows
+ * most non-matching paths to be rejected without calling minimatch.
+ * @typedef {Object} MatcherEntry
+ * @property {Minimatch} matcher The minimatch instance for the pattern.
+ * @property {string|null} prefix The literal leading path segments, each
+ * 		followed by a slash, that a matching path must start with, or `null`
+ * 		if there is no such prefix.
+ * @property {string|null} suffix The literal text that the last segment
+ * 		of a matching path must end with, or `null` if there is no such
+ * 		suffix.
+ */
+
+/**
+ * Derived information about a config object that is expensive to compute
+ * on every file path lookup, so it's computed once per config object and
+ * cached.
+ * @typedef {Object} ConfigMetadata
+ * @property {boolean} isGlobalIgnores True if the config object only has
+ * 		`ignores` (aside from meta fields) and therefore acts as global ignores.
+ * @property {FilesMatcher[]|null} universalFiles The universal patterns found
+ * 		in `files`, or `null` if the config has no `files`.
+ * @property {FilesMatcher[]|null} nonUniversalFiles The non-universal patterns
+ * 		found in `files`, or `null` if the config has no `files`.
+ */
+
 //------------------------------------------------------------------------------
 // Helpers
 //------------------------------------------------------------------------------
@@ -44,14 +71,14 @@ import { filesAndIgnoresSchema } from "./files-and-ignores-schema.js";
 const debug = createDebug("@eslint/config-array");
 
 /**
- * A cache for minimatch instances.
- * @type {Map<string, Minimatch>}
+ * A cache for pattern matchers.
+ * @type {Map<string, MatcherEntry>}
  */
 const minimatchCache = new Map();
 
 /**
- * A cache for negated minimatch instances.
- * @type {Map<string, Minimatch>}
+ * A cache for negated pattern matchers (used with `flipNegate` semantics).
+ * @type {Map<string, MatcherEntry>}
  */
 const negatedMinimatchCache = new Map();
 
@@ -63,6 +90,28 @@ const MINIMATCH_OPTIONS = {
 	// matchBase: true,
 	dot: true,
 };
+
+/**
+ * Options to use with minimatch for negated patterns matched with
+ * `flipNegate` semantics.
+ * @type {MinimatchOptions}
+ */
+const NEGATED_MINIMATCH_OPTIONS = {
+	dot: true,
+	flipNegate: true,
+};
+
+// The character code for `!` (exclamation mark).
+const EXCLAMATION_POINT_CHAR_CODE = 33;
+
+// The character code for `/` (forward slash).
+const SLASH_CHAR_CODE = 47;
+
+// Matches a pattern segment that contains no glob syntax.
+const LITERAL_SEGMENT_REGEX = /^[\w.-]+$/u;
+
+// Matches a pattern segment made of a single `*` followed by literal text.
+const LITERAL_SUFFIX_SEGMENT_REGEX = /^\*([\w.-]+)$/u;
 
 /**
  * The types of config objects that are supported.
@@ -92,6 +141,21 @@ const CONFIG_WITH_STATUS_UNCONFIGURED = Object.freeze({
 
 // Match two leading dots followed by a slash or the end of input.
 const EXTERNAL_PATH_REGEX = /^\.\.(?:\/|$)/u;
+
+// Detects repeated slashes or `.`/`..` segments in an absolute posix path.
+const POSIX_UNSAFE_SEGMENT_REGEX = /\/\/|\/\.{1,2}(?:\/|$)/u;
+
+/*
+ * Pattern to detect universal file patterns: `*`, patterns starting with
+ * `!`, or patterns ending with `/*` or `/**`.
+ */
+const UNIVERSAL_PATTERN_REGEX = /^\*$|^!|\/\*{1,2}$/u;
+
+/**
+ * A cache for config object metadata.
+ * @type {WeakMap<Object, ConfigMetadata>}
+ */
+const configMetadataCache = new WeakMap();
 
 /**
  * Wrapper error for config validation errors that adds a name to the front of the
@@ -221,31 +285,154 @@ function assertValidBaseConfig(config, index) {
 }
 
 /**
- * Wrapper around minimatch that caches minimatch patterns for
+ * Creates a cache entry for a pattern, extracting the literal text that
+ * any matching path must contain.
+ *
+ * The extracted text depends only on general glob semantics, not on how
+ * minimatch implements them: a literal pattern segment only matches an
+ * identical path segment, and a final segment like `*.js` only matches a
+ * path segment ending in `.js`. Negated, comment, and empty patterns get
+ * no literal text, nor do patterns with `.` or `..` segments, because
+ * minimatch may rewrite those (e.g., `a/../b` is treated as `b`).
+ * @param {Minimatch} matcher The minimatch instance for the pattern.
+ * @returns {MatcherEntry} The cache entry.
+ */
+function createMatcherEntry(matcher) {
+	const entry = { matcher, prefix: null, suffix: null };
+
+	if (matcher.negate || matcher.comment || matcher.empty) {
+		return entry;
+	}
+
+	const segments = matcher.pattern.split("/");
+
+	// a trailing slash in the pattern doesn't add a segment to match
+	if (segments.length > 1 && segments.at(-1) === "") {
+		segments.pop();
+	}
+
+	if (segments.some(segment => segment === "." || segment === "..")) {
+		return entry;
+	}
+
+	let prefix = "";
+	let i = 0;
+
+	while (i < segments.length && LITERAL_SEGMENT_REGEX.test(segments[i])) {
+		prefix += `${segments[i]}/`;
+		i++;
+	}
+
+	if (prefix !== "") {
+		entry.prefix = prefix;
+	}
+
+	if (i < segments.length) {
+		const suffixMatch = LITERAL_SUFFIX_SEGMENT_REGEX.exec(segments.at(-1));
+
+		if (suffixMatch) {
+			entry.suffix = suffixMatch[1];
+		}
+	}
+
+	return entry;
+}
+
+/**
+ * Determines if a file path contains the literal text required by a
+ * matcher entry. A `false` result means the path cannot match the pattern;
+ * a `true` result means minimatch must decide.
+ * @param {MatcherEntry} entry The matcher entry.
+ * @param {string} filepath The file path to check.
+ * @returns {boolean} True if the path may match, false if it can't.
+ */
+function mayMatch(entry, filepath) {
+	const { prefix, suffix } = entry;
+
+	// the prefix ends with a slash, which a matching path may omit
+	if (
+		prefix !== null &&
+		!filepath.startsWith(prefix) &&
+		(filepath.length !== prefix.length - 1 || !prefix.startsWith(filepath))
+	) {
+		return false;
+	}
+
+	if (suffix !== null && !filepath.endsWith(suffix)) {
+		// a path with a trailing slash can match a pattern without one
+		return (
+			filepath.charCodeAt(filepath.length - 1) === SLASH_CHAR_CODE &&
+			filepath.endsWith(suffix, filepath.length - 1)
+		);
+	}
+
+	return true;
+}
+
+/**
+ * The most recently split file path and its segments. Each file path is
+ * matched against many patterns in a row, so caching the last split avoids
+ * splitting the same path once per pattern.
+ */
+let lastSplitPath = null;
+let lastSplitSegments = null;
+
+/**
+ * Wrapper around minimatch that caches compiled patterns for
  * faster matching speed over multiple file path evaluations.
+ *
+ * Paths that can't match a pattern based on its literal text are rejected
+ * without calling minimatch. Otherwise, this does the same thing as
+ * `Minimatch#match()` but splits the file path into segments only once
+ * across patterns, then uses `Minimatch#matchOne()` to match the segments
+ * against each alternative in the parsed pattern set. This is safe because
+ * all paths passed here have already been normalized to use forward slashes
+ * with no repeated slashes, so splitting on `/` gives the same segments
+ * minimatch would. Paths containing backslashes are passed to `match()`
+ * because minimatch converts backslashes to slashes on Windows.
  * @param {string} filepath The file path to match.
  * @param {string} pattern The glob pattern to match against.
- * @param {MinimatchOptions} options The minimatch options to use.
+ * @param {boolean} flipNegate If true, negated patterns return true on a
+ * 		hit instead of being negated.
  * @returns {boolean} True if the file path matches, false if not.
  */
-function doMatch(filepath, pattern, options = {}) {
-	let cache = minimatchCache;
+function doMatch(filepath, pattern, flipNegate = false) {
+	const cache = flipNegate ? negatedMinimatchCache : minimatchCache;
 
-	if (options.flipNegate) {
-		cache = negatedMinimatchCache;
-	}
+	let entry = cache.get(pattern);
 
-	let matcher = cache.get(pattern);
-
-	if (!matcher) {
-		matcher = new Minimatch(
-			pattern,
-			Object.assign({}, MINIMATCH_OPTIONS, options),
+	if (entry === undefined) {
+		entry = createMatcherEntry(
+			new Minimatch(
+				pattern,
+				flipNegate ? NEGATED_MINIMATCH_OPTIONS : MINIMATCH_OPTIONS,
+			),
 		);
-		cache.set(pattern, matcher);
+		cache.set(pattern, entry);
 	}
 
-	return matcher.match(filepath);
+	if (!mayMatch(entry, filepath)) {
+		return false;
+	}
+
+	const { matcher } = entry;
+
+	if (matcher.comment || matcher.empty || filepath.includes("\\")) {
+		return matcher.match(filepath);
+	}
+
+	if (filepath !== lastSplitPath) {
+		lastSplitPath = filepath;
+		lastSplitSegments = filepath.split("/");
+	}
+
+	for (const alternative of matcher.set) {
+		if (matcher.matchOne(lastSplitSegments, alternative, false)) {
+			return flipNegate || !matcher.negate;
+		}
+	}
+
+	return !flipNegate && matcher.negate;
 }
 
 /**
@@ -484,6 +671,111 @@ function normalizeSync(
 }
 
 /**
+ * Computes the posix relative path from a base path to a path outside of it.
+ * Both paths must already be normalized absolute paths without trailing
+ * slashes (though `to` may be the root `"/"`), `from` must not be the
+ * root, and `to` must not be equal to or inside of `from`. Under those
+ * conditions the result always starts with `".."`, which lets this skip the
+ * `resolve()` calls and general-case branches of `path.relative()`.
+ * @param {string} from The base path.
+ * @param {string} to The path outside of the base path.
+ * @returns {string} The relative path.
+ */
+function posixRelativeOutside(from, to) {
+	const fromLength = from.length;
+	const toLength = to.length;
+	const length = fromLength < toLength ? fromLength : toLength;
+
+	// index of the slash that ends the deepest common ancestor directory
+	let commonSlash = 0;
+	let i = 1;
+
+	for (; i < length; i++) {
+		const code = from.charCodeAt(i);
+
+		if (code !== to.charCodeAt(i)) {
+			break;
+		}
+
+		if (code === SLASH_CHAR_CODE) {
+			commonSlash = i;
+		}
+	}
+
+	// `to` is an ancestor of `from`, e.g. from "/a/b" to "/a"
+	if (i === toLength && from.charCodeAt(i) === SLASH_CHAR_CODE) {
+		commonSlash = i;
+	}
+
+	// one ".." for each segment of `from` after the common ancestor
+	let result = "..";
+
+	for (let j = commonSlash + 1; j < fromLength; j++) {
+		if (from.charCodeAt(j) === SLASH_CHAR_CODE) {
+			result += "/..";
+		}
+	}
+
+	return commonSlash + 1 < toLength
+		? `${result}/${to.slice(commonSlash + 1)}`
+		: result;
+}
+
+/**
+ * Fast path for computing a posix relative path when the given path is
+ * an already-normalized absolute path.
+ * @param {string} filePath The absolute path to convert.
+ * @param {string} basePath The absolute base path to compute the relative path against.
+ * @returns {string|undefined} The relative path, or `undefined` if the fast
+ * 		path cannot be used and the caller must fall back to full resolution.
+ */
+function fastPosixRelative(filePath, basePath) {
+	if (
+		filePath.charCodeAt(0) !== SLASH_CHAR_CODE ||
+		POSIX_UNSAFE_SEGMENT_REGEX.test(filePath)
+	) {
+		return undefined;
+	}
+
+	// a single trailing slash is dropped by path resolution
+	let end = filePath.length;
+	if (end > 1 && filePath.charCodeAt(end - 1) === SLASH_CHAR_CODE) {
+		end--;
+	}
+
+	if (basePath === "/") {
+		return filePath.slice(1, end);
+	}
+
+	const baseLength = basePath.length;
+
+	// base paths always start with a slash in posix mode
+	if (
+		basePath.charCodeAt(baseLength - 1) === SLASH_CHAR_CODE ||
+		POSIX_UNSAFE_SEGMENT_REGEX.test(basePath)
+	) {
+		return undefined;
+	}
+
+	// the common case: the path is inside the base path
+	if (filePath.startsWith(basePath)) {
+		if (end === baseLength) {
+			return "";
+		}
+
+		if (filePath.charCodeAt(baseLength) === SLASH_CHAR_CODE) {
+			return filePath.slice(baseLength + 1, end);
+		}
+	}
+
+	// the path is outside of the base path
+	return posixRelativeOutside(
+		basePath,
+		end === filePath.length ? filePath : filePath.slice(0, end),
+	);
+}
+
+/**
  * Converts a given path to a relative path with all separator characters replaced by forward slashes (`"/"`).
  * @param {string} fileOrDirPath The unprocessed path to convert.
  * @param {string} namespacedBasePath The namespaced base path of the directory to which the calculated path shall be relative.
@@ -491,10 +783,62 @@ function normalizeSync(
  * @returns {string} A relative path with all separator characters replaced by forward slashes.
  */
 function toRelativePath(fileOrDirPath, namespacedBasePath, path) {
+	if (path === posixPath) {
+		const fastResult = fastPosixRelative(fileOrDirPath, namespacedBasePath);
+
+		if (fastResult !== undefined) {
+			return fastResult;
+		}
+	}
+
 	const fullPath = path.resolve(namespacedBasePath, fileOrDirPath);
 	const namespacedFullPath = path.toNamespacedPath(fullPath);
 	const relativePath = path.relative(namespacedBasePath, namespacedFullPath);
 	return relativePath.replaceAll(path.SEPARATOR, "/");
+}
+
+/**
+ * Applies a list of ignore matchers to a file path, honoring negated
+ * patterns, starting from a previous ignore state.
+ * @param {FileMatcher[]} ignores The ignore matchers to apply.
+ * @param {string} filePath The unprocessed file path to pass to functions.
+ * @param {string} relativeFilePathToCheck The relative file path to match patterns against.
+ * @param {boolean} initialShouldIgnore The ignore state to start from.
+ * @returns {boolean} True if the path should be ignored and false if not.
+ */
+function matchesIgnores(
+	ignores,
+	filePath,
+	relativeFilePathToCheck,
+	initialShouldIgnore,
+) {
+	let shouldIgnore = initialShouldIgnore;
+
+	for (let i = 0; i < ignores.length; i++) {
+		const matcher = ignores[i];
+
+		if (!shouldIgnore) {
+			if (typeof matcher === "function") {
+				shouldIgnore = matcher(filePath);
+			} else if (matcher.charCodeAt(0) !== EXCLAMATION_POINT_CHAR_CODE) {
+				shouldIgnore = doMatch(relativeFilePathToCheck, matcher);
+			} else {
+				// don't check negated patterns because we're not ignored yet
+				shouldIgnore = false;
+			}
+			continue;
+		}
+
+		// only need to check negated patterns because we're ignored
+		if (
+			typeof matcher === "string" &&
+			matcher.charCodeAt(0) === EXCLAMATION_POINT_CHAR_CODE
+		) {
+			shouldIgnore = !doMatch(relativeFilePathToCheck, matcher, true);
+		}
+	}
+
+	return shouldIgnore;
 }
 
 /**
@@ -518,11 +862,27 @@ function shouldIgnorePath(
 ) {
 	let shouldIgnore = false;
 
+	// lazily computed absolute version of `relativeFilePath`
+	let fullFilePath = null;
+
 	for (const config of configs) {
 		let relativeFilePathToCheck = relativeFilePath;
 		if (config.basePath) {
+			if (fullFilePath === null) {
+				/*
+				 * `relativeFilePath` is always a normalized relative path with
+				 * forward slashes, so on posix systems it can simply be
+				 * appended to the base path. If the result contains any
+				 * unexpected segments, `toRelativePath()` normalizes it.
+				 */
+				fullFilePath =
+					path === posixPath
+						? `${basePath === "/" ? "" : basePath}/${relativeFilePath}`
+						: path.resolve(basePath, relativeFilePath);
+			}
+
 			relativeFilePathToCheck = toRelativePath(
-				path.resolve(basePath, relativeFilePath),
+				fullFilePath,
 				config.basePath,
 				path,
 			);
@@ -538,93 +898,179 @@ function shouldIgnorePath(
 				relativeFilePathToCheck += "/";
 			}
 		}
-		shouldIgnore = config.ignores.reduce((ignored, matcher) => {
-			if (!ignored) {
-				if (typeof matcher === "function") {
-					return matcher(filePath);
-				}
-
-				// don't check negated patterns because we're not ignored yet
-				if (!matcher.startsWith("!")) {
-					return doMatch(relativeFilePathToCheck, matcher);
-				}
-
-				// otherwise we're still not ignored
-				return false;
-			}
-
-			// only need to check negated patterns because we're ignored
-			if (typeof matcher === "string" && matcher.startsWith("!")) {
-				return !doMatch(relativeFilePathToCheck, matcher, {
-					flipNegate: true,
-				});
-			}
-
-			return ignored;
-		}, shouldIgnore);
+		shouldIgnore = matchesIgnores(
+			config.ignores,
+			filePath,
+			relativeFilePathToCheck,
+			shouldIgnore,
+		);
 	}
 
 	return shouldIgnore;
 }
 
 /**
- * Determines if a given file path is matched by a config. If the config
- * has no `files` field, then it matches; otherwise, if a `files` field
- * is present then we match the globs in `files` and exclude any globs in
- * `ignores`.
+ * Matches a single file matcher against the provided file path.
+ * @param {string} filePath The unprocessed file path to pass to functions.
+ * @param {string} relativeFilePath The relative file path to match string patterns against.
+ * @param {FileMatcher} pattern The matcher pattern or function.
+ * @returns {boolean} True if the string pattern matches `relativeFilePath` or the matcher function returns true for `filePath`, false otherwise.
+ * @throws {TypeError} If the matcher is not a string or function.
+ */
+function matchFilePattern(filePath, relativeFilePath, pattern) {
+	if (isString(pattern)) {
+		return doMatch(relativeFilePath, pattern);
+	}
+
+	if (typeof pattern === "function") {
+		return pattern(filePath);
+	}
+
+	throw new TypeError(`Unexpected matcher type ${pattern}.`);
+}
+
+/**
+ * Determines if a given file path is matched by the given `files` patterns,
+ * excluding any matches from `ignores`.
  * @param {string} filePath The unprocessed file path to check.
  * @param {string} relativeFilePath The path of the file to check relative to the base path,
  * 		using forward slash (`"/"`) as a separator.
- * @param {ConfigObject & { files: FilesMatcher[] }} config The config object to check.
- * @returns {boolean} True if the file path is matched by the config,
+ * @param {FilesMatcher[]} files The `files` patterns to match against.
+ * @param {FileMatcher[]|undefined} ignores The `ignores` patterns to exclude, if any.
+ * @returns {boolean} True if the file path is matched by the patterns,
  *      false if not.
  */
-function pathMatches(filePath, relativeFilePath, config) {
-	// match both strings and functions
-	/**
-	 * Matches a file matcher against the provided file path.
-	 * @param {FileMatcher} pattern The matcher pattern or function.
-	 * @returns {boolean} True if the string pattern matches `relativeFilePath` or the matcher function returns true for `filePath`, false otherwise.
-	 * @throws {TypeError} If the matcher is not a string or function.
-	 */
-	function match(pattern) {
-		if (isString(pattern)) {
-			return doMatch(relativeFilePath, pattern);
-		}
+function pathMatchesFiles(filePath, relativeFilePath, files, ignores) {
+	// check for all matches to files
+	let filePathMatchesPattern = false;
 
-		if (typeof pattern === "function") {
-			return pattern(filePath);
-		}
+	for (let i = 0; i < files.length; i++) {
+		const pattern = files[i];
 
-		throw new TypeError(`Unexpected matcher type ${pattern}.`);
+		if (Array.isArray(pattern)) {
+			let matchesAll = true;
+
+			for (let j = 0; j < pattern.length; j++) {
+				if (!matchFilePattern(filePath, relativeFilePath, pattern[j])) {
+					matchesAll = false;
+					break;
+				}
+			}
+
+			if (matchesAll) {
+				filePathMatchesPattern = true;
+				break;
+			}
+		} else if (matchFilePattern(filePath, relativeFilePath, pattern)) {
+			filePathMatchesPattern = true;
+			break;
+		}
 	}
 
-	// check for all matches to config.files
-	let filePathMatchesPattern = config.files.some(pattern => {
-		if (Array.isArray(pattern)) {
-			return pattern.every(match);
-		}
-
-		return match(pattern);
-	});
-
 	/*
-	 * If the file path matches the config.files patterns, then check to see
-	 * if there are any files to ignore.
+	 * If the file path matches the files patterns, then check to see
+	 * if there are any files to ignore. `relativeFilePath` is already
+	 * relative to any config `basePath`, so ignores are matched directly.
 	 */
-	if (filePathMatchesPattern && config.ignores) {
-		/*
-		 * Pass config object without `basePath`, because `relativeFilePath` is already
-		 * calculated as relative to it.
-		 */
-		filePathMatchesPattern = !shouldIgnorePath(
-			[{ ignores: config.ignores }],
+	if (filePathMatchesPattern && ignores) {
+		filePathMatchesPattern = !matchesIgnores(
+			ignores,
 			filePath,
 			relativeFilePath,
+			false,
 		);
 	}
 
 	return filePathMatchesPattern;
+}
+
+/**
+ * Calculates derived information about a config object.
+ * @param {Object} config The config object to calculate metadata for.
+ * @returns {ConfigMetadata} The metadata for the config object.
+ */
+function calculateConfigMetadata(config) {
+	const metadata = {
+		isGlobalIgnores: false,
+		universalFiles: null,
+		nonUniversalFiles: null,
+	};
+
+	if (config.files) {
+		/*
+		 * If a config has a files pattern * or patterns ending in /** or /*,
+		 * and the filePath only matches those patterns, then the config is only
+		 * applied if there is another config where the filePath matches
+		 * a file with a specific extensions such as *.js.
+		 */
+		const universalFiles = [];
+		const nonUniversalFiles = [];
+
+		for (const element of config.files) {
+			if (Array.isArray(element)) {
+				/*
+				 * filePath matches an element that is an array only if it matches
+				 * all patterns in it (AND operation). Therefore, if there is at least
+				 * one non-universal pattern in the array, and filePath matches the array,
+				 * then we know for sure that filePath matches at least one non-universal
+				 * pattern, so we can consider the entire array to be non-universal.
+				 * In other words, all patterns in the array need to be universal
+				 * for it to be considered universal.
+				 */
+				if (
+					element.every(pattern =>
+						UNIVERSAL_PATTERN_REGEX.test(pattern),
+					)
+				) {
+					universalFiles.push(element);
+				} else {
+					nonUniversalFiles.push(element);
+				}
+			} else if (UNIVERSAL_PATTERN_REGEX.test(element)) {
+				universalFiles.push(element);
+			} else {
+				nonUniversalFiles.push(element);
+			}
+		}
+
+		metadata.universalFiles = universalFiles;
+		metadata.nonUniversalFiles = nonUniversalFiles;
+	} else if (config.ignores) {
+		/*
+		 * We only count ignores as global if there are no other keys in the
+		 * object aside from meta fields. In this case, the config acts like
+		 * a globally ignored pattern. If there are additional keys, then
+		 * ignores act like exclusions.
+		 */
+		let nonMetaKeyCount = 0;
+
+		for (const key of Object.keys(config)) {
+			if (!META_FIELDS.has(key)) {
+				nonMetaKeyCount++;
+			}
+		}
+
+		metadata.isGlobalIgnores = nonMetaKeyCount === 1;
+	}
+
+	return metadata;
+}
+
+/**
+ * Retrieves cached metadata for a config object, calculating it first
+ * if not already cached.
+ * @param {Object} config The config object to get metadata for.
+ * @returns {ConfigMetadata} The metadata for the config object.
+ */
+function getConfigMetadata(config) {
+	let metadata = configMetadataCache.get(config);
+
+	if (metadata === undefined) {
+		metadata = calculateConfigMetadata(config);
+		configMetadataCache.set(config, metadata);
+	}
+
+	return metadata;
 }
 
 /**
@@ -888,11 +1334,7 @@ export class ConfigArray extends Array {
 			 * In this case, it acts like a globally ignored pattern. If there
 			 * are additional keys, then ignores act like exclusions.
 			 */
-			if (
-				config.ignores &&
-				Object.keys(config).filter(key => !META_FIELDS.has(key))
-					.length === 1
-			) {
+			if (config.ignores && getConfigMetadata(config).isGlobalIgnores) {
 				result.push(config);
 			}
 		}
@@ -1017,8 +1459,10 @@ export class ConfigArray extends Array {
 		const cache = this[ConfigArraySymbol.configCache];
 
 		// first check the cache for a filename match to avoid duplicate work
-		if (cache.has(filePath)) {
-			return cache.get(filePath);
+		const cachedConfigWithStatus = cache.get(filePath);
+
+		if (cachedConfigWithStatus) {
+			return cachedConfigWithStatus;
 		}
 
 		// check to see if the file is outside the base path
@@ -1030,7 +1474,7 @@ export class ConfigArray extends Array {
 		);
 
 		if (EXTERNAL_PATH_REGEX.test(relativeToBaseFilePath)) {
-			debug(`No config for file ${filePath} outside of base path`);
+			debug("No config for file %s outside of base path", filePath);
 
 			// cache and return result
 			cache.set(filePath, CONFIG_WITH_STATUS_EXTERNAL);
@@ -1041,7 +1485,7 @@ export class ConfigArray extends Array {
 
 		// check if this should be ignored due to its directory
 		if (this.isDirectoryIgnored(this.#path.dirname(filePath))) {
-			debug(`Ignoring ${filePath} based on directory pattern`);
+			debug("Ignoring %s based on directory pattern", filePath);
 
 			// cache and return result
 			cache.set(filePath, CONFIG_WITH_STATUS_IGNORED);
@@ -1054,7 +1498,7 @@ export class ConfigArray extends Array {
 				path: this.#path,
 			})
 		) {
-			debug(`Ignoring ${filePath} based on file pattern`);
+			debug("Ignoring %s based on file pattern", filePath);
 
 			// cache and return result
 			cache.set(filePath, CONFIG_WITH_STATUS_IGNORED);
@@ -1065,103 +1509,94 @@ export class ConfigArray extends Array {
 
 		const matchingConfigIndices = [];
 		let matchFound = false;
-		const universalPattern = /^\*$|^!|\/\*{1,2}$/u;
 
-		this.forEach((config, index) => {
-			const relativeFilePath = config.basePath
-				? toRelativePath(
-						this.#path.resolve(this.#namespacedBasePath, filePath),
-						config.basePath,
-						this.#path,
-					)
-				: relativeToBaseFilePath;
+		// lazily computed absolute version of `filePath`
+		let fullFilePath = null;
 
-			if (config.basePath && EXTERNAL_PATH_REGEX.test(relativeFilePath)) {
-				debug(
-					`Skipped config found for ${filePath} (based on config's base path: ${config.basePath}`,
+		for (let index = 0; index < this.length; index++) {
+			const config = this[index];
+			let relativeFilePath = relativeToBaseFilePath;
+
+			if (config.basePath) {
+				if (fullFilePath === null) {
+					/*
+					 * `relativeToBaseFilePath` is always a normalized relative
+					 * path with forward slashes, so on posix systems it can
+					 * simply be appended to the base path. If the result
+					 * contains any unexpected segments, `toRelativePath()`
+					 * normalizes it.
+					 */
+					fullFilePath =
+						this.#path === posixPath
+							? `${this.#namespacedBasePath === "/" ? "" : this.#namespacedBasePath}/${relativeToBaseFilePath}`
+							: this.#path.resolve(
+									this.#namespacedBasePath,
+									filePath,
+								);
+				}
+
+				relativeFilePath = toRelativePath(
+					fullFilePath,
+					config.basePath,
+					this.#path,
 				);
-				return;
+
+				if (EXTERNAL_PATH_REGEX.test(relativeFilePath)) {
+					debug(
+						"Skipped config found for %s (based on config's base path: %s)",
+						filePath,
+						config.basePath,
+					);
+					continue;
+				}
 			}
 
 			if (!config.files) {
 				if (!config.ignores) {
-					debug(`Universal config found for ${filePath}`);
+					debug("Universal config found for %s", filePath);
 					matchingConfigIndices.push(index);
-					return;
+					continue;
 				}
 
-				if (
-					Object.keys(config).filter(key => !META_FIELDS.has(key))
-						.length === 1
-				) {
+				if (getConfigMetadata(config).isGlobalIgnores) {
 					debug(
-						`Skipped config found for ${filePath} (global ignores)`,
+						"Skipped config found for %s (global ignores)",
+						filePath,
 					);
-					return;
+					continue;
 				}
 
 				/*
-				 * Pass config object without `basePath`, because `relativeFilePath` is already
-				 * calculated as relative to it.
+				 * `relativeFilePath` is already calculated as relative to the
+				 * config's `basePath`, so ignores are matched directly.
 				 */
 				if (
-					shouldIgnorePath(
-						[{ ignores: config.ignores }],
+					matchesIgnores(
+						config.ignores,
 						filePath,
 						relativeFilePath,
+						false,
 					)
 				) {
 					debug(
-						`Skipped config found for ${filePath} (based on ignores: ${config.ignores})`,
+						"Skipped config found for %s (based on ignores: %s)",
+						filePath,
+						config.ignores,
 					);
-					return;
+					continue;
 				}
 
 				debug(
-					`Matching config found for ${filePath} (based on ignores: ${config.ignores})`,
+					"Matching config found for %s (based on ignores: %s)",
+					filePath,
+					config.ignores,
 				);
 				matchingConfigIndices.push(index);
-				return;
+				continue;
 			}
 
-			/*
-			 * If a config has a files pattern * or patterns ending in /** or /*,
-			 * and the filePath only matches those patterns, then the config is only
-			 * applied if there is another config where the filePath matches
-			 * a file with a specific extensions such as *.js.
-			 */
-
-			const nonUniversalFiles = [];
-			const universalFiles = config.files.filter(element => {
-				if (Array.isArray(element)) {
-					/*
-					 * filePath matches an element that is an array only if it matches
-					 * all patterns in it (AND operation). Therefore, if there is at least
-					 * one non-universal pattern in the array, and filePath matches the array,
-					 * then we know for sure that filePath matches at least one non-universal
-					 * pattern, so we can consider the entire array to be non-universal.
-					 * In other words, all patterns in the array need to be universal
-					 * for it to be considered universal.
-					 */
-					if (
-						element.every(pattern => universalPattern.test(pattern))
-					) {
-						return true;
-					}
-
-					nonUniversalFiles.push(element);
-					return false;
-				}
-
-				// element is a string
-
-				if (universalPattern.test(element)) {
-					return true;
-				}
-
-				nonUniversalFiles.push(element);
-				return false;
-			});
+			const { universalFiles, nonUniversalFiles } =
+				getConfigMetadata(config);
 
 			// universal patterns were found so we need to check the config twice
 			if (universalFiles.length) {
@@ -1170,45 +1605,55 @@ export class ConfigArray extends Array {
 				// check that the config matches without the non-universal files first
 				if (
 					nonUniversalFiles.length &&
-					pathMatches(filePath, relativeFilePath, {
-						files: nonUniversalFiles,
-						ignores: config.ignores,
-					})
+					pathMatchesFiles(
+						filePath,
+						relativeFilePath,
+						nonUniversalFiles,
+						config.ignores,
+					)
 				) {
-					debug(`Matching config found for ${filePath}`);
+					debug("Matching config found for %s", filePath);
 					matchingConfigIndices.push(index);
 					matchFound = true;
-					return;
+					continue;
 				}
 
 				// if there wasn't a match then check if it matches with universal files
 				if (
-					universalFiles.length &&
-					pathMatches(filePath, relativeFilePath, {
-						files: universalFiles,
-						ignores: config.ignores,
-					})
+					pathMatchesFiles(
+						filePath,
+						relativeFilePath,
+						universalFiles,
+						config.ignores,
+					)
 				) {
-					debug(`Matching config found for ${filePath}`);
+					debug("Matching config found for %s", filePath);
 					matchingConfigIndices.push(index);
-					return;
+					continue;
 				}
 
-				// if we make here, then there was no match
-				return;
+				// if we make it here, then there was no match
+				continue;
 			}
 
 			// the normal case
-			if (pathMatches(filePath, relativeFilePath, config)) {
-				debug(`Matching config found for ${filePath}`);
+			if (
+				pathMatchesFiles(
+					filePath,
+					relativeFilePath,
+					config.files,
+					config.ignores,
+				)
+			) {
+				debug("Matching config found for %s", filePath);
 				matchingConfigIndices.push(index);
 				matchFound = true;
 			}
-		});
+		}
 
 		// if matching both files and ignores, there will be no config to create
 		if (!matchFound) {
-			debug(`No matching configs found for ${filePath}`);
+			debug("No matching configs found for %s", filePath);
 
 			// cache and return result
 			cache.set(filePath, CONFIG_WITH_STATUS_UNCONFIGURED);
@@ -1330,6 +1775,8 @@ export class ConfigArray extends Array {
 		}
 
 		const directoryParts = relativeDirectoryPath.split("/");
+		const partCount = directoryParts.length;
+		let partIndex = 0;
 		let relativeDirectoryToCheck = "";
 		let result;
 
@@ -1343,20 +1790,24 @@ export class ConfigArray extends Array {
 		 * have to recalculate everything for every call.
 		 */
 		do {
-			relativeDirectoryToCheck += `${directoryParts.shift()}/`;
+			relativeDirectoryToCheck += `${directoryParts[partIndex++]}/`;
 
-			result = shouldIgnorePath(
-				this.ignores,
-				this.#path.join(this.basePath, relativeDirectoryToCheck),
-				relativeDirectoryToCheck,
-				{
-					basePath: this.#namespacedBasePath,
-					path: this.#path,
-				},
-			);
+			result = cache.get(relativeDirectoryToCheck);
 
-			cache.set(relativeDirectoryToCheck, result);
-		} while (!result && directoryParts.length);
+			if (result === undefined) {
+				result = shouldIgnorePath(
+					this.ignores,
+					this.#path.join(this.basePath, relativeDirectoryToCheck),
+					relativeDirectoryToCheck,
+					{
+						basePath: this.#namespacedBasePath,
+						path: this.#path,
+					},
+				);
+
+				cache.set(relativeDirectoryToCheck, result);
+			}
+		} while (!result && partIndex < partCount);
 
 		// also cache the result for the requested path
 		cache.set(relativeDirectoryPath, result);
