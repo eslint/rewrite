@@ -394,10 +394,10 @@ export class TextSourceCodeBase {
 	}
 
 	/**
-	 * Returns the loc information for the given node or token.
-	 * @param {Options['SyntaxElementWithLoc']} nodeOrToken The node or token to get the loc information for.
-	 * @returns {SourceLocation} The loc information for the node or token.
-	 * @throws {Error} If the node or token does not have loc information.
+	 * Returns the loc information for the given node, token, or comment.
+	 * @param {Options['SyntaxElementWithLoc']} nodeOrToken The node, token, or comment to get the loc information for.
+	 * @returns {SourceLocation} The loc information for the given argument.
+	 * @throws {Error} If the given argument does not have loc information.
 	 */
 	getLoc(nodeOrToken) {
 		if (hasESTreeStyleLoc(nodeOrToken)) {
@@ -543,10 +543,10 @@ export class TextSourceCodeBase {
 	}
 
 	/**
-	 * Returns the range information for the given node or token.
-	 * @param {Options['SyntaxElementWithLoc']} nodeOrToken The node or token to get the range information for.
-	 * @returns {SourceRange} The range information for the node or token.
-	 * @throws {Error} If the node or token does not have range information.
+	 * Returns the range information for the given node, token, or comment.
+	 * @param {Options['SyntaxElementWithLoc']} nodeOrToken The node, token, or comment to get the range information for.
+	 * @returns {SourceRange} The range information for the given argument.
+	 * @throws {Error} If the given argument does not have range information.
 	 */
 	getRange(nodeOrToken) {
 		if (hasESTreeStyleRange(nodeOrToken)) {
@@ -604,13 +604,13 @@ export class TextSourceCodeBase {
 	}
 
 	/**
-	 * Gets the source code for the given node.
-	 * @param {Options['SyntaxElementWithLoc']} [node] The AST node to get the text for.
+	 * Gets the source code for the given node, token, or comment.
+	 * @param {Options['SyntaxElementWithLoc']} [node] The AST node, token, or comment to get the text for.
 	 * If `node` is omitted or falsy (such as `undefined`, `null`, or an empty string),
 	 * the entire source text is returned.
-	 * @param {number} [beforeCount] The number of characters before the node to retrieve.
-	 * @param {number} [afterCount] The number of characters after the node to retrieve.
-	 * @returns {string} The text representing the AST node.
+	 * @param {number} [beforeCount] The number of characters before the node, token, or comment to retrieve.
+	 * @param {number} [afterCount] The number of characters after the node, token, or comment to retrieve.
+	 * @returns {string} The text representing the AST node, token, or comment.
 	 * @public
 	 */
 	getText(node, beforeCount, afterCount) {
