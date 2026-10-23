@@ -605,12 +605,12 @@ export class TextSourceCodeBase {
 
 	/**
 	 * Gets the source code for the given node, token, or comment.
-	 * @param {Options['SyntaxElementWithLoc']} [node] The AST node, token, or comment to get the text for.
+	 * @param {Options['SyntaxElementWithLoc']} [node] The node, token, or comment to get the text for.
 	 * If `node` is omitted or falsy (such as `undefined`, `null`, or an empty string),
 	 * the entire source text is returned.
 	 * @param {number} [beforeCount] The number of characters before the node, token, or comment to retrieve.
 	 * @param {number} [afterCount] The number of characters after the node, token, or comment to retrieve.
-	 * @returns {string} The text representing the AST node, token, or comment.
+	 * @returns {string} The text representing the node, token, or comment.
 	 * @public
 	 */
 	getText(node, beforeCount, afterCount) {
