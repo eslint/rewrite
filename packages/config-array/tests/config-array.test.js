@@ -2737,6 +2737,58 @@ describe("ConfigArray", () => {
 				);
 			});
 
+			it('should return "matched" when a pattern with multiple leading "!" comes after matching pattern', () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["**/foo.*", "**/bar.*"],
+							ignores: ["**/*.txt", "!!foo.txt"],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfigStatus("bar.txt"),
+					"unconfigured",
+				);
+				assert.strictEqual(
+					configs.getConfigStatus("foo.txt"),
+					"matched",
+				);
+			});
+
+			it('should return "matched" when a global ignore pattern with multiple leading "!" comes after matching pattern', () => {
+				configs = new ConfigArray(
+					[
+						{
+							files: ["**/*.txt"],
+						},
+						{
+							ignores: ["**/*.txt", "!!foo.txt"],
+						},
+					],
+					{
+						basePath,
+					},
+				);
+
+				configs.normalizeSync();
+
+				assert.strictEqual(
+					configs.getConfigStatus("bar.txt"),
+					"ignored",
+				);
+				assert.strictEqual(
+					configs.getConfigStatus("foo.txt"),
+					"matched",
+				);
+			});
+
 			it('should return "ignored" when negated pattern comes before matching pattern', () => {
 				configs = new ConfigArray(
 					[

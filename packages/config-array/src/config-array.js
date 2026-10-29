@@ -370,30 +370,17 @@ function mayMatch(entry, filepath) {
 }
 
 /**
- * The most recently split file path and its segments. Each file path is
- * matched against many patterns in a row, so caching the last split avoids
- * splitting the same path once per pattern.
- */
-let lastSplitPath = null;
-let lastSplitSegments = null;
-
-/**
  * Wrapper around minimatch that caches compiled patterns for
  * faster matching speed over multiple file path evaluations.
  *
  * Paths that can't match a pattern based on its literal text are rejected
- * without calling minimatch. Otherwise, this does the same thing as
- * `Minimatch#match()` but splits the file path into segments only once
- * across patterns, then uses `Minimatch#matchOne()` to match the segments
- * against each alternative in the parsed pattern set. This is safe because
- * all paths passed here have already been normalized to use forward slashes
- * with no repeated slashes, so splitting on `/` gives the same segments
- * minimatch would. Paths containing backslashes are passed to `match()`
- * because minimatch converts backslashes to slashes on Windows.
+ * without calling minimatch. All other paths are matched with
+ * `Minimatch#match()`.
  * @param {string} filepath The file path to match.
  * @param {string} pattern The glob pattern to match against.
- * @param {boolean} flipNegate If true, negated patterns return true on a
- * 		hit instead of being negated.
+ * @param {boolean} flipNegate If true, uses minimatch's `flipNegate` option,
+ * 		so the result is true when the file path matches the pattern
+ * 		without its leading `!` characters.
  * @returns {boolean} True if the file path matches, false if not.
  */
 function doMatch(filepath, pattern, flipNegate = false) {
@@ -415,24 +402,7 @@ function doMatch(filepath, pattern, flipNegate = false) {
 		return false;
 	}
 
-	const { matcher } = entry;
-
-	if (matcher.comment || matcher.empty || filepath.includes("\\")) {
-		return matcher.match(filepath);
-	}
-
-	if (filepath !== lastSplitPath) {
-		lastSplitPath = filepath;
-		lastSplitSegments = filepath.split("/");
-	}
-
-	for (const alternative of matcher.set) {
-		if (matcher.matchOne(lastSplitSegments, alternative, false)) {
-			return flipNegate || !matcher.negate;
-		}
-	}
-
-	return !flipNegate && matcher.negate;
+	return entry.matcher.match(filepath);
 }
 
 /**
