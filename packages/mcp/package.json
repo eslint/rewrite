@@ -1,6 +1,6 @@
 {
   "name": "@eslint/mcp",
-  "version": "0.3.15",
+  "version": "0.3.16",
   "description": "MCP server for ESLint",
   "type": "module",
   "bin": "./src/mcp-cli.js",
