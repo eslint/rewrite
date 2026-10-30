@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.16](https://github.com/eslint/rewrite/compare/mcp-v0.3.15...mcp-v0.3.16) (2026-10-30)
+
+
+### Bug Fixes
+
+* update dependency eslint to ^10.14.0 ([#530](https://github.com/eslint/rewrite/issues/530)) ([09f372b](https://github.com/eslint/rewrite/commit/09f372b8faa5ff28e32f3daa46b598ee8ac73c94))
+
 ## [0.3.15](https://github.com/eslint/rewrite/compare/mcp-v0.3.14...mcp-v0.3.15) (2026-10-16)
 
 
