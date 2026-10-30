@@ -1372,16 +1372,16 @@ interface SourceCodeBase<
 	visitorKeys?: Record<string, string[]>;
 
 	/**
-	 * Retrieves the equivalent of `loc` for a given node or token.
-	 * @param syntaxElement The node or token to get the location for.
-	 * @returns The location of the node or token.
+	 * Retrieves the equivalent of `loc` for a given node, token, or comment.
+	 * @param syntaxElement The node, token, or comment to get the location for.
+	 * @returns The location of the given argument.
 	 */
 	getLoc(syntaxElement: Options["SyntaxElementWithLoc"]): SourceLocation;
 
 	/**
-	 * Retrieves the equivalent of `range` for a given node or token.
-	 * @param syntaxElement The node or token to get the range for.
-	 * @returns The range of the node or token.
+	 * Retrieves the equivalent of `range` for a given node, token, or comment.
+	 * @param syntaxElement The node, token, or comment to get the range for.
+	 * @returns The range of the given argument.
 	 */
 	getRange(syntaxElement: Options["SyntaxElementWithLoc"]): SourceRange;
 
