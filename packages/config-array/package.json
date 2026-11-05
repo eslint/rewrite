@@ -53,7 +53,7 @@
   "dependencies": {
     "@eslint/object-schema": "^3.0.5",
     "debug": "^4.3.1",
-    "minimatch": "^10.2.4"
+    "minimatch": "^10.2.6"
   },
   "devDependencies": {
     "@jsr/std__path": "^1.0.4",
