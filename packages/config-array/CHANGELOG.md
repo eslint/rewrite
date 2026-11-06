@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.23.6](https://github.com/eslint/rewrite/compare/config-array-v0.23.5...config-array-v0.23.6) (2026-11-06)
+
+
+### Bug Fixes
+
+* require minimatch `10.2.6` to avoid vulnerable brace-expansion ([#529](https://github.com/eslint/rewrite/issues/529)) ([c442efc](https://github.com/eslint/rewrite/commit/c442efc4ed77fb90e845e4000b32caa6d9da23be))
+
 ## [0.23.5](https://github.com/eslint/rewrite/compare/config-array-v0.23.4...config-array-v0.23.5) (2026-04-08)
 
 
