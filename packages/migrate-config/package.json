@@ -51,6 +51,6 @@
     "@eslint/eslintrc": "^3.3.7",
     "camelcase": "^8.0.0",
     "espree": "^11.2.0",
-    "recast": "^0.23.7"
+    "recast": "^0.24.0"
   }
 }
