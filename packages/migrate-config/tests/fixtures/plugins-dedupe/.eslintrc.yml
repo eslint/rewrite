@@ -5,3 +5,8 @@ plugins:
 extends:
     - plugin:import/errors
     - plugin:n/recommended
+overrides:
+    - files:
+          - "*.ts"
+      extends:
+          - plugin:import/typescript

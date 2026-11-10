@@ -28,4 +28,7 @@ module.exports = defineConfig([{
         import: fixupPluginRules(_import),
         n: fixupPluginRules(n),
     },
+}, {
+    files: ["**/*.ts"],
+    extends: fixupConfigRules(compat.extends("plugin:import/typescript")),
 }]);
