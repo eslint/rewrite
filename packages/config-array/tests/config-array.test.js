@@ -4249,6 +4249,50 @@ describe("ConfigArray", () => {
 						true,
 					);
 				});
+
+				it("should match paths for a pattern with `..` produced by brace expansion", () => {
+					const patternConfigs = new ConfigArray(
+						[{ ignores: ["foo/{..,bar}/a/b.js"] }],
+						{ basePath },
+					);
+
+					patternConfigs.normalizeSync();
+
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("a/b.js"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("foo/bar/a/b.js"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("foo/a/b.js"),
+						false,
+					);
+				});
+
+				it("should match paths for a pattern with `..` inside braces containing a slash", () => {
+					const patternConfigs = new ConfigArray(
+						[{ ignores: ["foo/{../x,y}/a.js"] }],
+						{ basePath },
+					);
+
+					patternConfigs.normalizeSync();
+
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("x/a.js"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("foo/y/a.js"),
+						true,
+					);
+					assert.strictEqual(
+						patternConfigs.isFileIgnored("foo/x/a.js"),
+						false,
+					);
+				});
 			});
 
 			it("should throw an error when not normalized", () => {

@@ -292,15 +292,24 @@ function assertValidBaseConfig(config, index) {
  * minimatch implements them: a literal pattern segment only matches an
  * identical path segment, and a final segment like `*.js` only matches a
  * path segment ending in `.js`. Negated, comment, and empty patterns get
- * no literal text, nor do patterns with `.` or `..` segments, because
- * minimatch may rewrite those (e.g., `a/../b` is treated as `b`).
+ * no literal text, nor do patterns with `.` segments or `..` anywhere,
+ * because minimatch may rewrite those (e.g., `a/../b` is treated as `b`).
+ * The check for `..` covers the whole pattern rather than just its
+ * segments, because brace expansion can produce a `..` segment from
+ * text that isn't one (e.g., `foo/{..,bar}/a.js` expands to
+ * `foo/../a.js`, which matches `a.js`).
  * @param {Minimatch} matcher The minimatch instance for the pattern.
  * @returns {MatcherEntry} The cache entry.
  */
 function createMatcherEntry(matcher) {
 	const entry = { matcher, prefix: null, suffix: null };
 
-	if (matcher.negate || matcher.comment || matcher.empty) {
+	if (
+		matcher.negate ||
+		matcher.comment ||
+		matcher.empty ||
+		matcher.pattern.includes("..")
+	) {
 		return entry;
 	}
 
@@ -311,7 +320,7 @@ function createMatcherEntry(matcher) {
 		segments.pop();
 	}
 
-	if (segments.some(segment => segment === "." || segment === "..")) {
+	if (segments.includes(".")) {
 		return entry;
 	}
 
