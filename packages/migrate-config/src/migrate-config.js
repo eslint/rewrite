@@ -927,7 +927,11 @@ function createExtendsCallExpression(configExtends, migration) {
 				bindings: ["fixupConfigRules"],
 				added: true,
 			});
-		} else {
+		} else if (
+			!migration.imports
+				.get("@eslint/compat")
+				.bindings.includes("fixupConfigRules")
+		) {
 			migration.imports
 				.get("@eslint/compat")
 				.bindings.push("fixupConfigRules");
