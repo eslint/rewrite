@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.23.6](https://github.com/eslint/rewrite/compare/config-array-v0.23.5...config-array-v0.23.6) (2026-11-13)
+
+
+### Bug Fixes
+
+* require minimatch `10.2.6` to avoid vulnerable brace-expansion ([#529](https://github.com/eslint/rewrite/issues/529)) ([c442efc](https://github.com/eslint/rewrite/commit/c442efc4ed77fb90e845e4000b32caa6d9da23be))
+* update dependency minimatch to v11 [security] ([#535](https://github.com/eslint/rewrite/issues/535)) ([52ab336](https://github.com/eslint/rewrite/commit/52ab336d273aa070af271a749057fc9845a92377))
+
+
+### Performance Improvements
+
+* speed up ConfigArray config resolution ([#498](https://github.com/eslint/rewrite/issues/498)) ([0251320](https://github.com/eslint/rewrite/commit/0251320102f4f1b8d2f73ad713f213fd2454e97c))
+
 ## [0.23.5](https://github.com/eslint/rewrite/compare/config-array-v0.23.4...config-array-v0.23.5) (2026-04-08)
 
 
