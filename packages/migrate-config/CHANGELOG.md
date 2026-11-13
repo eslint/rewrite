@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.4](https://github.com/eslint/rewrite/compare/migrate-config-v3.0.3...migrate-config-v3.0.4) (2026-11-13)
+
+
+### Bug Fixes
+
+* avoid duplicate fixupConfigRules import in migrate-config ([#539](https://github.com/eslint/rewrite/issues/539)) ([fc6fc2d](https://github.com/eslint/rewrite/commit/fc6fc2d128c540c709daf26a0adbf19259bd537d))
+
 ## [3.0.3](https://github.com/eslint/rewrite/compare/migrate-config-v3.0.2...migrate-config-v3.0.3) (2026-09-01)
 
 
