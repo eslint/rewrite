@@ -1661,7 +1661,7 @@ export class ConfigArray extends Array {
 				...matchingConfigIndices.map(index => this[index]),
 			);
 		} catch {
-			// The pairwise fold runs only to name the config that fails.
+			// merge one at a time to find the config object that caused the error
 			// eslint-disable-next-line array-callback-return, consistent-return -- rethrowConfigError always throws an error
 			finalConfig = matchingConfigIndices.reduce((result, index) => {
 				try {
