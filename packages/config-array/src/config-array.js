@@ -1652,17 +1652,25 @@ export class ConfigArray extends Array {
 
 		// otherwise construct the config
 
-		// eslint-disable-next-line array-callback-return, consistent-return -- rethrowConfigError always throws an error
-		let finalConfig = matchingConfigIndices.reduce((result, index) => {
-			try {
-				return this[ConfigArraySymbol.schema].merge(
-					result,
-					this[index],
-				);
-			} catch (validationError) {
-				rethrowConfigError(this[index], index, validationError);
-			}
-		}, {});
+		const schema = this[ConfigArraySymbol.schema];
+		let finalConfig;
+
+		try {
+			finalConfig = schema.merge(
+				{},
+				...matchingConfigIndices.map(index => this[index]),
+			);
+		} catch {
+			// The pairwise fold runs only to name the config that fails.
+			// eslint-disable-next-line array-callback-return, consistent-return -- rethrowConfigError always throws an error
+			finalConfig = matchingConfigIndices.reduce((result, index) => {
+				try {
+					return schema.merge(result, this[index]);
+				} catch (validationError) {
+					rethrowConfigError(this[index], index, validationError);
+				}
+			}, {});
+		}
 
 		finalConfig = this[ConfigArraySymbol.finalizeConfig](finalConfig);
 
