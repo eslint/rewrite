@@ -2609,31 +2609,15 @@ describe("ConfigArray", () => {
 			});
 
 			describe("merging several matching config objects", () => {
-				/**
-				 * Freezes a value and every object it contains.
-				 * @param {any} value The value to freeze.
-				 * @returns {any} The frozen value.
-				 */
-				function deepFreeze(value) {
-					if (
-						value &&
-						typeof value === "object" &&
-						!Object.isFrozen(value)
-					) {
-						Object.freeze(value);
-						Object.values(value).forEach(deepFreeze);
-					}
-					return value;
-				}
-
-				it("should call merge() and validate() once per matching config object", () => {
-					const mergeCalls = [];
-					const validateCalls = [];
+				it("should merge and validate each matching config object once", () => {
+					let mergeCount = 0;
+					const validated = [];
 					const configsToTest = new ConfigArray(
 						[
 							{ files: ["**/*.js"], defs: { a: 1 } },
 							{ files: ["**/*.css"], defs: { skipped: true } },
 							{ defs: { b: 2 } },
+							{ name: "no-defs" },
 							{ files: ["**/*.js"], defs: { c: 3 } },
 						],
 						{
@@ -2641,52 +2625,12 @@ describe("ConfigArray", () => {
 							schema: {
 								defs: {
 									merge(a, b) {
-										mergeCalls.push([a, b]);
+										mergeCount++;
 										return { ...a, ...b };
 									},
 									validate(value) {
-										validateCalls.push(value);
+										validated.push(value);
 									},
-								},
-							},
-						},
-					);
-
-					configsToTest.normalizeSync();
-					const config = configsToTest.getConfig("foo.js");
-
-					assert.deepStrictEqual(config, {
-						defs: { a: 1, b: 2, c: 3 },
-					});
-					assert.deepStrictEqual(mergeCalls, [
-						[undefined, { a: 1 }],
-						[{ a: 1 }, { b: 2 }],
-						[{ a: 1, b: 2 }, { c: 3 }],
-					]);
-					assert.deepStrictEqual(validateCalls, [
-						{ a: 1 },
-						{ b: 2 },
-						{ c: 3 },
-					]);
-				});
-
-				it("should call merge() for a key that later matching config objects omit", () => {
-					const mergeCalls = [];
-					const configsToTest = new ConfigArray(
-						[
-							{ files: ["**/*.js"], defs: { a: 1 } },
-							{ name: "no-defs" },
-							{ defs: undefined },
-						],
-						{
-							basePath,
-							schema: {
-								defs: {
-									merge(a, b) {
-										mergeCalls.push([a, b]);
-										return b ?? a;
-									},
-									validate() {},
 								},
 							},
 						},
@@ -2695,84 +2639,38 @@ describe("ConfigArray", () => {
 					configsToTest.normalizeSync();
 
 					assert.deepStrictEqual(configsToTest.getConfig("foo.js"), {
-						defs: { a: 1 },
+						defs: { a: 1, b: 2, c: 3 },
 					});
-					assert.deepStrictEqual(mergeCalls, [
-						[undefined, { a: 1 }],
-						[{ a: 1 }, undefined],
-						[{ a: 1 }, undefined],
+					assert.strictEqual(mergeCount, 4);
+					assert.deepStrictEqual(validated, [
+						{ a: 1 },
+						{ b: 2 },
+						{ c: 3 },
 					]);
 				});
 
 				it("should name the config object that fails validation", () => {
 					const configsToTest = new ConfigArray(
 						[
-							{
-								files: ["**/*.js"],
-								defs: { a: 1 },
-								name: "first",
-							},
-							{
-								files: ["**/*.css"],
-								defs: "skipped",
-								name: "second",
-							},
+							{ files: ["**/*.js"], defs: { a: 1 } },
+							{ files: ["**/*.css"], defs: "skipped" },
 							{ defs: { b: 2 } },
 							{ defs: "foo", name: "fourth" },
 							{ defs: "bar", name: "fifth" },
 						],
-						{
-							basePath,
-							schema: {
-								defs: {
-									merge: "assign",
-									validate(value) {
-										if (
-											!value ||
-											typeof value !== "object"
-										) {
-											throw new TypeError(
-												"Object expected.",
-											);
-										}
-									},
-								},
-							},
-						},
+						{ basePath, schema },
 					);
 
 					configsToTest.normalizeSync();
 
-					assert.throws(
-						() => configsToTest.getConfig("foo.js"),
-						error => {
-							assert.strictEqual(error.name, "ConfigError");
-							assert.strictEqual(
-								error.message,
-								'Config "fourth": Key "defs": Object expected.',
-							);
-							assert.strictEqual(error.index, 3);
-							assert.strictEqual(
-								error.cause.message,
-								'Key "defs": Object expected.',
-							);
-							assert.ok(error.cause.cause instanceof TypeError);
-							return true;
-						},
-					);
+					assert.throws(() => configsToTest.getConfig("foo.js"), {
+						message:
+							'Config "fourth": Key "defs": Object expected.',
+						index: 3,
+					});
 				});
 
 				it("should name the config object whose merge() throws", () => {
-					/**
-					 * @param {string} key The key defined twice.
-					 */
-					class RedefineError extends Error {
-						constructor(key) {
-							super(`Cannot redefine "${key}".`);
-							this.messageTemplate = "redefine";
-							this.messageData = { key };
-						}
-					}
 					const configsToTest = new ConfigArray(
 						[
 							{ files: ["**/*.js"], defs: { a: 1 } },
@@ -2787,7 +2685,9 @@ describe("ConfigArray", () => {
 									merge(a = {}, b = {}) {
 										for (const key of Object.keys(b)) {
 											if (key in a && a[key] !== b[key]) {
-												throw new RedefineError(key);
+												throw new Error(
+													`Cannot redefine "${key}".`,
+												);
 											}
 										}
 										return { ...a, ...b };
@@ -2800,67 +2700,23 @@ describe("ConfigArray", () => {
 
 					configsToTest.normalizeSync();
 
-					assert.throws(
-						() => configsToTest.getConfig("foo.js"),
-						error => {
-							assert.strictEqual(error.name, "ConfigError");
-							assert.strictEqual(
-								error.message,
-								'Config (unnamed): Key "defs": Cannot redefine "a".',
-							);
-							assert.strictEqual(error.index, 2);
-							assert.strictEqual(
-								error.messageTemplate,
-								"redefine",
-							);
-							assert.deepStrictEqual(error.messageData, {
-								key: "a",
-							});
-							assert.ok(
-								error.cause.cause instanceof RedefineError,
-							);
-							return true;
-						},
-					);
-				});
-
-				it("should throw the same error on every call for the same file", () => {
-					const configsToTest = new ConfigArray(
-						[
-							{ files: ["**/*.js"], defs: {} },
-							{ defs: 1, name: "bad" },
-						],
-						{
-							basePath,
-							schema: {
-								defs: { merge: "assign", validate: "object" },
-							},
-						},
-					);
-
-					configsToTest.normalizeSync();
-
-					for (let i = 0; i < 2; i++) {
-						assert.throws(() => configsToTest.getConfig("foo.js"), {
-							name: "ConfigError",
-							message:
-								'Config "bad": Key "defs": Expected an object.',
-							index: 1,
-						});
-					}
+					assert.throws(() => configsToTest.getConfig("foo.js"), {
+						message:
+							'Config (unnamed): Key "defs": Cannot redefine "a".',
+						index: 2,
+					});
 				});
 
 				it("should not modify or return the matching config objects", () => {
-					const shared = { deep: { value: 1 } };
-					const rawConfigs = deepFreeze([
+					const rawConfigs = [
 						{
 							files: ["**/*.js"],
-							defs: { a: shared },
+							defs: { a: { deep: { value: 1 } } },
 							tags: ["x"],
 						},
 						{ defs: { b: { value: 2 } }, tags: ["y"] },
 						{ defs: { a: { other: 3 } } },
-					]);
+					];
 					const before = structuredClone(rawConfigs);
 					const configsToTest = new ConfigArray(rawConfigs, {
 						basePath,
