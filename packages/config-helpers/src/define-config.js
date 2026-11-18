@@ -149,12 +149,34 @@ function normalizePluginConfig(userNamespace, plugin, config) {
 	if (
 		!pluginNamespace ||
 		pluginNamespace === userNamespace ||
-		(!config.rules && !config.processor && !config.language)
+		(!config.plugins &&
+			!config.rules &&
+			!config.processor &&
+			!config.language)
 	) {
 		return config;
 	}
 
 	const result = { ...config };
+
+	if (result.plugins) {
+		const pluginNames = Object.keys(result.plugins);
+
+		/** @type {Record<string,Plugin>} */
+		const newPlugins = {};
+
+		for (let i = 0; i < pluginNames.length; i++) {
+			const pluginName = pluginNames[i];
+
+			if (pluginName === pluginNamespace) {
+				newPlugins[userNamespace] = result.plugins[pluginName];
+			} else {
+				newPlugins[pluginName] = result.plugins[pluginName];
+			}
+		}
+
+		result.plugins = newPlugins;
+	}
 
 	// update the rules
 	if (result.rules) {

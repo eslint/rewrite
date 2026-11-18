@@ -1409,6 +1409,181 @@ describe("defineConfig()", () => {
 				]);
 			});
 
+			it("should update plugins key in extended config when plugin has a namespace", () => {
+				const otherFooPlugin = { rules: {} };
+				const testPlugin = {
+					meta: {
+						namespace: "foo",
+					},
+					rules: {
+						bar: { create: () => ({}) },
+					},
+				};
+
+				testPlugin.configs = {
+					recommended: {
+						plugins: { foo: testPlugin },
+						rules: { "foo/bar": "error" },
+					},
+				};
+
+				const config = defineConfig([
+					{
+						plugins: { foo: otherFooPlugin, myFoo: testPlugin },
+						extends: ["myFoo/recommended"],
+					},
+				]);
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "UserConfig[0][0] > myFoo/recommended",
+						plugins: { myFoo: testPlugin },
+						rules: { "myFoo/bar": "error" },
+					},
+					{
+						plugins: { foo: otherFooPlugin, myFoo: testPlugin },
+					},
+				]);
+				assert.deepStrictEqual(testPlugin.configs.recommended.plugins, {
+					foo: testPlugin,
+				});
+			});
+
+			it("should update plugins key when extended config only has plugins", () => {
+				const testPlugin = {
+					meta: {
+						namespace: "foo",
+					},
+				};
+
+				testPlugin.configs = {
+					recommended: [
+						{ plugins: { foo: testPlugin } },
+						{ rules: { "foo/bar": "error" } },
+					],
+				};
+
+				const config = defineConfig({
+					plugins: { myFoo: testPlugin },
+					extends: ["myFoo/recommended"],
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "UserConfig[0] > myFoo/recommended[0]",
+						plugins: { myFoo: testPlugin },
+					},
+					{
+						name: "UserConfig[0] > myFoo/recommended[1]",
+						rules: { "myFoo/bar": "error" },
+					},
+					{
+						plugins: { myFoo: testPlugin },
+					},
+				]);
+			});
+
+			it("should update matching plugin key while preserving other plugins in extended config", () => {
+				const otherPlugin = { rules: {} };
+				const testPlugin = {
+					meta: {
+						namespace: "foo",
+					},
+				};
+
+				testPlugin.configs = {
+					recommended: {
+						plugins: { foo: testPlugin, other: otherPlugin },
+						rules: {
+							"foo/bar": "error",
+							"other/baz": "warn",
+						},
+					},
+				};
+
+				const config = defineConfig({
+					plugins: { "@custom/foo": testPlugin },
+					extends: ["@custom/foo/recommended"],
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "UserConfig[0] > @custom/foo/recommended",
+						plugins: {
+							"@custom/foo": testPlugin,
+							other: otherPlugin,
+						},
+						rules: {
+							"@custom/foo/bar": "error",
+							"other/baz": "warn",
+						},
+					},
+					{
+						plugins: { "@custom/foo": testPlugin },
+					},
+				]);
+			});
+
+			it("should not modify plugins when plugin has no namespace", () => {
+				const testPlugin = {};
+
+				testPlugin.configs = {
+					config1: {
+						plugins: { test: testPlugin },
+						rules: { "test/no-console": "error" },
+					},
+				};
+
+				const config = defineConfig({
+					plugins: {
+						test1: testPlugin,
+					},
+					extends: ["test1/config1"],
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "UserConfig[0] > test1/config1",
+						plugins: { test: testPlugin },
+						rules: { "test/no-console": "error" },
+					},
+					{
+						plugins: { test1: testPlugin },
+					},
+				]);
+			});
+
+			it("should not modify plugins when user namespace matches plugin namespace", () => {
+				const testPlugin = {
+					meta: {
+						namespace: "foo",
+					},
+				};
+
+				testPlugin.configs = {
+					recommended: {
+						plugins: { foo: testPlugin },
+						rules: { "foo/bar": "error" },
+					},
+				};
+
+				const config = defineConfig({
+					plugins: { foo: testPlugin },
+					extends: ["foo/recommended"],
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "UserConfig[0] > foo/recommended",
+						plugins: { foo: testPlugin },
+						rules: { "foo/bar": "error" },
+					},
+					{
+						plugins: { foo: testPlugin },
+					},
+				]);
+			});
+
 			it("should extend a three-dimensional array of configs by string names with plugin namespace replacement", () => {
 				const testPlugin = {
 					meta: {
