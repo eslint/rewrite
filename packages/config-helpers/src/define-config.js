@@ -169,7 +169,7 @@ function normalizePluginConfig(userNamespace, plugin, config) {
 			const pluginName = pluginNames[i];
 
 			if (pluginName === pluginNamespace) {
-				newPlugins[userNamespace] = result.plugins[pluginName];
+				newPlugins[userNamespace] = plugin;
 			} else {
 				newPlugins[pluginName] = result.plugins[pluginName];
 			}

@@ -1449,6 +1449,43 @@ describe("defineConfig()", () => {
 				});
 			});
 
+			it("should bind registered plugin instance when extended config embeds a separate plugin object", () => {
+				const basePlugin = {
+					meta: {
+						namespace: "foo",
+					},
+					rules: {
+						bar: { create: () => ({}) },
+					},
+				};
+				const exportedPlugin = {
+					...basePlugin,
+					configs: {
+						recommended: {
+							plugins: { foo: basePlugin },
+							rules: { "foo/bar": "error" },
+						},
+					},
+				};
+
+				const config = defineConfig({
+					plugins: { myFoo: exportedPlugin },
+					extends: ["myFoo/recommended"],
+				});
+
+				assert.deepStrictEqual(config, [
+					{
+						name: "UserConfig[0] > myFoo/recommended",
+						plugins: { myFoo: exportedPlugin },
+						rules: { "myFoo/bar": "error" },
+					},
+					{
+						plugins: { myFoo: exportedPlugin },
+					},
+				]);
+				assert.strictEqual(config[0].plugins.myFoo, exportedPlugin);
+			});
+
 			it("should update plugins key when extended config only has plugins", () => {
 				const testPlugin = {
 					meta: {
