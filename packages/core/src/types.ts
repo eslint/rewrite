@@ -1188,7 +1188,7 @@ export interface Language<
 	/**
 	 * Validates languageOptions for this language.
 	 */
-	validateLanguageOptions(languageOptions: Options["LangOptions"]): void;
+	validateLanguageOptions(languageOptions?: Options["LangOptions"]): void;
 
 	/**
 	 * Normalizes languageOptions for this language.
@@ -1216,7 +1216,7 @@ export interface Language<
 	 */
 	parse(
 		file: File,
-		context: LanguageContext<Options["LangOptions"]>,
+		context?: LanguageContext<Options["LangOptions"]>,
 	): ParseResult<Options["RootNode"]>; // Future: | Promise<ParseResult>;
 
 	/**
