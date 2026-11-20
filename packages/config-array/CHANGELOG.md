@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.23.7](https://github.com/eslint/rewrite/compare/config-array-v0.23.6...config-array-v0.23.7) (2026-11-20)
+
+
+### Performance Improvements
+
+* merge matching config objects in a single pass ([#546](https://github.com/eslint/rewrite/issues/546)) ([2438fe7](https://github.com/eslint/rewrite/commit/2438fe7e85f1defbbcb7095620d102394bc3f1e4))
+
 ## [0.23.6](https://github.com/eslint/rewrite/compare/config-array-v0.23.5...config-array-v0.23.6) (2026-11-13)
 
 
