@@ -2607,6 +2607,102 @@ describe("ConfigArray", () => {
 					);
 				});
 			});
+
+			describe("multiple matching config objects", () => {
+				it("should merge and validate each matching config object once", () => {
+					let mergeCount = 0;
+					const validatedValues = [];
+					const configsToTest = new ConfigArray(
+						[
+							{ files: ["**/*.js"], defs: { a: 1 } },
+							{ files: ["**/*.css"], defs: { css: true } },
+							{ defs: { b: 2 } },
+							{ name: "no-defs" },
+							{ files: ["**/*.js"], defs: { c: 3 } },
+						],
+						{
+							basePath,
+							schema: {
+								defs: {
+									merge(a, b) {
+										mergeCount++;
+										return { ...a, ...b };
+									},
+									validate(value) {
+										validatedValues.push(value);
+									},
+								},
+							},
+						},
+					);
+
+					configsToTest.normalizeSync();
+
+					assert.deepStrictEqual(configsToTest.getConfig("foo.js"), {
+						defs: { a: 1, b: 2, c: 3 },
+					});
+					assert.strictEqual(mergeCount, 4);
+					assert.deepStrictEqual(validatedValues, [
+						{ a: 1 },
+						{ b: 2 },
+						{ c: 3 },
+					]);
+				});
+
+				it("should throw an error naming the config object when defs doesn't pass validation", () => {
+					const configsToTest = new ConfigArray(
+						[
+							{ files: ["**/*.js"], defs: { a: 1 } },
+							{ files: ["**/*.css"], defs: { css: true } },
+							{ defs: { b: 2 } },
+							{ defs: "foo", name: "foo" },
+							{ defs: "bar", name: "bar" },
+						],
+						{ basePath, schema },
+					);
+
+					configsToTest.normalizeSync();
+
+					assert.throws(() => {
+						configsToTest.getConfig("foo.js");
+					}, /Config "foo": Key "defs": Object expected./u);
+				});
+
+				it("should throw an error naming the config object when merge() throws", () => {
+					const configsToTest = new ConfigArray(
+						[
+							{ files: ["**/*.js"], defs: { a: 1 } },
+							{ defs: { b: 1 } },
+							{ defs: { a: 2 }, name: "foo" },
+							{ defs: { b: 2 } },
+						],
+						{
+							basePath,
+							schema: {
+								defs: {
+									merge(a = {}, b = {}) {
+										for (const key of Object.keys(b)) {
+											if (key in a && a[key] !== b[key]) {
+												throw new Error(
+													`Cannot redefine "${key}".`,
+												);
+											}
+										}
+										return { ...a, ...b };
+									},
+									validate: "object",
+								},
+							},
+						},
+					);
+
+					configsToTest.normalizeSync();
+
+					assert.throws(() => {
+						configsToTest.getConfig("foo.js");
+					}, /Config "foo": Key "defs": Cannot redefine "a"./u);
+				});
+			});
 		});
 
 		describe("getConfigStatus()", () => {
