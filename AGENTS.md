@@ -18,7 +18,7 @@ ESLint's [AI Usage Policy](https://github.com/eslint/eslint/blob/main/docs/src/c
 
     **Created by AI (Claude Opus 5).**
 
-This applies to every AI-authored submission without exception, including follow-up comments on an existing thread. Note two related policy points: AI-generated PRs are only considered for issues labeled `accepted`, and maintainer feedback is expected to be answered by a human rather than fed back into an AI.
+This applies to every AI-authored submission without exception, including follow-up comments on an existing thread. Note three related policy points: AI-generated PRs are only considered for issues labeled `accepted`; a human must [thoroughly review and test](https://github.com/eslint/eslint/blob/main/docs/src/contribute/ai-policy.md#human-responsibility) AI-generated code before the PR is submitted; and maintainer feedback is expected to be answered by a human rather than fed back into an AI.
 
 ## Repository Guidance
 
@@ -27,7 +27,7 @@ This applies to every AI-authored submission without exception, including follow
 - `npm run build` builds the packages. Build before running `npm run lint`, as described in `CONTRIBUTING.md`.
 - `npm test` runs the package test scripts; `npm run test:unit` runs their unit tests, and `npm run test:types` checks types. For a focused check, use a package's scripts with `npm run <script> --workspace <package-name>`.
 - The package list in the root README is generated; do not edit it manually.
-- PR titles and commit messages must follow [Conventional Commits](https://www.conventionalcommits.org/).
+- PR titles and commit messages must follow ESLint's [commit message format](https://eslint.org/docs/latest/contribute/pull-requests#step2), which is based on [Conventional Commits](https://www.conventionalcommits.org/) but does not support scopes. Write `fix: ...`, not `fix(core): ...`.
 
 ## Writing Pull Request Descriptions
 
