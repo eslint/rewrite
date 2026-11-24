@@ -230,13 +230,13 @@ const testLanguage2: Language<{
 	},
 
 	validateLanguageOptions(languageOptions) {
-		languageOptions.howMuch satisfies boolean;
-		languageOptions.howMany satisfies number;
+		languageOptions?.howMuch satisfies boolean | undefined;
+		languageOptions?.howMany satisfies number | undefined;
 	},
 
 	parse(file, context): ParseResult<TestRootNode> {
-		context.languageOptions.howMuch satisfies boolean;
-		context.languageOptions.howMany satisfies number;
+		context?.languageOptions?.howMuch satisfies boolean | undefined;
+		context?.languageOptions?.howMany satisfies number | undefined;
 
 		return {
 			ok: true,
@@ -257,6 +257,12 @@ const testLanguage2: Language<{
 
 testLanguage2.defaultLanguageOptions satisfies
 	{ howMuch: boolean; howMany: number } | undefined;
+
+declare const file: File;
+testLanguage2.validateLanguageOptions();
+testLanguage2.validateLanguageOptions(undefined);
+testLanguage2.parse(file);
+testLanguage2.parse(file, undefined);
 
 //-----------------------------------------------------------------------------
 // Tests for rule-related types
