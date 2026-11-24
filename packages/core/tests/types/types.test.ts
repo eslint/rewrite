@@ -230,15 +230,13 @@ const testLanguage2: Language<{
 	},
 
 	validateLanguageOptions(languageOptions) {
-		languageOptions ??= { howMuch: false, howMany: 0 };
-		languageOptions.howMuch satisfies boolean;
-		languageOptions.howMany satisfies number;
+		languageOptions?.howMuch satisfies boolean | undefined;
+		languageOptions?.howMany satisfies number | undefined;
 	},
 
 	parse(file, context): ParseResult<TestRootNode> {
-		context ??= { languageOptions: { howMuch: false, howMany: 0 } };
-		context.languageOptions.howMuch satisfies boolean;
-		context.languageOptions.howMany satisfies number;
+		context?.languageOptions?.howMuch satisfies boolean | undefined;
+		context?.languageOptions?.howMany satisfies number | undefined;
 
 		return {
 			ok: true,
